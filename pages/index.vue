@@ -13,14 +13,18 @@
               Démarrer
             </button>
           </div>
-          <!-- Colonne Image (Placeholder pour vous) -->
-          <div class="bg-gray-200 h-80 rounded-xl flex items-center justify-center">
-            <span class="text-gray-500">[Insérez votre illustration ici]</span>
+          <div class="rounded-xl overflow-hidden">
+            <img
+                src="~/assets/img/ImageBanner.png"
+                alt="Illustration principale LeekPay"
+                class="w-full h-auto max-h-100 object-contain"
+            />
           </div>
         </div>
 
         <!-- Sous-section : "Dans quels cas utiliser LeekPay ?" -->
         <div class="mt-24 grid md:grid-cols-2 gap-12 items-center">
+          <h1 class="text-2xl font-semibold text-slate-900 mb-8">Dans quels cas utiliser LeekPay ?</h1>
           <!-- Colonne Image (Placeholder pour vous) -->
           <div class="bg-gray-200 h-64 rounded-xl flex items-center justify-center order-2 md:order-1">
             <span class="text-gray-500">[Insérez votre visuel ici]</span>
@@ -28,7 +32,6 @@
           </div>
           <!-- Colonne Texte -->
           <div class="order-1 md:order-2">
-            <h2 class="text-2xl font-semibold text-slate-900 mb-8">Dans quels cas utiliser LeekPay ?</h2>
             <div class="space-y-6">
               <!-- Cas 1 -->
               <div class="bg-white p-6 rounded-lg border border-gray-200">

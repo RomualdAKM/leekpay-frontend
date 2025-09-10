@@ -9,3 +9,21 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    develop:
+      watch:
+        # Synchronise les fichiers source (sauf node_modules) pour un rechargement instantané
+        - action: sync
+          path: ./ # ou ./src si votre code est dans un dossier src
+          target: /usr/src/app
+          ignore:
+            - node_modules/
+            - .nuxt/
+            - dist/
+            - .output/
+
+        # Redémarre le conteneur si package.json ou nuxt.config.* change (dépendances ou config)
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./nuxt.config.ts # ou .js
+          # Si vous avez plusieurs fichiers de config, ajoutez-les ici
