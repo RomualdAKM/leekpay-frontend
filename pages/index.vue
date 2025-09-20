@@ -45,9 +45,11 @@
     <section class="py-12 sm:py-20 px-6 md:px-12 bg-white">
       <div class="container mx-auto">
         <!-- Titre -->
-        <h2 class="text-4xl font-bold text-slate-900 mb-12 text-center">Dans quels cas utiliser LeekPay ?</h2>
+        <h2 class="text-2xl md:text-4xl font-bold text-slate-900 mb-12 text-center">
+          Dans quels cas utiliser LeekPay ?
+        </h2>
 
-        <!-- Barre de tabs (desktop) — largeur adaptée à l'image + texte -->
+        <!-- Barre de tabs (desktop) -->
         <div class="hidden md:block mb-8">
           <div class="bg-gray-100 rounded-lg p-1 flex justify-center border-b border-gray-200">
             <div class="flex space-x-4">
@@ -56,11 +58,11 @@
                   :key="index"
                   @click="activeTab = index"
                   :class="[
-              'px-6 py-3 font-medium text-sm transition whitespace-nowrap',
-              activeTab === index
-                ? 'text-green-500 border-b-2 border-green-500'
-                : 'text-gray-600 hover:text-gray-800'
-            ]"
+                'px-6 py-3 font-medium text-sm transition whitespace-nowrap',
+                activeTab === index
+                  ? 'text-green-500 border-b-2 border-green-500'
+                  : 'text-gray-600 hover:text-gray-800'
+              ]"
               >
                 {{ tab.title }}
               </button>
@@ -69,26 +71,36 @@
         </div>
 
         <!-- Icônes (mobile) -->
-        <div class="md:hidden flex justify-center gap-4 mb-8">
-          <button
+        <div class="md:hidden flex justify-center gap-4 mb-8 relative">
+          <div
               v-for="(tab, index) in tabs"
               :key="index"
-              @click="activeTab = index"
-              class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white"
+              class="flex flex-col items-center"
           >
-            <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
-            </svg>
-            <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
-            </svg>
-            <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            </svg>
-          </button>
+            <button
+                @click="activeTab = index"
+                class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white
+               hover:bg-green-600 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-green-400"
+            >
+              <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.5 3.5-6.5 3.5V14z" />
+              </svg>
+              <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
+              </svg>
+              <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v3.5A2.5 2.5 0 0118 14a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 016 14a2.5 2.5 0 01-2.5-2.5V9a2 2 0 012-2h8z" />
+              </svg>
+            </button>
+            <!-- Trait sous l'icône -->
+            <div
+                class="mt-2 w-8 h-1 rounded-full transition-all duration-300"
+                :class="activeTab === index ? 'bg-green-500 opacity-100' : 'bg-transparent opacity-0'"
+            ></div>
+          </div>
         </div>
 
         <!-- Conteneur centré pour le contenu -->
@@ -100,30 +112,30 @@
                 v-if="activeTab === 0"
                 src="~/assets/img/formations.png"
                 alt="Formations & consultations"
-                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500"
+                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 1"
                 src="~/assets/img/formations.png"
                 alt="Ventes en ligne"
-                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500"
+                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 2"
                 src="~/assets/img/formations.png"
                 alt="Associations & dons"
-                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500"
+                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 3"
                 src="~/assets/img/formations.png"
                 alt="Services & prestations"
-                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500"
+                class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
 
             <!-- Texte -->
-            <div class="space-y-6">
-              <h3 class="text-3xl font-bold text-slate-900">
+            <div class="space-y-6 order-1 md:order-2">
+              <h3 class="text-2xl font-bold" style="color: #2ECC71">
                 {{ tabs[activeTab].title }}
               </h3>
               <p class="text-xl text-gray-700 leading-relaxed">
@@ -236,32 +248,30 @@
     <!-- Fonctionnalités -->
     <section class="py-12 sm:py-20 px-6 md:px-12 bg-white">
       <div class="container mx-auto">
-        <!-- Titre principal avec mascotte -->
-        <div class="flex flex-col md:flex-row md:items-center justify-center gap-4 mb-16">
-          <h2 class="text-3xl font-bold text-slate-900 leading-tight text-center md:text-left">
+        <!-- Titre principal avec mise en valeur et mascotte -->
+        <div class="flex flex-col items-center md:flex-row md:items-center md:justify-center gap-4 mb-16 text-center md:text-left">
+          <h2 class="text-3xl font-bold text-slate-900 leading-tight">
             De la création du lien au retrait de vos fonds,
           </h2>
-          <span class="bg-orange-500 text-white px-4 py-2 rounded-md font-medium text-lg whitespace-nowrap">
-        tout devient facile.
-      </span>
+          <em class="text-orange-500 font-medium text-2xl not-italic relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-16 after:h-0.5 after:bg-orange-300">
+            tout devient facile.
+          </em>
           <img
               src="~/assets/img/Mascotte_LeekPay.png"
               alt="Mascotte LeekPay"
-              class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full shadow-md"
+              class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full shadow-md mt-2 md:mt-0"
           />
         </div>
 
         <!-- Wrapper global -->
         <div class="space-y-20">
-          <!-- Fonctionnalité 1 -->
+          <!-- Fonctionnalité 1 : image à gauche -->
           <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
-            <div class="rounded-xl overflow-hidden">
-              <img
-                  src="~/assets/img/creer_partage_partout.png"
-                  alt="Création de liens"
-                  class="w-auto h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md mx-auto border-4 border-green-100"
-              />
-            </div>
+            <img
+                src="~/assets/img/creer_partage_partout.png"
+                alt="Création de liens"
+                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md ml-auto border-4 border-green-100"
+            />
             <div>
               <div class="flex items-center mb-4">
                 <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
@@ -276,7 +286,7 @@
             </div>
           </div>
 
-          <!-- Fonctionnalité 2 -->
+          <!-- Fonctionnalité 2 : image à droite -->
           <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
             <div>
               <div class="flex items-center mb-4">
@@ -287,24 +297,20 @@
                 Retirez vos fonds facilement via Mobile Money ou carte bancaire, avec historique détaillé et confirmation instantanée.
               </p>
             </div>
-            <div class="rounded-xl overflow-hidden">
-              <img
-                  src="~/assets/img/retrait_rapide_flexible.png"
-                  alt="Retraits rapides"
-                  class="w-auto h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md mx-auto border-4 border-green-100"
-              />
-            </div>
+            <img
+                src="~/assets/img/retrait_rapide_flexible.png"
+                alt="Retraits rapides"
+                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md mr-auto border-4 border-green-100"
+            />
           </div>
 
-          <!-- Fonctionnalité 3 -->
+          <!-- Fonctionnalité 3 : image à gauche -->
           <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
-            <div class="rounded-xl overflow-hidden">
-              <img
-                  src="~/assets/img/suivi_gestion.png"
-                  alt="Suivi en temps réel"
-                  class="w-auto h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md mx-auto border-4 border-green-100"
-              />
-            </div>
+            <img
+                src="~/assets/img/suivi_gestion.png"
+                alt="Suivi en temps réel"
+                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md ml-auto border-4 border-green-100"
+            />
             <div>
               <div class="flex items-center mb-4">
                 <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
@@ -353,7 +359,7 @@
               <img
                   src="~/assets/img/how_creer.png"
                   alt="Étape 1"
-                  class="w-full h-auto object-cover border-4 border-green-100 rounded-xl"
+                  class="w-4/5 h-auto mx-auto object-cover border-4 border-green-100 rounded-xl"
               />
             </div>
           </div>
@@ -378,7 +384,7 @@
               <img
                   src="~/assets/img/how_partager.png"
                   alt="Étape 2"
-                  class="w-full h-auto object-cover border-4 border-green-100 rounded-xl"
+                  class="w-4/5 h-auto mx-auto object-cover border-4 border-green-100 rounded-xl"
               />
             </div>
           </div>
@@ -403,7 +409,7 @@
               <img
                   src="~/assets/img/how_encaisser.png"
                   alt="Étape 3"
-                  class="w-full h-auto object-cover border-4 border-green-100 rounded-xl"
+                  class="w-4/5 h-auto mx-auto object-cover border-4 border-green-100 rounded-xl"
               />
             </div>
           </div>
