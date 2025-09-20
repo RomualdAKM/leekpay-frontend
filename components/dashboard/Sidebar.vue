@@ -2,14 +2,20 @@
 <template>
   <div class="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-200">
+    <div class="p-5 sm:p-6 border-b border-gray-200">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #2ECC71">
-          <HomeIcon class="w-6 h-6 text-white" />
+        <!-- Logo (image ou SVG) -->
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center" >
+          <img
+              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png"
+              alt="LeekPay Logo"
+          />
         </div>
+
+        <!-- Texte -->
         <div>
-          <h1 class="font-semibold" style="color: #0A1F44">PayLink Pro</h1>
-          <p class="text-sm text-gray-500">Générateur de liens</p>
+          <h1 class="font-bold text-lg" style="color: #0A1F44">LeekPay</h1>
+          <p class="text-xs sm:text-sm text-gray-500">Générateur de liens</p>
         </div>
       </div>
     </div>

@@ -1,15 +1,14 @@
-<!-- pages/dashboard/transactions.vue -->
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold mb-2" style="color: #0A1F44">Transactions</h1>
-        <p class="text-gray-600">Historique de tous vos paiements</p>
+        <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Transactions</h1>
+        <p class="text-gray-600 text-sm sm:text-base">Historique de tous vos paiements</p>
       </div>
       <Button
           variant="outline"
-          class="gap-2 w-full md:w-auto"
+          class="gap-2 w-full md:w-auto py-2 text-sm"
       >
         <DownloadIcon class="w-4 h-4" />
         Exporter
@@ -17,57 +16,57 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card class="p-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
             <DollarSignIcon class="w-5 h-5" style="color: #2ECC71" />
           </div>
           <div>
-            <p class="text-sm text-gray-600">Revenus totaux</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Revenus totaux</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ totalRevenue.toLocaleString() }}€
             </p>
           </div>
         </div>
       </Card>
 
-      <Card class="p-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-            <span class="text-green-600 font-semibold">✓</span>
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-green-600 font-semibold text-sm">✓</span>
           </div>
           <div>
-            <p class="text-sm text-gray-600">Payées</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Payées</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ completedCount }}
             </p>
           </div>
         </div>
       </Card>
 
-      <Card class="p-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-            <span class="text-yellow-600 font-semibold">⏳</span>
+          <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-yellow-600 font-semibold text-sm">⏳</span>
           </div>
           <div>
-            <p class="text-sm text-gray-600">En attente</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">En attente</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ pendingCount }}
             </p>
           </div>
         </div>
       </Card>
 
-      <Card class="p-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-            <span class="text-red-600 font-semibold">✗</span>
+          <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+            <span class="text-red-600 font-semibold text-sm">✗</span>
           </div>
           <div>
-            <p class="text-sm text-gray-600">Échouées</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Échouées</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ failedCount }}
             </p>
           </div>
@@ -76,22 +75,22 @@
     </div>
 
     <!-- Filters -->
-    <Card class="p-4">
-      <div class="flex flex-col sm:flex-row flex-wrap gap-4">
-        <div class="flex-1 min-w-64">
+    <Card class="p-3 sm:p-4">
+      <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
+        <div class="flex-1 min-w-0">
           <div class="relative">
             <SearchIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <Input
-                placeholder="Rechercher par ID, email ou lien..."
+                placeholder="Rechercher..."
                 v-model="searchTerm"
-                class="pl-10 w-full"
+                class="pl-10 w-full text-sm py-2"
             />
           </div>
         </div>
 
         <select
             v-model="statusFilter"
-            class="px-3 py-2 border rounded-md bg-white min-w-48"
+            class="px-3 py-2 border rounded-md bg-white text-sm min-w-36 sm:min-w-48"
         >
           <option value="all">Tous les statuts</option>
           <option value="completed">Payé</option>
@@ -101,7 +100,7 @@
 
         <select
             v-model="methodFilter"
-            class="px-3 py-2 border rounded-md bg-white min-w-48"
+            class="px-3 py-2 border rounded-md bg-white text-sm min-w-36 sm:min-w-48"
         >
           <option value="all">Tous les moyens</option>
           <option value="Carte bancaire">Carte bancaire</option>
@@ -113,79 +112,142 @@
       </div>
     </Card>
 
-    <!-- Transactions List -->
-    <Card>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead>
-          <tr class="border-b">
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Transaction</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Lien</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Client</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Montant</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Moyen</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Date</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Statut</th>
-            <th class="text-left p-4 font-medium" style="color: #0A1F44">Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr
-              v-for="transaction in filteredTransactions"
-              :key="transaction.id"
-              class="border-b hover:bg-gray-50"
-          >
-            <td class="p-4">
-              <div>
-                <p class="font-medium" style="color: #0A1F44">{{ transaction.id }}</p>
-                <p class="text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
+    <!-- Desktop: Table -->
+    <div v-if="!isMobile" class="hidden md:block">
+      <Card>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+            <tr class="border-b">
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Transaction</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Lien</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Client</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Montant</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Moyen</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Date</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Statut</th>
+              <th class="text-left p-3 sm:p-4 font-medium text-xs sm:text-sm" style="color: #0A1F44">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                v-for="transaction in filteredTransactions"
+                :key="transaction.id"
+                class="border-b hover:bg-gray-50"
+            >
+              <td class="p-3 sm:p-4">
+                <div>
+                  <p class="font-medium text-xs sm:text-sm" style="color: #0A1F44">{{ transaction.id }}</p>
+                  <p class="text-xs text-gray-500">{{ formatDate(transaction.date) }}</p>
+                </div>
+              </td>
+              <td class="p-3 sm:p-4">
+                <div>
+                  <p class="font-medium text-xs sm:text-sm">{{ transaction.linkTitle }}</p>
+                  <p class="text-xs text-gray-500">paylink.pro/{{ transaction.linkId }}</p>
+                </div>
+              </td>
+              <td class="p-3 sm:p-4">
+                <p class="text-xs sm:text-sm">{{ transaction.customerEmail }}</p>
+              </td>
+              <td class="p-3 sm:p-4">
+                <p class="font-semibold text-sm" style="color: #2ECC71">
+                  {{ transaction.amount.toLocaleString() }} {{ transaction.currency }}
+                </p>
+              </td>
+              <td class="p-3 sm:p-4">
+                <div class="flex items-center gap-1">
+                  <component :is="getPaymentMethodIcon(transaction.paymentMethod)" class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                  <span class="text-xs sm:text-sm">{{ transaction.paymentMethod }}</span>
+                </div>
+              </td>
+              <td class="p-3 sm:p-4">
+                <div class="flex items-center gap-1 text-xs text-gray-500">
+                  <CalendarIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                  {{ formatDate(transaction.date) }}
+                </div>
+              </td>
+              <td class="p-3 sm:p-4">
+                <Badge :class="getStatusBadgeClass(transaction.status)" class="text-xs py-0.5 px-2">
+                  {{ getStatusBadgeText(transaction.status) }}
+                </Badge>
+              </td>
+              <td class="p-3 sm:p-4">
+                <Button variant="ghost" size="sm" class="gap-1 py-1 px-2 text-xs">
+                  <ExternalLinkIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                  Détails
+                </Button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+
+    <!-- Mobile: Cards -->
+    <div v-else class="space-y-4 md:hidden">
+      <Card
+          v-for="transaction in filteredTransactions"
+          :key="transaction.id"
+          class="p-3 sm:p-4"
+      >
+        <div class="space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="font-medium text-sm" style="color: #0A1F44">{{ transaction.id }}</p>
+              <p class="text-xs text-gray-500">{{ formatDate(transaction.date) }}</p>
+            </div>
+            <Badge :class="getStatusBadgeClass(transaction.status)" class="text-xs py-0.5 px-2">
+              {{ getStatusBadgeText(transaction.status) }}
+            </Badge>
+          </div>
+
+          <div>
+            <p class="text-xs text-gray-600">Lien</p>
+            <p class="font-medium text-sm">{{ transaction.linkTitle }}</p>
+            <p class="text-xs text-gray-500">paylink.pro/{{ transaction.linkId }}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <div>
+              <p class="text-xs text-gray-600">Client</p>
+              <p>{{ transaction.customerEmail }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-600">Moyen</p>
+              <div class="flex items-center gap-1">
+                <component :is="getPaymentMethodIcon(transaction.paymentMethod)" class="w-3.5 h-3.5" />
+                <span>{{ transaction.paymentMethod }}</span>
               </div>
-            </td>
-            <td class="p-4">
-              <div>
-                <p class="font-medium text-sm">{{ transaction.linkTitle }}</p>
-                <p class="text-xs text-gray-500">paylink.pro/{{ transaction.linkId }}</p>
-              </div>
-            </td>
-            <td class="p-4">
-              <p class="text-sm">{{ transaction.customerEmail }}</p>
-            </td>
-            <td class="p-4">
-              <p class="font-semibold" style="color: #2ECC71">
+            </div>
+            <div>
+              <p class="text-xs text-gray-600">Montant</p>
+              <p class="font-semibold" :style="{ color: '#2ECC71' }">
                 {{ transaction.amount.toLocaleString() }} {{ transaction.currency }}
               </p>
-            </td>
-            <td class="p-4">
-              <div class="flex items-center gap-2">
-                <component :is="getPaymentMethodIcon(transaction.paymentMethod)" class="w-4 h-4" />
-                <span class="text-sm">{{ transaction.paymentMethod }}</span>
+            </div>
+            <div>
+              <p class="text-xs text-gray-600">Date</p>
+              <div class="flex items-center gap-1 text-gray-500">
+                <CalendarIcon class="w-3.5 h-3.5" />
+                <span>{{ formatDate(transaction.date) }}</span>
               </div>
-            </td>
-            <td class="p-4">
-              <div class="flex items-center gap-1 text-sm text-gray-500">
-                <CalendarIcon class="w-4 h-4" />
-                {{ formatDate(transaction.date) }}
-              </div>
-            </td>
-            <td class="p-4">
-              <Badge :class="getStatusBadgeClass(transaction.status)">
-                {{ getStatusBadgeText(transaction.status) }}
-              </Badge>
-            </td>
-            <td class="p-4">
-              <Button variant="ghost" size="sm" class="gap-1">
-                <ExternalLinkIcon class="w-4 h-4" />
-                Détails
-              </Button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-    </Card>
+            </div>
+          </div>
 
-    <div v-if="filteredTransactions.length === 0" class="text-center py-12">
-      <p class="text-gray-500">Aucune transaction trouvée</p>
+          <div class="pt-2">
+            <Button variant="ghost" size="sm" class="gap-1 py-1 px-2 text-xs w-full">
+              <ExternalLinkIcon class="w-3.5 h-3.5" />
+              Voir détails
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </div>
+
+    <div v-if="filteredTransactions.length === 0" class="text-center py-8 sm:py-12">
+      <p class="text-gray-500 text-sm sm:text-base">Aucune transaction trouvée</p>
     </div>
   </div>
 </template>
@@ -208,6 +270,20 @@ import Input from "~/components/ui/Input.vue";
 
 definePageMeta({
   layout: 'dashboard'
+})
+
+// Responsive breakpoint
+const isMobile = ref(false)
+const checkScreen = () => {
+  isMobile.value = window.innerWidth < 768
+}
+onMounted(() => {
+  checkScreen()
+  window.addEventListener('resize', checkScreen)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', checkScreen)
 })
 
 const searchTerm = ref('')

@@ -1,15 +1,14 @@
-<!-- pages/dashboard/links.vue -->
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold mb-2" style="color: #0A1F44">Mes Liens de Paiement</h1>
-        <p class="text-gray-600">Gérez tous vos liens de paiement</p>
+        <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Mes Liens de Paiement</h1>
+        <p class="text-gray-600 text-sm sm:text-base">Gérez tous vos liens de paiement</p>
       </div>
       <Button
           @click="navigateToCreateLink"
-          class="gap-2 w-full md:w-auto"
+          class="gap-2 w-full md:w-auto py-2 text-sm sm:text-base"
           :style="{ backgroundColor: '#2ECC71', color: 'white' }"
       >
         <Link2Icon class="w-4 h-4" />
@@ -18,43 +17,43 @@
     </div>
 
     <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <Card class="p-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
             <Link2Icon class="w-5 h-5" style="color: #0A1F44" />
           </div>
           <div>
-            <p class="text-sm text-gray-600">Total des liens</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Total des liens</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ mockLinks.length }}
             </p>
           </div>
         </div>
       </Card>
 
-      <Card class="p-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
             <EyeIcon class="w-5 h-5" style="color: #2ECC71" />
           </div>
           <div>
-            <p class="text-sm text-gray-600">Total des clics</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Total des clics</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ mockLinks.reduce((sum, link) => sum + link.clicks, 0) }}
             </p>
           </div>
         </div>
       </Card>
 
-      <Card class="p-4">
+      <Card class="p-3 sm:p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
             <DollarSignIcon class="w-5 h-5" style="color: #F39C12" />
           </div>
           <div>
-            <p class="text-sm text-gray-600">Total collecté</p>
-            <p class="text-xl font-semibold" style="color: #0A1F44">
+            <p class="text-xs sm:text-sm text-gray-600">Total collecté</p>
+            <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
               {{ mockLinks.reduce((sum, link) => sum + link.totalCollected, 0).toLocaleString() }}€
             </p>
           </div>
@@ -63,7 +62,7 @@
     </div>
 
     <!-- Links Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       <Card
           v-for="link in mockLinks"
           :key="link.id"
@@ -73,37 +72,36 @@
           <ImageWithFallback
               :src="link.image"
               :alt="link.title"
-              class="w-full aspect-[4/3] min-h-32 max-h-64 object-cover"
+              class="w-full aspect-[4/3] min-h-24 sm:min-h-32 max-h-64 object-cover"
           />
-          <div class="absolute top-4 right-4">
+          <div class="absolute top-3 sm:top-4 right-3 sm:right-4">
             <component :is="getStatusBadge(link.status)" />
           </div>
-
         </div>
 
-        <div class="p-6 space-y-4">
+        <div class="p-4 sm:p-6 space-y-3 sm:space-y-4">
           <div>
-            <h3 class="font-semibold text-lg mb-2" style="color: #0A1F44">
+            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2" style="color: #0A1F44">
               {{ link.title }}
             </h3>
-            <p class="text-sm text-gray-600 line-clamp-2">
+            <p class="text-xs sm:text-sm text-gray-600 line-clamp-2">
               {{ link.description }}
             </p>
           </div>
 
-          <div class="flex items-center justify-between text-sm text-gray-500">
+          <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500">
             <div class="flex items-center gap-1">
-              <EyeIcon class="w-4 h-4" />
+              <EyeIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               {{ link.clicks }} clics
             </div>
             <div class="flex items-center gap-1">
-              <DollarSignIcon class="w-4 h-4" />
+              <DollarSignIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
               {{ link.totalCollected.toLocaleString() }}€
             </div>
           </div>
 
-          <div class="pt-4 border-t border-gray-100">
-            <div class="text-sm text-gray-600 mb-3">
+          <div class="pt-3 sm:pt-4 border-t border-gray-100">
+            <div class="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
               <p class="mb-1">URL: paylink.pro/{{ link.url }}</p>
               <p v-if="link.amount > 0">
                 Montant: {{ link.amount }}{{ link.currency }}
@@ -111,23 +109,23 @@
               <p v-else>Montant: Libre</p>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-2 mb-2">
+            <div class="flex flex-col sm:flex-row gap-2 mb-3">
               <Button
                   variant="outline"
                   size="sm"
                   @click="copyToClipboard(link.url)"
-                  class="flex-1"
+                  class="flex-1 text-xs py-1.5"
               >
-                <CopyIcon class="w-4 h-4 mr-1" />
+                <CopyIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
                 Copier
               </Button>
 
               <Button
                   variant="outline"
                   size="sm"
-                  class="flex-1"
+                  class="flex-1 text-xs py-1.5"
               >
-                <QrCodeIcon class="w-4 h-4 mr-1" />
+                <QrCodeIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
                 QR Code
               </Button>
             </div>
@@ -136,18 +134,18 @@
               <Button
                   variant="outline"
                   size="sm"
-                  class="flex-1"
+                  class="flex-1 text-xs py-1.5"
               >
-                <EditIcon class="w-4 h-4 mr-1" />
+                <EditIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
                 Modifier
               </Button>
 
               <Button
                   variant="outline"
                   size="sm"
-                  class="flex-1"
+                  class="flex-1 text-xs py-1.5"
               >
-                <ExternalLinkIcon class="w-4 h-4 mr-1" />
+                <ExternalLinkIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
                 Voir
               </Button>
             </div>
@@ -247,11 +245,11 @@ const mockLinks = [
 const getStatusBadge = (status) => {
   switch (status) {
     case 'active':
-      return h('span', { class: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700' }, 'Actif')
+      return h('span', { class: 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700' }, 'Actif')
     case 'expired':
-      return h('span', { class: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700' }, 'Expiré')
+      return h('span', { class: 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700' }, 'Expiré')
     default:
-      return h('span', { class: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700' }, 'Inconnu')
+      return h('span', { class: 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700' }, 'Inconnu')
   }
 }
 

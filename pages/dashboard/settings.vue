@@ -1,337 +1,356 @@
+<style scoped>
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
+
 <template>
-  <div class="p-6 space-y-6">
+  <div class="p-4 sm:p-6 space-y-6">
     <!-- Header -->
     <div>
-      <h1 class="text-2xl font-bold" style="color: #0A1F44">Paramètres</h1>
-      <p class="text-gray-600">Gérez votre compte et configurez vos préférences</p>
+      <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Paramètres</h1>
+      <p class="text-gray-600 text-sm sm:text-base">Gérez votre compte et configurez vos préférences</p>
     </div>
 
     <!-- Tabs -->
     <Tabs v-model="activeTab" defaultValue="profile" class="space-y-6">
-      <TabsList class="grid w-full grid-cols-5">
-        <TabsTrigger value="profile">Profil</TabsTrigger>
-        <TabsTrigger value="payment">Paiements</TabsTrigger>
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        <TabsTrigger value="security">Sécurité</TabsTrigger>
-        <TabsTrigger value="appearance">Apparence</TabsTrigger>
+      <TabsList class="flex border-b border-gray-200 overflow-x-auto whitespace-nowrap hide-scrollbar">
+        <TabsTrigger
+            v-for="tab in tabs"
+            :key="tab.value"
+            :value="tab.value"
+            class="px-4 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap"
+            :class="{
+              'border-b-2 border-green-500 text-green-700': activeTab === tab.value,
+              'border-transparent text-gray-700 hover:text-gray-900': activeTab !== tab.value
+            }"
+        >
+          {{ tab.label }}
+        </TabsTrigger>
       </TabsList>
 
       <!-- Profil -->
       <TabsContent value="profile" class="space-y-6">
         <!-- Informations personnelles -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <User class="w-5 h-5" />
-              Informations personnelles
-            </CardTitle>
-            <CardDescription>
-              Gérez vos informations de profil et de contact
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <User class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Informations personnelles</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Gérez vos informations de profil et de contact</p>
+
+          <div class="space-y-3">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="space-y-2">
-                <Label for="firstName">Prénom</Label>
-                <Input id="firstName" v-model="profile.firstName" />
+                <Label for="firstName" class="text-xs sm:text-sm">Prénom</Label>
+                <Input id="firstName" v-model="profile.firstName" class="text-sm py-2" />
               </div>
               <div class="space-y-2">
-                <Label for="lastName">Nom</Label>
-                <Input id="lastName" v-model="profile.lastName" />
+                <Label for="lastName" class="text-xs sm:text-sm">Nom</Label>
+                <Input id="lastName" v-model="profile.lastName" class="text-sm py-2" />
               </div>
             </div>
+
             <div class="space-y-2">
-              <Label for="email">Email</Label>
-              <Input id="email" type="email" v-model="profile.email" />
+              <Label for="email" class="text-xs sm:text-sm">Email</Label>
+              <Input id="email" type="email" v-model="profile.email" class="text-sm py-2" />
             </div>
+
             <div class="space-y-2">
-              <Label for="phone">Téléphone</Label>
-              <Input id="phone" type="tel" v-model="profile.phone" />
+              <Label for="phone" class="text-xs sm:text-sm">Téléphone</Label>
+              <Input id="phone" type="tel" v-model="profile.phone" class="text-sm py-2" />
             </div>
+
             <div class="space-y-2">
-              <Label for="company">Entreprise</Label>
-              <Input id="company" v-model="profile.company" />
+              <Label for="company" class="text-xs sm:text-sm">Entreprise</Label>
+              <Input id="company" v-model="profile.company" class="text-sm py-2" />
             </div>
+
             <div class="space-y-2">
-              <Label for="bio">Biographie</Label>
+              <Label for="bio" class="text-xs sm:text-sm">Biographie</Label>
               <Textarea
                   id="bio"
                   v-model="profile.bio"
                   placeholder="Parlez-nous un peu de vous..."
+                  class="text-sm py-2"
               />
             </div>
-            <Button @click="saveProfile">Sauvegarder</Button>
-          </CardContent>
+
+            <Button @click="saveProfile" class="gap-2 py-2 text-sm" style="background-color: #2ECC71; color: white">
+              Sauvegarder
+            </Button>
+          </div>
         </Card>
 
         <!-- Préférences régionales -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Globe class="w-5 h-5" />
-              Préférences régionales
-            </CardTitle>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label>Langue</Label>
-                <Select v-model="preferences.language">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez une langue" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fr">Français</SelectItem>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Español</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div class="space-y-2">
-                <Label>Fuseau horaire</Label>
-                <Select v-model="preferences.timezone">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez un fuseau" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="europe/paris">Europe/Paris</SelectItem>
-                    <SelectItem value="africa/abidjan">Africa/Abidjan</SelectItem>
-                    <SelectItem value="america/new_york">America/New_York</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <Globe class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Préférences régionales</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4"></p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <Label class="text-xs sm:text-sm">Langue</Label>
+              <Select
+                  v-model="preferences.language"
+                  :options="[
+                    { value: 'fr', label: 'Français' },
+                    { value: 'en', label: 'English' },
+                    { value: 'es', label: 'Español' }
+                  ]"
+                  placeholder="Sélectionnez une langue"
+                  class="text-sm py-2"
+              />
             </div>
-            <Button @click="savePreferences">Sauvegarder</Button>
-          </CardContent>
+
+            <div class="space-y-2">
+              <Label class="text-xs sm:text-sm">Fuseau horaire</Label>
+              <Select
+                  v-model="preferences.timezone"
+                  :options="[
+                    { value: 'europe/paris', label: 'Europe/Paris' },
+                    { value: 'africa/abidjan', label: 'Africa/Abidjan' },
+                    { value: 'america/new_york', label: 'America/New_York' }
+                  ]"
+                  placeholder="Sélectionnez un fuseau"
+                  class="text-sm py-2"
+              />
+            </div>
+          </div>
+
+          <Button @click="savePreferences" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
+            Sauvegarder
+          </Button>
         </Card>
       </TabsContent>
 
       <!-- Paiements -->
       <TabsContent value="payment" class="space-y-6">
         <!-- Méthodes de paiement -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <CreditCard class="w-5 h-5" />
-              Méthodes de paiement
-            </CardTitle>
-            <CardDescription>
-              Configurez les moyens de paiement acceptés
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <CreditCard class="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p class="font-medium">Cartes bancaires</p>
-                    <p class="text-sm text-gray-500">Visa, Mastercard, American Express</p>
-                  </div>
-                </div>
-                <Switch v-model="paymentMethods.card" />
-              </div>
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <CreditCard class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Méthodes de paiement</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Configurez les moyens de paiement acceptés</p>
 
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <Smartphone class="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p class="font-medium">Mobile Money</p>
-                    <p class="text-sm text-gray-500">Orange Money, MTN Money</p>
-                  </div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <CreditCard class="w-5 h-5 text-gray-500" />
+                <div>
+                  <p class="font-medium text-sm">Cartes bancaires</p>
+                  <p class="text-xs text-gray-500">Visa, Mastercard, American Express</p>
                 </div>
-                <Switch v-model="paymentMethods.mobileMoney" />
               </div>
+              <Switch v-model="paymentMethods.card" />
+            </div>
 
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <Mail class="w-5 h-5 text-gray-500" />
-                  <div>
-                    <p class="font-medium">Virement bancaire</p>
-                    <p class="text-sm text-gray-500">Transfert direct</p>
-                  </div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <Smartphone class="w-5 h-5 text-gray-500" />
+                <div>
+                  <p class="font-medium text-sm">Mobile Money</p>
+                  <p class="text-xs text-gray-500">Orange Money, MTN Money</p>
                 </div>
-                <Switch v-model="paymentMethods.bankTransfer" />
               </div>
+              <Switch v-model="paymentMethods.mobileMoney" />
             </div>
-            <Separator />
-            <div class="space-y-2">
-              <Label>Devise par défaut</Label>
-              <Select v-model="paymentPreferences.currency">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="EUR">EUR (€)</SelectItem>
-                  <SelectItem value="USD">USD ($)</SelectItem>
-                  <SelectItem value="XOF">XOF (CFA)</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <Mail class="w-5 h-5 text-gray-500" />
+                <div>
+                  <p class="font-medium text-sm">Virement bancaire</p>
+                  <p class="text-xs text-gray-500">Transfert direct</p>
+                </div>
+              </div>
+              <Switch v-model="paymentMethods.bankTransfer" />
             </div>
-            <Button @click="savePaymentSettings">Sauvegarder</Button>
-          </CardContent>
+          </div>
+
+          <Separator class="my-4" />
+
+          <div class="space-y-2">
+            <Label class="text-xs sm:text-sm">Devise par défaut</Label>
+            <Select
+                v-model="paymentPreferences.currency"
+                :options="[
+                  { value: 'EUR', label: 'EUR (€)' },
+                  { value: 'USD', label: 'USD ($)' },
+                  { value: 'XOF', label: 'XOF (CFA)' }
+                ]"
+                class="text-sm py-2"
+            />
+          </div>
+
+          <Button @click="savePaymentSettings" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
+            Sauvegarder
+          </Button>
         </Card>
 
         <!-- Frais et commissions -->
-        <Card>
-          <CardHeader>
-            <CardTitle>Frais et commissions</CardTitle>
-            <CardDescription>
-              Aperçu des frais appliqués à vos transactions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-3">
-              <div class="flex justify-between">
-                <span>Cartes bancaires</span>
-                <span>2.9% + 0.30€</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Mobile Money</span>
-                <span>1.5% + 0.20€</span>
-              </div>
-              <div class="flex justify-between">
-                <span>Virement bancaire</span>
-                <span>0.8% + 0.50€</span>
-              </div>
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <DollarSignIcon class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Frais et commissions</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Aperçu des frais appliqués à vos transactions</p>
+
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span>Cartes bancaires</span>
+              <span>2.9% + 0.30€</span>
             </div>
-          </CardContent>
+            <div class="flex justify-between text-sm">
+              <span>Mobile Money</span>
+              <span>1.5% + 0.20€</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span>Virement bancaire</span>
+              <span>0.8% + 0.50€</span>
+            </div>
+          </div>
         </Card>
       </TabsContent>
 
       <!-- Notifications -->
       <TabsContent value="notifications" class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Bell class="w-5 h-5" />
-              Notifications
-            </CardTitle>
-            <CardDescription>
-              Choisissez quand et comment recevoir les notifications
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="font-medium">Nouveaux paiements</p>
-                  <p class="text-sm text-gray-500">Recevoir une notification pour chaque paiement reçu</p>
-                </div>
-                <Switch v-model="notifications.newPayments" />
-              </div>
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <Bell class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Notifications</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Choisissez quand et comment recevoir les notifications</p>
 
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="font-medium">Paiements échoués</p>
-                  <p class="text-sm text-gray-500">Être alerté des tentatives de paiement échouées</p>
-                </div>
-                <Switch v-model="notifications.failedPayments" />
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Nouveaux paiements</p>
+                <p class="text-xs text-gray-500">Recevoir une notification pour chaque paiement reçu</p>
               </div>
-
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="font-medium">Rapport hebdomadaire</p>
-                  <p class="text-sm text-gray-500">Recevoir un résumé chaque lundi</p>
-                </div>
-                <Switch v-model="notifications.weeklyReport" />
-              </div>
-
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="font-medium">Notifications marketing</p>
-                  <p class="text-sm text-gray-500">Conseils et nouvelles fonctionnalités</p>
-                </div>
-                <Switch v-model="notifications.marketing" />
-              </div>
+              <Switch v-model="notifications.newPayments" />
             </div>
-            <Button @click="saveNotifications">Sauvegarder</Button>
-          </CardContent>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Paiements échoués</p>
+                <p class="text-xs text-gray-500">Être alerté des tentatives de paiement échouées</p>
+              </div>
+              <Switch v-model="notifications.failedPayments" />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Rapport hebdomadaire</p>
+                <p class="text-xs text-gray-500">Recevoir un résumé chaque lundi</p>
+              </div>
+              <Switch v-model="notifications.weeklyReport" />
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm">Notifications marketing</p>
+                <p class="text-xs text-gray-500">Conseils et nouvelles fonctionnalités</p>
+              </div>
+              <Switch v-model="notifications.marketing" />
+            </div>
+          </div>
+
+          <Button @click="saveNotifications" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
+            Sauvegarder
+          </Button>
         </Card>
       </TabsContent>
 
       <!-- Sécurité -->
       <TabsContent value="security" class="space-y-6">
         <!-- Mot de passe -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Shield class="w-5 h-5" />
-              Sécurité
-            </CardTitle>
-            <CardDescription>
-              Gérez la sécurité de votre compte
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <Shield class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Sécurité</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Gérez la sécurité de votre compte</p>
+
+          <div class="space-y-3">
             <div class="space-y-2">
-              <Label for="current-password">Mot de passe actuel</Label>
-              <Input id="current-password" v-model="security.currentPassword" type="password" />
+              <Label for="current-password" class="text-xs sm:text-sm">Mot de passe actuel</Label>
+              <Input id="current-password" v-model="security.currentPassword" type="password" class="text-sm py-2" />
             </div>
             <div class="space-y-2">
-              <Label for="new-password">Nouveau mot de passe</Label>
-              <Input id="new-password" v-model="security.newPassword" type="password" />
+              <Label for="new-password" class="text-xs sm:text-sm">Nouveau mot de passe</Label>
+              <Input id="new-password" v-model="security.newPassword" type="password" class="text-sm py-2" />
             </div>
             <div class="space-y-2">
-              <Label for="confirm-password">Confirmer le mot de passe</Label>
-              <Input id="confirm-password" v-model="security.confirmPassword" type="password" />
+              <Label for="confirm-password" class="text-xs sm:text-sm">Confirmer le mot de passe</Label>
+              <Input id="confirm-password" v-model="security.confirmPassword" type="password" class="text-sm py-2" />
             </div>
-            <Button @click="changePassword" :disabled="!canChangePassword">Changer le mot de passe</Button>
-          </CardContent>
+            <Button
+                @click="changePassword"
+                :disabled="!canChangePassword"
+                class="gap-2 py-2 text-sm"
+                style="background-color: #2ECC71; color: white"
+            >
+              Changer le mot de passe
+            </Button>
+          </div>
         </Card>
 
         <!-- 2FA -->
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Key class="w-5 h-5" />
-              Authentification à deux facteurs
-            </CardTitle>
-            <CardDescription>
-              Sécurisez votre compte avec l'authentification à deux facteurs
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-medium">Authentification à deux facteurs</p>
-                <p class="text-sm text-gray-500">Utilisez une application d'authentification pour sécuriser votre compte</p>
-              </div>
-              <Switch v-model="security.twoFactorEnabled" />
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <Key class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Authentification à deux facteurs</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Sécurisez votre compte avec l'authentification à deux facteurs</p>
+
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="font-medium text-sm">Authentification à deux facteurs</p>
+              <p class="text-xs text-gray-500">Utilisez une application d'authentification pour sécuriser votre compte</p>
             </div>
-            <Button variant="outline" @click="configure2FA">Configurer 2FA</Button>
-          </CardContent>
+            <Switch v-model="security.twoFactorEnabled" />
+          </div>
+
+          <Button variant="outline" @click="configure2FA" class="gap-2 py-2 text-sm" style="color: #2ECC71; border-color: #2ECC71">
+            Configurer 2FA
+          </Button>
         </Card>
       </TabsContent>
 
       <!-- Apparence -->
       <TabsContent value="appearance" class="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle class="flex items-center gap-2">
-              <Palette class="w-5 h-5" />
-              Apparence
-            </CardTitle>
-            <CardDescription>
-              Personnalisez l'apparence de votre tableau de bord
-            </CardDescription>
-          </CardHeader>
-          <CardContent class="space-y-4">
+        <Card class="border border-gray-200 rounded-lg p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <Palette class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Apparence</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">Personnalisez l'apparence de votre tableau de bord</p>
+
+          <div class="space-y-3">
             <div class="space-y-2">
-              <Label>Thème</Label>
-              <Select v-model="appearance.theme">
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Clair</SelectItem>
-                  <SelectItem value="dark">Sombre</SelectItem>
-                  <SelectItem value="system">Système</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label class="text-xs sm:text-sm">Thème</Label>
+              <Select
+                  v-model="appearance.theme"
+                  :options="[
+                    { value: 'light', label: 'Clair' },
+                    { value: 'dark', label: 'Sombre' },
+                    { value: 'system', label: 'Système' }
+                  ]"
+                  class="text-sm py-2"
+              />
             </div>
+
             <div class="space-y-2">
-              <Label>Couleur d'accent</Label>
+              <Label class="text-xs sm:text-sm">Couleur d'accent</Label>
               <div class="flex gap-2">
                 <button
                     v-for="color in accentColors"
@@ -343,8 +362,11 @@
                 />
               </div>
             </div>
-            <Button @click="saveAppearance">Sauvegarder</Button>
-          </CardContent>
+
+            <Button @click="saveAppearance" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
+              Sauvegarder
+            </Button>
+          </div>
         </Card>
       </TabsContent>
     </Tabs>
@@ -353,7 +375,7 @@
 
 <script setup>
 definePageMeta({
-  layout: 'dashboard' // adapte selon ton layout
+  layout: 'dashboard'
 })
 
 // Import des icônes
@@ -366,37 +388,36 @@ import {
   Globe,
   Mail,
   Key,
-  Smartphone
+  Smartphone,
+  DollarSignIcon,
+  ChevronDownIcon
 } from "lucide-vue-next"
 
-// Import des composants UI (à adapter selon ton chemin)
+// Import des composants UI
 import Card from "~/components/ui/Card.vue"
-import CardHeader from "~/components/ui/CardHeader.vue"
-import CardTitle from "~/components/ui/CardTitle.vue"
-import CardDescription from "~/components/ui/CardDescription.vue"
-import CardContent from "~/components/ui/CardContent.vue"
 import Button from "~/components/ui/Button.vue"
 import Input from "~/components/ui/Input.vue"
 import Label from "~/components/ui/Label.vue"
 import Switch from "~/components/ui/Switch.vue"
 import Textarea from "~/components/ui/Textarea.vue"
-/*import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "~/components/ui/Select.vue"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from "~/components/ui/Tabs.vue"
-import Separator from "~/components/ui/Separator.vue"*/
+import Select from "~/components/ui/Select.vue"
+import Separator from "~/components/ui/Separator.vue"
+import Tabs from "~/components/ui/Tabs.vue"
+import TabsList from "~/components/ui/TabsList.vue"
+import TabsTrigger from "~/components/ui/TabsTrigger.vue"
+import TabsContent from "~/components/ui/TabsContent.vue"
 
 // État réactif
 const activeTab = ref("profile")
+
+// Tabs data
+const tabs = [
+  { value: "profile", label: "Profil" },
+  { value: "payment", label: "Paiements" },
+  { value: "notifications", label: "Notifications" },
+  { value: "security", label: "Sécurité" },
+  { value: "appearance", label: "Apparence" }
+]
 
 // Profil
 const profile = ref({
@@ -458,7 +479,6 @@ const colorMap = {
 // Méthodes
 const saveProfile = () => {
   console.log("Profil sauvegardé :", profile.value)
-  // Appel API ici
 }
 
 const savePreferences = () => {
@@ -479,7 +499,6 @@ const changePassword = () => {
     return
   }
   console.log("Changement de mot de passe demandé")
-  // Appel API ici
 }
 
 const configure2FA = () => {
@@ -488,7 +507,6 @@ const configure2FA = () => {
 
 const saveAppearance = () => {
   console.log("Apparence sauvegardée :", appearance.value)
-  // Tu peux ici stocker dans localStorage ou envoyer au serveur
 }
 
 // Calculé
@@ -496,8 +514,3 @@ const canChangePassword = computed(() => {
   return security.value.currentPassword && security.value.newPassword && security.value.newPassword === security.value.confirmPassword
 })
 </script>
-
-<style scoped>
-/* Optionnel : si tu veux styliser les tabs activés */
-
-</style>
