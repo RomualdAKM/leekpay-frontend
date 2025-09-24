@@ -139,7 +139,8 @@
               </button>
             </div>
           </div>
-          <!-- Bouton de paiement normal (visible sur mobile et desktop) -->
+
+          <!-- Bouton de paiement -->
           <button
               @click="triggerPayment"
               :disabled="isProcessing || isPaymentExpired"
@@ -207,6 +208,8 @@
 </template>
 
 <script setup>
+
+
 definePageMeta({
   layout: false
 })
@@ -228,6 +231,7 @@ const imageError = ref(false)
 const showCountryDropdown = ref(false)
 const selectedCountry = ref(null)
 const showStickyButton = ref(true)
+
 const formData = ref({
   name: '',
   email: '',
@@ -636,9 +640,13 @@ onMounted(() => {
   }
 })
 
+
+
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
   window.removeEventListener('scroll', checkPaymentFormVisibility)
   stopTimer() // Nettoyer le timer pour éviter les fuites mémoire
 })
+
+
 </script>
