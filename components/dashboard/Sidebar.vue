@@ -53,11 +53,25 @@
           <UserIcon class="w-5 h-5 text-gray-600" />
         </div>
         <div>
-          <p class="font-medium" style="color: #0A1F44">John Doe</p>
-          <p class="text-sm text-gray-500">john.doe@email.com</p>
+          <p v-if="user" class="font-medium" style="color: #0A1F44">
+            {{ user.name }}
+          </p>
+          <p v-if="user" class="text-sm text-gray-500">
+            {{ user.email }}
+          </p>
+          <p v-else class="text-sm text-gray-500">Chargement...</p>
         </div>
       </div>
     </div>
+
+    <!-- Bouton Déconnexion -->
+    <button
+        @click="handleLogout"
+        class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 transition-colors text-sm font-medium"
+    >
+      <LogOutIcon class="w-4 h-4" />
+      Déconnexion
+    </button>
   </div>
 </template>
 
@@ -70,6 +84,12 @@ const props = defineProps({
     required: true
   }
 })
+const { user, logout } = useAuth()
+const router = useRouter()
+const handleLogout = async () => {
+  await logout()
+  await router.push('/login')
+}
 
 const emit = defineEmits(['section-change'])
 
@@ -86,5 +106,5 @@ const menuItems = [
 ]
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon  } from 'lucide-vue-next'
 </script>
