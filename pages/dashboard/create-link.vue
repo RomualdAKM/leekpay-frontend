@@ -126,30 +126,36 @@
                   @update:checked="toggleAmountType"
               />
               <span class="text-xs sm:text-sm">
-                {{ formData.amountType === 'free' ? 'Montant libre' : 'Montant fixe' }}
-              </span>
+      {{ formData.amountType === 'free' ? 'Montant libre' : 'Montant fixe' }}
+    </span>
             </div>
 
-            <div v-if="formData.amountType === 'fixed'" class="grid grid-cols-2 gap-4">
+            <!-- Sélecteur devise toujours visible -->
+            <div class="grid grid-cols-2 gap-4">
               <div class="space-y-2">
+                <Label for="currency" class="text-sm">Devise *</Label>
+                <select
+                    v-model="formData.currencyId"
+                    id="currency"
+                    class="border rounded-md px-3 py-2 bg-white text-sm w-full"
+                >
+                  <option disabled value="">-- Sélectionnez une devise --</option>
+                  <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
+                    {{ currency.symbol }} {{ currency.name }} ({{ currency.code }})
+                  </option>
+                </select>
+              </div>
+
+              <!-- Champ Montant uniquement si montant fixe -->
+              <div v-if="formData.amountType === 'fixed'" class="space-y-2">
                 <Label for="amount" class="text-sm">Montant</Label>
-                <div class="flex">
-                  <Input
-                      id="amount"
-                      type="number"
-                      v-model="formData.fixedAmount"
-                      placeholder="0.00"
-                      class="rounded-r-none text-sm py-2"
-                  />
-                  <select
-                      v-model="formData.currencyId"
-                      class="border border-l-0 rounded-r-md px-3 py-2 bg-white text-sm"
-                  >
-                    <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
-                      {{ currency.symbol }} {{ currency.name }}
-                    </option>
-                  </select>
-                </div>
+                <Input
+                    id="amount"
+                    type="number"
+                    v-model="formData.fixedAmount"
+                    placeholder="0.00"
+                    class="text-sm py-2 w-full"
+                />
               </div>
             </div>
           </div>
@@ -312,6 +318,7 @@ import Input from "~/components/ui/Input.vue"
 import Textarea from "~/components/ui/Textarea.vue"
 import Switch from "~/components/ui/Switch.vue"
 import Label from "~/components/ui/Label.vue"
+import { useCurrencies } from '~/composables/useCurrencies'
 
 definePageMeta({
   layout: 'dashboard'
@@ -333,8 +340,8 @@ const formData = ref({
   image: null,
   pdf: null,
   amountType: 'fixed',
-  fixedAmount: '',
-  currencyId: null,
+  fixedAmount: 0,
+  currencyId: '',
   expirationDate: ''
 })
 
@@ -343,31 +350,15 @@ const error = ref('')
 const generatedLink = ref(null)
 const copied = ref(false)
 const imagePreview = ref(null)
-const currencies = ref([])
-const currenciesLoading = ref(true)
 
-// Récupère les devises
-const fetchCurrencies = async () => {
-  try {
-    const response = await $fetch('/currencies', {
-      baseURL: config.public.apiBaseURL,
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
-    })
-    currencies.value = response.data
-    if (response.data.length > 0 && !formData.value.currencyId) {
-      formData.value.currencyId = response.data[0].id
-    }
-  } catch (err) {
-    console.error('Erreur chargement devises:', err)
-  } finally {
-    currenciesLoading.value = false
+// 👉 utilisation de ton composable
+const { currencies, currenciesLoading } = useCurrencies()
+
+// Quand les devises sont chargées, mettre une valeur par défaut
+watchEffect(() => {
+  if (!currenciesLoading.value && currencies.value.length > 0 && !formData.value.currencyId) {
+    formData.value.currencyId = currencies.value[0].id
   }
-}
-
-onMounted(() => {
-  fetchCurrencies()
 })
 
 const getCurrencySymbol = (currencyId) => {
@@ -406,6 +397,12 @@ const handleSubmit = async (event) => {
     return
   }
 
+  if (!formData.value.currencyId) {
+    error.value = 'Veuillez sélectionner une devise.'
+    loading.value = false
+    return
+  }
+
   if (formData.value.amountType === 'fixed' && (!formData.value.fixedAmount || parseFloat(formData.value.fixedAmount) <= 0)) {
     error.value = 'Veuillez entrer un montant valide.'
     loading.value = false
@@ -422,6 +419,8 @@ const handleSubmit = async (event) => {
 
     if (formData.value.amountType === 'fixed') {
       body.append('fixed_amount', formData.value.fixedAmount)
+    } else {
+      body.append('fixed_amount', 0)
     }
 
     if (formData.value.expirationDate) {

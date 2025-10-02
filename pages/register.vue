@@ -94,6 +94,30 @@
               </div>
             </div>
 
+            <!-- Sélection Devise -->
+            <div>
+              <label for="currency" class="block text-sm font-medium text-slate-700 mb-1">Devise</label>
+              <select
+                  id="currency"
+                  v-model="form.currency_id"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                  required
+              >
+                <option disabled value="">-- Sélectionnez une devise --</option>
+                <option
+                    v-for="currency in currencies"
+                    :key="currency.id"
+                    :value="currency.id"
+                >
+                  {{ currency.symbol }} - {{ currency.name }} ({{ currency.code }})
+                </option>
+              </select>
+              <div v-if="apiErrors.currency_id" class="text-red-600 text-xs mt-1">
+                {{ apiErrors.currency_id[0] }}
+              </div>
+            </div>
+
+
             <!-- Bouton Continuer -->
             <button
                 type="submit"
@@ -158,21 +182,35 @@ definePageMeta({
   layout: 'auth'
 })
 
+import { useCurrencies } from '~/composables/useCurrencies'
+
+const { currencies, currenciesLoading } = useCurrencies()
+
 const form = reactive({
   name: '',
   email: '',
   password: '',
   password_confirmation: '',
   country_code: '',
-  currency_id: null
+  currency_id: '' // obligatoire pour le select
 })
 
 const loading = ref(false)
 const apiErrors = ref({})
-
 const router = useRouter()
 const config = useRuntimeConfig()
 const successMessage = ref('')
+const { setAuth } = useAuth()
+
+onMounted(async () => {
+  try {
+    // Appel à une API gratuite (ipapi, ipwhois, ipinfo, etc.)
+    const res = await $fetch('https://ipapi.co/json/')
+    form.country_code = res.country_code
+  } catch (err) {
+    console.warn('Impossible de récupérer le country_code', err)
+  }
+})
 
 const handleSubmit = async () => {
   loading.value = true
@@ -186,11 +224,9 @@ const handleSubmit = async () => {
       body: form
     })
 
-    localStorage.setItem('leekpay_token', response.token)
+    setAuth(response.token, response.user)
 
-    // Affiche le message de succès
     successMessage.value = response.message
-    // Redirige après 2.5 secondes
     setTimeout(() => {
       router.push('/dashboard')
     }, 2500)
