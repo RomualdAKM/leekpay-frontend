@@ -122,11 +122,11 @@
             <Label class="text-sm">Type de montant</Label>
             <div class="flex items-center space-x-2">
               <Switch
-                  :checked="formData.amountType === 'free'"
+                  :checked="formData.amountType === 'flexible'"
                   @update:checked="toggleAmountType"
               />
               <span class="text-xs sm:text-sm">
-      {{ formData.amountType === 'free' ? 'Montant libre' : 'Montant fixe' }}
+      {{ formData.amountType === 'flexible' ? 'Montant libre' : 'Montant fixe' }}
     </span>
             </div>
 
@@ -275,7 +275,7 @@
                 URL: paylink.pro/{{ formData.customUrl || 'votre-url' }}
               </p>
               <p class="text-base sm:text-lg font-semibold mt-2" style="color: #2ECC71">
-                {{ formData.amountType === 'free'
+                {{ formData.amountType === 'flexible'
                   ? 'Montant libre'
                   : formData.fixedAmount
                       ? `${formData.fixedAmount} ${getCurrencySymbol(formData.currencyId)}`
@@ -340,7 +340,7 @@ const formData = ref({
   image: null,
   pdf: null,
   amountType: 'fixed',
-  fixedAmount: 0,
+  fixedAmount: null,
   currencyId: '',
   expirationDate: ''
 })
@@ -350,8 +350,6 @@ const error = ref('')
 const generatedLink = ref(null)
 const copied = ref(false)
 const imagePreview = ref(null)
-
-// 👉 utilisation de ton composable
 const { currencies, currenciesLoading } = useCurrencies()
 
 // Quand les devises sont chargées, mettre une valeur par défaut
@@ -383,7 +381,7 @@ const handlePdfUpload = (event) => {
 }
 
 const toggleAmountType = (checked) => {
-  formData.value.amountType = checked ? 'free' : 'fixed'
+  formData.value.amountType = checked ? 'flexible' : 'fixed'
 }
 
 const handleSubmit = async (event) => {
@@ -419,8 +417,6 @@ const handleSubmit = async (event) => {
 
     if (formData.value.amountType === 'fixed') {
       body.append('fixed_amount', formData.value.fixedAmount)
-    } else {
-      body.append('fixed_amount', 0)
     }
 
     if (formData.value.expirationDate) {
@@ -445,8 +441,8 @@ const handleSubmit = async (event) => {
       body
     })
 
+    // GPT : corrige ceci , c'est le lien de base concatener à custom_ulr
     generatedLink.value = `https://paylink.pro/${response.data.custom_url}`
-
   } catch (err) {
     console.error('Erreur création lien:', err)
     error.value = err.data?.message || 'Une erreur est survenue lors de la création du lien.'
