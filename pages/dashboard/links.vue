@@ -75,7 +75,7 @@
       >
         <div class="relative">
           <ImageWithFallback
-              :src="safeImageSrc(link.image_path)"
+              :src="safeImageSrc(link.image_url)"
               :alt="link.title || 'Image lien'"
               class="w-full aspect-[4/3] min-h-24 sm:min-h-32 max-h-64 object-cover"
           />
@@ -115,25 +115,27 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2 mb-3">
+              
               <Button
                   variant="outline"
                   size="sm"
                   @click="copyToClipboard(link.custom_url)"
                   class="flex-1 text-xs py-1.5"
-              >
-                <CopyIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
-                Copier
-              </Button>
+                >
+                  <CopyIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
+                  Copier
+            </Button>
 
               <Button
                   variant="outline"
                   size="sm"
                   class="flex-1 text-xs py-1.5"
-                  @click="openQr(link.custom_url)"
-              >
-                <QrCodeIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
-                QR Code
-              </Button>
+                  @click="openQr(link.qr_code_url)"
+                >
+                  <QrCodeIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4 mr-1" />
+                  QR Code
+                </Button>
+
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2">
@@ -171,6 +173,48 @@
       <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
     </div>
   </div>
+
+  <!-- Modal QR Code -->
+<Transition name="fade">
+   
+  <div
+    v-if="showQrModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    @click.self="closeQrModal"
+  >
+    <div class="bg-white rounded-2xl p-6 w-[90%] max-w-sm text-center shadow-xl">
+      <h3 class="text-lg font-semibold mb-4" style="color: #0A1F44">QR Code du lien</h3>
+
+      <div v-if="qrCodeUrl" class="flex justify-center mb-4">
+        <img
+          :src="qrCodeUrl"
+          alt="QR Code"
+          class="w-48 h-48 object-contain"
+        />
+      </div>
+
+      <Button
+        @click="closeQrModal"
+        class="w-full mt-2 py-2 text-sm font-medium"
+        :style="{ backgroundColor: '#2ECC71', color: 'white' }"
+      >
+        Fermer
+      </Button>
+    </div>
+  </div>
+  
+</Transition>
+
+<Transition name="fade">
+  <div
+    v-if="copied"
+    class="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 z-50"
+  >
+    ✅ Lien copié !
+  </div>
+</Transition>
+
+
 </template>
 
 <script setup>
@@ -194,6 +238,47 @@ definePageMeta({ layout: 'dashboard' })
 const router = useRouter()
 const config = useRuntimeConfig()
 const { token } = useAuth()
+
+
+// --- Modal QR Code ---
+const showQrModal = ref(false)
+const qrCodeUrl = ref('')
+
+const openQr = (qrPath) => {
+  if (!qrPath) return
+  const base = String(config.public.apiBaseURL || '')
+    .replace(/\/api$/, '') // retire /api si présent
+    .replace(/\/$/, '')
+  const p = String(qrPath).replace(/^\//, '')
+  qrCodeUrl.value = `${base}/${p}`
+  showQrModal.value = true
+}
+
+const closeQrModal = () => {
+  showQrModal.value = false
+  qrCodeUrl.value = ''
+}
+
+
+
+// --- Copier le lien ---
+const copied = ref(false) // pour afficher ou cacher le message
+
+const copyToClipboard = async (customUrl) => {
+  try {
+    const fullLink = `https://paylink.pro/${customUrl}`
+    await navigator.clipboard.writeText(fullLink)
+
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  } catch (e) {
+    console.error('Erreur lors de la copie :', e)
+  }
+}
+
+
 
 // États
 const links = ref([])
@@ -256,12 +341,25 @@ const fetchLinks = async () => {
 }
 
 // Utilitaires
+// const safeImageSrc = (path) => {
+//   if (!path) return null
+//   const base = String(config.public.apiBaseURL || '').replace(/\/$/, '')
+//   const p = String(path).replace(/^\//, '')
+//   return `${base}/${p}`
+// }
+
+
 const safeImageSrc = (path) => {
   if (!path) return null
-  const base = String(config.public.apiBaseURL || '').replace(/\/$/, '')
+  // base sans /api
+  const base = String(config.public.apiBaseURL || '')
+    .replace(/\/api$/, '') // retire /api à la fin s’il existe
+    .replace(/\/$/, '') // supprime / final
   const p = String(path).replace(/^\//, '')
   return `${base}/${p}`
 }
+
+
 
 const formatAmount = (value) => {
   const n = Number(value || 0)
@@ -297,22 +395,22 @@ const getStatusBadge = (is_active, expires_at) => {
 }
 
 // Actions utilitaires
-const copyToClipboard = async (customUrl) => {
-  try {
-    const full = `https://paylink.pro/${customUrl}`
-    await navigator.clipboard.writeText(full)
-    // petit retour visuel
-    // tu peux remplacer alert par un toast si tu en as un
-    alert('Lien copié : ' + full)
-  } catch (e) {
-    console.error(e)
-  }
-}
+// const copyToClipboard = async (customUrl) => {
+//   try {
+//     const full = `https://paylink.pro/${customUrl}`
+//     await navigator.clipboard.writeText(full)
+//     // petit retour visuel
+//     // tu peux remplacer alert par un toast si tu en as un
+//     alert('Lien copié : ' + full)
+//   } catch (e) {
+//     console.error(e)
+//   }
+// }
 
-const openQr = (customUrl) => {
-  // ouvrir dans un modal ou nouvelle page pour générer le QR (placeholder)
-  window.open(`https://paylink.pro/${customUrl}`, '_blank')
-}
+// const openQr = (customUrl) => {
+//   // ouvrir dans un modal ou nouvelle page pour générer le QR (placeholder)
+//   window.open(`https://paylink.pro/${customUrl}`, '_blank')
+// }
 
 const editLink = (id) => {
   router.push(`/dashboard/edit-link/${id}`)
