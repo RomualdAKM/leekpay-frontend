@@ -23,7 +23,11 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Form -->
       <Card class="p-4 sm:p-6">
-        <form @submit.prevent="handleSubmit" class="space-y-6" :class="{ 'opacity-75 pointer-events-none': loading }">
+        <form
+            @submit.prevent="handleSubmit"
+            class="space-y-6"
+            :class="{ 'opacity-75 pointer-events-none': loading }"
+        >
           <!-- Title -->
           <div class="space-y-2">
             <Label for="title" class="text-sm">Titre *</Label>
@@ -51,7 +55,9 @@
           <div class="space-y-2">
             <Label for="customUrl" class="text-sm">URL personnalisée *</Label>
             <div class="flex">
-              <div class="bg-gray-100 px-3 py-2 border border-r-0 rounded-l-md text-xs sm:text-sm text-gray-600">
+              <div
+                  class="bg-gray-100 px-3 py-2 border border-r-0 rounded-l-md text-xs sm:text-sm text-gray-600"
+              >
                 paylink.pro/
               </div>
               <Input
@@ -66,12 +72,17 @@
           <!-- Image Upload -->
           <div class="space-y-2">
             <Label for="image" class="text-sm">Image *</Label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center">
+            <div
+                class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center"
+            >
               <img
                   v-if="imagePreview"
                   :src="imagePreview"
-                  class="mx-auto h-24 mb-2 object-contain"
+                  class="mx-auto h-24 mb-2 object-contain rounded"
               />
+              <p v-else class="text-xs sm:text-sm text-gray-500 mb-2">
+                Aucune image sélectionnée
+              </p>
               <Button
                   type="button"
                   variant="outline"
@@ -96,7 +107,9 @@
           <!-- PDF Upload -->
           <div class="space-y-2">
             <Label for="pdf" class="text-sm">PDF (optionnel)</Label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <div
+                class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
+            >
               <Button
                   type="button"
                   variant="outline"
@@ -128,7 +141,9 @@
                   @update:checked="toggleAmountType"
               />
               <span class="text-xs sm:text-sm">
-                {{ formData.amountType === 'flexible' ? 'Montant libre' : 'Montant fixe' }}
+                {{ formData.amountType === 'flexible'
+                  ? 'Montant libre'
+                  : 'Montant fixe' }}
               </span>
             </div>
 
@@ -141,13 +156,20 @@
                     class="border rounded-md px-3 py-2 bg-white text-sm w-full"
                 >
                   <option disabled value="">-- Sélectionnez une devise --</option>
-                  <option v-for="currency in currencies" :key="currency.id" :value="currency.id">
+                  <option
+                      v-for="currency in currencies"
+                      :key="currency.id"
+                      :value="currency.id"
+                  >
                     {{ currency.symbol }} {{ currency.name }}
                   </option>
                 </select>
               </div>
 
-              <div v-if="formData.amountType === 'fixed'" class="space-y-2">
+              <div
+                  v-if="formData.amountType === 'fixed'"
+                  class="space-y-2"
+              >
                 <Label for="amount" class="text-sm">Montant</Label>
                 <Input
                     id="amount"
@@ -171,9 +193,13 @@
             />
           </div>
 
-          <!-- Erreur API -->
+          <!-- Messages -->
           <div v-if="error" class="text-red-600 text-sm p-2 bg-red-50 rounded text-center">
             {{ error }}
+          </div>
+
+          <div v-if="success" class="text-green-600 text-sm p-2 bg-green-50 rounded text-center">
+            {{ success }}
           </div>
 
           <!-- Submit -->
@@ -195,18 +221,27 @@
             Aperçu
           </h3>
           <div>
-            <img v-if="imagePreview" :src="imagePreview" class="w-full h-40 object-contain rounded-lg" />
+            <img
+                v-if="imagePreview"
+                :src="imagePreview"
+                class="w-full h-40 object-contain rounded-lg"
+            />
             <p v-else class="text-gray-500 text-sm">Aucune image</p>
           </div>
           <div class="pt-3">
             <h4 class="font-semibold">{{ formData.title || 'Titre' }}</h4>
-            <p class="text-sm text-gray-600">{{ formData.description || 'Description...' }}</p>
-            <p class="text-xs text-gray-600 mt-2">URL: paylink.pro/{{ formData.customUrl }}</p>
+            <p class="text-sm text-gray-600">
+              {{ formData.description || 'Description...' }}
+            </p>
+            <p class="text-xs text-gray-600 mt-2">
+              URL: paylink.pro/{{ formData.customUrl }}
+            </p>
             <p class="text-base font-semibold mt-1" style="color: #2ECC71">
               {{ formData.amountType === 'flexible'
                 ? 'Montant libre'
-                : formData.fixedAmount ? formData.fixedAmount + ' ' + getCurrencySymbol(formData.currencyId) : '---'
-              }}
+                : formData.fixedAmount
+                    ? formData.fixedAmount + ' ' + getCurrencySymbol(formData.currencyId)
+                    : '---' }}
             </p>
           </div>
         </Card>
@@ -217,12 +252,12 @@
 
 <script setup>
 import { ArrowLeftIcon, UploadIcon } from 'lucide-vue-next'
-import Button from "~/components/ui/Button.vue"
-import Card from "~/components/ui/Card.vue"
-import Input from "~/components/ui/Input.vue"
-import Textarea from "~/components/ui/Textarea.vue"
-import Switch from "~/components/ui/Switch.vue"
-import Label from "~/components/ui/Label.vue"
+import Button from '~/components/ui/Button.vue'
+import Card from '~/components/ui/Card.vue'
+import Input from '~/components/ui/Input.vue'
+import Textarea from '~/components/ui/Textarea.vue'
+import Switch from '~/components/ui/Switch.vue'
+import Label from '~/components/ui/Label.vue'
 import { useCurrencies } from '~/composables/useCurrencies'
 
 definePageMeta({ layout: 'dashboard' })
@@ -247,9 +282,10 @@ const formData = ref({
 const imagePreview = ref(null)
 const loading = ref(false)
 const error = ref('')
+const success = ref('')
 const { currencies } = useCurrencies()
 
-// Charger lien existant
+// Charger le lien existant
 onMounted(async () => {
   try {
     const linkId = route.params.id
@@ -258,6 +294,7 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${token.value}` }
     })
     const link = response.data
+
     formData.value = {
       title: link.title,
       description: link.description,
@@ -267,37 +304,51 @@ onMounted(async () => {
       amountType: link.amount_type,
       fixedAmount: link.fixed_amount,
       currencyId: link.currency_id,
-      expirationDate: link.expires_at ? link.expires_at.substring(0,10) : ''
+      expirationDate: link.expires_at ? link.expires_at.substring(0, 10) : ''
     }
-    imagePreview.value = link.image_url
+
+    // ✅ Corrige et prévisualise l'image existante
+    if (link.image_url) {
+      imagePreview.value = link.image_url.startsWith('http')
+          ? link.image_url
+          : `${config.public.apiBaseURL}${link.image_url}`
+    }
   } catch (err) {
-    error.value = "Impossible de charger le lien"
+    console.error(err)
+    error.value = 'Impossible de charger le lien'
   }
 })
 
 // Helpers
 const getCurrencySymbol = (currencyId) => {
-  const c = currencies.value.find(c => c.id === currencyId)
+  const c = currencies.value.find((c) => c.id === currencyId)
   return c ? c.symbol : ''
 }
-const handleImageUpload = e => {
+
+const handleImageUpload = (e) => {
   const file = e.target.files?.[0]
   if (file) {
     formData.value.image = file
+    if (imagePreview.value && imagePreview.value.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreview.value)
+    }
     imagePreview.value = URL.createObjectURL(file)
   }
 }
-const handlePdfUpload = e => {
+
+const handlePdfUpload = (e) => {
   const file = e.target.files?.[0]
   if (file) formData.value.pdf = file
 }
-const toggleAmountType = checked => {
+
+const toggleAmountType = (checked) => {
   formData.value.amountType = checked ? 'flexible' : 'fixed'
 }
 
 const handleSubmit = async () => {
   loading.value = true
   error.value = ''
+  success.value = ''
   try {
     const body = new FormData()
     body.append('title', formData.value.title)
@@ -309,25 +360,29 @@ const handleSubmit = async () => {
       body.append('fixed_amount', formData.value.fixedAmount)
     }
     if (formData.value.expirationDate) {
-      body.append('expires_at', new Date(formData.value.expirationDate).toISOString())
+      body.append(
+          'expires_at',
+          new Date(formData.value.expirationDate).toISOString()
+      )
     }
     if (formData.value.image) body.append('image', formData.value.image)
     if (formData.value.pdf) body.append('pdf', formData.value.pdf)
 
-    await $fetch(`/payment-links/${route.params.id}`, {
-      method: 'POST', // ⚠️ Si ton API supporte PUT/PATCH mets-le ici
+    const response = await $fetch(`/payment-links/${route.params.id}`, {
+      method: 'PUT',
       baseURL: config.public.apiBaseURL,
       headers: { Authorization: `Bearer ${token.value}` },
       body
     })
 
-    router.push('/links') // retour liste
+    success.value = response.message || 'Lien mis à jour avec succès ✅'
   } catch (err) {
+    console.error(err)
     error.value = err.data?.message || 'Erreur lors de la mise à jour.'
   } finally {
     loading.value = false
   }
 }
 
-const onBack = () => router.push('/links')
+const onBack = () => router.push('/dashboard/links')
 </script>

@@ -115,7 +115,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2 mb-3">
-              
+
               <Button
                   variant="outline"
                   size="sm"
@@ -176,7 +176,7 @@
 
   <!-- Modal QR Code -->
 <Transition name="fade">
-   
+
   <div
     v-if="showQrModal"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -202,7 +202,7 @@
       </Button>
     </div>
   </div>
-  
+
 </Transition>
 
 <Transition name="fade">
@@ -393,24 +393,6 @@ const getStatusBadge = (is_active, expires_at) => {
 
   return h('span', { class: 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700' }, 'Actif')
 }
-
-// Actions utilitaires
-// const copyToClipboard = async (customUrl) => {
-//   try {
-//     const full = `https://paylink.pro/${customUrl}`
-//     await navigator.clipboard.writeText(full)
-//     // petit retour visuel
-//     // tu peux remplacer alert par un toast si tu en as un
-//     alert('Lien copié : ' + full)
-//   } catch (e) {
-//     console.error(e)
-//   }
-// }
-
-// const openQr = (customUrl) => {
-//   // ouvrir dans un modal ou nouvelle page pour générer le QR (placeholder)
-//   window.open(`https://paylink.pro/${customUrl}`, '_blank')
-// }
 
 const editLink = (id) => {
   router.push(`/dashboard/edit-link/${id}`)
