@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <!-- Loading state -->
       <div v-if="loading" class="text-center">
@@ -18,21 +18,21 @@
         <p class="text-gray-600 mb-6">Votre transaction a été traitée avec succès.</p>
         
         <!-- Transaction details -->
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-200 text-left mb-6">
+        <div class="bg-white p-6 rounded-lg  border border-gray-200 text-left mb-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la transaction</h3>
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">#{{ transaction.id }}</span>
+              <span class="font-medium">{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Montant:</span>
               <span class="font-medium">{{ transaction.amount }} {{ currency.symbol }}</span>
             </div>
-            <div class="flex justify-between" v-if="transaction.total_fees > 0">
+            <!-- <div class="flex justify-between" v-if="transaction.total_fees > 0">
               <span class="text-gray-600">Frais:</span>
               <span class="font-medium">{{ transaction.total_fees }} {{ currency.symbol }}</span>
-            </div>
+            </div> -->
             <div class="flex justify-between">
               <span class="text-gray-600">Date:</span>
               <span class="font-medium">{{ formatDate(transaction.processed_at) }}</span>
@@ -49,12 +49,12 @@
           <a 
             :href="transaction.payment_link.pdf_url" 
             target="_blank"
-            class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            class="inline-flex items-center px-4 py-2   rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
-            Télécharger le reçu
+            Télécharger
           </a>
         </div>
       </div>
@@ -74,7 +74,7 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">#{{ transaction.id }}</span>
+              <span class="font-medium">#{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Montant:</span>
@@ -107,12 +107,12 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Paiement échoué</h2>
         <p class="text-gray-600 mb-6">Une erreur s'est produite lors du traitement de votre paiement.</p>
         
-        <div class="bg-white p-6 rounded-lg shadow border border-gray-200 text-left mb-6">
+        <div class="bg-white p-6 rounded-lg  border border-gray-200 text-left mb-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la transaction</h3>
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">#{{ transaction.id }}</span>
+              <span class="font-medium">#{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Statut:</span>
@@ -149,14 +149,50 @@
         </button>
       </div>
 
-      <!-- Back to home -->
+      <!-- Back to payment page -->
       <div class="text-center">
         <NuxtLink 
+          v-if="transaction?.payment_link?.custom_url"
+          :to="`/${transaction.payment_link.custom_url}`"
+          class="text-sm text-gray-500 hover:text-gray-700 transition"
+        >
+          ← Retour à la page de paiement
+        </NuxtLink>
+        <NuxtLink 
+          v-else
           to="/"
           class="text-sm text-gray-500 hover:text-gray-700 transition"
         >
-          ← Retour à l'accueil
+          Visitez leekpay
         </NuxtLink>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <div class="text-center">
+          <a 
+            href="https://leekpay.me" 
+            target="_blank" class="flex items-center justify-center mb-1">
+            <img 
+              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
+              alt="LeekPay Logo" 
+              class="h-16 w-auto"
+            >
+        </a>
+          <p class="text-xs text-gray-500 mb-2">
+            Propulsé par LeekPay - Solution de paiement simple et sécurisée
+          </p>
+          <a 
+            href="https://leekpay.me" 
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+            Découvrir LeekPay
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -178,7 +214,7 @@ const transaction = ref(null)
 
 // Configuration de l'API
 const config = useRuntimeConfig()
-const apiBaseUrl = config.public.apiUrl || 'http://localhost:8000/api'
+const apiBaseUrl = config.public.apiUrl || 'http://leekpay.fr/api'
 
 // Récupération de l'ID de transaction depuis l'URL
 const transactionId = computed(() => route.query.transaction)

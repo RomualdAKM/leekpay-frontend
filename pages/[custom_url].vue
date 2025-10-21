@@ -1,9 +1,10 @@
 <template>
   <div class="min-h-screen flex flex-col md:flex-row font-sans bg-gray-50">
-    <div class="w-full md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center justify-center p-6 md:p-12">
+    <div class="w-full md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center  p-6 md:p-12">
       <div class="text-center max-w-lg w-full">
         <img
-            :src="paymentImage"
+            v-if="paymentData?.image_url && !imageError"
+            :src="paymentData.image_url"
             :alt="paymentTitle"
             class="w-full max-h-80 md:max-h-96 object-contain rounded-2xl shadow-lg mb-8"
             @error="handleImageError"
@@ -27,7 +28,7 @@
           </div>
         </div>
         
-        <div v-else-if="paymentData" class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100">
+        <div v-else-if="paymentData" class="bg-white p-6 md:p-8 rounded-sm shadow-sm border border-gray-100">
           <!-- Expiration Status -->
           <div v-if="expirationStatus.show" :class="expirationStatus.containerClass">
             <div class="flex items-center justify-between">
@@ -82,7 +83,7 @@
                 <input
                     v-model="searchQuery"
                     type="text"
-                    placeholder="Rechercher un pays..."
+                    placeholder="Rechercher votre pays..."
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
                     @focus="showCountryDropdown = true"
                 />
@@ -106,14 +107,14 @@
                 </div>
               </div>
               <div class="flex gap-2">
-                <div class="px-3 py-3 border border-gray-300 rounded-lg bg-gray-50 text-sm min-w-[120px] flex items-center gap-2">
+                <div class="px-3 py-3 border border-gray-300 rounded-lg bg-gray-50 text-sm min-w-[90px] flex items-center gap-2">
                   <span>{{ selectedCountry?.flag || '🇨🇮' }}</span>
                   <span>{{ selectedCountry?.dialCode || '+225' }}</span>
                 </div>
                 <input
                     v-model="formData.phoneNumber"
                     type="tel"
-                    placeholder="Numéro de téléphone (optionnel)"
+                    placeholder="Numéro (optionnel)"
                     class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
                 />
               </div>
@@ -122,14 +123,14 @@
 
           <div id="payment-form" class="space-y-4 mb-2">
             <label class="block text-sm font-medium text-slate-700">Choisissez votre mode de paiement</label>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-3 gap-3">
               <button
                   v-for="method in availablePaymentMethods"
                   :key="method.value"
                   type="button"
                   @click="selectedPayment = method.value"
                   :class="[
-                    'px-4 py-4 rounded-lg font-medium transition text-sm',
+                    'py-4 px-2 rounded-sm font-medium transition text-sm',
                     selectedPayment === method.value
                       ? 'bg-green-500 text-white shadow-md'
                       : 'border border-gray-300 text-slate-700 hover:bg-gray-50'
@@ -144,7 +145,7 @@
           <button
               @click="triggerPayment"
               :disabled="isProcessing || isPaymentExpired"
-              class="w-full bg-green-500 text-white py-4 px-6 rounded-lg font-bold text-base hover:bg-green-600 transition shadow-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full bg-green-500 text-white py-4 px-6 rounded-sm font-bold text-base hover:bg-green-600 transition shadow-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="isProcessing" class="flex items-center justify-center">
               <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -161,7 +162,7 @@
             </span>
           </button>
 
-          <div class="mt-4 text-center mb-20 md:mb-4">
+          <div class="mt-4 text-center mb-6 md:mb-4">
             <div class="flex items-center justify-center gap-2 text-sm text-gray-600 mb-4">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -204,7 +205,37 @@
         </span>
       </button>
     </div>
+
+    
   </div>
+     <!-- Footer -->
+      <div class="mt-4 pt-4 border-t border-gray-200">
+        <div class="text-center">
+          <a 
+            href="https://leekpay.me" 
+            target="_blank" class="flex items-center justify-center mb-1">
+            <img 
+              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
+              alt="LeekPay Logo" 
+              class="h-16 w-auto"
+            >
+        </a>
+          <p class="text-xs text-gray-500 mb-2">
+            Propulsé par LeekPay - Solution de paiement simple et sécurisée
+          </p>
+          <a 
+            href="https://leekpay.me" 
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+            Découvrir LeekPay
+          </a>
+        </div>
+      </div>
 </template>
 
 <script setup>
@@ -217,7 +248,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 
-import defaultImage from '~/assets/img/register_img.jpg'
+
 
 const { searchQuery, filteredCountries, getCountryByDialCode } = useCountries()
 
@@ -240,7 +271,7 @@ const formData = ref({
 })
 
 const config = useRuntimeConfig()
-const apiBaseUrl = config.public.apiUrl || 'http://localhost:8000/api'
+const apiBaseUrl = config.public.apiUrl || 'https://leekpay.fr/api'
 
 const customUrl = computed(() => route.params.custom_url)
 const fetchPaymentData = async () => {
@@ -546,12 +577,7 @@ const paymentDescription = computed(() => {
   return paymentData.value?.description || ''
 })
 
-const paymentImage = computed(() => {
-  if (imageError.value || !paymentData.value?.image_url) {
-    return defaultImage
-  }
-  return paymentData.value.image_url
-})
+
 
 const handleImageError = () => {
   imageError.value = true
