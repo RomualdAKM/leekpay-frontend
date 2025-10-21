@@ -258,7 +258,7 @@
               <div class="flex items-center gap-3">
                 <div class="flex-1 bg-gray-100 rounded-full h-2 w-24">
                   <div 
-                    class="bg-blue-500 h-full rounded-full"
+                    class="bg-green-500 h-full rounded-full"
                     :style="{ width: getCountryBarWidth(country.total) + '%' }"
                   ></div>
                 </div>
