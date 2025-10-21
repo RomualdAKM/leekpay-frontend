@@ -1,5 +1,5 @@
 <!-- components/ui/TabsTrigger.vue -->
-<script setup>
+<script setup lang="ts">
 import { inject, computed } from 'vue'
 
 const props = defineProps({
@@ -12,11 +12,9 @@ const model = inject('tabsModel', null)
 const isActive = computed(() => model && model.value === props.value)
 
 const classes = computed(() => [
-  'inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-1 text-sm font-medium whitespace-nowrap border border-transparent transition-[color,box-shadow] h-[calc(100%-1px)]',
-  'disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:ring-ring/50 focus-visible:outline-ring',
-  'data-[state=active]:bg-card data-[state=active]:text-foreground dark:data-[state=active]:text-foreground dark:data-[state=active]:bg-input/30 dark:data-[state=active]:border-input',
-  // NOTE: on met des double-quotes à l'intérieur d'une string JS entourée par des '
-  '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+  'inline-flex items-center justify-center px-4 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer',
+  'border-transparent text-gray-700 hover:text-gray-900',
+  'data-[state=active]:border-b-2 data-[state=active]:border-green-500 data-[state=active]:text-green-700',
   props.class || ''
 ])
 

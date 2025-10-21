@@ -2,14 +2,20 @@
 <template>
   <div class="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
     <!-- Logo -->
-    <div class="p-6 border-b border-gray-200">
+    <div class="p-5 sm:p-6 border-b border-gray-200">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #2ECC71">
-          <HomeIcon class="w-6 h-6 text-white" />
+        <!-- Logo (image ou SVG) -->
+        <div class="w-10 h-10 rounded-lg flex items-center justify-center" >
+          <img
+              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png"
+              alt="LeekPay Logo"
+          />
         </div>
+
+        <!-- Texte -->
         <div>
-          <h1 class="font-semibold" style="color: #0A1F44">PayLink Pro</h1>
-          <p class="text-sm text-gray-500">Générateur de liens</p>
+          <h1 class="font-bold text-lg" style="color: #0A1F44">LeekPay</h1>
+          <p class="text-xs sm:text-sm text-gray-500">Générateur de liens</p>
         </div>
       </div>
     </div>
@@ -47,11 +53,25 @@
           <UserIcon class="w-5 h-5 text-gray-600" />
         </div>
         <div>
-          <p class="font-medium" style="color: #0A1F44">John Doe</p>
-          <p class="text-sm text-gray-500">john.doe@email.com</p>
+          <p v-if="user" class="font-medium" style="color: #0A1F44">
+            {{ user.name }}
+          </p>
+          <p v-if="user" class="text-sm text-gray-500">
+            {{ user.email }}
+          </p>
+          <p v-else class="text-sm text-gray-500">Chargement...</p>
         </div>
       </div>
     </div>
+
+    <!-- Bouton Déconnexion -->
+    <button
+        @click="handleLogout"
+        class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 transition-colors text-sm font-medium"
+    >
+      <LogOutIcon class="w-4 h-4" />
+      Déconnexion
+    </button>
   </div>
 </template>
 
@@ -64,6 +84,12 @@ const props = defineProps({
     required: true
   }
 })
+const { user, logout } = useAuth()
+const router = useRouter()
+const handleLogout = async () => {
+  await logout()
+  await router.push('/login')
+}
 
 const emit = defineEmits(['section-change'])
 
@@ -80,5 +106,5 @@ const menuItems = [
 ]
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon  } from 'lucide-vue-next'
 </script>

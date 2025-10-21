@@ -1,4 +1,5 @@
-<script setup>
+<!-- components/ui/TabsContent.vue -->
+<script setup lang="ts">
 import { inject, computed } from 'vue'
 
 const props = defineProps({

@@ -1,3 +1,4 @@
+<!-- components/ui/Tabs.vue -->
 <script setup lang="ts">
 import { ref, provide, inject } from 'vue'
 

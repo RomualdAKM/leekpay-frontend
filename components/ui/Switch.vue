@@ -1,6 +1,7 @@
 <!-- components/ui/Switch.vue -->
 <template>
   <button
+      type="button"
       :class="[
       'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
       props.checked ? 'bg-green-500' : 'bg-gray-300'
