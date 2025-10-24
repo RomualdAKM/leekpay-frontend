@@ -11,10 +11,40 @@
 
 <template>
   <div class="p-4 sm:p-6 space-y-6">
+    <!-- Toast notification -->
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0 translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-2"
+    >
+      <div
+        v-if="showToast"
+        class="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+      >
+        <CheckIcon class="h-5 w-5" />
+        <span>{{ toastMessage }}</span>
+      </div>
+    </Transition>
+
     <!-- Header -->
     <div>
       <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Paramètres</h1>
       <p class="text-gray-600 text-sm sm:text-base">Gérez votre compte et configurez vos préférences</p>
+    </div>
+
+    <!-- Message de succès global -->
+    <div v-if="successMessage" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+      {{ successMessage }}
+    </div>
+
+    <!-- Erreur globale -->
+    <div v-if="apiErrors.global" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+      <ul class="list-disc list-inside">
+        <li v-for="error in apiErrors.global" :key="error">{{ error }}</li>
+      </ul>
     </div>
 
     <!-- Tabs -->
@@ -45,229 +75,46 @@
           <p class="text-xs sm:text-sm text-gray-500 mb-4">Gérez vos informations de profil et de contact</p>
 
           <div class="space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="firstName" class="text-xs sm:text-sm">Prénom</Label>
-                <Input id="firstName" v-model="profile.firstName" class="text-sm py-2" />
-              </div>
-              <div class="space-y-2">
-                <Label for="lastName" class="text-xs sm:text-sm">Nom</Label>
-                <Input id="lastName" v-model="profile.lastName" class="text-sm py-2" />
+            <div class="space-y-2">
+              <Label for="name" class="text-xs sm:text-sm">Nom complet</Label>
+              <Input 
+                id="name"
+                v-model="profile.name" 
+                class="text-sm py-2"
+                :class="{ 'border-red-500': apiErrors.name }"
+              />
+              <div v-if="apiErrors.name" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.name" :key="error">{{ error }}</p>
               </div>
             </div>
 
             <div class="space-y-2">
               <Label for="email" class="text-xs sm:text-sm">Email</Label>
-              <Input id="email" type="email" v-model="profile.email" class="text-sm py-2" />
-            </div>
-
-            <div class="space-y-2">
-              <Label for="phone" class="text-xs sm:text-sm">Téléphone</Label>
-              <Input id="phone" type="tel" v-model="profile.phone" class="text-sm py-2" />
-            </div>
-
-            <div class="space-y-2">
-              <Label for="company" class="text-xs sm:text-sm">Entreprise</Label>
-              <Input id="company" v-model="profile.company" class="text-sm py-2" />
-            </div>
-
-            <div class="space-y-2">
-              <Label for="bio" class="text-xs sm:text-sm">Biographie</Label>
-              <Textarea
-                  id="bio"
-                  v-model="profile.bio"
-                  placeholder="Parlez-nous un peu de vous..."
-                  class="text-sm py-2"
+              <Input 
+                id="email" 
+                type="email" 
+                v-model="profile.email" 
+                class="text-sm py-2"
+                :class="{ 'border-red-500': apiErrors.email }"
               />
+              <div v-if="apiErrors.email" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.email" :key="error">{{ error }}</p>
+              </div>
             </div>
 
-            <Button @click="saveProfile" class="gap-2 py-2 text-sm" style="background-color: #2ECC71; color: white">
-              Sauvegarder
+            <Button 
+              @click="saveProfile" 
+              :disabled="profileLoading"
+              class="gap-2 py-2 text-sm" 
+              style="background-color: #2ECC71; color: white"
+            >
+              <span v-if="profileLoading">Sauvegarde...</span>
+              <span v-else>Sauvegarder</span>
             </Button>
           </div>
         </Card>
 
-        <!-- Préférences régionales -->
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <Globe class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Préférences régionales</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4"></p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <Label class="text-xs sm:text-sm">Langue</Label>
-              <Select
-                  v-model="preferences.language"
-                  :options="[
-                    { value: 'fr', label: 'Français' },
-                    { value: 'en', label: 'English' },
-                    { value: 'es', label: 'Español' }
-                  ]"
-                  placeholder="Sélectionnez une langue"
-                  class="text-sm py-2"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <Label class="text-xs sm:text-sm">Fuseau horaire</Label>
-              <Select
-                  v-model="preferences.timezone"
-                  :options="[
-                    { value: 'europe/paris', label: 'Europe/Paris' },
-                    { value: 'africa/abidjan', label: 'Africa/Abidjan' },
-                    { value: 'america/new_york', label: 'America/New_York' }
-                  ]"
-                  placeholder="Sélectionnez un fuseau"
-                  class="text-sm py-2"
-              />
-            </div>
-          </div>
-
-          <Button @click="savePreferences" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
-            Sauvegarder
-          </Button>
-        </Card>
-      </TabsContent>
-
-      <!-- Paiements -->
-      <TabsContent value="payment" class="space-y-6">
-        <!-- Méthodes de paiement -->
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <CreditCard class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Méthodes de paiement</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Configurez les moyens de paiement acceptés</p>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <CreditCard class="w-5 h-5 text-gray-500" />
-                <div>
-                  <p class="font-medium text-sm">Cartes bancaires</p>
-                  <p class="text-xs text-gray-500">Visa, Mastercard, American Express</p>
-                </div>
-              </div>
-              <Switch v-model="paymentMethods.card" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <Smartphone class="w-5 h-5 text-gray-500" />
-                <div>
-                  <p class="font-medium text-sm">Mobile Money</p>
-                  <p class="text-xs text-gray-500">Orange Money, MTN Money</p>
-                </div>
-              </div>
-              <Switch v-model="paymentMethods.mobileMoney" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <Mail class="w-5 h-5 text-gray-500" />
-                <div>
-                  <p class="font-medium text-sm">Virement bancaire</p>
-                  <p class="text-xs text-gray-500">Transfert direct</p>
-                </div>
-              </div>
-              <Switch v-model="paymentMethods.bankTransfer" />
-            </div>
-          </div>
-
-          <Separator class="my-4" />
-
-          <div class="space-y-2">
-            <Label class="text-xs sm:text-sm">Devise par défaut</Label>
-            <Select
-                v-model="paymentPreferences.currency"
-                :options="[
-                  { value: 'EUR', label: 'EUR (€)' },
-                  { value: 'USD', label: 'USD ($)' },
-                  { value: 'XOF', label: 'XOF (CFA)' }
-                ]"
-                class="text-sm py-2"
-            />
-          </div>
-
-          <Button @click="savePaymentSettings" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
-            Sauvegarder
-          </Button>
-        </Card>
-
-        <!-- Frais et commissions -->
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <DollarSignIcon class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Frais et commissions</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Aperçu des frais appliqués à vos transactions</p>
-
-          <div class="space-y-3">
-            <div class="flex justify-between text-sm">
-              <span>Cartes bancaires</span>
-              <span>2.9% + 0.30€</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span>Mobile Money</span>
-              <span>1.5% + 0.20€</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span>Virement bancaire</span>
-              <span>0.8% + 0.50€</span>
-            </div>
-          </div>
-        </Card>
-      </TabsContent>
-
-      <!-- Notifications -->
-      <TabsContent value="notifications" class="space-y-6">
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <Bell class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Notifications</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Choisissez quand et comment recevoir les notifications</p>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-medium text-sm">Nouveaux paiements</p>
-                <p class="text-xs text-gray-500">Recevoir une notification pour chaque paiement reçu</p>
-              </div>
-              <Switch v-model="notifications.newPayments" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-medium text-sm">Paiements échoués</p>
-                <p class="text-xs text-gray-500">Être alerté des tentatives de paiement échouées</p>
-              </div>
-              <Switch v-model="notifications.failedPayments" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-medium text-sm">Rapport hebdomadaire</p>
-                <p class="text-xs text-gray-500">Recevoir un résumé chaque lundi</p>
-              </div>
-              <Switch v-model="notifications.weeklyReport" />
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-medium text-sm">Notifications marketing</p>
-                <p class="text-xs text-gray-500">Conseils et nouvelles fonctionnalités</p>
-              </div>
-              <Switch v-model="notifications.marketing" />
-            </div>
-          </div>
-
-          <Button @click="saveNotifications" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
-            Sauvegarder
-          </Button>
-        </Card>
       </TabsContent>
 
       <!-- Sécurité -->
@@ -283,91 +130,56 @@
           <div class="space-y-3">
             <div class="space-y-2">
               <Label for="current-password" class="text-xs sm:text-sm">Mot de passe actuel</Label>
-              <Input id="current-password" v-model="security.currentPassword" type="password" class="text-sm py-2" />
+              <Input 
+                id="current-password" 
+                v-model="security.currentPassword" 
+                type="password" 
+                class="text-sm py-2"
+                :class="{ 'border-red-500': apiErrors.current_password }"
+              />
+              <div v-if="apiErrors.current_password" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.current_password" :key="error">{{ error }}</p>
+              </div>
             </div>
             <div class="space-y-2">
               <Label for="new-password" class="text-xs sm:text-sm">Nouveau mot de passe</Label>
-              <Input id="new-password" v-model="security.newPassword" type="password" class="text-sm py-2" />
+              <Input 
+                id="new-password" 
+                v-model="security.newPassword" 
+                type="password" 
+                class="text-sm py-2"
+                :class="{ 'border-red-500': apiErrors.password }"
+              />
+              <div v-if="apiErrors.password" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.password" :key="error">{{ error }}</p>
+              </div>
             </div>
             <div class="space-y-2">
               <Label for="confirm-password" class="text-xs sm:text-sm">Confirmer le mot de passe</Label>
-              <Input id="confirm-password" v-model="security.confirmPassword" type="password" class="text-sm py-2" />
+              <Input 
+                id="confirm-password" 
+                v-model="security.confirmPassword" 
+                type="password" 
+                class="text-sm py-2"
+                :class="{ 'border-red-500': apiErrors.password_confirmation }"
+              />
+              <div v-if="apiErrors.password_confirmation" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.password_confirmation" :key="error">{{ error }}</p>
+              </div>
             </div>
             <Button
-                @click="changePassword"
-                :disabled="!canChangePassword"
+                @click="changePasswordHandler"
+                :disabled="!canChangePassword || passwordLoading"
                 class="gap-2 py-2 text-sm"
                 style="background-color: #2ECC71; color: white"
             >
-              Changer le mot de passe
+              <span v-if="passwordLoading">Changement...</span>
+              <span v-else>Changer le mot de passe</span>
             </Button>
           </div>
         </Card>
 
-        <!-- 2FA -->
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <Key class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Authentification à deux facteurs</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Sécurisez votre compte avec l'authentification à deux facteurs</p>
 
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p class="font-medium text-sm">Authentification à deux facteurs</p>
-              <p class="text-xs text-gray-500">Utilisez une application d'authentification pour sécuriser votre compte</p>
-            </div>
-            <Switch v-model="security.twoFactorEnabled" />
-          </div>
-
-          <Button variant="outline" @click="configure2FA" class="gap-2 py-2 text-sm" style="color: #2ECC71; border-color: #2ECC71">
-            Configurer 2FA
-          </Button>
-        </Card>
-      </TabsContent>
-
-      <!-- Apparence -->
-      <TabsContent value="appearance" class="space-y-6">
-        <Card class="border border-gray-200 rounded-lg p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <Palette class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Apparence</h3>
-          </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Personnalisez l'apparence de votre tableau de bord</p>
-
-          <div class="space-y-3">
-            <div class="space-y-2">
-              <Label class="text-xs sm:text-sm">Thème</Label>
-              <Select
-                  v-model="appearance.theme"
-                  :options="[
-                    { value: 'light', label: 'Clair' },
-                    { value: 'dark', label: 'Sombre' },
-                    { value: 'system', label: 'Système' }
-                  ]"
-                  class="text-sm py-2"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <Label class="text-xs sm:text-sm">Couleur d'accent</Label>
-              <div class="flex gap-2">
-                <button
-                    v-for="color in accentColors"
-                    :key="color"
-                    class="w-8 h-8 rounded-full border-2 focus:outline-none"
-                    :class="appearance.accent === color ? 'border-blue-500' : 'border-transparent'"
-                    :style="{ backgroundColor: colorMap[color] }"
-                    @click="appearance.accent = color"
-                />
-              </div>
-            </div>
-
-            <Button @click="saveAppearance" class="gap-2 py-2 text-sm mt-4" style="background-color: #2ECC71; color: white">
-              Sauvegarder
-            </Button>
-          </div>
-        </Card>
       </TabsContent>
     </Tabs>
   </div>
@@ -378,19 +190,11 @@ definePageMeta({
   layout: 'dashboard'
 })
 
-// Import des icônes
+// Import des icônes nécessaires
 import {
   User,
-  CreditCard,
-  Bell,
   Shield,
-  Palette,
-  Globe,
-  Mail,
-  Key,
-  Smartphone,
-  DollarSignIcon,
-  ChevronDownIcon
+  CheckIcon
 } from "lucide-vue-next"
 
 // Import des composants UI
@@ -398,115 +202,119 @@ import Card from "~/components/ui/Card.vue"
 import Button from "~/components/ui/Button.vue"
 import Input from "~/components/ui/Input.vue"
 import Label from "~/components/ui/Label.vue"
-import Switch from "~/components/ui/Switch.vue"
 import Textarea from "~/components/ui/Textarea.vue"
-import Select from "~/components/ui/Select.vue"
-import Separator from "~/components/ui/Separator.vue"
 import Tabs from "~/components/ui/Tabs.vue"
 import TabsList from "~/components/ui/TabsList.vue"
 import TabsTrigger from "~/components/ui/TabsTrigger.vue"
 import TabsContent from "~/components/ui/TabsContent.vue"
 
+// Composables
+const { user, updateProfile, changePassword } = useAuth()
+
 // État réactif
 const activeTab = ref("profile")
+const loading = ref(false)
+const profileLoading = ref(false)
+const passwordLoading = ref(false)
+const apiErrors = ref({})
+const successMessage = ref('')
+const showToast = ref(false)
+const toastMessage = ref('')
 
-// Tabs data
+// Tabs data - seulement Profil et Sécurité
 const tabs = [
   { value: "profile", label: "Profil" },
-  { value: "payment", label: "Paiements" },
-  { value: "notifications", label: "Notifications" },
-  { value: "security", label: "Sécurité" },
-  { value: "appearance", label: "Apparence" }
+  { value: "security", label: "Sécurité" }
 ]
 
-// Profil
+// Profil - initialisé avec les données utilisateur réelles
 const profile = ref({
-  firstName: "Jean",
-  lastName: "Dupont",
-  email: "jean.dupont@email.com",
-  phone: "+33 6 12 34 56 78",
-  company: "Digital Solutions SARL",
-  bio: "Consultant en marketing digital avec 8 ans d'expérience."
-})
-
-// Préférences régionales
-const preferences = ref({
-  language: "fr",
-  timezone: "europe/paris"
-})
-
-// Paiements
-const paymentMethods = ref({
-  card: true,
-  mobileMoney: true,
-  bankTransfer: false
-})
-
-const paymentPreferences = ref({
-  currency: "EUR"
-})
-
-// Notifications
-const notifications = ref({
-  newPayments: true,
-  failedPayments: true,
-  weeklyReport: false,
-  marketing: false
+  name: user.value?.name || '',
+  email: user.value?.email || ''
 })
 
 // Sécurité
 const security = ref({
   currentPassword: "",
   newPassword: "",
-  confirmPassword: "",
-  twoFactorEnabled: false
+  confirmPassword: ""
 })
 
-// Apparence
-const appearance = ref({
-  theme: "light",
-  accent: "blue"
-})
+// Watcher pour mettre à jour le profil quand l'utilisateur change
+watch(user, (newUser) => {
+  if (newUser) {
+    profile.value.name = newUser.name || ''
+    profile.value.email = newUser.email || ''
+  }
+}, { immediate: true })
 
-const accentColors = ["blue", "green", "purple", "orange"]
-const colorMap = {
-  blue: "#3B82F6",
-  green: "#10B981",
-  purple: "#8B5CF6",
-  orange: "#F59E0B"
+// Fonction pour afficher le toast
+const displayToast = (message) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000)
 }
 
 // Méthodes
-const saveProfile = () => {
-  console.log("Profil sauvegardé :", profile.value)
+const saveProfile = async () => {
+  profileLoading.value = true
+  apiErrors.value = {}
+  successMessage.value = ''
+
+  try {
+    const response = await updateProfile({
+      name: profile.value.name,
+      email: profile.value.email
+    })
+
+    displayToast(response.message || 'Profil mis à jour avec succès')
+  } catch (err) {
+    if (err.data?.errors) {
+      apiErrors.value = err.data.errors
+    } else {
+      apiErrors.value = { global: [err.data?.message || 'Une erreur est survenue lors de la mise à jour du profil.'] }
+    }
+  } finally {
+    profileLoading.value = false
+  }
 }
 
-const savePreferences = () => {
-  console.log("Préférences sauvegardées :", preferences.value)
-}
-
-const savePaymentSettings = () => {
-  console.log("Paramètres de paiement sauvegardés :", { paymentMethods: paymentMethods.value, currency: paymentPreferences.value.currency })
-}
-
-const saveNotifications = () => {
-  console.log("Notifications sauvegardées :", notifications.value)
-}
-
-const changePassword = () => {
+const changePasswordHandler = async () => {
   if (security.value.newPassword !== security.value.confirmPassword) {
-    alert("Les mots de passe ne correspondent pas.")
+    apiErrors.value = { password_confirmation: ['Les mots de passe ne correspondent pas.'] }
     return
   }
-  console.log("Changement de mot de passe demandé")
-}
 
-const configure2FA = () => {
-  alert("Configuration 2FA ouverte")
-}
+  passwordLoading.value = true
+  apiErrors.value = {}
+  successMessage.value = ''
 
-const saveAppearance = () => {
-  console.log("Apparence sauvegardée :", appearance.value)
+  try {
+    const response = await changePassword({
+      current_password: security.value.currentPassword,
+      password: security.value.newPassword,
+      password_confirmation: security.value.confirmPassword
+    })
+
+    displayToast(response.message || 'Mot de passe changé avec succès')
+    
+    // Réinitialiser le formulaire
+    security.value = {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    }
+  } catch (err) {
+    if (err.data?.errors) {
+      apiErrors.value = err.data.errors
+    } else {
+      apiErrors.value = { global: [err.data?.message || 'Une erreur est survenue lors du changement de mot de passe.'] }
+    }
+  } finally {
+    passwordLoading.value = false
+  }
 }
 
 // Calculé
