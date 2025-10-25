@@ -1,7 +1,7 @@
 <!-- components/ui/Card.vue -->
 <template>
   <div
-      class="bg-white rounded-xl shadow-sm border border-gray-200"
+      class="bg-white rounded-sm  border border-gray-200"
       :class="props.class"
   >
     <slot />

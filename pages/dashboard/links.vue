@@ -18,7 +18,6 @@
       </div>
 
       <!-- Recherche et filtres -->
-      <Card class="p-4">
         <div class="flex flex-col sm:flex-row gap-3">
           <div class="flex-1">
             <input
@@ -26,13 +25,13 @@
               @input="debouncedSearch"
               type="text"
               placeholder="Rechercher par titre, description ou URL..."
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+              class="w-full px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
             />
           </div>
           <select
             v-model="filterStatus"
             @change="applyFilters"
-            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            class="px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
           >
             <option value="all">Tous les statuts</option>
             <option value="active">Actifs</option>
@@ -41,20 +40,19 @@
           <select
             v-model="filterExpired"
             @change="applyFilters"
-            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            class="px-3 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
           >
             <option value="all">Tous</option>
             <option value="false">Valides</option>
             <option value="true">Expirés</option>
           </select>
         </div>
-      </Card>
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <Card class="p-3 sm:p-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
               <Link2Icon class="w-5 h-5" style="color: #0A1F44" />
             </div>
             <div>
@@ -68,8 +66,8 @@
 
         <Card class="p-3 sm:p-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <EyeIcon class="w-5 h-5" style="color: #2ECC71" />
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <EyeIcon class="w-5 h-5" style="color: #0A1F44" />
             </div>
             <div>
               <p class="text-xs sm:text-sm text-gray-600">Total des clics</p>
@@ -82,8 +80,8 @@
 
         <Card class="p-3 sm:p-4">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
-              <DollarSignIcon class="w-5 h-5" style="color: #F39C12" />
+            <div class="w-10 h-10 rounded-full bg-gray-100  flex items-center justify-center flex-shrink-0">
+              <DollarSignIcon class="w-5 h-5" style="color: #0A1F44" />
             </div>
             <div>
               <p class="text-xs sm:text-sm text-gray-600">Total collecté</p>

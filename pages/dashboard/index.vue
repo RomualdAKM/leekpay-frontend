@@ -5,14 +5,14 @@
       <p class="text-sm text-gray-600">Vue d'ensemble de vos performances</p>
     </div>
 
-    <div class="bg-white rounded-lg border border-gray-200 p-4">
+    <div class="bg-white rounded-md">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">Filtrer par lien</label>
           <select
             v-model="selectedLink"
             @change="fetchDashboard"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
             :disabled="loading"
           >
             <option value="">Tous les liens</option>
@@ -26,7 +26,7 @@
           <select
             v-model="selectedPeriod"
             @change="fetchDashboard"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+            class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
             :disabled="loading"
           >
             <option value="">Toute la période</option>

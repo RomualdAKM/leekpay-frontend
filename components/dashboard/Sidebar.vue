@@ -2,7 +2,7 @@
 <template>
   <div class="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
     <!-- Logo -->
-    <div class="p-5 sm:p-6 border-b border-gray-200">
+    <div class="p-5 sm:p-6  border-gray-200">
       <div class="flex items-center gap-3">
         <!-- Logo (image ou SVG) -->
         <div class="w-10 h-10 rounded-lg flex items-center justify-center" >
@@ -24,8 +24,7 @@
     <div class="p-4">
       <button
           @click="onSectionChange('dashboard/create-link')"
-          class="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-white font-medium transition-colors"
-          style="background-color: #2ECC71"
+          class="w-full bg-green-500 flex items-center gap-2 px-4 py-3 rounded-sm text-white font-medium transition-colors"
       >
         <PlusIcon class="w-4 h-4" />
         Créer un lien
@@ -37,7 +36,7 @@
       <template v-for="item in menuItems" :key="item.id">
         <button
             @click="onSectionChange(item.id)"
-            class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors"
+            class="w-full flex items-center gap-3 px-4 py-3 rounded-sm text-left transition-colors"
             :class="{ 'bg-green-500 text-white': activeSection === item.id, 'text-gray-600 hover:bg-gray-50': activeSection !== item.id }"
         >
           <component :is="item.icon" class="w-5 h-5" />
@@ -84,7 +83,7 @@ const props = defineProps({
     required: true
   }
 })
-const { user, logout } = useAuth()
+const { user, logout, isAdmin } = useAuth()
 const router = useRouter()
 const handleLogout = async () => {
   await logout()
@@ -97,14 +96,26 @@ const onSectionChange = (section) => {
   emit('section-change', section)
 }
 
-const menuItems = [
-  { id: 'dashboard', label: 'Tableau de Bord', icon: HomeIcon },
-  { id: 'dashboard/links', label: 'Mes Liens', icon: LinkIcon },
-  { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
-  { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
-  { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
-]
+const menuItems = computed(() => {
+  const baseItems = [
+    { id: 'dashboard', label: 'Tableau de Bord', icon: HomeIcon },
+    { id: 'dashboard/links', label: 'Mes Liens', icon: LinkIcon },
+    { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
+    { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
+    { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
+  ]
+
+  // Ajouter les éléments admin si l'utilisateur est admin
+  if (isAdmin.value) {
+    baseItems.splice(-1, 0, // Insérer avant "Paramètres"
+      { id: 'dashboard/admin/stats', label: 'Statistiques Admin', icon: BarChart3Icon },
+      { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: ShieldCheckIcon }
+    )
+  }
+
+  return baseItems
+})
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon  } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon } from 'lucide-vue-next'
 </script>

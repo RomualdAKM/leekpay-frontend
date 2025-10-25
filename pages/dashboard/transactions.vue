@@ -5,7 +5,7 @@
       <p class="text-sm text-gray-600">Historique de tous vos paiements</p>
     </div>
 
-    <div class="bg-white rounded-lg border border-gray-200 p-4">
+    <div class="bg-white">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div>
           <label class="block text-xs font-medium text-gray-700 mb-1">Rechercher</label>

@@ -78,13 +78,25 @@ export const useAuth = () => {
         return response
     }
 
+    // Vérifier si l'utilisateur est admin
+    const isAdmin = computed(() => {
+        return user.value?.role === 'admin'
+    })
+
+    // Vérifier si l'utilisateur a un rôle spécifique
+    const hasRole = (role: string) => {
+        return user.value?.role === role
+    }
+
     return {
         token,
         user,
+        isAdmin,
         setAuth,
         clearAuth,
         logout,
         updateProfile,
         changePassword,
+        hasRole,
     }
 }
