@@ -108,7 +108,7 @@
                   {{ formatCurrency(withdrawal.amount) }}
                 </div>
                 <div class="text-sm text-gray-500">
-                  Frais: {{ formatCurrency(withdrawal.fees) }}
+                  Frais: {{ formatCurrency(withdrawal.total_fees) }}
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
@@ -295,12 +295,12 @@
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Frais</label>
-                <p class="text-lg font-semibold text-red-600">{{ formatCurrency(selectedWithdrawalDetails.fees) }}</p>
+                <p class="text-lg font-semibold text-red-600">{{ formatCurrency(selectedWithdrawalDetails.total_fees) }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Montant net</label>
                 <p class="text-lg font-semibold text-green-600">
-                  {{ formatCurrency(selectedWithdrawalDetails.amount - selectedWithdrawalDetails.fees) }}
+                  {{ formatCurrency(selectedWithdrawalDetails.amount - selectedWithdrawalDetails.total_fees) }}
                 </p>
               </div>
             </div>

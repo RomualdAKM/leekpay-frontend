@@ -87,7 +87,7 @@
                       id="amount"
                       type="number"
                       v-model="withdrawalAmount"
-                      :min="minimumWithdrawal"
+                      :min="feesConfig.minimum_withdrawal"
                       :max="userBalance.available_balance"
                       placeholder="0"
                       class="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -97,13 +97,13 @@
                   </div>
                 </div>
                 <p class="mt-2 text-sm text-gray-500">
-                  Minimum: {{ formatCurrency(minimumWithdrawal) }} • Maximum: {{ formatCurrency(userBalance.available_balance) }}
+                  Minimum: {{ formatCurrency(feesConfig.minimum_withdrawal) }} • Maximum: {{ formatCurrency(userBalance.available_balance) }}
                 </p>
               </div>
 
               <!-- Résumé Calcul -->
               <div
-                  v-if="withdrawalAmount && parseFloat(withdrawalAmount) >= minimumWithdrawal"
+                  v-if="withdrawalAmount && parseFloat(withdrawalAmount) >= feesConfig.minimum_withdrawal"
                   class="bg-gray-50 rounded-lg p-4"
               >
                 <div class="space-y-3">
@@ -112,16 +112,16 @@
                     <span class="font-medium">{{ formatCurrency(parseFloat(withdrawalAmount)) }}</span>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">Frais de traitement ({{ feesPercentage * 100 }}%)</span>
+                    <span class="text-gray-600">Frais totaux ({{ feesConfig.leekpay.percentage + feesConfig.aggregator.percentage }}%)</span>
                     <span class="font-medium text-red-600">
-                      -{{ formatCurrency(calculateFees(parseFloat(withdrawalAmount))) }}
+                      -{{ formatCurrency(calculateFees(parseFloat(withdrawalAmount)).totalFees) }}
                     </span>
                   </div>
                   <div class="border-t border-gray-200 pt-3">
                     <div class="flex justify-between font-semibold">
                       <span>Montant à recevoir</span>
                       <span class="text-green-600">
-                        {{ formatCurrency((parseFloat(withdrawalAmount) - calculateFees(parseFloat(withdrawalAmount)))) }}
+                        {{ formatCurrency(calculateFees(parseFloat(withdrawalAmount)).netAmount) }}
                       </span>
                     </div>
                   </div>
@@ -160,7 +160,7 @@
               <button
                   :disabled="
                     !withdrawalAmount ||
-                    parseFloat(withdrawalAmount) < minimumWithdrawal ||
+                    parseFloat(withdrawalAmount) < feesConfig.minimum_withdrawal ||
                     parseFloat(withdrawalAmount) > userBalance.available_balance ||
                     !selectedMethod ||
                     requestingWithdrawal
@@ -603,9 +603,31 @@ const checkScreen = () => {
   isMobile.value = window.innerWidth < 768
 }
 
+// Fetch fees configuration
+const fetchFeesConfig = async () => {
+  try {
+    const response = await $fetch('/withdrawal-requests/fees-config', {
+      method: 'GET',
+      baseURL: config.public.apiBaseURL,
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/json'
+      }
+    })
+    
+    if (response.success) {
+      feesConfig.value = response.data
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement de la configuration des frais:', error)
+    // Garder les valeurs par défaut en cas d'erreur
+  }
+}
+
 onMounted(() => {
   checkScreen()
   window.addEventListener('resize', checkScreen)
+  fetchFeesConfig()
   fetchUserBalance()
   fetchWithdrawalMethods()
   fetchWithdrawalHistory()
@@ -635,8 +657,21 @@ const historyPagination = ref({
   total: 0
 })
 
-const minimumWithdrawal = 1000 // 1000 CFA minimum
-const feesPercentage = 0.02 // 2% fees
+// Configuration des frais (sera récupérée depuis l'API)
+const feesConfig = ref({
+  leekpay: {
+    rate: 0.02,
+    minimum: 100,
+    percentage: 2
+  },
+  aggregator: {
+    rate: 0.01,
+    minimum: 50,
+    percentage: 1
+  },
+  minimum_withdrawal: 1000
+})
+
 const currencySymbol = 'CFA'
 
 // UI State
@@ -764,15 +799,22 @@ const fetchWithdrawalHistory = async (page = 1) => {
   }
 }
 
-// Calculate fees
+// Calculate fees using backend configuration
 const calculateFees = (amount) => {
-  return amount * feesPercentage
+  const leekpayFee = Math.max(amount * feesConfig.value.leekpay.rate, feesConfig.value.leekpay.minimum)
+  const aggregatorFee = Math.max(amount * feesConfig.value.aggregator.rate, feesConfig.value.aggregator.minimum)
+  return {
+    leekpayFee,
+    aggregatorFee,
+    totalFees: leekpayFee + aggregatorFee,
+    netAmount: amount - (leekpayFee + aggregatorFee)
+  }
 }
 
 // Handle withdrawal request
 const handleWithdrawalRequest = async () => {
   const amount = parseFloat(withdrawalAmount.value)
-  if (!amount || amount < minimumWithdrawal || amount > userBalance.value.available_balance || !selectedMethod.value) {
+  if (!amount || amount < feesConfig.value.minimum_withdrawal || amount > userBalance.value.available_balance || !selectedMethod.value) {
     showToast('Veuillez vérifier les informations de retrait.')
     return
   }
