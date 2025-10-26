@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+  <div class=" mx-auto space-y-6">
     <!-- Toast Notification -->
     <Transition
       enter-active-class="transition ease-out duration-300"
@@ -23,10 +23,10 @@
       <Button
           variant="outline"
           @click="onBack"
-          class="gap-2 w-full sm:w-auto text-sm py-2"
+          class="gap-1 w-full sm:w-auto text-sm py-2"
       >
         <ArrowLeftIcon class="w-4 h-4" />
-        Retour
+        
       </Button>
       <div>
         <h1 class="text-xl sm:text-2xl font-bold" style="color: #0A1F44">Créer un lien de paiement</h1>
@@ -45,7 +45,6 @@
                 id="title"
                 v-model="formData.title"
                 @input="generateUrlFromTitle"
-                placeholder="Ex: Formation JavaScript"
                 required
                 class="text-sm py-2"
             />
@@ -57,7 +56,6 @@
             <Textarea
                 id="description"
                 v-model="formData.description"
-                placeholder="Décrivez votre produit ou service..."
                 :rows="3"
                 required
                 class="text-sm py-2"
@@ -94,7 +92,8 @@
           <!-- Image Upload -->
           <div class="space-y-2">
             <Label for="image" class="text-sm">Image (optionnel)</Label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center">
+            <div class="text-center">
+            <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center"> -->
               <UploadIcon class="w-8 h-8 text-gray-400 mx-auto mb-2" />
               <p class="text-xs sm:text-sm text-gray-600 mb-2">
                 Cliquez pour sélectionner une image
@@ -121,16 +120,17 @@
           </div>
 
           <!-- PDF Upload -->
-          <div class="space-y-2">
-            <Label for="pdf" class="text-sm">PDF à télécharger (optionnel)</Label>
-            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+          <div class="space-y-2v mt-4">
+            <Label for="pdf" class="text-sm mt-8">PDF à télécharger (optionnel)</Label>
+            <div class="text-center">
+            <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"> -->
               <Button
                   type="button"
                   variant="outline"
                   @click="$refs.pdfInput.click()"
-                  class="w-full gap-2 text-sm py-2 sm:py-3"
+                  class="w-full gap-2 text-sm py-2 sm:py-2 mt-2"
               >
-                <UploadIcon class="w-4 h-4" />
+                <UploadIcon class="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 Ajouter un PDF
               </Button>
               <input
@@ -168,7 +168,6 @@
                   step="0.01"
                   min="0.01"
                   v-model="formData.fixedAmount"
-                  placeholder="0.00"
                   class="text-sm py-2 w-full"
                   required
               />
@@ -184,6 +183,21 @@
                 v-model="formData.expirationDate"
                 class="text-sm py-2"
             />
+          </div>
+
+          <!-- Redirect URL -->
+          <div class="space-y-2">
+            <Label for="redirectUrl" class="text-sm">URL de redirection après paiement (optionnel)</Label>
+            <Input
+                id="redirectUrl"
+                type="url"
+                v-model="formData.redirectUrl"
+                placeholder="https://example.com/success"
+                class="text-sm py-2"
+            />
+            <p class="text-xs text-gray-500">
+              Les utilisateurs seront redirigés vers cette URL après un paiement réussi
+            </p>
           </div>
 
           <!-- Erreur API -->
@@ -323,7 +337,7 @@
         </Card>
 
         <!-- Tips -->
-        <Card class="p-4 sm:p-6 border-l-4" :style="{ borderLeftColor: '#F39C12' }">
+        <!-- <Card class="p-4 sm:p-6 border-l-4" :style="{ borderLeftColor: '#F39C12' }">
           <h4 class="font-semibold text-sm sm:text-base mb-2 sm:mb-3" style="color: #0A1F44">
             Conseils pour optimiser vos liens
           </h4>
@@ -333,7 +347,7 @@
             <li>• Créez des URLs courtes et mémorables</li>
             <li>• Définissez une date d'expiration si nécessaire</li>
           </ul>
-        </Card>
+        </Card> -->
       </div>
     </div>
   </div>
@@ -375,7 +389,8 @@ const formData = ref({
   pdf: null,
   amountType: 'fixed',
   fixedAmount: null,
-  expirationDate: ''
+  expirationDate: '',
+  redirectUrl: ''
 })
 
 const loading = ref(false)
@@ -556,6 +571,10 @@ const handleSubmit = async (event) => {
       body.append('expires_at', date.toISOString())
     }
 
+    if (formData.value.redirectUrl) {
+      body.append('redirect_url', formData.value.redirectUrl)
+    }
+
     if (formData.value.image) {
       body.append('image', formData.value.image)
     }
@@ -643,7 +662,8 @@ const resetForm = () => {
     pdf: null,
     amountType: 'fixed',
     fixedAmount: null,
-    expirationDate: ''
+    expirationDate: '',
+    redirectUrl: ''
   }
   generatedLink.value = null
   qrCodeUrl.value = null

@@ -17,6 +17,16 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Paiement réussi !</h2>
         <p class="text-gray-600 mb-6">Votre transaction a été traitée avec succès.</p>
         
+        <!-- Redirection message -->
+        <div v-if="transaction.payment_link?.redirect_url" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-center">
+            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+            <p class="text-blue-800 text-sm">
+              Vous allez être redirigé automatiquement dans quelques secondes...
+            </p>
+          </div>
+        </div>
+        
         <!-- Transaction details -->
         <div class="bg-white p-6 rounded-lg  border border-gray-200 text-left mb-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la transaction</h3>
@@ -240,6 +250,13 @@ const checkStatus = async () => {
     
     if (response.success) {
       transaction.value = response.data
+      
+      // Redirection automatique si le paiement est réussi et qu'une URL de redirection est définie
+      if (transaction.value.status === 'paid' && transaction.value.payment_link?.redirect_url) {
+        setTimeout(() => {
+          window.location.href = transaction.value.payment_link.redirect_url
+        }, 3000) // Redirection après 3 secondes pour laisser le temps de voir le message de succès
+      }
     } else {
       error.value = response.message || 'Erreur lors de la récupération du statut'
     }

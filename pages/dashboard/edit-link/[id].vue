@@ -1,6 +1,5 @@
 <template>
   <div class="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
-    <!-- Toast Notification -->
     <Transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0 translate-y-2"
@@ -18,7 +17,6 @@
       </div>
     </Transition>
 
-    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
       <Button
           variant="outline"
@@ -206,6 +204,21 @@
             />
           </div>
 
+          <!-- Redirect URL -->
+          <div class="space-y-2">
+            <Label for="redirectUrl" class="text-sm">URL de redirection (optionnel)</Label>
+            <Input
+                id="redirectUrl"
+                type="url"
+                v-model="formData.redirectUrl"
+                placeholder="https://example.com/success"
+                class="text-sm py-2"
+            />
+            <p class="text-xs text-gray-500">
+              URL vers laquelle rediriger l'utilisateur après un paiement réussi
+            </p>
+          </div>
+
           <!-- Messages -->
           <div v-if="error" class="text-red-600 text-sm p-2 bg-red-50 rounded text-center">
             {{ error }}
@@ -286,7 +299,8 @@ const formData = ref({
   pdf: null,
   amountType: 'fixed',
   fixedAmount: null,
-  expirationDate: ''
+  expirationDate: '',
+  redirectUrl: ''
 })
 
 const imagePreview = ref(null)
@@ -421,7 +435,8 @@ onMounted(async () => {
       pdf: null,
       amountType: link.amount_type,
       fixedAmount: link.fixed_amount,
-      expirationDate: link.expires_at ? link.expires_at.substring(0, 10) : ''
+      expirationDate: link.expires_at ? link.expires_at.substring(0, 10) : '',
+      redirectUrl: link.redirect_url || ''
     }
 
     if (link.currency?.symbol) {
@@ -492,6 +507,10 @@ const handleSubmit = async () => {
       const date = new Date(formData.value.expirationDate)
       date.setHours(23, 59, 59, 999)
       body.append('expires_at', date.toISOString())
+    }
+    
+    if (formData.value.redirectUrl) {
+      body.append('redirect_url', formData.value.redirectUrl)
     }
     
     if (formData.value.image) body.append('image', formData.value.image)
