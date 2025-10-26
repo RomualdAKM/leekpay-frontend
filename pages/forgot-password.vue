@@ -8,8 +8,18 @@
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-slate-900 mb-6">Mot de passe oublié ?</h1>
             <p class="text-gray-700 mb-6">
-              Entrez votre adresse e-mail ci-dessous et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+              Entrez votre adresse e-mail ci-dessous et nous vous enverrons un mot de passe temporaire.
             </p>
+          </div>
+
+          <!-- Message de succès -->
+          <div v-if="successMessage" class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              <p class="text-green-700 text-sm">{{ successMessage }}</p>
+            </div>
           </div>
 
           <form @submit.prevent="handleSubmit" class="space-y-6">
@@ -26,17 +36,28 @@
                     id="email"
                     placeholder="Adresse e-mail"
                     class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                    :class="{ 'border-red-300': apiErrors.email }"
                     required
                 />
               </div>
+              <!-- Erreur de validation pour l'email -->
+              <div v-if="apiErrors.email" class="text-red-600 text-sm mt-1">
+                {{ apiErrors.email[0] }}
+              </div>
+            </div>
+
+            <!-- Erreur globale -->
+            <div v-if="apiErrors.global" class="text-red-600 text-sm p-2 bg-red-50 rounded text-center">
+              {{ apiErrors.global[0] }}
             </div>
 
             <!-- Bouton Réinitialiser -->
             <button
                 type="submit"
-                class="w-full bg-green-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-600 transition shadow-md"
+                :disabled="loading"
+                class="w-full bg-green-500 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-600 transition shadow-md disabled:opacity-70"
             >
-              Réinitialiser le mot de passe
+              {{ loading ? 'Envoi en cours...' : 'Réinitialiser le mot de passe' }}
             </button>
 
             <!-- Lien Se connecter -->
@@ -57,11 +78,36 @@ definePageMeta({
 })
 
 const email = ref('')
+const loading = ref(false)
+const apiErrors = ref({})
+const successMessage = ref('')
 
-const handleSubmit = () => {
-  // Ici, vous enverrez l'email à votre backend (Laravel)
-  console.log('Email:', email.value)
-  // Ex: await $fetch('/api/forgot-password', { method: 'POST', body: { email: email.value } })
-  alert('Un lien de réinitialisation a été envoyé à votre adresse e-mail.')
+const config = useRuntimeConfig()
+
+const handleSubmit = async () => {
+  loading.value = true
+  apiErrors.value = {}
+  successMessage.value = ''
+
+  try {
+    const response = await $fetch('/forgot-password', {
+      method: 'POST',
+      baseURL: config.public.apiBaseURL,
+      body: {
+        email: email.value
+      }
+    })
+
+    successMessage.value = response.message
+    email.value = '' // Réinitialiser le champ email
+  } catch (err) {
+    if (err.data?.errors) {
+      apiErrors.value = err.data.errors
+    } else {
+      apiErrors.value = { global: [err.data?.message || 'Une erreur est survenue lors de l\'envoi de l\'email.'] }
+    }
+  } finally {
+    loading.value = false
+  }
 }
 </script>

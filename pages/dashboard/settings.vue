@@ -67,7 +67,7 @@
       <!-- Profil -->
       <TabsContent value="profile" class="space-y-6">
         <!-- Informations personnelles -->
-        <Card class="border border-gray-200 rounded-lg p-5">
+        <Card >
           <div class="flex items-center gap-2 mb-3">
             <User class="w-5 h-5 text-gray-500" />
             <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Informations personnelles</h3>
@@ -120,7 +120,7 @@
       <!-- Sécurité -->
       <TabsContent value="security" class="space-y-6">
         <!-- Mot de passe -->
-        <Card class="border border-gray-200 rounded-lg p-5">
+        <Card >
           <div class="flex items-center gap-2 mb-3">
             <Shield class="w-5 h-5 text-gray-500" />
             <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Sécurité</h3>

@@ -53,12 +53,10 @@
           <!-- Description -->
           <div class="space-y-2">
             <Label for="description" class="text-sm">Description *</Label>
-            <Textarea
-                id="description"
+            <RichTextEditor
                 v-model="formData.description"
-                :rows="3"
-                required
-                class="text-sm py-2"
+                placeholder="Décrivez votre lien de paiement..."
+                class="text-sm"
             />
           </div>
 
@@ -315,8 +313,7 @@
               <h4 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">
                 {{ formData.title || 'Titre du produit' }}
               </h4>
-              <p class="text-xs sm:text-sm text-gray-600 mt-1">
-                {{ formData.description || 'Description du produit...' }}
+              <p v-html="formData.description" class="text-xs sm:text-sm text-gray-600 mt-1">
               </p>
             </div>
             <div class="pt-3 sm:pt-4 border-t">
@@ -364,7 +361,7 @@ import {
 import Button from "~/components/ui/Button.vue"
 import Card from "~/components/ui/Card.vue"
 import Input from "~/components/ui/Input.vue"
-import Textarea from "~/components/ui/Textarea.vue"
+import RichTextEditor from "~/components/ui/RichTextEditor.vue"
 import Switch from "~/components/ui/Switch.vue"
 import Label from "~/components/ui/Label.vue"
 

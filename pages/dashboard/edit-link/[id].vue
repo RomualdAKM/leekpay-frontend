@@ -59,12 +59,9 @@
           <!-- Description -->
           <div class="space-y-2">
             <Label for="description" class="text-sm">Description *</Label>
-            <Textarea
-                id="description"
+            <RichTextEditor
                 v-model="formData.description"
-                :rows="3"
-                required
-                class="text-sm py-2"
+                placeholder="Entrez la description de votre lien de paiement..."
             />
           </div>
 
@@ -252,8 +249,7 @@
           </div>
           <div class="pt-3">
             <h4 class="font-semibold">{{ formData.title || 'Titre' }}</h4>
-            <p class="text-sm text-gray-600">
-              {{ formData.description || 'Description...' }}
+            <p v-html="formData.description" class="text-sm text-gray-600">
             </p>
             <p class="text-xs sm:text-sm text-gray-600 mb-1">
               URL:
@@ -280,7 +276,7 @@ import { ArrowLeftIcon, UploadIcon, CheckIcon } from 'lucide-vue-next'
 import Button from '~/components/ui/Button.vue'
 import Card from '~/components/ui/Card.vue'
 import Input from '~/components/ui/Input.vue'
-import Textarea from '~/components/ui/Textarea.vue'
+import RichTextEditor from '~/components/ui/RichTextEditor.vue'
 import Switch from '~/components/ui/Switch.vue'
 import Label from '~/components/ui/Label.vue'
 

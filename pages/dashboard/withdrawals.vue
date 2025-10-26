@@ -77,7 +77,7 @@
 
         <!-- Nouvelle Demande -->
         <TabsContent value="request" class="pt-6">
-          <div class="bg-white rounded-lg border border-gray-200 p-6">
+          <div class="bg-white">
             <div class="space-y-6">
               <!-- Montant -->
               <div>

@@ -9,11 +9,10 @@
         </div>
         <Button
             @click="navigateToCreateLink"
-            class="gap-2 w-full md:w-auto py-2 text-sm sm:text-base"
+            class="flex items-center gap-2 w-full md:w-auto py-2 text-sm sm:text-base"
             :style="{ backgroundColor: '#2ECC71', color: 'white' }"
         >
-          <Link2Icon class="w-4 h-4" />
-          Créer un lien
+          <Link2Icon class="w-4 h-4" /> Créer un lien
         </Button>
       </div>
 

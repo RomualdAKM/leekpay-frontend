@@ -115,7 +115,7 @@
       </div>
     </div>
 
-    <div v-if="!loading && pagination.last_page > 1" class="bg-white rounded-lg border border-gray-200 p-4">
+    <div v-if="!loading && pagination.last_page > 1" class="bg-white ">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-600">
           {{ pagination.total }} transaction{{ pagination.total > 1 ? 's' : '' }} au total
@@ -231,12 +231,12 @@
                   {{ formatAmount(selectedTransaction.leekpay_fee) }} {{ selectedTransaction.currency?.code || 'EUR' }}
                 </p>
               </div>
-              <div>
+              <!-- <div>
                 <p class="text-xs text-gray-500 mb-1">Frais agrégateur</p>
                 <p class="text-sm text-gray-900">
                   {{ formatAmount(selectedTransaction.aggregator_fee) }} {{ selectedTransaction.currency?.code || 'EUR' }}
                 </p>
-              </div>
+              </div> -->
               <div>
                 <p class="text-xs text-gray-500 mb-1">Montant net</p>
                 <p class="text-sm font-semibold text-green-700">
