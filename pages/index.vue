@@ -25,9 +25,9 @@
             <p class="text-lg text-gray-700 mb-8 leading-relaxed max-w-xl">
               La plateforme qui vous permet de générer des liens de paiement en 1 clic, de les partager sur WhatsApp, réseaux sociaux ou email, et d’encaisser instantanément via Mobile Money ou carte bancaire.
             </p>
-            <button class="bg-amber-500 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-amber-600 transition mt-2 shadow-md">
+            <NuxtLink to="/register" class="bg-amber-500 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-amber-600 transition mt-2 shadow-md">
               Démarrer
-            </button>
+            </NuxtLink>
           </div>
           <!-- Colonne Image -->
           <div class="rounded-xl overflow-hidden">
@@ -110,25 +110,25 @@
             <!-- Image -->
             <img
                 v-if="activeTab === 0"
-                src="~/assets/img/formations.png"
+                src="~/assets/img/formation_consultation.png"
                 alt="Formations & consultations"
                 class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 1"
-                src="~/assets/img/formations.png"
+                src="~/assets/img/vente_enligen_rs.png"
                 alt="Ventes en ligne"
                 class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 2"
-                src="~/assets/img/formations.png"
+                src="~/assets/img/associations_dons.png"
                 alt="Associations & dons"
                 class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
             <img
                 v-else-if="activeTab === 3"
-                src="~/assets/img/formations.png"
+                src="~/assets/img/services_prestations.png"
                 alt="Services & prestations"
                 class="w-full h-auto rounded-xl shadow-md border-2 border-green-500 order-2 md:order-1"
             />
@@ -155,100 +155,60 @@
       </div>
     </section>
 
-    <!-- Adoption -->
+
+    <!-- Réseaux et agrégateurs – Slider automatique en fondu -->
     <section class="py-16 px-6 md:px-12 bg-gray-50">
       <div class="container mx-auto text-center">
-        <h2 class="text-2xl font-bold text-slate-900 mb-12">LeekPay, adopté en Afrique et au-delà.</h2>
+        <h2 class="text-2xl font-bold text-slate-900 mb-12">
+          Paiements possibles via nos partenaires et réseaux
+        </h2>
 
-        <!-- Wrapper du carrousel -->
-        <div class="relative max-w-4xl mx-auto px-8">
-          <!-- Conteneur du carrousel -->
-          <div ref="carousel" class="flex overflow-x-auto scroll-smooth pb-4 space-x-6 justify-center">
-            <!-- Bénin -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-bj text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Bénin</span>
-            </div>
-            <!-- Côte d'Ivoire -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-ci text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Côte d'Ivoire</span>
-            </div>
-            <!-- Mali -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-ml text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Mali</span>
-            </div>
-            <!-- Sénégal -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-sn text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Sénégal</span>
-            </div>
-            <!-- Togo -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-tg text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Togo</span>
-            </div>
-            <!-- Burkina Faso -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-bf text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Burkina Faso</span>
-            </div>
-            <!-- Niger -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-ne text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Niger</span>
-            </div>
-            <!-- Guinée -->
-            <div class="flex flex-col items-center flex-shrink-0">
-              <span class="fi fi-gn text-3xl md:text-4xl rounded-lg shadow-sm"></span>
-              <span class="text-xs text-gray-600 mt-2 font-medium whitespace-nowrap">Guinée</span>
-            </div>
+        <div
+            class="relative max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto"
+            @mouseenter="isPaused = true"
+            @mouseleave="isPaused = false"
+            @focusin="isPaused = true"
+            @focusout="isPaused = false"
+            tabindex="0"
+            role="region"
+            aria-label="Partenaires de paiement"
+        >
+          <div
+              v-for="(partner, index) in partners"
+              :key="index"
+              class="flex flex-col items-center transition-opacity duration-700 ease-in-out absolute inset-0"
+              :class="currentPartnerIndex === index ? 'opacity-100 relative' : 'opacity-0'"
+              :aria-hidden="currentPartnerIndex !== index"
+          >
+            <img
+                :src="partner.logo"
+                :alt="partner.name"
+                class="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-md object-contain"
+            />
+            <span class="mt-4 text-lg font-medium text-gray-800">{{ partner.name }}</span>
           </div>
 
-          <!-- Flèches de navigation -->
-          <button
-              @click="scrollLeft"
-              class="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100 transition z-10"
-              aria-label="Précédent"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <button
-              @click="scrollRight"
-              class="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-1.5 rounded-full shadow-md hover:bg-gray-100 transition z-10"
-              aria-label="Suivant"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-
-          <!-- Indicateurs de points (optionnel) -->
-          <div class="flex justify-center mt-6 space-x-2">
+          <!-- Points de navigation -->
+          <div class="flex justify-center gap-2 mt-8 relative z-10">
             <button
-                v-for="(country, index) in countries"
-                :key="index"
-                @click="scrollToIndex(index)"
-                :class="[
-            'w-2 h-2 rounded-full transition',
-            currentIndex === index ? 'bg-green-500' : 'bg-gray-300'
-          ]"
-                class="focus:outline-none"
-                :aria-label="`Aller à ${country}`"
+                v-for="(_, i) in partners"
+                :key="i"
+                @click="goToPartner(i)"
+                :aria-label="`Voir ${partners[i].name}`"
+                class="w-3 h-3 rounded-full transition-all"
+                :class="currentPartnerIndex === i ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-500'"
             ></button>
           </div>
         </div>
       </div>
     </section>
 
+
     <!-- Fonctionnalités -->
     <section class="py-12 sm:py-20 px-6 md:px-12 bg-white">
       <div class="container mx-auto">
-        <!-- Titre principal avec mise en valeur et mascotte -->
+
+        <!-- Titre principal -->
         <div class="flex flex-col items-center md:flex-row md:items-center md:justify-center gap-4 mb-16 text-center md:text-left">
           <h2 class="text-3xl font-bold text-slate-900 leading-tight">
             De la création du lien au retrait de vos fonds,
@@ -256,77 +216,80 @@
           <em class="text-orange-500 font-medium text-2xl not-italic relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-16 after:h-0.5 after:bg-orange-300">
             tout devient facile.
           </em>
-          <img
-              src="~/assets/img/Mascotte_LeekPay.png"
-              alt="Mascotte LeekPay"
-              class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full shadow-md mt-2 md:mt-0"
-          />
+          <img src="~/assets/img/Mascotte_LeekPay.png" alt="Mascotte LeekPay"
+               class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full shadow-md mt-2 md:mt-0" />
         </div>
 
         <!-- Wrapper global -->
         <div class="space-y-20">
+
           <!-- Fonctionnalité 1 : image à gauche -->
-          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
-            <img
-                src="~/assets/img/creer_partage_partout.png"
-                alt="Création de liens"
-                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md ml-auto border-4 border-green-100"
-            />
-            <div>
-              <div class="flex items-center mb-4">
-                <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
-                <h2 class="text-3xl font-bold text-slate-900">Créez vos liens et partagez-les partout</h2>
+          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition md:mx-auto md:max-w-6xl">
+            <div class="flex items-center">
+              <img src="~/assets/img/creer_partage_partout.png" alt="Création de liens"
+                   class="w-auto h-auto lg:max-h-[420px] object-contain rounded-xl shadow-md ml-auto border-4 border-green-100 transition-all duration-300 ease-in-out" />
+            </div>
+            <div class="flex items-center">
+              <div class="max-w-xl mx-auto">
+                <div class="flex items-center mb-4">
+                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <h2 class="text-3xl font-bold text-slate-900">Créez vos liens et partagez-les partout</h2>
+                </div>
+                <p class="text-lg text-gray-800 leading-relaxed mb-4">
+                  Créez en quelques secondes un lien de paiement adapté à vos besoins : montant fixe ou libre, description claire, image, expiration... Tout est pensé pour vous faciliter la vie.
+                </p>
+                <p class="text-lg text-gray-800 leading-relaxed">
+                  Diffusez vos liens de paiement sur WhatsApp, SMS, email ou réseaux sociaux, et offrez à vos clients une expérience fluide où qu'ils soient.
+                </p>
               </div>
-              <p class="text-lg text-gray-800 leading-relaxed mb-4">
-                Créez en quelques secondes un lien de paiement adapté à vos besoins : montant fixe ou libre, description claire, image, expiration... Tout est pensé pour vous faciliter la vie.
-              </p>
-              <p class="text-lg text-gray-800 leading-relaxed">
-                Diffusez vos liens de paiement sur WhatsApp, SMS, email ou réseaux sociaux, et offrez à vos clients une expérience fluide où qu'ils soient.
-              </p>
             </div>
           </div>
 
           <!-- Fonctionnalité 2 : image à droite -->
-          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
-            <div>
-              <div class="flex items-center mb-4">
-                <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
-                <h2 class="text-3xl font-bold text-slate-900">Retraits rapides et flexibles</h2>
+          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition md:mx-auto md:max-w-6xl">
+            <div class="flex items-center">
+              <div class="max-w-xl mx-auto md:ml-auto">
+                <div class="flex items-center mb-4">
+                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <h2 class="text-3xl font-bold text-slate-900">Retraits rapides et flexibles</h2>
+                </div>
+                <p class="text-lg text-gray-800 leading-relaxed">
+                  Retirez vos fonds facilement via Mobile Money ou carte bancaire, avec historique détaillé et confirmation instantanée.
+                </p>
               </div>
-              <p class="text-lg text-gray-800 leading-relaxed">
-                Retirez vos fonds facilement via Mobile Money ou carte bancaire, avec historique détaillé et confirmation instantanée.
-              </p>
             </div>
-            <img
-                src="~/assets/img/retrait_rapide_flexible.png"
-                alt="Retraits rapides"
-                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md mr-auto border-4 border-green-100"
-            />
+            <div class="flex items-center">
+              <img src="~/assets/img/retrait_rapide_flexible.png" alt="Retraits rapides"
+                   class="w-auto h-auto lg:max-h-[420px] object-contain rounded-xl shadow-md mr-auto border-4 border-green-100 transition-all duration-300 ease-in-out" />
+            </div>
           </div>
 
           <!-- Fonctionnalité 3 : image à gauche -->
-          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition">
-            <img
-                src="~/assets/img/suivi_gestion.png"
-                alt="Suivi en temps réel"
-                class="w-auto max-w-full h-auto max-h-80 md:max-h-96 object-contain rounded-xl shadow-md ml-auto border-4 border-green-100"
-            />
-            <div>
-              <div class="flex items-center mb-4">
-                <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
-                <h2 class="text-3xl font-bold text-slate-900">Suivi et gestion en temps réel</h2>
+          <div class="grid md:grid-cols-2 gap-12 items-center p-6 md:p-8 rounded-2xl bg-gray-50 hover:bg-gray-100 transition md:mx-auto md:max-w-6xl">
+            <div class="flex items-center">
+              <img src="~/assets/img/suivi_gestion.png" alt="Suivi en temps réel"
+                   class="w-auto h-auto lg:max-h-[420px] object-contain rounded-xl shadow-md ml-auto border-4 border-green-100 transition-all duration-300 ease-in-out" />
+            </div>
+            <div class="flex items-center">
+              <div class="max-w-xl mx-auto">
+                <div class="flex items-center mb-4">
+                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <h2 class="text-3xl font-bold text-slate-900">Suivi et gestion en temps réel</h2>
+                </div>
+                <p class="text-lg text-gray-800 leading-relaxed mb-4">
+                  Gardez toujours un œil sur vos performances : chiffre d’affaires, montants collectés. Un tableau de bord simple et intuitif.
+                </p>
+                <p class="text-lg text-gray-800 leading-relaxed">
+                  Accédez à vos statistiques en temps réel, exportez vos données, et gérez vos paiements depuis n’importe quel appareil.
+                </p>
               </div>
-              <p class="text-lg text-gray-800 leading-relaxed mb-4">
-                Gardez toujours un œil sur vos performances : chiffre d’affaires, montants collectés. Un tableau de bord simple et intuitif.
-              </p>
-              <p class="text-lg text-gray-800 leading-relaxed">
-                Accédez à vos statistiques en temps réel, exportez vos données, et gérez vos paiements depuis n’importe quel appareil.
-              </p>
             </div>
           </div>
+
         </div>
       </div>
     </section>
+
 
     <!-- Comment ça marche ? -->
     <section class="py-20 px-6 md:px-12 bg-green-50">
@@ -417,9 +380,11 @@
 
         <!-- Bouton Démarrer -->
         <div class="text-center">
-          <button class="bg-amber-500 text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-amber-600 transition shadow-lg">
+          <NuxtLink
+              to="/register"
+              class="bg-amber-500 text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-amber-600 transition shadow-lg">
             Démarrer
-          </button>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -538,30 +503,52 @@ const faqs = ref([
   }
 ])
 
-const carousel = ref(null)
-const currentIndex = ref(0)
-const countries = [
-  'Bénin', 'Côte d\'Ivoire', 'Mali', 'Sénégal',
-  'Togo', 'Burkina Faso', 'Niger', 'Guinée'
-]
+// Importer les logos depuis assets
+import orangeLogo from '~/assets/img/orange.png'
+import mtnLogo from '~/assets/img/mtn.png'
+import waveLogo from '~/assets/img/wave_logo.png'
+import moovLogo from '~/assets/img/moov_logo.png'
+import visaLogo from '~/assets/img/visa.png'
+import paypalLogo from '~/assets/img/paypal.png'
+import freeMoneyLogo from '~/assets/img/free_money_logo.png'
+import airtelLogo from '~/assets/img/airtel_logo.svg'
+import mpesaLogo from '~/assets/img/mpesa_logo.png'
 
-const scrollLeft = () => {
-  if (carousel.value) {
-    carousel.value.scrollBy({ left: -200, behavior: 'smooth' })
-  }
+// Partenaires de paiement
+const partners = ref([
+  { name: 'Orange Money', logo: orangeLogo },
+  { name: 'MTN Money', logo: mtnLogo },
+  { name: 'Wave', logo: waveLogo },
+  { name: 'Moov Money', logo: moovLogo },
+  { name: 'Cartes bancaires', logo: visaLogo },
+  { name: 'PayPal', logo: paypalLogo },
+  { name: 'Free Money', logo: freeMoneyLogo },
+  { name: 'Airtel Money', logo: airtelLogo },
+  { name: 'M-Pesa', logo: mpesaLogo }
+])
+
+const currentPartnerIndex = ref(0)
+const isPaused = ref(false)
+const interval = ref(null)
+
+// Passer au partenaire suivant
+const nextPartner = () => {
+  currentPartnerIndex.value = (currentPartnerIndex.value + 1) % partners.value.length
 }
 
-const scrollRight = () => {
-  if (carousel.value) {
-    carousel.value.scrollBy({ left: 200, behavior: 'smooth' })
-  }
+// Aller à un partenaire spécifique
+const goToPartner = (index) => {
+  currentPartnerIndex.value = index
 }
 
-const scrollToIndex = (index) => {
-  if (carousel.value) {
-    const itemWidth = 120 // Largeur approximative d'un item + espace
-    carousel.value.scrollTo({ left: index * itemWidth, behavior: 'smooth' })
-    currentIndex.value = index
-  }
-}
+// Gestion de l’intervalle automatique
+onMounted(() => {
+  interval.value = setInterval(() => {
+    if (!isPaused.value) nextPartner()
+  }, 3000)
+})
+
+onBeforeUnmount(() => {
+  if (interval.value) clearInterval(interval.value)
+})
 </script>
