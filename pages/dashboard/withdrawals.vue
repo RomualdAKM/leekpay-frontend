@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="p-4 sm:p-6 space-y-6">
+    <div class="p-2 sm:p-2 space-y-2">
       <!-- Header -->
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Retraits</h1>
+        <!-- <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Retraits</h1> -->
         <p class="text-sm text-gray-600">Gérez vos demandes de retrait et vos méthodes de paiement</p>
       </div>
 
@@ -168,7 +168,7 @@
                   class="w-full py-3 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
                   @click="handleWithdrawalRequest"
               >
-                <div v-if="requestingWithdrawal" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div v-if="requestingWithdrawal" class="w-5 h-5 border border-white border-t-transparent rounded-full animate-spin"></div>
                 <Wallet v-else class="w-5 h-5" />
                 {{ requestingWithdrawal ? 'Demande en cours...' : 'Demander le retrait' }}
               </button>
@@ -195,7 +195,7 @@
           </div>
 
           <div v-if="loadingMethods" class="text-center py-12">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border border-green-500 border-t-transparent"></div>
             <p class="mt-2 text-sm text-gray-500">Chargement des méthodes de retrait...</p>
           </div>
           
@@ -245,7 +245,7 @@
                     @click="setDefaultMethod(method.id)"
                     :disabled="updatingMethod"
                   >
-                    <div v-if="updatingMethod" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                    <div v-if="updatingMethod" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin"></div>
                     <Star v-else class="w-4 h-4" /> 
                     {{ updatingMethod ? 'Mise à jour...' : 'Définir par défaut' }}
                   </button>
@@ -256,7 +256,7 @@
                     @click="toggleMethodStatus(method.id)"
                     :disabled="updatingMethod"
                   >
-                    <div v-if="updatingMethod" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                    <div v-if="updatingMethod" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin"></div>
                     <X v-else class="w-4 h-4" /> 
                     {{ updatingMethod ? 'Désactivation...' : 'Désactiver' }}
                   </button>
@@ -267,7 +267,7 @@
                     @click="toggleMethodStatus(method.id)"
                     :disabled="updatingMethod"
                   >
-                    <div v-if="updatingMethod" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                    <div v-if="updatingMethod" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin"></div>
                     <Check v-else class="w-4 h-4" /> 
                     {{ updatingMethod ? 'Activation...' : 'Activer' }}
                   </button>
@@ -277,7 +277,7 @@
                     @click="deleteMethod(method.id)"
                     :disabled="deletingMethod"
                   >
-                    <div v-if="deletingMethod" class="w-4 h-4 border-2 border-red-300 border-t-transparent rounded-full animate-spin"></div>
+                    <div v-if="deletingMethod" class="w-4 h-4 border border-red-300 border-t-transparent rounded-full animate-spin"></div>
                     <Trash2 v-else class="w-4 h-4" /> 
                     {{ deletingMethod ? 'Suppression...' : 'Supprimer' }}
                   </button>
@@ -291,7 +291,7 @@
         <TabsContent value="history" class="pt-6">
           <div class="bg-white rounded-lg border border-gray-200">
             <div v-if="loadingHistory" class="text-center py-12">
-              <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
+              <div class="inline-block h-8 w-8 animate-spin rounded-full border border-green-500 border-t-transparent"></div>
               <p class="mt-2 text-sm text-gray-500">Chargement de l'historique...</p>
             </div>
             
@@ -368,7 +368,7 @@
                       :disabled="historyPagination.current_page === 1 || loadingHistory"
                       @click="fetchWithdrawalHistory(historyPagination.current_page - 1)"
                     >
-                      <div v-if="loadingHistory" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <div v-if="loadingHistory" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
                       Précédent
                     </button>
                     <button
@@ -378,7 +378,7 @@
                       @click="fetchWithdrawalHistory(historyPagination.current_page + 1)"
                     >
                       Suivant
-                      <div v-if="loadingHistory" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin ml-2"></div>
+                      <div v-if="loadingHistory" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin ml-2"></div>
                     </button>
                   </div>
                 </div>
@@ -435,7 +435,7 @@
                       :disabled="historyPagination.current_page === 1 || loadingHistory"
                       @click="fetchWithdrawalHistory(historyPagination.current_page - 1)"
                     >
-                      <div v-if="loadingHistory" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <div v-if="loadingHistory" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin mr-2"></div>
                       Précédent
                     </button>
                     <button
@@ -445,7 +445,7 @@
                       @click="fetchWithdrawalHistory(historyPagination.current_page + 1)"
                     >
                       Suivant
-                      <div v-if="loadingHistory" class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin ml-2"></div>
+                      <div v-if="loadingHistory" class="w-4 h-4 border border-gray-300 border-t-transparent rounded-full animate-spin ml-2"></div>
                     </button>
                   </div>
                 </div>
@@ -482,22 +482,24 @@
               required
             >
               <option value="">Sélectionnez un type</option>
-              <option value="bank_transfer">Virement bancaire</option>
               <option value="mobile_money">Mobile Money</option>
-              <option value="crypto_wallet">Portefeuille crypto</option>
+              <option value="bank_transfer" disabled class="text-gray-400">Virement bancaire (bientôt)</option>
+              <option value="crypto_wallet" disabled class="text-gray-400">Portefeuille crypto (bientôt)</option>
             </select>
           </div>
           
           <div>
             <label for="providerName" class="block text-sm font-medium text-gray-700 mb-1">Nom du fournisseur</label>
-            <input
+            <select
               id="providerName"
               v-model="newMethod.provider_name"
-              type="text"
-              placeholder="Ex: Orange Money, Wave, etc."
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               required
-            />
+            >
+              <option value="">Sélectionnez un fournisseur</option>
+              <option value="MTN BENIN">MTN BENIN</option>
+              <option value="MOOV BENIN">MOOV BENIN</option>
+            </select>
           </div>
           
           <div>
@@ -547,7 +549,7 @@
               class="flex-1 py-2 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 flex items-center justify-center"
               :disabled="submittingMethod"
             >
-              <div v-if="submittingMethod" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              <div v-if="submittingMethod" class="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               {{ submittingMethod ? 'Ajout...' : 'Ajouter' }}
             </button>
           </div>
@@ -625,6 +627,11 @@ const fetchFeesConfig = async () => {
 }
 
 onMounted(() => {
+  // Définir le symbole de la devise de l'utilisateur
+  if (user.value?.currency?.symbol) {
+    currencySymbol.value = user.value.currency.symbol
+  }
+  
   checkScreen()
   window.addEventListener('resize', checkScreen)
   fetchFeesConfig()
@@ -639,7 +646,7 @@ onBeforeUnmount(() => {
 
 // Auth and API
 const config = useRuntimeConfig()
-const { token } = useAuth()
+const { token, user } = useAuth()
 
 // Data
 const userBalance = ref({
@@ -672,7 +679,7 @@ const feesConfig = ref({
   minimum_withdrawal: 1000
 })
 
-const currencySymbol = 'CFA'
+const currencySymbol = ref('CFA')
 
 // UI State
 const activeTab = ref("request")
@@ -895,9 +902,10 @@ const formatDate = (dateString) => {
 
 // Format currency
 const formatCurrency = (amount) => {
+  const currencyCode = user.value?.currency?.code || 'XOF'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'XOF',
+    currency: currencyCode,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   }).format(amount)

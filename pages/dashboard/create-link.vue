@@ -1,5 +1,5 @@
 <template>
-  <div class=" mx-auto space-y-6">
+  <div class="mx-auto space-y-6">
     <!-- Toast Notification -->
     <Transition
       enter-active-class="transition ease-out duration-300"
@@ -19,24 +19,24 @@
     </Transition>
 
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-      <Button
-          variant="outline"
-          @click="onBack"
-          class="gap-1 w-full sm:w-auto text-sm py-2"
-      >
-        <ArrowLeftIcon class="w-4 h-4" />
-        
-      </Button>
+    <!-- <Button
+        variant="outline"
+        @click="onBack"
+        class="py-2"
+    >
+      <ArrowLeftIcon class="w-4 h-4" />
+      
+    </Button> -->
+    <div class="flex flex-col px-2 sm:flex-row sm:items-center gap-2">
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold" style="color: #0A1F44">Créer un lien de paiement</h1>
+        <!-- <h1 class="text-xl sm:text-2xl font-bold" style="color: #0A1F44">Créer un lien de paiement</h1> -->
         <p class="text-gray-600 text-sm sm:text-base">Configurez votre nouveau lien de paiement</p>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Form -->
-      <Card class="p-4 sm:p-6">
+      <Card class="p-2 sm:p-2">
         <form @submit.prevent="handleSubmit" class="space-y-6" :class="{ 'opacity-75 pointer-events-none': loading }">
           <!-- Title -->
           <div class="space-y-2">
@@ -169,6 +169,9 @@
                   class="text-sm py-2 w-full"
                   required
               />
+              <p v-if="user?.currency?.symbol" class="text-xs text-gray-500">
+                Devise: {{ user.currency.symbol }}
+              </p>
             </div>
           </div>
 
@@ -294,7 +297,7 @@
           </div>
         </Card>
 
-        <Card v-else class="p-4 sm:p-6">
+        <Card v-else class="p-4 sm:p-6 hidden sm:block">
           <h3 class="text-lg sm:text-xl font-semibold mb-4" style="color: #0A1F44">Aperçu</h3>
           <div class="space-y-4">
             <div class="bg-gray-100 rounded-lg flex items-center justify-center" :class="formData.image ? 'h-40 sm:h-48' : 'h-40'">
@@ -364,6 +367,7 @@ import Input from "~/components/ui/Input.vue"
 import RichTextEditor from "~/components/ui/RichTextEditor.vue"
 import Switch from "~/components/ui/Switch.vue"
 import Label from "~/components/ui/Label.vue"
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
   layout: 'dashboard'
@@ -372,7 +376,7 @@ definePageMeta({
 const emit = defineEmits(['back'])
 const router = useRouter()
 const config = useRuntimeConfig()
-const { token } = useAuth()
+const { token, user } = useAuth()
 
 const onBack = () => {
   emit('back')

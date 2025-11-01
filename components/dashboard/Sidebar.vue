@@ -2,7 +2,7 @@
 <template>
   <div class="w-64 bg-white border-r border-gray-200 h-full flex flex-col">
     <!-- Logo -->
-    <div class="p-5 sm:p-6  border-gray-200">
+    <div class="p-5 sm:p-4  border-gray-200">
       <div class="flex items-center gap-3">
         <!-- Logo (image ou SVG) -->
         <div class="w-10 h-10 rounded-lg flex items-center justify-center" >
@@ -21,10 +21,10 @@
     </div>
 
     <!-- Create Link Button -->
-    <div class="p-4">
+    <div class="p-2">
       <button
           @click="onSectionChange('dashboard/create-link')"
-          class="w-full bg-green-500 flex items-center gap-2 px-4 py-3 rounded-sm text-white font-medium transition-colors"
+          class="w-full bg-green-500 flex items-center gap-2 px-4 py-2 rounded-sm text-white font-medium transition-colors"
       >
         <PlusIcon class="w-4 h-4" />
         Créer un lien
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 p-4 space-y-2">
+    <nav class="flex-1 p-2 space-y-1">
       <template v-for="item in menuItems" :key="item.id">
         <button
             @click="onSectionChange(item.id)"
@@ -46,12 +46,12 @@
     </nav>
 
     <!-- User Profile -->
-    <div class="p-4 border-t border-gray-200">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+    <div class="p-2 border-t border-gray-200">
+      <div class="flex items-center gap-2">
+        <!-- <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
           <UserIcon class="w-5 h-5 text-gray-600" />
-        </div>
-        <div>
+        </div> -->
+        <NuxtLink to="/dashboard/settings">
           <p v-if="user" class="font-medium" style="color: #0A1F44">
             {{ user.name }}
           </p>
@@ -59,18 +59,18 @@
             {{ user.email }}
           </p>
           <p v-else class="text-sm text-gray-500">Chargement...</p>
-        </div>
+        </NuxtLink>
       </div>
     </div>
-
     <!-- Bouton Déconnexion -->
     <button
         @click="handleLogout"
-        class="w-full flex items-center gap-2 px-4 py-2 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 transition-colors text-sm font-medium"
+        class="w-full flex items-center my-2 gap-2 px-2 py-2 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 transition-colors text-sm font-medium"
     >
       <LogOutIcon class="w-4 h-4" />
       Déconnexion
     </button>
+
   </div>
 </template>
 

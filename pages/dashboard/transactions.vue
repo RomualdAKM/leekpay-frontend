@@ -1,7 +1,7 @@
 <template>
-  <div class="p-4 sm:p-6 space-y-6">
+  <div class="p-2 sm:p-2 space-y-2">
     <div>
-      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Transactions</h1>
+      <!-- <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Transactions</h1> -->
       <p class="text-sm text-gray-600">Historique de tous vos paiements</p>
     </div>
 
@@ -50,7 +50,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-600 mb-1">Revenus</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ formatAmount(totalRevenue) }}€</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalRevenue) }}</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-600 mb-1">Payées</p>
@@ -102,7 +102,7 @@
               </td>
               <td class="px-4 py-3 text-sm text-gray-700">{{ transaction.payment_link?.title || '-' }}</td>
               <td class="px-4 py-3 text-sm text-right font-medium text-gray-900">
-                {{ formatAmount(transaction.amount) }} {{ transaction.currency?.code || 'EUR' }}
+                {{ formatCurrency(transaction.amount, transaction.currency?.code) }}
               </td>
               <td class="px-4 py-3 text-sm text-gray-600">{{ getPaymentMethodText(transaction.payment_method) }}</td>
               <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(transaction.created_at) }}</td>
@@ -124,7 +124,7 @@
           <button
             @click="changePage(pagination.current_page - 1)"
             :disabled="pagination.current_page === 1"
-            class="px-3 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            class="px-2 py-1 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Précédent
           </button>
@@ -222,25 +222,25 @@
               <div>
                 <p class="text-xs text-gray-500 mb-1">Montant</p>
                 <p class="text-sm font-semibold text-gray-900">
-                  {{ formatAmount(selectedTransaction.amount) }} {{ selectedTransaction.currency?.code || 'EUR' }}
+                  {{ formatCurrency(selectedTransaction.amount, selectedTransaction.currency?.code) }}
                 </p>
               </div>
               <div>
                 <p class="text-xs text-gray-500 mb-1">Frais LeekPay</p>
                 <p class="text-sm text-gray-900">
-                  {{ formatAmount(selectedTransaction.leekpay_fee) }} {{ selectedTransaction.currency?.code || 'EUR' }}
+                  {{ formatCurrency(selectedTransaction.leekpay_fee, selectedTransaction.currency?.code) }}
                 </p>
               </div>
               <!-- <div>
                 <p class="text-xs text-gray-500 mb-1">Frais agrégateur</p>
                 <p class="text-sm text-gray-900">
-                  {{ formatAmount(selectedTransaction.aggregator_fee) }} {{ selectedTransaction.currency?.code || 'EUR' }}
+                  {{ formatCurrency(selectedTransaction.aggregator_fee, selectedTransaction.currency?.code) }}
                 </p>
               </div> -->
               <div>
                 <p class="text-xs text-gray-500 mb-1">Montant net</p>
                 <p class="text-sm font-semibold text-green-700">
-                  {{ formatAmount(selectedTransaction.net_amount) }} {{ selectedTransaction.currency?.code || 'EUR' }}
+                  {{ formatCurrency(selectedTransaction.net_amount, selectedTransaction.currency?.code) }}
                 </p>
               </div>
             </div>
@@ -311,11 +311,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'dashboard' })
 
 const config = useRuntimeConfig()
-const { token } = useAuth()
+const { token, user } = useAuth()
 const searchTerm = ref('')
 const statusFilter = ref('all')
 const methodFilter = ref('all')
@@ -471,6 +472,19 @@ const formatDate = (dateString) => {
 
 const formatAmount = (value) => {
   return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+}
+
+// Nouvelle fonction pour formater les montants avec devise
+const formatCurrency = (amount, currencyCode) => {
+  // Utiliser la devise de l'utilisateur connecté si aucune devise n'est fournie
+  const code = currencyCode || user.value?.currency?.code || 'XOF'
+  
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: code,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(amount || 0)
 }
 
 const filteredTransactions = computed(() => {

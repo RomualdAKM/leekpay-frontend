@@ -22,7 +22,7 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
+    <div class="flex-1 flex flex-col overflow-hidden ml-0">
       <!-- Header -->
       <header class="bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
         <!-- Hamburger button (mobile) -->
@@ -39,17 +39,17 @@
           </svg>
         </button>
 
-        <h1 class="text-xl font-bold text-gray-800 hidden sm:block">{{ pageTitle }}</h1>
-        <h1 class="text-lg font-bold text-gray-800 sm:hidden">{{ pageTitleShort }}</h1>
+        <p class="text-sm font-semibold text-gray-800 ">{{ pageTitle }}</p>
+        <!-- <p class="text-sm font-bold text-gray-800 sm:hidden">{{ pageTitleShort }}</p> -->
 
-        <div class="flex items-center space-x-4">
+        <!-- <div class="flex items-center space-x-4">
           <button class="p-2 text-gray-600 hover:text-green-500 transition">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 7H4l5-5v5z" />
             </svg>
           </button>
           <img src="~/assets/img/dashboard/avatar.png" alt="Avatar" class="h-8 w-8 rounded-full" />
-        </div>
+        </div> -->
       </header>
 
       <!-- Page Content -->

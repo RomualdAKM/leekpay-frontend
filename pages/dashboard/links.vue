@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="p-4 sm:p-6 space-y-6">
+    <div class="p-2 sm:p-2 space-y-4">
       <!-- Header -->
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Mes Liens de Paiement</h1>
+          <!-- <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Mes Liens de Paiement</h1> -->
           <p class="text-gray-600 text-sm sm:text-base">Gérez tous vos liens de paiement</p>
         </div>
         <Button
@@ -16,6 +16,7 @@
         </Button>
       </div>
 
+      <!-- Recherche et filtres -->
         <div class="flex flex-col sm:flex-row gap-3">
           <div class="flex-1">
             <input
@@ -57,6 +58,7 @@
               <p class="text-xs sm:text-sm text-gray-600">Total des liens</p>
               <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
                 {{ stats.total_links }}
+                
               </p>
             </div>
           </div>
@@ -84,7 +86,7 @@
             <div>
               <p class="text-xs sm:text-sm text-gray-600">Total collecté</p>
               <p class="text-lg sm:text-xl font-semibold" style="color: #0A1F44">
-                {{ formatAmount(stats.total_collected) }} {{ userCurrencySymbol }}
+                {{ formatAmount(stats.total_collected) }} {{ user?.currency?.symbol || 'XOF' }}
               </p>
             </div>
           </div>
@@ -119,9 +121,8 @@
               <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2" style="color: #0A1F44">
                 {{ link.title }}
               </h3>
-              <p class="text-xs sm:text-sm text-gray-600 line-clamp-2">
-                {{ link.description }}
-              </p>
+              <!-- <p v-html="link.description" class="text-xs sm:text-sm text-gray-600 line-clamp-2">
+              </p> -->
             </div>
 
             <div class="flex items-center justify-between text-xs sm:text-sm text-gray-500">
@@ -130,8 +131,8 @@
                 {{ link.click_count || 0 }} clics
               </div>
               <div class="flex items-center gap-1">
-                <DollarSignIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" />
-                {{ formatAmount(link.total_collected) }} {{ getCurrencySymbol(link.currency_id) }}
+                <!-- <DollarSignIcon class="w-3.5 sm:w-4 h-3.5 sm:h-4" /> -->
+                {{ formatAmount(link.total_collected) }} {{ user?.currency?.symbol || 'XOF' }}
               </div>
             </div>
 
@@ -139,7 +140,7 @@
               <div class="text-xs sm:text-sm text-gray-600 mb-3">
                 <p class="mb-1 break-all">https://leekpay.me/{{ link.custom_url }}</p>
                 <p v-if="link.amount_type === 'fixed' && link.fixed_amount" class="text-gray-500">
-                  {{ formatAmount(link.fixed_amount) }} {{ getCurrencySymbol(link.currency_id) }}
+                  {{ formatAmount(link.fixed_amount) }} {{ user?.currency?.symbol || 'XOF' }}
                 </p>
                 <p v-else class="text-gray-500">Montant flexible</p>
               </div>
@@ -354,10 +355,10 @@ import {
   DollarSignIcon,
   QrCodeIcon,
   CopyIcon,
-  EditIcon,
   ExternalLinkIcon,
-  TrashIcon,
-  PowerIcon
+  EditIcon,
+  PowerIcon,
+  TrashIcon
 } from 'lucide-vue-next'
 import Button from "~/components/ui/Button.vue"
 import Card from "~/components/ui/Card.vue"
@@ -368,7 +369,7 @@ definePageMeta({ layout: 'dashboard' })
 
 const router = useRouter()
 const config = useRuntimeConfig()
-const { token } = useAuth()
+const { token, user } = useAuth()
 
 
 // --- Modal QR Code ---
@@ -579,21 +580,10 @@ const formatAmount = (value) => {
   return n.toLocaleString()
 }
 
-const currencyMap = {
-  1: 'EUR',
-  2: 'USD',
-  3: 'XOF',
-  4: 'XAF'
-}
-const currencySymbolMap = {
-  EUR: '€',
-  USD: '$',
-  XOF: 'XOF',
-  XAF: 'XAF'
-}
-const getCurrencySymbol = (currency_id) => {
-  const code = currencyMap[currency_id] || 'XOF'
-  return currencySymbolMap[code] || code
+// Fonction pour obtenir le symbole de devise
+const getCurrencySymbol = (currencyId) => {
+  // Utiliser la devise de l'utilisateur connecté
+  return user.value?.currency?.symbol || 'XOF'
 }
 
 const getStatusBadge = (is_active, expires_at) => {

@@ -397,9 +397,11 @@ const { token } = useAuth()
 
 // Fonction pour formater les montants
 const formatCurrency = (amount) => {
+  // Utiliser la devise de l'utilisateur connecté ou XOF par défaut
+  const currencyCode = 'XOF' // Dans le contexte admin, on utilise XOF par défaut
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'XOF',
+    currency: currencyCode,
     minimumFractionDigits: 0
   }).format(amount || 0)
 }

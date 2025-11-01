@@ -31,7 +31,7 @@
 
     <!-- Header -->
     <div>
-      <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Paramètres</h1>
+      <!-- <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Paramètres</h1> -->
       <p class="text-gray-600 text-sm sm:text-base">Gérez votre compte et configurez vos préférences</p>
     </div>
 

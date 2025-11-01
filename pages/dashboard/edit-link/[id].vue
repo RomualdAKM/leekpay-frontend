@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 sm:p-6 max-w-5xl mx-auto space-y-6">
+  <div class="p-2 sm:p-2  mx-auto space-y-2">
     <Transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0 translate-y-2"
@@ -17,19 +17,17 @@
       </div>
     </Transition>
 
+    <Button
+        variant="outline"
+        @click="onBack"
+    >
+      <ArrowLeftIcon class="w-4 h-4" />
+    </Button>
     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-      <Button
-          variant="outline"
-          @click="onBack"
-          class="gap-2 w-full sm:w-auto text-sm py-2"
-      >
-        <ArrowLeftIcon class="w-4 h-4" />
-        Retour
-      </Button>
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold" style="color: #0A1F44">
+        <!-- <h1 class="text-xl sm:text-2xl font-bold" style="color: #0A1F44">
           Modifier le lien de paiement
-        </h1>
+        </h1> -->
         <p class="text-gray-600 text-sm sm:text-base">
           Mettez à jour les informations de votre lien
         </p>
@@ -38,7 +36,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Form -->
-      <Card class="p-4 sm:p-6">
+      <Card class="p-2 sm:p-1">
         <form
             @submit.prevent="handleSubmit"
             class="space-y-6"
@@ -93,7 +91,38 @@
             <p v-else-if="urlError" class="text-xs text-red-600">{{ urlError }}</p>
             <p v-else-if="urlAvailable && formData.customUrl && hasUrlChanged" class="text-xs text-green-600">URL disponible</p>
           </div>
+          <!-- Amount Configuration -->
+          <div class="space-y-4">
+            <Label class="text-sm">Type de montant</Label>
+            <div class="flex items-center space-x-2">
+              <Switch
+                  :checked="formData.amountType === 'flexible'"
+                  @update:checked="toggleAmountType"
+              />
+              <span class="text-xs sm:text-sm">
+                {{ formData.amountType === 'flexible'
+                  ? 'Montant libre'
+                  : 'Montant fixe' }}
+              </span>
+            </div>
 
+            <div
+                v-if="formData.amountType === 'fixed'"
+                class="space-y-2"
+            >
+              <Label for="amount" class="text-sm">Montant *</Label>
+              <Input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  v-model="formData.fixedAmount"
+                  placeholder="0.00"
+                  class="text-sm py-2 w-full"
+                  required
+              />
+            </div>
+          </div>
           <!-- Image Upload -->
           <div class="space-y-2">
             <Label for="image" class="text-sm">Image (optionnel)</Label>
@@ -157,38 +186,7 @@
             </div>
           </div>
 
-          <!-- Amount Configuration -->
-          <div class="space-y-4">
-            <Label class="text-sm">Type de montant</Label>
-            <div class="flex items-center space-x-2">
-              <Switch
-                  :checked="formData.amountType === 'flexible'"
-                  @update:checked="toggleAmountType"
-              />
-              <span class="text-xs sm:text-sm">
-                {{ formData.amountType === 'flexible'
-                  ? 'Montant libre'
-                  : 'Montant fixe' }}
-              </span>
-            </div>
 
-            <div
-                v-if="formData.amountType === 'fixed'"
-                class="space-y-2"
-            >
-              <Label for="amount" class="text-sm">Montant *</Label>
-              <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  v-model="formData.fixedAmount"
-                  placeholder="0.00"
-                  class="text-sm py-2 w-full"
-                  required
-              />
-            </div>
-          </div>
 
           <!-- Expiration Date -->
           <div class="space-y-2">
@@ -235,7 +233,7 @@
 
       <!-- Preview -->
       <div>
-        <Card class="p-4 sm:p-6">
+        <Card class="p-4 sm:p-6 hidden sm:block">
           <h3 class="text-lg sm:text-xl font-semibold mb-4" style="color: #0A1F44">
             Aperçu
           </h3>

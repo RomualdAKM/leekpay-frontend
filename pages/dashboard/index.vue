@@ -1,7 +1,7 @@
 <template>
-  <div class="p-4 sm:p-6 space-y-6">
+  <div class="p-2 sm:p-2 space-y-4">
     <div>
-      <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Tableau de bord</h1>
+      <!-- <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Tableau de bord</h1> -->
       <p class="text-sm text-gray-600">Vue d'ensemble de vos performances</p>
     </div>
 
@@ -110,7 +110,7 @@
             <DollarSignIcon class="w-4 h-4 text-gray-400" />
           </div>
           <p class="text-2xl font-semibold text-gray-900">{{ formatAmount(metrics.total_collected) }}</p>
-          <p class="text-xs text-gray-500 mt-2">{{ userCurrencySymbol }}</p>
+          <p class="text-xs text-gray-500 mt-2">{{ user?.currency?.symbol || 'XOF' }}</p>
         </div>
       </div>
 
@@ -130,7 +130,7 @@
                 ></div>
               </div>
               <span class="text-xs font-medium text-gray-900 w-24 text-right">
-                {{ formatAmount(stat.revenue) }} {{ userCurrencySymbol }}
+                {{ formatAmount(stat.revenue) }} {{ user?.currency?.symbol || 'XOF' }}
               </span>
             </div>
           </div>
@@ -147,11 +147,11 @@
           <div class="space-y-4">
             <div>
               <p class="text-xs text-gray-500 mb-1">Mois en cours</p>
-              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.current_month_revenue) }} {{ userCurrencySymbol }}</p>
+              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.current_month_revenue) }} {{ user?.currency?.symbol || 'XOF' }}</p>
             </div>
             <div>
               <p class="text-xs text-gray-500 mb-1">Mois précédent</p>
-              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.last_month_revenue) }} {{ userCurrencySymbol }}</p>
+              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.last_month_revenue) }} {{ user?.currency?.symbol || 'XOF' }}</p>
             </div>
             <div>
               <p class="text-xs text-gray-500 mb-1">Évolution</p>
@@ -311,7 +311,7 @@ import { useAuth } from '~/composables/useAuth'
 definePageMeta({ layout: 'dashboard' })
 
 const config = useRuntimeConfig()
-const { token } = useAuth()
+const { token, user } = useAuth()
 
 const loading = ref(true)
 const error = ref('')
