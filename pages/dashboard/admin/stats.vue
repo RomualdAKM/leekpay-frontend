@@ -208,12 +208,10 @@ const loadStats = async () => {
 onMounted(() => {
   loadStats()
   
-  // Actualiser toutes les 5 minutes (uniquement côté client)
   const refreshInterval = setInterval(() => {
     loadStats()
   }, 5 * 60 * 1000)
   
-  // Nettoyer l'intervalle à la destruction du composant
   onUnmounted(() => {
     if (refreshInterval) {
       clearInterval(refreshInterval)
