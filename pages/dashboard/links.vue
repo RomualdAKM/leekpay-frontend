@@ -16,7 +16,6 @@
         </Button>
       </div>
 
-      <!-- Recherche et filtres -->
         <div class="flex flex-col sm:flex-row gap-3">
           <div class="flex-1">
             <input
