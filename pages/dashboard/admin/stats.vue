@@ -204,7 +204,6 @@ const loadStats = async () => {
   }
 }
 
-// Charger les données au montage
 onMounted(() => {
   loadStats()
   
