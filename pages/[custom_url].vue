@@ -2,7 +2,7 @@
   <div>
 
   <div class="min-h-screen flex flex-col md:flex-row font-sans bg-gray-50">
-    <div class="w-full md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center  p-6 md:p-12">
+    <div class="w-full md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center  p-4 md:p-6">
       <div class="text-center max-w-lg w-full">
         <img
             v-if="paymentData?.image_url && !imageError"
@@ -16,20 +16,20 @@
         </p>
       </div>
     </div>
-    <div class="w-full md:w-1/2  flex items-center justify-center p-4 md:p-6">
+    <div class="w-full md:w-1/2  flex items-center justify-center p-2 md:p-2">
       <div class="w-full max-w-md">
         <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <p class="text-red-700 text-sm">{{ error }}</p>
         </div>
 
-        <div v-if="loading" class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-100">
+        <div v-if="loading" class="bg-white p-2 md:p-2 rounded-xl shadow-md border border-gray-100">
           <div class="text-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
             <p class="text-gray-600">Chargement du lien de paiement...</p>
           </div>
         </div>
         
-        <div v-else-if="paymentData" class="bg-white p-6 md:p-8 rounded-sm shadow-sm border border-gray-100">
+        <div v-else-if="paymentData" class="bg-white p-2 md:p-8 rounded-sm shadow-sm border border-gray-100">
           <!-- Expiration Status -->
           <div v-if="expirationStatus.show" :class="expirationStatus.containerClass">
             <div class="flex items-center justify-between">
@@ -122,31 +122,33 @@
             </div>
           </div>
 
-          <div id="payment-form" class="space-y-4 mb-2">
-            <label class="block text-sm font-medium text-slate-700">Choisissez votre mode de paiement</label>
-            <div class="grid grid-cols-3 gap-3">
+          <div id="payment-form" class="space-y-3 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
               <button
-                  v-for="method in availablePaymentMethods"
-                  :key="method.value"
-                  type="button"
-                  @click="selectedPayment = method.value"
-                  :class="[
-                    'py-4 px-2 rounded-sm font-medium transition text-sm',
-                    selectedPayment === method.value
-                      ? 'bg-green-500 text-white shadow-md'
-                      : 'border border-gray-300 text-slate-700 hover:bg-gray-50'
-                  ]"
+              v-for="method in availablePaymentMethods"
+              :key="method.value"
+              type="button"
+              @click="selectedPayment = method.value"
+              :class="[
+                'py-3 px-2 rounded-lg font-medium transition text-sm border',
+                selectedPayment === method.value
+                ? 'bg-green-600 text-white shadow-sm border-green-500'
+                : 'border-gray-200 text-slate-700 hover:bg-gray-50 hover:border-gray-300'
+              ]"
               >
-                {{ method.label }}
-              </button>
-            </div>
+              <div class="flex flex-col items-center">
+                <span class="text-xs mb-1">{{ method.label }}</span>
+              </div>
+            </button>
           </div>
+          <label class="block text-sm font-medium text-slate-700">Choisissez votre mode de paiement</label>
+        </div>
 
           <!-- Bouton de paiement -->
           <button
               @click="triggerPayment"
               :disabled="isProcessing || isPaymentExpired"
-              class="w-full bg-green-500 text-white py-4 px-6 rounded-sm font-bold text-base hover:bg-green-600 transition shadow-md mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="w-full bg-green-600 text-white py-3 px-4 rounded-sm font-semibold text-base hover:bg-green-600 transition shadow-sm mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span v-if="isProcessing" class="flex items-center justify-center">
               <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -182,13 +184,13 @@
   </div>
 
   <!-- Bouton de paiement sticky (toujours visible) -->
-  <div v-if="paymentData && !loading && showStickyButton" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-2xl z-50 md:hidden">
+  <div v-if="paymentData && !loading && showStickyButton" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-2 shadow-sm z-50 md:hidden">
     <div class="max-w-md mx-auto">
       <div class="flex items-center justify-between mb-3">
-        <div class="text-sm">
+        <!-- <div class="text-sm">
           <span class="text-gray-600">Total: </span>
           <span class="font-bold text-xl text-gray-900">{{ displayAmount }} {{ currency.symbol }}</span>
-        </div>
+        </div> -->
         <div v-if="expirationStatus.show" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
           {{ expirationStatus.timeDisplay }}
         </div>
@@ -196,13 +198,13 @@
       <button
           @click="scrollToPaymentForm"
           :disabled="isPaymentExpired"
-          class="w-full bg-green-500 text-white py-4 px-6 rounded-lg font-bold text-lg hover:bg-green-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
+          class="w-full bg-green-600 text-white py-3 px-4 rounded-sm font-semibold text-lg hover:bg-green-600 transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95"
       >
         <span v-if="isPaymentExpired">
           Lien expiré
         </span>
         <span v-else>
-          Paiement
+          Paiement {{ displayAmount }} {{ currency.symbol }}
         </span>
       </button>
     </div>

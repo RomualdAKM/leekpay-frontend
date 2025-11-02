@@ -135,7 +135,7 @@
 
         <button 
           @click="goBackToPayment"
-          class="w-full bg-green-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition"
+          class="w-full bg-green-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-green-600 transition"
         >
           Réessayer le paiement
         </button>

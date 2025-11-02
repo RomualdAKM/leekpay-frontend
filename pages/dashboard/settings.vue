@@ -22,7 +22,7 @@
     >
       <div
         v-if="showToast"
-        class="fixed top-4 right-4 z-50 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+        class="fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2"
       >
         <CheckIcon class="h-5 w-5" />
         <span>{{ toastMessage }}</span>

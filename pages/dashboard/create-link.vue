@@ -11,7 +11,7 @@
     >
       <div
         v-if="showToast"
-        class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3"
+        class="fixed top-4 right-4 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3"
       >
         <CheckIcon class="w-5 h-5" />
         <span class="font-medium">{{ toastMessage }}</span>

@@ -24,7 +24,7 @@
     <div class="p-2">
       <button
           @click="onSectionChange('dashboard/create-link')"
-          class="w-full bg-green-500 flex items-center gap-2 px-4 py-2 rounded-sm text-white font-medium transition-colors"
+          class="w-full bg-green-600 flex items-center gap-2 px-4 py-2 rounded-sm text-white font-medium transition-colors"
       >
         <PlusIcon class="w-4 h-4" />
         Créer un lien
@@ -37,7 +37,7 @@
         <button
             @click="onSectionChange(item.id)"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-sm text-left transition-colors"
-            :class="{ 'bg-green-500 text-white': activeSection === item.id, 'text-gray-600 hover:bg-gray-50': activeSection !== item.id }"
+            :class="{ 'bg-green-600 text-white': activeSection === item.id, 'text-gray-600 hover:bg-gray-50': activeSection !== item.id }"
         >
           <component :is="item.icon" class="w-5 h-5" />
           <span>{{ item.label }}</span>

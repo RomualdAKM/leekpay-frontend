@@ -125,7 +125,7 @@
               <span class="text-xs text-gray-500 w-20">{{ formatShortDate(stat.date) }}</span>
               <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
                 <div 
-                  class="bg-green-500 h-full transition-all"
+                  class="bg-green-600 h-full transition-all"
                   :style="{ width: getBarWidth(stat.revenue) + '%' }"
                 ></div>
               </div>
@@ -258,7 +258,7 @@
               <div class="flex items-center gap-3">
                 <div class="flex-1 bg-gray-100 rounded-full h-2 w-24">
                   <div 
-                    class="bg-green-500 h-full rounded-full"
+                    class="bg-green-600 h-full rounded-full"
                     :style="{ width: getCountryBarWidth(country.total) + '%' }"
                   ></div>
                 </div>

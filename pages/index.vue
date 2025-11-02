@@ -121,7 +121,7 @@
           >
             <button
                 @click="activeTab = index"
-                class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white
+                class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white
           hover:bg-green-600 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-green-400"
             >
               <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -141,7 +141,7 @@
             <!-- Trait sous l'icône -->
             <div
                 class="mt-2 w-8 h-1 rounded-full transition-all duration-300"
-                :class="activeTab === index ? 'bg-green-500 opacity-100' : 'bg-transparent opacity-0'"
+                :class="activeTab === index ? 'bg-green-600 opacity-100' : 'bg-transparent opacity-0'"
             ></div>
           </div>
         </div>
@@ -284,7 +284,7 @@
                 @click="goToPartner(i)"
                 :aria-label="`Voir ${partners[i].name}`"
                 class="w-3 h-3 rounded-full transition-all"
-                :class="currentPartnerIndex === i ? 'bg-green-500' : 'bg-gray-300 hover:bg-gray-500'"
+                :class="currentPartnerIndex === i ? 'bg-green-600' : 'bg-gray-300 hover:bg-gray-500'"
             ></button>
           </div>
         </div>
@@ -353,7 +353,7 @@
             >
               <div class="max-w-xl mx-auto">
                 <div class="flex items-center mb-4">
-                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <div class="w-1 h-8 bg-green-600 rounded-full mr-3"></div>
                   <h2 class="text-3xl font-bold text-slate-900">Créez vos liens et partagez-les partout</h2>
                 </div>
                 <p class="text-lg text-gray-800 leading-relaxed mb-4">
@@ -376,7 +376,7 @@
             >
               <div class="max-w-xl mx-auto md:ml-auto">
                 <div class="flex items-center mb-4">
-                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <div class="w-1 h-8 bg-green-600 rounded-full mr-3"></div>
                   <h2 class="text-3xl font-bold text-slate-900">Retraits rapides et flexibles</h2>
                 </div>
                 <p class="text-lg text-gray-800 leading-relaxed">
@@ -420,7 +420,7 @@
             >
               <div class="max-w-xl mx-auto">
                 <div class="flex items-center mb-4">
-                  <div class="w-1 h-8 bg-green-500 rounded-full mr-3"></div>
+                  <div class="w-1 h-8 bg-green-600 rounded-full mr-3"></div>
                   <h2 class="text-3xl font-bold text-slate-900">Suivi et gestion en temps réel</h2>
                 </div>
                 <p class="text-lg text-gray-800 leading-relaxed mb-4">
@@ -479,7 +479,7 @@
           >
             <!-- Icône animée -->
             <div
-                class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+                class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -538,7 +538,7 @@
               @mouseleave="$event.currentTarget.classList.remove('transform', '-translate-y-2')"
           >
             <div
-                class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+                class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -587,7 +587,7 @@
               @mouseleave="$event.currentTarget.classList.remove('transform', '-translate-y-2')"
           >
             <div
-                class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
+                class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />

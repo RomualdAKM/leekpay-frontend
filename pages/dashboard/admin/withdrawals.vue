@@ -9,7 +9,7 @@
       <button 
         @click="loadWithdrawals" 
         :disabled="loading"
-        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
+        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
       >
         <RefreshCwIcon class="w-4 h-4 inline mr-2" :class="{ 'animate-spin': loading }" />
         Actualiser

@@ -73,7 +73,7 @@
         </div>
         <NuxtLink 
           to="/dashboard/admin/withdrawals"
-          class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-600 transition-colors"
         >
           Gérer les retraits
         </NuxtLink>
