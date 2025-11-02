@@ -171,7 +171,6 @@ const formatCurrency = (amount) => {
   }).format(amount || 0)
 }
 
-// Charger les statistiques
 const loadStats = async () => {
   try {
     loading.value = true
@@ -186,7 +185,7 @@ const loadStats = async () => {
     
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Erreurr lors du chargement des statistiques')
+      throw new Error(errorData.message || 'Erreur lors du chargement des statistiques')
     }
     
     const data = await response.json()
