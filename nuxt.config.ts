@@ -6,13 +6,6 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css','flag-icons/css/flag-icons.min.css'],
     vite: {    plugins: [      tailwindcss(),    ],  },
 
-    // Configuration de l'API
-    runtimeConfig: {
-        public: {
-            apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:8000/api'
-        }
-    },
-
     app: {
         head: {
             link: [
