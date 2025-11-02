@@ -1,4 +1,6 @@
 <template>
+  <div>
+
   <div class="min-h-screen flex flex-col md:flex-row font-sans bg-gray-50">
     <div class="w-full md:w-1/2 bg-gradient-to-br from-green-50 to-blue-50 flex flex-col items-center  p-6 md:p-12">
       <div class="text-center max-w-lg w-full">
@@ -10,8 +12,7 @@
             @error="handleImageError"
         />
         <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-3">{{ paymentTitle }}</h2>
-        <p class="text-gray-700 leading-relaxed text-sm md:text-base">
-          {{ paymentDescription }}
+        <p v-html="paymentDescription" class="text-gray-700 leading-relaxed text-sm md:text-base">
         </p>
       </div>
     </div>
@@ -106,8 +107,8 @@
                   </div>
                 </div>
               </div>
-              <div class="flex gap-2">
-                <div class="px-3 py-3 border border-gray-300 rounded-lg bg-gray-50 text-sm min-w-[90px] flex items-center gap-2">
+              <div class="flex gap-1">
+                <div class="px-2 py-3 border border-gray-300 rounded-lg bg-gray-50 text-sm min-w-[70px] flex items-center gap-2">
                   <span>{{ selectedCountry?.flag || '🇨🇮' }}</span>
                   <span>{{ selectedCountry?.dialCode || '+225' }}</span>
                 </div>
@@ -115,7 +116,7 @@
                     v-model="formData.phoneNumber"
                     type="tel"
                     placeholder="Numéro (optionnel)"
-                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
+                    class="flex-1 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
                 />
               </div>
             </div>
@@ -208,34 +209,36 @@
 
     
   </div>
-     <!-- Footer -->
-      <div class="mt-4 pt-4 border-t border-gray-200">
-        <div class="text-center">
-          <a 
-            href="https://leekpay.me" 
-            target="_blank" class="flex items-center justify-center mb-1">
-            <img 
-              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
-              alt="LeekPay Logo" 
-              class="h-16 w-auto"
-            >
-        </a>
-          <p class="text-xs text-gray-500 mb-2">
-            Propulsé par LeekPay - Solution de paiement simple et sécurisée
-          </p>
-          <a 
-            href="https://leekpay.me" 
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-            </svg>
-            Découvrir LeekPay
-          </a>
-        </div>
-      </div>
+  <!-- Footer -->
+   <div class="mt-4 pt-4 border-t border-gray-200">
+     <div class="text-center">
+       <a 
+         href="https://leekpay.me" 
+         target="_blank" class="flex items-center justify-center mb-1">
+         <img 
+           src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
+           alt="LeekPay Logo" 
+           class="h-16 w-auto"
+         >
+     </a>
+       <p class="text-xs text-gray-500 mb-2">
+         Propulsé par LeekPay - Solution de paiement simple et sécurisée
+       </p>
+       <a 
+         href="https://leekpay.me" 
+         target="_blank"
+         rel="noopener noreferrer"
+         class="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+       >
+         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+         </svg>
+         Découvrir LeekPay
+       </a>
+     </div>
+   </div>
+  </div>
+
 </template>
 
 <script setup>
