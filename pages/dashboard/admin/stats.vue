@@ -158,11 +158,9 @@ const stats = ref(null)
 const loading = ref(true)
 const error = ref(null)
 
-// Composables
 const config = useRuntimeConfig()
 const { token } = useAuth()
 
-// Fonction pour formater les montants
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
