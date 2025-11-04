@@ -51,13 +51,21 @@
       </div>
 
       <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mb-3">
           <div>
             <p class="text-sm font-medium text-gray-600">Profit LeekPay</p>
-            <p class="text-2xl font-bold text-gray-900">{{ formatCurrency(stats.leekpay_profit) }}</p>
           </div>
           <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
             <DollarSignIcon class="w-6 h-6 text-green-600" />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <div v-for="(profit, currency) in stats.leekpay_profit_by_currency" :key="currency" class="flex items-center justify-between">
+            <span class="text-sm text-gray-600">{{ currency }}</span>
+            <span class="text-lg font-bold text-gray-900">{{ formatCurrencyByCurrency(profit, currency) }}</span>
+          </div>
+          <div v-if="!stats.leekpay_profit_by_currency || Object.keys(stats.leekpay_profit_by_currency).length === 0" class="text-center text-gray-500 text-sm py-2">
+            Aucun profit
           </div>
         </div>
       </div>
@@ -165,6 +173,14 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF',
+    minimumFractionDigits: 0
+  }).format(amount || 0)
+}
+
+const formatCurrencyByCurrency = (amount, currency) => {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currency,
     minimumFractionDigits: 0
   }).format(amount || 0)
 }
