@@ -125,9 +125,25 @@
                 >
                   {{ getStatusLabel(withdrawal.status) }}
                 </span>
+                <!-- Badge statut payout -->
+                <span 
+                  v-if="withdrawal.payout_status"
+                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ml-2"
+                  :class="getPayoutStatusClass(withdrawal.payout_status)"
+                >
+                  {{ getPayoutStatusLabel(withdrawal.payout_status) }}
+                </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
+                  <!-- Bouton Payer via Moneroo -->
+                  <button
+                    v-if="canPayAutomatically(withdrawal)"
+                    @click="openPayoutModal(withdrawal)"
+                    class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs font-medium"
+                  >
+                    💸 Payer via Moneroo
+                  </button>
                   <button
                     v-if="withdrawal.status === 'pending'"
                     @click="openModal(withdrawal, 'processed')"
@@ -353,6 +369,49 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal de confirmation payout -->
+    <div v-if="showPayoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+          💸 Payer via Moneroo
+        </h3>
+        <p class="text-gray-600 mb-4">
+          Êtes-vous sûr de vouloir envoyer automatiquement <strong>{{ formatCurrency(selectedWithdrawal?.net_amount) }}</strong> via Moneroo ?
+        </p>
+        
+        <div class="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
+          <p class="text-sm text-blue-900">
+            <strong>📌 Détails du transfert :</strong><br>
+            Méthode : {{ selectedWithdrawal?.withdrawal_method?.provider_name }}<br>
+            Numéro : {{ selectedWithdrawal?.withdrawal_method?.account_number }}<br>
+            Bénéficiaire : {{ selectedWithdrawal?.user?.name }}
+          </p>
+        </div>
+
+        <div class="bg-yellow-50 p-4 rounded-lg mb-4 border border-yellow-200">
+          <p class="text-sm text-yellow-900">
+            ⚠️ L'utilisateur recevra une notification email et l'argent sera envoyé automatiquement sur son compte Mobile Money.
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button
+            @click="closePayoutModal"
+            class="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+          >
+            Annuler
+          </button>
+          <button
+            @click="processPayoutAutomatically"
+            :disabled="processingPayout"
+            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            {{ processingPayout ? 'Envoi en cours...' : 'Confirmer et envoyer' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -386,10 +445,12 @@ const filters = ref({
 // Modal
 const showModal = ref(false)
 const showDetailsModal = ref(false)
+const showPayoutModal = ref(false)
 const selectedWithdrawal = ref(null)
 const selectedWithdrawalDetails = ref(null)
 const modalAction = ref('')
 const adminNotes = ref('')
+const processingPayout = ref(false)
 
 // Composables
 const config = useRuntimeConfig()
@@ -595,6 +656,81 @@ const openModalFromDetails = (action) => {
   selectedWithdrawal.value = selectedWithdrawalDetails.value
   showDetailsModal.value = false
   showModal.value = true
+  adminNotes.value = ''
+}
+
+// Fonctions pour le payout automatique
+const canPayAutomatically = (withdrawal) => {
+  return withdrawal.status === 'pending' && 
+         withdrawal.withdrawal_method?.method_type === 'mobile_money' &&
+         !withdrawal.payout_id
+}
+
+const getPayoutStatusClass = (status) => {
+  const classes = {
+    initiated: 'bg-orange-100 text-orange-800',
+    completed: 'bg-green-100 text-green-800',
+    failed: 'bg-red-100 text-red-800'
+  }
+  return classes[status] || 'bg-gray-100 text-gray-800'
+}
+
+const getPayoutStatusLabel = (status) => {
+  const labels = {
+    initiated: '⏳ En cours',
+    completed: '✅ Envoyé',
+    failed: '❌ Échoué'
+  }
+  return labels[status] || status
+}
+
+const openPayoutModal = (withdrawal) => {
+  selectedWithdrawal.value = withdrawal
+  showPayoutModal.value = true
+}
+
+const closePayoutModal = () => {
+  showPayoutModal.value = false
+  selectedWithdrawal.value = null
+}
+
+const processPayoutAutomatically = async () => {
+  try {
+    processingPayout.value = true
+    
+    const response = await fetch(`${config.public.apiBaseURL}/admin/withdrawal-requests/${selectedWithdrawal.value.id}/process-payout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Erreur lors du traitement du payout')
+    }
+    
+    const data = await response.json()
+    
+    if (data.success) {
+      // Recharger la liste des retraits
+      await loadWithdrawals(pagination.value?.current_page || 1)
+      closePayoutModal()
+      
+      // Notification de succès
+      console.log('Payout initié avec succès')
+    } else {
+      throw new Error(data.message || 'Erreur lors du traitement du payout')
+    }
+  } catch (err) {
+    error.value = err.message || 'Erreur lors du traitement du payout'
+    console.error('Erreur payout:', err)
+    alert(err.message)
+  } finally {
+    processingPayout.value = false
+  }
 }
 
 // Charger les données au montage
