@@ -19,6 +19,7 @@ export default {
             },
             fontFamily: {
                 sans: ['Poppins', 'sans-serif'],
+                display: ['Bowlby One', 'cursive'],
             },
         },
     },

@@ -497,8 +497,30 @@
               required
             >
               <option value="">Sélectionnez un fournisseur</option>
-              <option value="MTN BENIN">MTN BENIN</option>
-              <option value="MOOV BENIN">MOOV BENIN</option>
+              <optgroup label="Bénin">
+                <option value="MTN Benin">MTN Mobile Money Bénin</option>
+                <option value="Moov Benin">Moov Money Bénin</option>
+              </optgroup>
+              <optgroup label="Sénégal">
+                <option value="E-money Sénégal">E-money Sénégal</option>
+                <option value="Orange Money Sénégal">Orange Money Sénégal</option>
+                <option value="Wave Sénégal">Wave Sénégal</option>
+                <option value="Free Money Sénégal">Free Money Sénégal</option>
+                <option value="Djamo Sénégal">Djamo Sénégal</option>
+              </optgroup>
+              <optgroup label="Côte d'Ivoire">
+                <option value="Orange Money Côte d'Ivoire">Orange Money Côte d'Ivoire</option>
+                <option value="MTN MoMo Côte d'Ivoire">MTN MoMo Côte d'Ivoire</option>
+                <option value="Moov Money Côte d'Ivoire">Moov Money Côte d'Ivoire</option>
+                <option value="Wave Côte d'Ivoire">Wave Côte d'Ivoire</option>
+                <option value="Djamo Côte d'Ivoire">Djamo Côte d'Ivoire</option>
+              </optgroup>
+              <optgroup label="Togo">
+                <option value="T-Money">T-Money (Togocel)</option>
+              </optgroup>
+              <optgroup label="Mali">
+                <option value="Orange Money Mali">Orange Money Mali</option>
+              </optgroup>
             </select>
           </div>
           
@@ -508,10 +530,11 @@
               id="accountNumber"
               v-model="newMethod.account_number"
               type="text"
-              placeholder="Numéro de compte ou téléphone"
+              placeholder="Ex: 22996123456 (avec indicatif pays)"
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               required
             />
+            <p class="mt-1 text-xs text-gray-500">Format international : indicatif + numéro (sans +,ni espaces ou ni tirets)</p>
           </div>
           
           <div>

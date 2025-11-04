@@ -24,36 +24,12 @@ const toggleMobileMenu = () => {
 
         <!-- Navigation Desktop -->
         <nav class="hidden md:flex items-center space-x-6">
-          <div class="relative group">
-            <button class="text-slate-900 hover:text-green-500 font-medium flex items-center gap-1 transition">
-              Produits
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div class="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-10">
-              <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-green-50">Tarifs</a>
-              <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-green-50">Intégrations</a>
-            </div>
-          </div>
+          <a href="#fonctionnalites" class="text-slate-900 hover:text-green-500 font-medium transition">Fonctionnalités</a>
+          <a href="#cas-usage" class="text-slate-900 hover:text-green-500 font-medium transition">Cas d'usage</a>
+          <a href="#comment-ca-marche" class="text-slate-900 hover:text-green-500 font-medium transition">Comment ça marche</a>
+          <a href="#faq" class="text-slate-900 hover:text-green-500 font-medium transition">FAQ</a>
 
-          <a href="#" class="text-slate-900 hover:text-green-500 font-medium transition">Tarifs</a>
-          <a href="#" class="text-slate-900 hover:text-green-500 font-medium transition">Contacts</a>
-
-          <div class="relative group">
-            <button class="text-slate-900 hover:text-green-500 font-medium flex items-center gap-1 transition">
-              Ressources
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div class="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg hidden group-hover:block z-10">
-              <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-green-50">Documentation</a>
-              <a href="#" class="block px-4 py-2 text-sm text-slate-700 hover:bg-green-50">Blog</a>
-            </div>
-          </div>
-
-          <NuxtLink to="/register" class="bg-amber-500 text-white px-6 py-2.5 rounded-full font-medium hover:bg-amber-600 transition shadow-md">
+          <NuxtLink to="/register" class="bg-amber-500 text-white px-6 py-2.5 rounded-full font-medium hover:bg-amber-600 transition">
             Démarrer
           </NuxtLink>
 
@@ -81,12 +57,12 @@ const toggleMobileMenu = () => {
       <!-- Menu mobile déroulant -->
       <transition name="fade">
         <div v-if="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-200 mt-2 p-4 space-y-3">
-          <a href="#" class="block text-slate-900 hover:text-green-500 font-medium transition">Produits</a>
-          <a href="#" class="block text-slate-900 hover:text-green-500 font-medium transition">Tarifs</a>
-          <a href="#" class="block text-slate-900 hover:text-green-500 font-medium transition">Contacts</a>
-          <a href="#" class="block text-slate-900 hover:text-green-500 font-medium transition">Ressources</a>
+          <a href="#fonctionnalites" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Fonctionnalités</a>
+          <a href="#cas-usage" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Cas d'usage</a>
+          <a href="#comment-ca-marche" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Comment ça marche</a>
+          <a href="#faq" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">FAQ</a>
 
-          <NuxtLink to="/register" class="block bg-amber-500 text-white text-center px-6 py-2 rounded-full font-medium hover:bg-amber-600 transition shadow-md">
+          <NuxtLink to="/register" class="block bg-amber-500 text-white text-center px-6 py-2 rounded-full font-medium hover:bg-amber-600 transition">
             Démarrer
           </NuxtLink>
 
