@@ -772,7 +772,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
-// Désactiver SSR pour cette page à cause de v-motion
+// Désactiver complètement le SSR pour cette page
 definePageMeta({
   ssr: false
 })

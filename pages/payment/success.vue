@@ -8,7 +8,7 @@
       </div>
 
       <!-- Success state -->
-      <div v-else-if="transaction && transaction.status === 'paid'" class="text-center">
+      <div v-else-if="transaction && (transaction.status === 'paid' || transaction.status === 'completed')" class="text-center">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-6">
           <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -69,15 +69,15 @@
         </div>
       </div>
 
-      <!-- Pending state -->
-      <div v-else-if="transaction && transaction.status === 'pending'" class="text-center">
+      <!-- Pending/Processing state -->
+      <div v-else-if="transaction && (transaction.status === 'pending' || transaction.status === 'processing' || transaction.status === 'initiated')" class="text-center">
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-6">
           <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">Paiement en cours...</h2>
-        <p class="text-gray-600 mb-6">Votre transaction est en cours de traitement. Veuillez patienter.</p>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Paiement en cours de traitement...</h2>
+        <p class="text-gray-600 mb-6">Votre transaction est en cours de validation. Veuillez patienter...</p>
         
         <div class="bg-white p-6 rounded-lg shadow border border-gray-200 text-left mb-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la transaction</h3>
@@ -93,7 +93,7 @@
             <div class="flex justify-between">
               <span class="text-gray-600">Statut:</span>
               <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                En attente
+                {{ transaction.status === 'processing' ? 'En traitement' : 'En attente' }}
               </span>
             </div>
           </div>
@@ -302,7 +302,9 @@ const startStatusPolling = () => {
   if (statusInterval) clearInterval(statusInterval)
   
   statusInterval = setInterval(() => {
-    if (transaction.value?.status === 'pending') {
+    if (transaction.value?.status === 'pending' || 
+        transaction.value?.status === 'processing' || 
+        transaction.value?.status === 'initiated') {
       checkStatus()
     } else {
       clearInterval(statusInterval)
@@ -313,7 +315,9 @@ const startStatusPolling = () => {
 // Initialisation au montage du composant
 onMounted(() => {
   checkStatus().then(() => {
-    if (transaction.value?.status === 'pending') {
+    if (transaction.value?.status === 'pending' || 
+        transaction.value?.status === 'processing' || 
+        transaction.value?.status === 'initiated') {
       startStatusPolling()
     }
   })
