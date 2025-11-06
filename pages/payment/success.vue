@@ -224,7 +224,7 @@ const transaction = ref(null)
 
 // Configuration de l'API
 const config = useRuntimeConfig()
-const apiBaseUrl = config.public.apiUrl || 'http://leekpay.fr/api'
+const apiBaseUrl = config.public.apiBaseURL || 'https://leekpay.fr/api'
 
 // Récupération des paramètres depuis l'URL
 const transactionId = computed(() => route.query.transaction)
