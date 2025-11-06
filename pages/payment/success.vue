@@ -226,8 +226,10 @@ const transaction = ref(null)
 const config = useRuntimeConfig()
 const apiBaseUrl = config.public.apiUrl || 'http://leekpay.fr/api'
 
-// Récupération de l'ID de transaction depuis l'URL
+// Récupération des paramètres depuis l'URL
 const transactionId = computed(() => route.query.transaction)
+const paymentId = computed(() => route.query.paymentId)
+const paymentStatus = computed(() => route.query.paymentStatus)
 
 // Devise par défaut
 const currency = computed(() => {
@@ -246,7 +248,22 @@ const checkStatus = async () => {
     loading.value = true
     error.value = ''
     
-    const response = await $fetch(`${apiBaseUrl}/public/transaction/${transactionId.value}/status`)
+    // Construire l'URL avec les paramètres optionnels
+    let url = `${apiBaseUrl}/public/transaction/${transactionId.value}/status`
+    const params = new URLSearchParams()
+    
+    if (paymentId.value) {
+      params.append('paymentId', paymentId.value)
+    }
+    if (paymentStatus.value) {
+      params.append('paymentStatus', paymentStatus.value)
+    }
+    
+    if (params.toString()) {
+      url += `?${params.toString()}`
+    }
+    
+    const response = await $fetch(url)
     
     if (response.success) {
       transaction.value = response.data
