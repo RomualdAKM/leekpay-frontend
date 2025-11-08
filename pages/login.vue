@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-white px-6 py-12">
+  <div class="min-h-screen flex items-center justify-center bg-white px-6 py-8">
     <div class="w-full max-w-md">
       <div class="mb-8 text-center">
         <h1 class="text-2xl font-bold text-slate-900 mb-2">Bienvenue !</h1>
@@ -19,7 +19,7 @@
                 type="email"
                 id="email"
                 placeholder="Adresse e-mail"
-                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                 required
             />
           </div>
@@ -40,7 +40,7 @@
                 type="password"
                 id="password"
                 placeholder="Mot de passe"
-                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                 required
             />
           </div>
@@ -65,7 +65,7 @@
         <button
             type="submit"
             :disabled="loading"
-            class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-600 transition shadow-md disabled:opacity-70"
+            class="w-full bg-green-600 text-white py-3 px-6 rounded-sm font-medium hover:bg-green-600 transition shadow-sm disabled:opacity-70"
         >
           {{ loading ? 'Connexion...' : 'Se connecter' }}
         </button>

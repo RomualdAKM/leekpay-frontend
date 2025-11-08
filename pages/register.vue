@@ -1,15 +1,15 @@
 <template>
   <div class="min-h-screen flex flex-col font-sans bg-white">
     <!-- Main Content -->
-    <main class="flex-grow flex items-center justify-center px-6 md:px-12 py-12">
-      <div class="container mx-auto max-w-6xl flex flex-col md:flex-row items-center gap-12">
+    <main class="flex-grow flex items-center justify-center px-2 md:px-2 py-2">
+      <div class="container mx-auto max-w-8xl flex flex-col md:flex-row items-center gap-8">
         <!-- Formulaire de création de compte -->
         <div class="w-full md:w-1/2">
-          <div class="mb-8">
+          <div class="mb-4">
             <h1 class="text-3xl font-bold text-slate-900 mb-6">Créer un compte</h1>
           </div>
 
-          <form @submit.prevent="handleSubmit" class="space-y-6">
+          <form @submit.prevent="handleSubmit" class="space-y-2">
             <!-- Nom & Prénoms -->
             <div>
               <label for="nom" class="block text-sm font-medium text-slate-700 mb-1">Nom et Prénoms</label>
@@ -22,7 +22,7 @@
                     type="text"
                     id="nom"
                     placeholder="Nom et Prénoms"
-                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                    class="pl-10 w-full px-2 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                     required
                 />
               </div>
@@ -43,7 +43,7 @@
                     type="email"
                     id="email"
                     placeholder="Adresse e-mail"
-                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                    class="pl-10 w-full px-2 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                     required
                 />
               </div>
@@ -64,7 +64,7 @@
                     type="password"
                     id="password"
                     placeholder="Mot de passe"
-                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                    class="pl-10 w-full px-2 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                     required
                 />
               </div>
@@ -85,7 +85,7 @@
                     type="password"
                     id="passwordConfirm"
                     placeholder="Confirmer le mot de passe"
-                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                    class="pl-10 w-full px-2 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                     required
                 />
               </div>
@@ -100,7 +100,7 @@
               <select
                   id="currency"
                   v-model="form.currency_id"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
+                  class="w-full px-2 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent"
                   required
               >
                 <option disabled value="">-- Sélectionnez une devise --</option>
@@ -122,7 +122,7 @@
             <button
                 type="submit"
                 :disabled="loading"
-                class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-600 transition shadow-md disabled:opacity-70"
+                class="w-full bg-green-600 mt-2 text-white py-2 px-4 rounded-sm font-medium hover:bg-green-600 transition shadow-sm disabled:opacity-70"
             >
               {{ loading ? 'Création...' : 'Continuer' }}
             </button>

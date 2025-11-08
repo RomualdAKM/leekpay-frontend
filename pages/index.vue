@@ -9,7 +9,8 @@
 </style>
 
 <template>
-  <div class="font-sans">
+  <ClientOnly>
+    <div class="font-sans">
 
     <!-- === HERO SECTION ANIMÉE === -->
     <section class="py-4 sm:py-4 px-4 md:px-12 bg-white">
@@ -766,7 +767,8 @@
         </div>
       </div>
     </footer>
-  </div>
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>

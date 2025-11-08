@@ -30,4 +30,5 @@ export default defineNuxtConfig({
             apiBaseURL: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://leekpay.fr/api'
         }
     },
+    modules: ['@vueuse/motion/nuxt']
 })

@@ -47,9 +47,24 @@
           <div class="text-center mb-4">
             <h1 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2"></h1>
             <p class="text-base md:text-lg text-gray-700">Effectuez votre paiement</p>
-            <p class="text-2xl md:text-3xl font-bold text-green-500 mt-2">
-              {{ displayAmount }} {{ currency.symbol }}
-            </p>
+            
+            <!-- Affichage du montant avec détail des frais -->
+            <div class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between text-gray-700">
+                  <span>Montant</span>
+                  <span class="font-medium">{{ displayAmount }} {{ currency.symbol }}</span>
+                </div>
+                <div v-if="calculatedFees.total_fees > 0" class="flex justify-between text-gray-600">
+                  <span>Frais de traitement ({{ Math.round((selectedPaymentMethod?.total_fee_rate || 0) * 100) }}%)</span>
+                  <span>{{ calculatedFees.total_fees.toFixed(2) }} {{ currency.symbol }}</span>
+                </div>
+                <div class="border-t border-gray-300 pt-2 flex justify-between">
+                  <span class="font-semibold text-gray-900">Total à payer</span>
+                  <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
 
@@ -567,6 +582,34 @@ const displayAmount = computed(() => {
     return paymentData.value.fixed_amount
   } else {
     return formData.value.amount || '0'
+  }
+})
+
+// Calculer les frais en fonction de la méthode de paiement sélectionnée
+const selectedPaymentMethod = computed(() => {
+  return availablePaymentMethods.value.find(m => m.value === selectedPayment.value)
+})
+
+const calculatedFees = computed(() => {
+  const amount = parseFloat(displayAmount.value) || 0
+  if (!selectedPaymentMethod.value || amount === 0) {
+    return {
+      leekpay_fee: 0,
+      aggregator_fee: 0,
+      total_fees: 0,
+      total_amount: amount
+    }
+  }
+  
+  const leekpayFee = Math.round(amount * (selectedPaymentMethod.value.leekpay_fee_rate || 0) * 100) / 100
+  const aggregatorFee = Math.round(amount * (selectedPaymentMethod.value.aggregator_fee_rate || 0) * 100) / 100
+  const totalFees = leekpayFee + aggregatorFee
+  
+  return {
+    leekpay_fee: leekpayFee,
+    aggregator_fee: aggregatorFee,
+    total_fees: totalFees,
+    total_amount: amount + totalFees
   }
 })
 
