@@ -128,17 +128,21 @@
                 class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white
           hover:bg-green-600 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-green-400"
             >
-              <svg v-if="index === 0" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.5 3.5-6.5 3.5V14z" />
+            <!-- Icône 1: Ventes en ligne -->
+            <!-- Icône 0: Formations -->
+            <svg v-if="index === 0"  xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
-              <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
+              <svg v-else-if="index === 1" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+              <!-- Icône 2: Associations & Dons -->
+              <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
               </svg>
-              <svg v-else-if="index === 2" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v3.5A2.5 2.5 0 0118 14a2.5 2.5 0 01-2.5 2.5h-7A2.5 2.5 0 016 14a2.5 2.5 0 01-2.5-2.5V9a2 2 0 012-2h8z" />
+              <!-- Icône 3: Services & Prestations -->
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
             </button>
 
@@ -206,11 +210,11 @@
                   <li
                       v-for="(item, i) in tabs[activeTab].points"
                       :key="i"
-                      class="flex items-start"
+                      class="flex items-start text-xl"
                   >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6 text-green-500 mr-3 mt-1"
+                        class="h-15 w-15 text-green-500 mr-3 mt-1"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -783,20 +787,20 @@ definePageMeta({
 const activeTab = ref(0)
 const tabs = ref([
   {
+    title: "Ventes en ligne & réseaux sociaux",
+    description: "Générez des liens de paiement pour vendre vos produits digitaux ou services sur Instagram, WhatsApp, Facebook…",
+    points: [
+      "Créez un lien personnalisé pour chaque produit ou service",
+      "Acceptez les paiements via Mobile Money (+21 pays en Afrique), carte bancaire ou PayPal",
+      "Suivez les ventes en temps réel depuis votre tableau de bord"
+    ]
+  },
+  {
     title: "Formations & consultations",
     description: "Encaissez vos frais de formation, ateliers ou consultations en toute simplicité.",
     points: [
       "Partagez un lien de paiement directement aux étudiants ou clients...",
       "Offrez la possibilité de régler par Mobile Money, carte bancaire ou PayPal, avec un suivi instantané et sécurisé."
-    ]
-  },
-  {
-    title: "Ventes en ligne & réseaux sociaux",
-    description: "Générez des liens de paiement pour vendre vos produits ou services sur Instagram, WhatsApp, Facebook…",
-    points: [
-      "Créez un lien personnalisé pour chaque produit ou service",
-      "Acceptez les paiements via Mobile Money, carte bancaire ou PayPal",
-      "Suivez les ventes en temps réel depuis votre tableau de bord"
     ]
   },
   {
@@ -831,13 +835,13 @@ const faqs = ref([
     isOpen: false
   },
   {
-    question: "Puis-je personnaliser mon lien de paiement ?",
-    answer: "Oui, absolument. Vous pouvez ajouter une description détaillée, fixer un montant (ou laisser le choix au client), ajouter une image ou un logo, et même personnaliser l'URL.",
+    question: "Comment suivre mes paiements ?",
+    answer: "Votre tableau de bord LeekPay vous offre une vue d'ensemble en temps réel de tous vos paiements : montants reçus, dates de transaction, statuts, nombre de clics, provenance géographique des visiteurs, et de nombreuses autres informations utiles",
     isOpen: false
   },
   {
-    question: "Comment suivre mes paiements ?",
-    answer: "Via votre tableau de bord LeekPay en temps réel. Vous y voyez tous les paiements reçus, les montants, les dates, les statuts et pouvez exporter les données.",
+    question: "Puis-je personnaliser mon lien de paiement ?",
+    answer: "Oui, absolument. Vous avez la possibilité d'ajouter une description détaillée, de fixer un montant précis ou de laisser le choix au client, d'intégrer une image ou un fichier PDF, de configurer un lien de retour personnalisé, et même de personnaliser l'URL de votre page de paiement.",
     isOpen: false
   },
   {
