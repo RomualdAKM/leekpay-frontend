@@ -285,6 +285,42 @@ const showCountryDropdown = ref(false)
 const selectedCountry = ref(null)
 const showStickyButton = ref(true)
 
+// Configuration dynamique des métadonnées SEO
+useHead(() => {
+  const title = paymentData.value?.title 
+    ? `${paymentData.value.title} - LeekPay` 
+    : 'Paiement - LeekPay'
+  
+  const description = paymentData.value?.description 
+    ? paymentData.value.description.replace(/<[^>]*>/g, '').substring(0, 160) 
+    : 'Effectuez votre paiement de manière simple et sécurisée avec LeekPay'
+  
+  const image = paymentData.value?.image_url || 'https://leekpay.me/default-og-image.png'
+  const url = `https://leekpay.me/${route.params.custom_url}`
+
+  return {
+    title,
+    meta: [
+      { name: 'description', content: description },
+      // Open Graph
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: description },
+      { property: 'og:image', content: image },
+      { property: 'og:url', content: url },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'LeekPay' },
+      // Twitter Card
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: image },
+    ],
+    link: [
+      { rel: 'canonical', href: url }
+    ]
+  }
+})
+
 const formData = ref({
   name: '',
   email: '',
