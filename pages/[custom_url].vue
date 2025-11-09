@@ -299,7 +299,7 @@ const pageDescription = computed(() =>
 )
 
 const pageImage = computed(() => 
-  paymentData.value?.image_url || 'https://leekpay.me/logo-leekpay.png'
+  paymentData.value?.image_url || 'https://leekpay.me/Logo_de_LeekPay_avec_arriere-plan.png'
 )
 
 const pageUrl = computed(() => 
