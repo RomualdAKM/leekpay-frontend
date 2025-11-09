@@ -181,10 +181,10 @@
               <p class="text-xs text-gray-500 mb-1">Référence Transaction</p>
               <p class="text-sm text-gray-900 font-mono">{{ selectedTransaction.transaction_reference }}</p>
             </div>
-            <div>
-              <p class="text-xs text-gray-500 mb-1">Statut</p>
-              <span :class="getStatusClass(selectedTransaction.status)">{{ getStatusText(selectedTransaction.status) }}</span>
-            </div>
+          </div>
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Statut</p>
+            <span :class="getStatusClass(selectedTransaction.status)">{{ getStatusText(selectedTransaction.status) }}</span>
           </div>
 
           <!-- Informations du client -->
