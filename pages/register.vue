@@ -127,10 +127,24 @@
               {{ loading ? 'Création...' : 'Continuer' }}
             </button>
 
-            <!-- Message de succès -->
-            <div v-if="successMessage" class="text-green-600 text-sm text-center p-3 bg-green-50 rounded font-medium">
-              {{ successMessage }}
-            </div>
+            <transition name="fade">
+              <div v-if="successMessage" class="fixed top-4 right-4 z-50">
+                <div class="border border-green-300 bg-white rounded-md p-3 flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div class="text-sm">
+                    <p class="text-slate-900 font-semibold">{{ successMessage }}</p>
+                    <p class="text-slate-700">Redirection vers votre tableau de bord...</p>
+                  </div>
+                  <button type="button" @click="successMessage = ''" class="ml-2 text-slate-500 hover:text-slate-700" aria-label="Fermer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </transition>
 
             <!-- Lien Se connecter -->
             <p class="text-center text-sm text-slate-600 mt-4">
