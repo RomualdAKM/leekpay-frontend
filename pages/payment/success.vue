@@ -58,7 +58,7 @@
         <div v-if="transaction.payment_link?.pdf_url" class="mb-6">
           <a 
             :href="transaction.payment_link.pdf_url" 
-            target="_blank"
+            :download="`leekpay-${transaction.transaction_reference || 'document'}.pdf`"
             class="inline-flex items-center px-4 py-2   rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
           >
             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +84,7 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">#{{ transaction.transaction_reference }}</span>
+              <span >#{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Montant:</span>

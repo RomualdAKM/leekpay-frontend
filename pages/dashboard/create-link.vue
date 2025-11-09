@@ -379,7 +379,7 @@ const config = useRuntimeConfig()
 const { token, user } = useAuth()
 
 const onBack = () => {
-  emit('back')
+  router.push('/dashboard/links')
 }
 
 const formData = ref({
@@ -603,6 +603,7 @@ const handleSubmit = async (event) => {
         payment_url: response.data.payment_url,
         qr_code_url: response.data.qr_code_url
       })
+      router.push('/dashboard/links')
     }
   } catch (err) {
     console.error('Erreur création lien:', err)

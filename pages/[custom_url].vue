@@ -51,17 +51,19 @@
             <!-- Affichage du montant avec détail des frais -->
             <div class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
               <div class="space-y-2 text-sm">
-                <div class="flex justify-between text-gray-700">
+                <!-- <div class="flex justify-between text-gray-700">
                   <span>Montant</span>
                   <span class="font-medium">{{ displayAmount }} {{ currency.symbol }}</span>
                 </div>
                 <div v-if="calculatedFees.total_fees > 0" class="flex justify-between text-gray-600">
                   <span>Frais de traitement ({{ Math.round((selectedPaymentMethod?.total_fee_rate || 0) * 100) }}%)</span>
                   <span>{{ calculatedFees.total_fees.toFixed(2) }} {{ currency.symbol }}</span>
-                </div>
+                </div> -->
                 <div class="border-t border-gray-300 pt-2 flex justify-between">
-                  <span class="font-semibold text-gray-900">Total à payer</span>
-                  <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span>
+                  <span class="font-semibold text-gray-900">Montant</span>
+                  <span class="text-2xl font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
+                  <!-- <span class="font-semibold text-gray-900">Total à payer</span>
+                  <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span> -->
                 </div>
               </div>
             </div>
