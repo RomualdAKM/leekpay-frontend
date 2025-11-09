@@ -329,7 +329,7 @@ const formData = ref({
 })
 
 const config = useRuntimeConfig()
-const apiBaseUrl = config.public.apiUrl || 'https://leekpay.fr/api'
+const apiBaseUrl = config.public.apiBaseURL || 'https://leekpay.fr/api'
 
 const customUrl = computed(() => route.params.custom_url)
 const fetchPaymentData = async () => {
