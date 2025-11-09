@@ -33,7 +33,7 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">{{ transaction.transaction_reference }}</span>
+              <span >{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Montant:</span>
@@ -122,7 +122,7 @@
           <div class="space-y-2">
             <div class="flex justify-between">
               <span class="text-gray-600">ID Transaction:</span>
-              <span class="font-medium">#{{ transaction.transaction_reference }}</span>
+              <span >#{{ transaction.transaction_reference }}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Statut:</span>
