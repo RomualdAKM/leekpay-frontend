@@ -49,7 +49,7 @@
             <p class="text-base md:text-lg text-gray-700">Effectuez votre paiement</p>
             
             <!-- Affichage du montant avec détail des frais -->
-            <div class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="mt-4 bg-gray-50 rounded-lg p-2 border border-gray-200">
               <div class="space-y-2 text-sm">
                 <!-- <div class="flex justify-between text-gray-700">
                   <span>Montant</span>
@@ -61,8 +61,8 @@
                 </div> -->
                 <!-- <div class="border-t border-gray-300 pt-2 flex justify-between"> -->
                 <div class="pt-2 flex justify-between">
-                  <span class="font-semibold text-gray-900">Montant</span>
-                  <span class="font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
+                  <span class="text-xl font-bold text-gray-900">Montant</span>
+                  <span class="text-xl font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
                   <!-- <span class="font-semibold text-gray-900">Total à payer</span>
                   <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span> -->
                 </div>
