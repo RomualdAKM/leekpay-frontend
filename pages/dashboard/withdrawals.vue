@@ -112,7 +112,7 @@
                     <span class="font-medium">{{ formatCurrency(parseFloat(withdrawalAmount)) }}</span>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-600">Frais totaux ({{ feesConfig.leekpay.percentage + feesConfig.aggregator.percentage }}%)</span>
+                    <span class="text-gray-600">Frais totaux ({{ feesConfig.total_percentage }}%)</span>
                     <span class="font-medium text-red-600">
                       -{{ formatCurrency(calculateFees(parseFloat(withdrawalAmount)).totalFees) }}
                     </span>
@@ -689,15 +689,15 @@ const historyPagination = ref({
 
 // Configuration des frais (sera récupérée depuis l'API)
 const feesConfig = ref({
+  total_rate: 0.03,
+  total_percentage: 3,
   leekpay: {
-    rate: 0.02,
-    minimum: 100,
-    percentage: 2
+    share: 0.33,
+    percentage: 1
   },
   aggregator: {
-    rate: 0.01,
-    minimum: 50,
-    percentage: 1
+    share: 0.67,
+    percentage: 2
   },
   minimum_withdrawal: 1000
 })
@@ -831,13 +831,14 @@ const fetchWithdrawalHistory = async (page = 1) => {
 
 // Calculate fees using backend configuration
 const calculateFees = (amount) => {
-  const leekpayFee = Math.max(amount * feesConfig.value.leekpay.rate, feesConfig.value.leekpay.minimum)
-  const aggregatorFee = Math.max(amount * feesConfig.value.aggregator.rate, feesConfig.value.aggregator.minimum)
+  const totalFees = amount * feesConfig.value.total_rate
+  const leekpayFee = totalFees * feesConfig.value.leekpay.share
+  const aggregatorFee = totalFees * feesConfig.value.aggregator.share
   return {
-    leekpayFee,
-    aggregatorFee,
-    totalFees: leekpayFee + aggregatorFee,
-    netAmount: amount - (leekpayFee + aggregatorFee)
+    leekpayFee: Math.round(leekpayFee * 100) / 100,
+    aggregatorFee: Math.round(aggregatorFee * 100) / 100,
+    totalFees: Math.round(totalFees * 100) / 100,
+    netAmount: Math.round((amount - totalFees) * 100) / 100
   }
 }
 
