@@ -61,7 +61,7 @@
                 </div> -->
                 <!-- <div class="border-t border-gray-300 pt-2 flex justify-between"> -->
                 <div class="pt-2 flex justify-between">
-                  <span class="text-xl font-bold text-gray-900">Montant</span>
+                  <span class="text-xl font-semibold text-gray-900">Montant</span>
                   <span class="text-xl font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
                   <!-- <span class="font-semibold text-gray-900">Total à payer</span>
                   <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span> -->
