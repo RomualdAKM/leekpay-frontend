@@ -78,7 +78,35 @@
         <!-- Nouvelle Demande -->
         <TabsContent value="request" class="pt-6">
           <div class="bg-white">
-            <div class="space-y-6">
+            <!-- Si aucun moyen de paiement n'est configuré -->
+            <div v-if="!loadingMethods && withdrawalMethods.length === 0" class="text-center py-12">
+              <!-- <div class="mx-auto h-16 w-16 text-gray-400 mb-4">
+                <CreditCard class="w-16 h-16" />
+              </div> -->
+              <h3 class="text-sm font-semibold text-gray-900 mb-2">Aucune méthode de paiement configurée</h3>
+              <p class="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+                Pour effectuer un retrait, vous devez d'abord ajouter au moins une méthode de paiement (Mobile Money, Virement bancaire, etc.).
+              </p>
+              <button
+                type="button"
+                class="inline-flex items-center gap-2 rounded-md bg-green-600 px-2 py-2 text-sm font-semibold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                @click="openAddMethodModal"
+                :disabled="addingMethod"
+              >
+                <div v-if="addingMethod" class="w-2 h-2 border border-white border-t-transparent rounded-sm animate-spin"></div>
+                <Plus v-else class="w-5 h-5" />
+                {{ addingMethod ? 'Ajout en cours...' : 'Ajouter une méthode de paiement' }}
+              </button>
+            </div>
+
+            <!-- Loader pendant le chargement des méthodes -->
+            <div v-else-if="loadingMethods" class="text-center py-12">
+              <div class="inline-block h-8 w-8 animate-spin rounded-full border border-green-500 border-t-transparent"></div>
+              <p class="mt-2 text-sm text-gray-500">Chargement des méthodes de paiement...</p>
+            </div>
+
+            <!-- Formulaire de retrait si des méthodes existent -->
+            <div v-else class="space-y-6">
               <!-- Montant -->
               <div>
                 <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">Montant à retirer</label>
@@ -200,9 +228,9 @@
           </div>
           
           <div v-else-if="withdrawalMethods.length === 0" class="text-center py-12">
-            <div class="mx-auto h-12 w-12 text-gray-400">
+            <!-- <div class="mx-auto h-12 w-12 text-gray-400">
               <CreditCard class="w-12 h-12" />
-            </div>
+            </div> -->
             <h3 class="mt-2 text-sm font-medium text-gray-900">Aucune méthode de retrait</h3>
             <p class="mt-1 text-sm text-gray-500">Commencez par ajouter une méthode de retrait.</p>
             <div class="mt-6">
@@ -457,11 +485,11 @@
     </div>
     
     <!-- Modal pour ajouter une méthode de retrait -->
-    <div v-if="showAddMethodModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div v-if="showAddMethodModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 z-50">
+      <div class="bg-white rounded-md w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div class="px-6 py-5 border-b border-gray-200">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-900">Ajouter une méthode de retrait</h3>
+            <h3 class="text-md font-semibold text-gray-900">Ajouter une méthode de retrait</h3>
             <button 
               type="button" 
               class="text-gray-400 hover:text-gray-500"
