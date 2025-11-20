@@ -254,10 +254,10 @@
                 <p class="text-xs text-gray-500 mb-1">Mode de paiement</p>
                 <p class="text-sm text-gray-900">{{ getPaymentMethodText(selectedTransaction.payment_method) }}</p>
               </div>
-              <div>
+              <!-- <div>
                 <p class="text-xs text-gray-500 mb-1">Fournisseur</p>
                 <p class="text-sm text-gray-900">{{ selectedTransaction.payment_provider || '-' }}</p>
-              </div>
+              </div> -->
             </div>
           </div>
 
