@@ -567,7 +567,7 @@ const fetchLinks = async () => {
 
 
 const safeImageSrc = (imageUrl) => {
-  if (!imageUrl) return null
+  if (!imageUrl) return '/Logo_de_LeekPay_avec_arriere-plan.png'
   return imageUrl.startsWith('http')
       ? imageUrl
       : `${config.public.apiBaseURL}${imageUrl}`
