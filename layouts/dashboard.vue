@@ -57,11 +57,15 @@
         <slot />
       </main>
     </div>
+
+    <!-- WhatsApp Channel Popup -->
+    <WhatsAppPopup />
   </div>
 </template>
 
 <script setup>
 import DashboardSidebar from '~/components/dashboard/Sidebar.vue'
+import WhatsAppPopup from '~/components/dashboard/WhatsAppPopup.vue'
 
 const route = useRoute()
 const mobileBreakpoint = 1024 // lg
