@@ -158,7 +158,7 @@
 
     <div
       v-if="selectedTransaction"
-      class="fixed inset-0 bg-gray-900 bg-opacity-20 flex items-center justify-center z-50 p-4"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       @click.self="closeDetails"
     >
       <div class="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
