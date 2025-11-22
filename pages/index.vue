@@ -280,7 +280,7 @@
                   class="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-md object-contain
                    hover:scale-110 hover:-translate-y-1 cursor-pointer transition-transform duration-300"
               />
-              <span class="mt-4 text-lg font-medium text-gray-800">{{ partner.name }}</span>
+              <!-- <span class="mt-4 text-lg font-medium text-gray-800">{{ partner.name }}</span> -->
             </div>
           </div>
 
