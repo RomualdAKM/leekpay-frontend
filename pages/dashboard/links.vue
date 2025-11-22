@@ -162,6 +162,15 @@
                     <QrCodeIcon class="w-4 h-4" />
                   </button>
                   <button
+                    @click="downloadPdf(link.id)"
+                    :disabled="downloadingPdf === link.id"
+                    class="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Télécharger le rapport PDF"
+                  >
+                    <DownloadIcon v-if="downloadingPdf !== link.id" class="w-4 h-4" />
+                    <div v-else class="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                  </button>
+                  <button
                     @click="openLink(link.custom_url)"
                     class="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title="Ouvrir le lien"
@@ -358,7 +367,8 @@ import {
   ExternalLinkIcon,
   EditIcon,
   PowerIcon,
-  TrashIcon
+  TrashIcon,
+  DownloadIcon
 } from 'lucide-vue-next'
 import Button from "~/components/ui/Button.vue"
 import Card from "~/components/ui/Card.vue"
@@ -624,6 +634,49 @@ const toggleStatus = async (link) => {
   } catch (err) {
     console.error('Erreur toggle:', err)
     showToast('Erreur lors du changement de statut')
+  }
+}
+
+// Téléchargement PDF
+const downloadingPdf = ref(null)
+
+const downloadPdf = async (linkId) => {
+  try {
+    downloadingPdf.value = linkId
+    
+    const response = await fetch(`${config.public.apiBaseURL}/payment-links/${linkId}/export-pdf`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/pdf'
+      }
+    })
+
+    if (!response.ok) {
+      throw new Error('Erreur lors de la génération du PDF')
+    }
+
+    // Récupérer le blob PDF
+    const blob = await response.blob()
+    
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `rapport-lien-${linkId}-${new Date().toISOString().split('T')[0]}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    
+    // Nettoyer
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+    
+    showToast('PDF téléchargé avec succès')
+  } catch (err) {
+    console.error('Erreur téléchargement PDF:', err)
+    showToast('Erreur lors du téléchargement du PDF')
+  } finally {
+    downloadingPdf.value = null
   }
 }
 

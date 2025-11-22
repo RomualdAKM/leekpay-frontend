@@ -141,32 +141,55 @@
                 <p v-for="error in apiErrors.current_password" :key="error">{{ error }}</p>
               </div>
             </div>
+
             <div class="space-y-2">
               <Label for="new-password" class="text-xs sm:text-sm">Nouveau mot de passe</Label>
-              <Input 
-                id="new-password" 
-                v-model="security.newPassword" 
-                type="password" 
-                class="text-sm py-2"
-                :class="{ 'border-red-500': apiErrors.password }"
-              />
+              <div class="relative">
+                <Input 
+                  id="new-password" 
+                  v-model="security.newPassword" 
+                  :type="showNewPassword ? 'text' : 'password'"
+                  class="text-sm py-2 pr-10"
+                  :class="{ 'border-red-500': apiErrors.password }"
+                />
+                <button 
+                  type="button"
+                  @click="showNewPassword = !showNewPassword"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <Eye v-if="!showNewPassword" class="h-4 w-4" />
+                  <EyeOff v-else class="h-4 w-4" />
+                </button>
+              </div>
               <div v-if="apiErrors.password" class="text-red-500 text-sm">
                 <p v-for="error in apiErrors.password" :key="error">{{ error }}</p>
               </div>
             </div>
+
             <div class="space-y-2">
               <Label for="confirm-password" class="text-xs sm:text-sm">Confirmer le mot de passe</Label>
-              <Input 
-                id="confirm-password" 
-                v-model="security.confirmPassword" 
-                type="password" 
-                class="text-sm py-2"
-                :class="{ 'border-red-500': apiErrors.password_confirmation }"
-              />
+              <div class="relative">
+                <Input 
+                  id="confirm-password" 
+                  v-model="security.confirmPassword" 
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  class="text-sm py-2 pr-10"
+                  :class="{ 'border-red-500': apiErrors.password_confirmation }"
+                />
+                <button 
+                  type="button"
+                  @click="showConfirmPassword = !showConfirmPassword"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <Eye v-if="!showConfirmPassword" class="h-4 w-4" />
+                  <EyeOff v-else class="h-4 w-4" />
+                </button>
+              </div>
               <div v-if="apiErrors.password_confirmation" class="text-red-500 text-sm">
                 <p v-for="error in apiErrors.password_confirmation" :key="error">{{ error }}</p>
               </div>
             </div>
+            
             <Button
                 @click="changePasswordHandler"
                 :disabled="!canChangePassword || passwordLoading"
@@ -194,7 +217,9 @@ definePageMeta({
 import {
   User,
   Shield,
-  CheckIcon
+  CheckIcon,
+  Eye,
+  EyeOff
 } from "lucide-vue-next"
 
 // Import des composants UI
@@ -220,6 +245,10 @@ const apiErrors = ref({})
 const successMessage = ref('')
 const showToast = ref(false)
 const toastMessage = ref('')
+
+// État pour l'affichage des mots de passe
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 // Tabs data - seulement Profil et Sécurité
 const tabs = [
@@ -306,6 +335,9 @@ const changePasswordHandler = async () => {
       newPassword: "",
       confirmPassword: ""
     }
+    // Réinitialiser l'affichage des mots de passe
+    showNewPassword.value = false
+    showConfirmPassword.value = false
   } catch (err) {
     if (err.data?.errors) {
       apiErrors.value = err.data.errors
