@@ -166,7 +166,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div v-if="allLinks.length > 1" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="bg-white rounded-lg border border-gray-200 p-6">
           <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-gray-900">Liens les plus rentables</h3>

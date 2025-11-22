@@ -97,12 +97,12 @@
       <div class="space-y-4">
         <div class="border-l-4 border-green-500 pl-4 py-2">
           <h4 class="font-medium text-sm sm:text-base text-gray-900 mb-1">Quels sont les horaires du support ?</h4>
-          <p class="text-xs sm:text-sm text-gray-600">Notre équipe est disponible du lundi au vendredi de 9h à 18h (GMT). Les demandes reçues en dehors de ces horaires seront traitées le jour ouvrable suivant.</p>
+          <p class="text-xs sm:text-sm text-gray-600">Notre équipe est disponible 24h/24 et 7j/7 pour vous accompagner à tout moment.</p>
         </div>
         
         <div class="border-l-4 border-green-500 pl-4 py-2">
           <h4 class="font-medium text-sm sm:text-base text-gray-900 mb-1">Quel est le délai de réponse ?</h4>
-          <p class="text-xs sm:text-sm text-gray-600">Via WhatsApp, vous recevrez généralement une réponse en quelques minutes pendant les heures ouvrables. Par email, comptez 2 à 4 heures maximum.</p>
+          <p class="text-xs sm:text-sm text-gray-600">Via WhatsApp, vous recevrez généralement une réponse en quelques minutes.</p>
         </div>
         
         <div class="border-l-4 border-green-500 pl-4 py-2">
