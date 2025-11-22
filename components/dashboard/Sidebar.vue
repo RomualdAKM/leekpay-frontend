@@ -48,9 +48,6 @@
     <!-- User Profile -->
     <div class="p-2 border-t border-gray-200">
       <div class="flex items-center gap-2">
-        <!-- <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-          <UserIcon class="w-5 h-5 text-gray-600" />
-        </div> -->
         <NuxtLink to="/dashboard/settings">
           <p v-if="user" class="font-medium" style="color: #0A1F44">
             {{ user.name }}
@@ -102,12 +99,13 @@ const menuItems = computed(() => {
     { id: 'dashboard/links', label: 'Mes Liens', icon: LinkIcon },
     { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
     { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
+    { id: 'dashboard/support', label: 'Support', icon: HeadphonesIcon },
     { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
   ]
 
   // Ajouter les éléments admin si l'utilisateur est admin
   if (isAdmin.value) {
-    baseItems.splice(-1, 0, // Insérer avant "Paramètres"
+    baseItems.splice(-2, 0, // Insérer avant "Support" et "Paramètres"
       { id: 'dashboard/admin/stats', label: 'Statistiques Admin', icon: BarChart3Icon },
       { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: ShieldCheckIcon }
     )
@@ -117,5 +115,5 @@ const menuItems = computed(() => {
 })
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon } from 'lucide-vue-next'
 </script>
