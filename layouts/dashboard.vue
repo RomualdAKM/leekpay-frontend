@@ -56,6 +56,10 @@
 <script setup>
 import DashboardSidebar from '~/components/dashboard/Sidebar.vue'
 import WhatsAppPopup from '~/components/dashboard/WhatsAppPopup.vue'
+import { useAuth } from '~/composables/useAuth'  
+
+const { requireAuth } = useAuth()  
+requireAuth()  
 
 const route = useRoute()
 const mobileBreakpoint = 1024 // lg

@@ -1,12 +1,12 @@
 // composables/useAuth.ts
 export const useAuth = () => {
-    const token = useCookie<string | null>('leekpay_token', { 
+    const token = useCookie<string | null>('leekpay_token', {
         sameSite: 'strict',
         default: () => null,
         httpOnly: false,
         secure: false
     })
-    const user = useCookie<any | null>('leekpay_user', { 
+    const user = useCookie<any | null>('leekpay_user', {
         sameSite: 'strict',
         default: () => null,
         httpOnly: false,
@@ -21,6 +21,15 @@ export const useAuth = () => {
     const clearAuth = () => {
         token.value = null
         user.value = null
+    }
+
+    // Vérifier l'authentification et rediriger si nécessaire
+    const requireAuth = () => {
+        if (process.client && !token.value) {
+            navigateTo('/login')
+            return false
+        }
+        return true
     }
 
     // Déconnexion
@@ -51,12 +60,12 @@ export const useAuth = () => {
             },
             body: profileData
         })
-        
+
         // Mettre à jour les données utilisateur en cookie
         if (response.user) {
             user.value = response.user
         }
-        
+
         return response
     }
 
@@ -74,7 +83,7 @@ export const useAuth = () => {
             },
             body: passwordData
         })
-        
+
         return response
     }
 
@@ -98,5 +107,6 @@ export const useAuth = () => {
         updateProfile,
         changePassword,
         hasRole,
+        requireAuth,
     }
 }
