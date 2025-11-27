@@ -530,24 +530,45 @@
                 <option value="Moov Benin">Moov Money Bénin</option>
               </optgroup>
               <optgroup label="Sénégal">
-                <option value="E-money Sénégal">E-money Sénégal</option>
+                <!-- <option value="E-money Sénégal">E-money Sénégal</option> -->
                 <option value="Orange Money Sénégal">Orange Money Sénégal</option>
-                <option value="Wave Sénégal">Wave Sénégal</option>
+                <!-- <option value="Wave Sénégal">Wave Sénégal</option> -->
                 <option value="Free Money Sénégal">Free Money Sénégal</option>
-                <option value="Djamo Sénégal">Djamo Sénégal</option>
+                <!-- <option value="Djamo Sénégal">Djamo Sénégal</option> -->
               </optgroup>
               <optgroup label="Côte d'Ivoire">
                 <option value="Orange Money Côte d'Ivoire">Orange Money Côte d'Ivoire</option>
                 <option value="MTN MoMo Côte d'Ivoire">MTN MoMo Côte d'Ivoire</option>
-                <option value="Moov Money Côte d'Ivoire">Moov Money Côte d'Ivoire</option>
+                <!-- <option value="Moov Money Côte d'Ivoire">Moov Money Côte d'Ivoire</option>
                 <option value="Wave Côte d'Ivoire">Wave Côte d'Ivoire</option>
-                <option value="Djamo Côte d'Ivoire">Djamo Côte d'Ivoire</option>
+                <option value="Djamo Côte d'Ivoire">Djamo Côte d'Ivoire</option> -->
               </optgroup>
               <optgroup label="Togo">
                 <option value="T-Money">T-Money (Togocel)</option>
               </optgroup>
-              <optgroup label="Mali">
+              <!-- <optgroup label="Mali">
                 <option value="Orange Money Mali">Orange Money Mali</option>
+              </optgroup> -->
+              <optgroup label="Cameroun">
+                <option value="MTN Cameroun">MTN Mobile Money Cameroun</option>
+                <option value="Orange Money Cameroun">Orange Money Cameroun</option>
+              </optgroup>
+              <optgroup label="Burkina Faso">
+                <option value="Moov Burkina Faso">Moov Money Burkina Faso</option>
+                <option value="Orange Money Burkina Faso">Orange Money Burkina Faso</option>
+              </optgroup>
+              <optgroup label="Gabon">
+                <option value="Airtel Money Gabon">Airtel Money Gabon</option>
+                <option value="Moov Gabon">Moov Money Gabon</option>
+              </optgroup>
+              <optgroup label="Congo-Brazzaville">
+                <option value="Airtel Money Congo">Airtel Money Congo-Brazzaville</option>
+                <option value="MTN Congo">MTN Mobile Money Congo-Brazzaville</option>
+              </optgroup>
+              <optgroup label="RDC (Congo-Kinshasa)">
+                <option value="Airtel Money RDC">Airtel Money RDC</option>
+                <option value="Orange Money RDC">Orange Money RDC</option>
+                <!-- <option value="Vodacom M-Pesa RDC">Vodacom M-Pesa RDC</option> -->
               </optgroup>
             </select>
           </div>
