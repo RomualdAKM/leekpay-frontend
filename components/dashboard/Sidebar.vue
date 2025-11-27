@@ -103,10 +103,12 @@ const menuItems = computed(() => {
     { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
   ]
 
-  // Ajouter les éléments admin si l'utilisateur est admin
+   // Ajouter les éléments admin si l'utilisateur est admin
   if (isAdmin.value) {
     baseItems.splice(-2, 0, // Insérer avant "Support" et "Paramètres"
       { id: 'dashboard/admin/stats', label: 'Statistiques Admin', icon: BarChart3Icon },
+      { id: 'dashboard/admin/transactions', label: 'Transactions', icon: CreditCardIcon },
+      { id: 'dashboard/admin/links', label: 'Liens de Paiement', icon: LinkIcon },
       { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: ShieldCheckIcon }
     )
   }
