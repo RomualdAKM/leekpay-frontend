@@ -85,6 +85,12 @@
                   Client
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fournisseur
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Méthode
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Montant
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -120,15 +126,15 @@
                   <div class="text-xs text-gray-500">{{ transaction.payer_phone || 'N/A' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">{{ formatProvider(transaction.payment_provider) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ formatPaymentMethod(transaction.payment_method) }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-semibold text-gray-900">
                     {{ formatCurrency(transaction.amount, transaction.currency?.code) }}
                   </div>
-                  <!-- <div class="text-xs text-gray-500">
-                    Frais: {{ formatCurrency(transaction.total_fees, transaction.currency?.code) }}
-                  </div>
-                  <div class="text-xs font-medium text-green-600">
-                    Net: {{ formatCurrency(transaction.net_amount, transaction.currency?.code) }}
-                  </div> -->
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span 
@@ -175,6 +181,14 @@
                 <div>
                   <div class="text-xs text-gray-500">Client</div>
                   <div class="text-gray-900">{{ transaction.payer_email || 'N/A' }}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500">Fournisseur</div>
+                  <div class="font-medium text-gray-900">{{ formatProvider(transaction.payment_provider) }}</div>
+                </div>
+                <div>
+                  <div class="text-xs text-gray-500">Méthode</div>
+                  <div class="text-gray-900">{{ formatPaymentMethod(transaction.payment_method) }}</div>
                 </div>
                 <div>
                   <div class="text-xs text-gray-500">Montant</div>
@@ -291,6 +305,32 @@ const getStatusLabel = (status) => {
     failed: 'Échoué'
   }
   return labels[status] || status
+}
+
+// Fonction pour formater le provider
+const formatProvider = (provider) => {
+  if (!provider) return 'N/A'
+  const providers = {
+    'moneroo': 'Moneroo',
+    'paypal': 'PayPal',
+    'stripe': 'Stripe',
+    'orange_money': 'Orange Money',
+    'mtn_money': 'MTN Money',
+    'moov_money': 'Moov Money'
+  }
+  return providers[provider.toLowerCase()] || provider
+}
+
+// Fonction pour formater la méthode de paiement
+const formatPaymentMethod = (method) => {
+  if (!method) return 'N/A'
+  const methods = {
+    'card': 'Carte bancaire',
+    'mobile_money': 'Mobile Money',
+    'paypal': 'PayPal',
+    'crypto': 'Crypto-monnaie'
+  }
+  return methods[method.toLowerCase()] || method
 }
 
 // Charger les transactions
