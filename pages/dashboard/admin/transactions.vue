@@ -123,12 +123,12 @@
                   <div class="text-sm font-semibold text-gray-900">
                     {{ formatCurrency(transaction.amount, transaction.currency?.code) }}
                   </div>
-                  <div class="text-xs text-gray-500">
+                  <!-- <div class="text-xs text-gray-500">
                     Frais: {{ formatCurrency(transaction.total_fees, transaction.currency?.code) }}
                   </div>
                   <div class="text-xs font-medium text-green-600">
                     Net: {{ formatCurrency(transaction.net_amount, transaction.currency?.code) }}
-                  </div>
+                  </div> -->
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span 
