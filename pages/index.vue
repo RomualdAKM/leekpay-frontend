@@ -785,6 +785,20 @@ definePageMeta({
 
 // Gestion de l'onglet actif
 const activeTab = ref(0)
+
+// Configuration SEO
+useSeoMeta({
+  title: 'La solution de paiement simplifiée pour l\'Afrique',
+  ogTitle: 'LeekPay - La solution de paiement simplifiée pour l\'Afrique',
+  description: 'Créez vos liens de paiement en quelques secondes et encaissez vos clients via Mobile Money, Carte Bancaire et PayPal. Idéal pour les vendeurs, formateurs et associations.',
+  ogDescription: 'Créez vos liens de paiement en quelques secondes et encaissez vos clients via Mobile Money, Carte Bancaire et PayPal. Idéal pour les vendeurs, formateurs et associations.',
+  ogImage: 'https://leekpay.me/Logo_de_LeekPay_avec_arriere-plan.png',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'LeekPay - La solution de paiement simplifiée',
+  twitterDescription: 'Recevez vos paiements partout en Afrique et à l\'international.',
+  twitterImage: 'https://leekpay.me/Logo_de_LeekPay_avec_arriere-plan.png',
+})
+
 const tabs = ref([
   {
     title: "Ventes en ligne & réseaux sociaux",
