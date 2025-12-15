@@ -146,20 +146,37 @@
               v-for="method in availablePaymentMethods"
               :key="method.value"
               type="button"
-              @click="selectedPayment = method.value"
+              @click="handlePaymentMethodClick(method.value)"
+              :disabled="isPaymentMethodDisabled(method.value)"
               :class="[
-                'py-3 px-2 rounded-lg font-medium transition text-sm border',
-                selectedPayment === method.value
-                ? 'bg-green-600 text-white shadow-sm border-green-500'
-                : 'border-gray-200 text-slate-700 hover:bg-gray-50 hover:border-gray-300'
+                'py-3 px-2 rounded-lg font-medium transition text-sm border relative',
+                isPaymentMethodDisabled(method.value)
+                  ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+                  : selectedPayment === method.value
+                    ? 'bg-green-600 text-white shadow-sm border-green-500'
+                    : 'border-gray-200 text-slate-700 hover:bg-gray-50 hover:border-gray-300'
               ]"
               >
               <div class="flex flex-col items-center">
                 <span class="text-xs mb-1">{{ method.label }}</span>
+                <span v-if="isPaymentMethodDisabled(method.value)" class="text-[10px] text-red-500 mt-1">Indisponible</span>
               </div>
             </button>
           </div>
           <label class="block text-sm font-medium text-slate-700">Choisissez votre mode de paiement</label>
+          
+          <!-- Message d'information sur les méthodes désactivées -->
+          <div class="mt-2 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div class="flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div class="text-xs text-yellow-800">
+                <p class="font-medium mb-1">Méthodes temporairement indisponibles</p>
+                <p>Les paiements par carte bancaire et PayPal sont actuellement indisponibles pour maintenance. Merci d'utiliser Mobile Money.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
           <!-- Bouton de paiement -->
@@ -619,6 +636,19 @@ const getSelectedPaymentLabel = () => {
   if (!selectedPayment.value) return ''
   const method = availablePaymentMethods.value.find(m => m.value === selectedPayment.value)
   return method ? method.label : selectedPayment.value
+}
+
+// Liste des méthodes de paiement désactivées
+const disabledPaymentMethods = ['card', 'paypal']
+
+const isPaymentMethodDisabled = (methodValue) => {
+  return disabledPaymentMethods.includes(methodValue)
+}
+
+const handlePaymentMethodClick = (methodValue) => {
+  if (!isPaymentMethodDisabled(methodValue)) {
+    selectedPayment.value = methodValue
+  }
 }
 
 const displayAmount = computed(() => {
