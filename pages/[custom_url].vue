@@ -639,7 +639,8 @@ const getSelectedPaymentLabel = () => {
 }
 
 // Liste des méthodes de paiement désactivées
-const disabledPaymentMethods = ['card', 'paypal']
+const disabledPaymentMethods = []
+// const disabledPaymentMethods = ['card', 'paypal']
 
 const isPaymentMethodDisabled = (methodValue) => {
   return disabledPaymentMethods.includes(methodValue)
