@@ -1,10 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-  css: ['~/assets/css/main.css','flag-icons/css/flag-icons.min.css'],
-    vite: {    plugins: [      tailwindcss(),    ],  },
+    compatibilityDate: '2025-07-15',
+    devtools: { enabled: true },
+    css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
+    vite: { plugins: [tailwindcss(),], },
 
     app: {
         head: {
@@ -28,6 +28,11 @@ export default defineNuxtConfig({
                     href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Bowlby+One&display=swap',
                 },
             ],
+            noscript: [
+                {
+                    innerHTML: '<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2428692480923365&ev=PageView&noscript=1" />'
+                }
+            ]
         },
     },
     runtimeConfig: {
