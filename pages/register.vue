@@ -223,6 +223,7 @@ definePageMeta({
 })
 
 import { useCurrencies } from '~/composables/useCurrencies'
+const { trackCompleteRegistration, trackLead } = useFacebookPixel()
 
 const { currencies, currenciesLoading } = useCurrencies()
 
@@ -264,6 +265,13 @@ const handleSubmit = async () => {
       method: 'POST',
       baseURL: config.public.apiBaseURL,
       body: form
+    })
+
+    // Track successful registration with Facebook Pixel
+    trackCompleteRegistration({
+      content_name: 'LeekPay User Registration',
+      status: 'completed',
+      currency: form.currency_id
     })
 
     // Check if verification is required
