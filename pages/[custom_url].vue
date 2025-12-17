@@ -159,7 +159,7 @@
               >
               <div class="flex flex-col items-center">
                 <span class="text-xs mb-1">{{ method.label }}</span>
-                <span v-if="isPaymentMethodDisabled(method.value)" class="text-[10px] text-red-500 mt-1">Indisponible</span>
+                <span v-if="isPaymentMethodDisabled(method.value)" class="text-[10px] text-red-500 mt-1">{{ getDisabledReason(method.value) }}</span>
               </div>
             </button>
           </div>
@@ -638,12 +638,61 @@ const getSelectedPaymentLabel = () => {
   return method ? method.label : selectedPayment.value
 }
 
-// Liste des méthodes de paiement désactivées
-const disabledPaymentMethods = []
-// const disabledPaymentMethods = ['card', 'paypal']
+// Liste des méthodes de paiement désactivées statiquement (maintenance, etc.)
+const staticDisabledMethods = []
+// const staticDisabledMethods = ['card', 'paypal']
 
+// Seuil minimum pour carte/PayPal dans la devise du lien (reçu de l'API)
+const minAmountForCardPaypal = computed(() => {
+  return paymentData.value?.min_amount_for_card_paypal || null
+})
+
+// Vérifier si une méthode nécessite un montant minimum et si ce montant est atteint
 const isPaymentMethodDisabled = (methodValue) => {
-  return disabledPaymentMethods.includes(methodValue)
+  // Vérifier d'abord les méthodes désactivées statiquement
+  if (staticDisabledMethods.includes(methodValue)) {
+    return true
+  }
+  
+  // Pour les méthodes card et paypal, vérifier le montant minimum
+  if (methodValue === 'card' || methodValue === 'paypal') {
+    const method = availablePaymentMethods.value.find(m => m.value === methodValue)
+    
+    // Si la méthode a un seuil minimum défini
+    if (method?.min_amount_eur !== null && method?.min_amount_eur !== undefined) {
+      const currentAmount = parseFloat(displayAmount.value) || 0
+      const minAmount = minAmountForCardPaypal.value || 0
+      
+      // Si le montant actuel est inférieur au seuil minimum, désactiver
+      if (currentAmount > 0 && minAmount > 0 && currentAmount < minAmount) {
+        return true
+      }
+      
+      // Pour les montants flexibles avec montant non saisi, désactiver
+      if (paymentData.value?.amount_type === 'flexible' && currentAmount === 0) {
+        return true
+      }
+    }
+  }
+  
+  return false
+}
+
+// Message explicatif pour les méthodes désactivées à cause du montant minimum
+const getDisabledReason = (methodValue) => {
+  if (staticDisabledMethods.includes(methodValue)) {
+    return 'Indisponible'
+  }
+  
+  if ((methodValue === 'card' || methodValue === 'paypal') && isPaymentMethodDisabled(methodValue)) {
+    const minAmount = minAmountForCardPaypal.value
+    if (minAmount) {
+      return `Min. ${Math.ceil(minAmount)} ${currency.value.symbol}`
+    }
+    return 'Montant insuffisant'
+  }
+  
+  return 'Indisponible'
 }
 
 const handlePaymentMethodClick = (methodValue) => {
@@ -700,6 +749,18 @@ const paymentTitle = computed(() => {
 
 const paymentDescription = computed(() => {
   return paymentData.value?.description || ''
+})
+
+// Watcher pour réinitialiser la méthode de paiement si elle devient désactivée
+watch(displayAmount, (newAmount) => {
+  // Si la méthode actuellement sélectionnée est désactivée, basculer vers mobile_money
+  if (selectedPayment.value && isPaymentMethodDisabled(selectedPayment.value)) {
+    // Trouver la première méthode disponible
+    const firstAvailable = availablePaymentMethods.value.find(m => !isPaymentMethodDisabled(m.value))
+    if (firstAvailable) {
+      selectedPayment.value = firstAvailable.value
+    }
+  }
 })
 
 
