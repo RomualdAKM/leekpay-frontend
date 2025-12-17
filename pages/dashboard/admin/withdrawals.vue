@@ -105,10 +105,10 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">
-                  {{ formatCurrency(withdrawal.amount) }}
+                  {{ formatCurrency(withdrawal.amount, withdrawal.currency) }}
                 </div>
                 <div class="text-sm text-gray-500">
-                  Frais: {{ formatCurrency(withdrawal.total_fees) }}
+                  Frais: {{ formatCurrency(withdrawal.total_fees, withdrawal.currency) }}
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
@@ -208,7 +208,7 @@
         </h3>
         <p class="text-gray-600 mb-4">
           Êtes-vous sûr de vouloir {{ modalAction === 'processed' ? 'approuver' : 'rejeter' }} 
-          cette demande de retrait de {{ formatCurrency(selectedWithdrawal?.amount) }} ?
+          cette demande de retrait de {{ formatCurrency(selectedWithdrawal?.amount, selectedWithdrawal?.currency) }} ?
         </p>
         
         <div class="mb-4">
@@ -307,16 +307,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="text-sm font-medium text-gray-600">Montant demandé</label>
-                <p class="text-lg font-semibold text-gray-900">{{ formatCurrency(selectedWithdrawalDetails.amount) }}</p>
+                <p class="text-lg font-semibold text-gray-900">{{ formatCurrency(selectedWithdrawalDetails.amount, selectedWithdrawalDetails.currency) }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Frais</label>
-                <p class="text-lg font-semibold text-red-600">{{ formatCurrency(selectedWithdrawalDetails.total_fees) }}</p>
+                <p class="text-lg font-semibold text-red-600">{{ formatCurrency(selectedWithdrawalDetails.total_fees, selectedWithdrawalDetails.currency) }}</p>
               </div>
               <div>
                 <label class="text-sm font-medium text-gray-600">Montant net</label>
                 <p class="text-lg font-semibold text-green-600">
-                  {{ formatCurrency(selectedWithdrawalDetails.amount - selectedWithdrawalDetails.total_fees) }}
+                  {{ formatCurrency(selectedWithdrawalDetails.amount - selectedWithdrawalDetails.total_fees, selectedWithdrawalDetails.currency) }}
                 </p>
               </div>
             </div>
@@ -377,7 +377,7 @@
           💸 Payer via Moneroo
         </h3>
         <p class="text-gray-600 mb-4">
-          Êtes-vous sûr de vouloir envoyer automatiquement <strong>{{ formatCurrency(selectedWithdrawal?.net_amount) }}</strong> via Moneroo ?
+          Êtes-vous sûr de vouloir envoyer automatiquement <strong>{{ formatCurrency(selectedWithdrawal?.net_amount, selectedWithdrawal?.currency) }}</strong> via Moneroo ?
         </p>
         
         <div class="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
@@ -456,10 +456,10 @@ const processingPayout = ref(false)
 const config = useRuntimeConfig()
 const { token } = useAuth()
 
-// Fonction pour formater les montants
-const formatCurrency = (amount) => {
-  // Utiliser la devise de l'utilisateur connecté ou XOF par défaut
-  const currencyCode = 'XOF' // Dans le contexte admin, on utilise XOF par défaut
+// Fonction pour formater les montants avec la devise appropriée
+const formatCurrency = (amount, currency = null) => {
+  // Utiliser la devise passée en paramètre ou XOF par défaut
+  const currencyCode = currency?.code || 'XOF'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: currencyCode,
