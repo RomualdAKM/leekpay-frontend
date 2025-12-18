@@ -368,12 +368,32 @@ const startStatusPolling = () => {
 // Initialisation au montage du composant
 onMounted(() => {
   checkStatus().then(() => {
-    if (transaction.value?.status === 'pending' || 
+    // Si le paiement est réussi et qu'on est dans une iframe (widget)
+    if (transaction.value?.status === 'paid' && window.parent && window.parent !== window) {
+      // Envoyer les détails complets au parent
+      window.parent.postMessage({
+        type: 'leekpay_success',
+        transaction: {
+          id: transaction.value.id,
+          reference: transaction.value.transaction_reference,
+          amount: transaction.value.amount,
+          currency: transaction.value.currency?.code || 'XOF',
+          status: transaction.value.status
+        }
+      }, '*');
+      
+      // Fermer le modal après un court délai
+      setTimeout(() => {
+        window.parent.postMessage({ type: 'leekpay_close_modal' }, '*');
+      }, 2000);
+    }
+    // Sinon, suivre le comportement normal (redirection si configurée)
+    else if (transaction.value?.status === 'pending' || 
         transaction.value?.status === 'processing' || 
         transaction.value?.status === 'initiated') {
-      startStatusPolling()
+      startStatusPolling();
     }
-  })
+  });
 })
 
 // Nettoyage à la destruction du composant
