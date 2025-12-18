@@ -79,6 +79,7 @@ const pageMap = {
   transactions: 'Transactions',
   withdrawals: 'Retraits',
   analytics: 'Analytiques',
+  'api-keys': 'Clés API',
   settings: 'Paramètres',
   support: 'Support'
 }
