@@ -115,25 +115,25 @@
           <p class="text-sm text-gray-600 mb-3">Pour le bouton HTML, ajoutez ce code JavaScript pour être notifié :</p>
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
             <pre class="text-sm text-white"><code>&lt;script&gt;
-                window.addEventListener('message', function(event) {
-                // Vérifier l'origine
-                if (event.origin !== 'https://leekpay.me') return;
-                
-                // Paiement réussi
-                if (event.data.type === 'leekpay_success') {
-                    const tx = event.data.transaction;
-                    alert('Merci ! Paiement de ' + tx.amount + ' validé');
-                    
-                    // Rediriger ou débloquer du contenu
-                    window.location.href = '/merci?id=' + tx.id;
-                }
-                
-                // Paiement annulé
-                if (event.data.type === 'leekpay_cancel') {
-                    console.log('Paiement annulé');
-                }
-                });
-                &lt;/script&gt;</code></pre>
+window.addEventListener('message', function(event) {
+  // Vérifier l'origine
+  if (event.origin !== 'https://leekpay.me') return;
+  
+  // Paiement réussi
+  if (event.data.type === 'leekpay_success') {
+    const tx = event.data.transaction;
+    alert('Merci ! Paiement de ' + tx.amount + ' ' + tx.currency + ' validé');
+    
+    // Rediriger ou débloquer du contenu
+    window.location.href = '/merci?id=' + tx.id;
+  }
+  
+  // Paiement annulé
+  if (event.data.type === 'leekpay_cancel') {
+    console.log('Paiement annulé');
+  }
+});
+&lt;/script&gt;</code></pre>
           </div>
           <p class="text-xs text-gray-500 mt-3">
             <strong>Alternative :</strong> Utilisez les <strong>Webhooks</strong> (section 5) pour une notification serveur plus fiable.
@@ -196,6 +196,11 @@
       // Callbacks (optionnels)
       onSuccess: function(transaction) {
         console.log('Paiement réussi!', transaction);
+        // transaction.id
+        // transaction.reference
+        // transaction.amount
+        // transaction.currency
+        // transaction.status
         // Rediriger vers page de confirmation
         window.location.href = '/merci?tx=' + transaction.id;
       },
@@ -279,6 +284,7 @@
     // transaction.id
     // transaction.reference
     // transaction.amount
+    // transaction.currency
     // transaction.status
     
     // Exemples d'actions :

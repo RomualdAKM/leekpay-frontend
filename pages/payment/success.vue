@@ -275,6 +275,11 @@ const checkStatus = async () => {
       
       // Redirection automatique si le paiement est réussi et qu'une URL de redirection est définie
       if (transaction.value.status === 'paid' && transaction.value.payment_link?.redirect_url) {
+        // Fermer le popup/modal du widget si on est dans une iframe
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'leekpay_close_modal' }, '*');
+        }
+        
         setTimeout(() => {
           window.location.href = transaction.value.payment_link.redirect_url
         }, 3000) // Redirection après 3 secondes pour laisser le temps de voir le message de succès
