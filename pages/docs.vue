@@ -92,7 +92,7 @@
           
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
             <pre class="text-sm"><code class="text-green-400">&lt;!-- 1. Ajouter le script (une seule fois) --&gt;</code>
-<code class="text-white">&lt;script src="https://leekpay.me/js/leekpay.js"&gt;&lt;/script&gt;</code>
+<code class="text-white">&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;</code>
 
 <code class="text-green-400">&lt;!-- 2. Ajouter le bouton --&gt;</code>
 <code class="text-white">&lt;button 
@@ -150,7 +150,7 @@
           <p class="text-gray-600 mb-4">Pour plus de contrôle, utilisez l'API JavaScript :</p>
           
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
-            <pre class="text-sm text-white"><code>&lt;script src="https://leekpay.me/js/leekpay.js"&gt;&lt;/script&gt;
+            <pre class="text-sm text-white"><code>&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;
 &lt;script&gt;
   function payer() {
     LeekPay.checkout({

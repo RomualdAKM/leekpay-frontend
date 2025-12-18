@@ -119,7 +119,7 @@
           </h3>
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
             <pre class="text-green-400 text-sm"><code>&lt;!-- Ajouter le script --&gt;
-&lt;script src="https://leekpay.me/js/leekpay.js"&gt;&lt;/script&gt;
+&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;
 
 &lt;!-- Bouton de paiement --&gt;
 &lt;button 

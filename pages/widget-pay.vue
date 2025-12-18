@@ -3,7 +3,7 @@
     <div class="w-full max-w-md">
       <!-- Logo -->
       <div class="text-center mb-6">
-        <img src="/logo.png" alt="LeekPay" class="h-10 mx-auto" />
+        <img src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" alt="LeekPay" class="h-10 mx-auto" />
       </div>
 
       <!-- Card principale -->
@@ -255,7 +255,7 @@ async function processPayment() {
   
   try {
     // Créer le checkout via la route publique widget (clé publique acceptée)
-    const response = await $fetch(`${config.public.apiBase}/public/widget/checkout`, {
+    const response = await $fetch(`${config.public.apiBaseURL}/public/widget/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
