@@ -879,11 +879,12 @@ onMounted(() => {
     checkPaymentFormVisibility()
   })
   
-  const shouldRedirect = handleReturnParameters()
-  
-  if (!shouldRedirect) {
-    fetchPaymentData()
-  }
+  // Attendre la fin du traitement des paramètres de retour avant de charger les données
+  handleReturnParameters().then(shouldRedirect => {
+    if (!shouldRedirect) {
+      fetchPaymentData()
+    }
+  })
 })
 
 
