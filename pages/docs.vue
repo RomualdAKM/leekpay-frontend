@@ -104,6 +104,41 @@
 
           <p class="text-sm text-gray-500">C'est tout ! Le bouton ouvrira automatiquement une popup de paiement.</p>
         </div>
+        
+        <div class="bg-white rounded-xl border border-yellow-200 p-6 mb-6">
+          <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Comment savoir si le paiement a réussi ?
+          </h3>
+          <p class="text-sm text-gray-600 mb-3">Pour le bouton HTML, ajoutez ce code JavaScript pour être notifié :</p>
+          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+            <pre class="text-sm text-white"><code>&lt;script&gt;
+                window.addEventListener('message', function(event) {
+                // Vérifier l'origine
+                if (event.origin !== 'https://leekpay.me') return;
+                
+                // Paiement réussi
+                if (event.data.type === 'leekpay_success') {
+                    const tx = event.data.transaction;
+                    alert('Merci ! Paiement de ' + tx.amount + ' validé');
+                    
+                    // Rediriger ou débloquer du contenu
+                    window.location.href = '/merci?id=' + tx.id;
+                }
+                
+                // Paiement annulé
+                if (event.data.type === 'leekpay_cancel') {
+                    console.log('Paiement annulé');
+                }
+                });
+                &lt;/script&gt;</code></pre>
+          </div>
+          <p class="text-xs text-gray-500 mt-3">
+            <strong>Alternative :</strong> Utilisez les <strong>Webhooks</strong> (section 5) pour une notification serveur plus fiable.
+          </p>
+        </div>
 
         <div class="bg-white rounded-xl  p-6">
           <h3 class="font-semibold text-gray-900 mb-4">Options disponibles</h3>
@@ -215,7 +250,7 @@
                 <tr class="border-b">
                   <td class="py-2"><code>onSuccess</code></td>
                   <td class="py-2">function</td>
-                  <td class="py-2">Appelé après paiement réussi</td>
+                  <td class="py-2">Callback appelé avec les détails : <code>(transaction) => {}</code></td>
                 </tr>
                 <tr class="border-b">
                   <td class="py-2"><code>onCancel</code></td>
@@ -224,6 +259,35 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl  p-6 mb-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Callback onSuccess</h3>
+          
+          <p class="text-gray-600 mb-4">Le callback <code class="bg-gray-100 px-2 py-1 rounded">onSuccess</code> reçoit automatiquement les détails de la transaction :</p>
+          
+          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+            <pre class="text-sm text-white"><code>LeekPay.checkout({
+  amount: 5000,
+  currency: 'XOF',
+  apiKey: 'pk_live_xxx',
+  onSuccess: function(transaction) {
+    console.log('Paiement réussi !', transaction)
+    
+    // Données disponibles :
+    // transaction.id
+    // transaction.reference
+    // transaction.amount
+    // transaction.status
+    
+    // Exemples d'actions :
+    alert('Merci ! Votre paiement de ' + transaction.amount + ' CFA a été validé')
+    // Débloquer du contenu premium
+    // Activer un service
+    // Envoyer à votre backend pour validation
+  }
+})</code></pre>
           </div>
         </div>
       </section>
@@ -316,37 +380,87 @@ return redirect($data['data']['payment_url']);</code></pre>
         <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
           <span class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-sm">5</span>
           Webhooks
-          <span class="text-sm font-normal text-gray-500 ml-2">Optionnel</span>
+          <span class="text-sm font-normal text-gray-500 ml-2">Recommandé</span>
         </h2>
 
         <div class="bg-white rounded-xl  p-6 mb-6">
           <p class="text-gray-600 mb-4">
-            Recevez des notifications automatiques quand un paiement est effectué. 
-            Configurez votre URL webhook dans <strong>Dashboard → Clés API</strong>.
+            <strong>Recommandé :</strong> Configurez une URL webhook pour recevoir des notifications serveur à serveur quand un paiement est effectué. 
+            Plus fiable que les callbacks JavaScript.
+          </p>
+          
+          <p class="text-sm text-gray-500 mb-4">
+            Configurez votre URL dans <strong>Dashboard → Clés API → Webhook URL</strong>
           </p>
           
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
-            <pre class="text-sm"><code class="text-gray-400"># LeekPay envoie à votre URL</code>
+            <pre class="text-sm"><code class="text-gray-400"># LeekPay envoie automatiquement :</code>
 <code class="text-white">POST https://votresite.com/webhook/leekpay
+Headers:
+  Content-Type: application/json
+  X-LeekPay-Signature: abc123...
 
 {
   "event": "payment.success",
-  "data": {
-    "transaction_id": "tx_456789",
-    "checkout_id": "checkout_123",
+  "created_at": "2025-12-18T22:30:00Z",
+  "transaction": {
+    "id": 123,
+    "reference": "LEEKPAY_ABC123_1734567890",
     "amount": 5000,
     "currency": "XOF",
     "status": "paid",
-    "payer_email": "client@example.com",
-    "paid_at": "2024-12-18T20:15:00Z"
+    "payment_method": "mobile_money",
+    "customer_email": "client@example.com",
+    "customer_name": "Jean Dupont",
+    "payment_link": {
+      "id": 45,
+      "title": "Achat produit",
+      "custom_url": "pay_abc123"
+    },
+    "processed_at": "2025-12-18T22:29:45Z"
   }
 }</code></pre>
           </div>
 
+          <div class="bg-white rounded-xl border p-4 mb-4">
+            <h4 class="font-semibold text-gray-900 mb-2">Vérifier la signature (recommandé)</h4>
+            <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+              <pre class="text-sm text-white"><code>&lt;?php
+// Votre endpoint de webhook
+$signature = $_SERVER['HTTP_X_LEEKPAY_SIGNATURE'];
+$payload = file_get_contents('php://input');
+$secret = 'pk_live_votre_cle_publique'; // Utilisez votre clé publique
+
+// Vérifier la signature HMAC
+$expected = hash_hmac('sha256', $payload, $secret);
+
+if (hash_equals($expected, $signature)) {
+    // ✅ Webhook authentique
+    $data = json_decode($payload, true);
+    
+    if ($data['event'] === 'payment.success') {
+        $transactionId = $data['transaction']['id'];
+        $amount = $data['transaction']['amount'];
+        $email = $data['transaction']['customer_email'];
+        
+        // Débloquer le service, envoyer le produit, etc.
+        activateService($email);
+    }
+    
+    http_response_code(200);
+    echo json_encode(['received' => true]);
+} else {
+    // ❌ Signature invalide
+    http_response_code(401);
+}
+?&gt;</code></pre>
+            </div>
+          </div>
+
           <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p class="text-blue-800 text-sm">
-              <strong>Conseil :</strong> Les webhooks sont optionnels. Vous pouvez aussi vérifier le statut via l'API 
-              ou simplement faire confiance aux paramètres de l'URL de retour.
+              <strong>Avantages :</strong> Contrairement aux callbacks JavaScript, les webhooks fonctionnent même si l'utilisateur ferme sa page. 
+              Parfait pour débloquer automatiquement un service ou envoyer un produit numérique.
             </p>
           </div>
         </div>

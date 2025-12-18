@@ -786,17 +786,38 @@ const handleClickOutside = (event) => {
   }
 }
 
-const handleReturnParameters = () => {
+const handleReturnParameters = async () => {
   const status = route.query.status
   const transactionId = route.query.transaction
   
   if (status === 'success' && transactionId) {
-    // Si on est dans une iframe (widget), envoyer un message au parent
+    // Si on est dans une iframe (widget), envoyer un message au parent avec les détails
     if (window.parent && window.parent !== window) {
-      window.parent.postMessage({
-        type: 'leekpay_success',
-        transaction: { id: transactionId }
-      }, '*')
+      try {
+        // Récupérer les détails de la transaction
+        const config = useRuntimeConfig()
+        const response = await $fetch(`${config.public.apiBaseURL}/public/transaction/${transactionId}/status`)
+        
+        if (response.success) {
+          window.parent.postMessage({
+            type: 'leekpay_success',
+            transaction: {
+              id: response.data.id,
+              reference: response.data.transaction_reference,
+              amount: response.data.amount,
+              currency: response.data.payment_link?.custom_url || '',
+              status: response.data.status
+            }
+          }, '*')
+        }
+      } catch (error) {
+        console.error('Erreur récupération transaction:', error)
+        // Envoyer quand même un message basique
+        window.parent.postMessage({
+          type: 'leekpay_success',
+          transaction: { id: transactionId }
+        }, '*')
+      }
     }
     
     router.push(`/payment/success?transaction=${transactionId}`)
