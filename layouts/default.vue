@@ -61,7 +61,7 @@ const toggleMobileMenu = () => {
           <a href="#fonctionnalites" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Fonctionnalités</a>
           <a href="#cas-usage" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Cas d'usage</a>
           <a href="#comment-ca-marche" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">Comment ça marche</a>
-          <NuxtLink to="/docs" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">API</NuxtLink>
+          <!-- <NuxtLink to="/docs" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">API</NuxtLink> -->
           <a href="#faq" @click="toggleMobileMenu" class="block text-slate-900 hover:text-green-500 font-medium transition">FAQ</a>
 
           <NuxtLink to="/register" class="block bg-amber-500 text-white text-center px-6 py-2 rounded-full font-medium hover:bg-amber-600 transition">
