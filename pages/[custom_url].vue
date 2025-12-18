@@ -791,11 +791,24 @@ const handleReturnParameters = () => {
   const transactionId = route.query.transaction
   
   if (status === 'success' && transactionId) {
+    // Si on est dans une iframe (widget), envoyer un message au parent
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'leekpay_success',
+        transaction: { id: transactionId }
+      }, '*')
+    }
+    
     router.push(`/payment/success?transaction=${transactionId}`)
     return true
   }
   
   if (status === 'cancelled' && transactionId) {
+    // Si on est dans une iframe (widget), envoyer un message au parent
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'leekpay_cancel' }, '*')
+    }
+    
     error.value = 'Le paiement a été annulé. Vous pouvez réessayer ci-dessous.'
     return false
   }
