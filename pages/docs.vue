@@ -29,14 +29,47 @@
         <section id="demarrage" class="mb-16">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">Démarrage</h2>
           
-          <div class="mb-6">
+          <div class="mb-8">
             <h3 class="text-sm font-medium text-gray-900 mb-3">Obtenez vos clés API</h3>
             <ol class="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-              <li>Créez un compte sur <a href="/register" class="text-gray-900 underline">leekpay.me</a></li>
+              <li>Créez un compte sur <a href="/register" class="text-gray-900 underline">leekpay.fr</a></li>
               <li>Allez dans Dashboard → Clés API</li>
               <li>Cliquez sur Nouvelle clé API</li>
-              <li>Copiez votre <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">sk_live_xxx</code></li>
+              <li>Copiez votre <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">pk_live_xxx</code> (publique) et <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">sk_live_xxx</code> (secrète)</li>
             </ol>
+          </div>
+
+          <div class="mb-8">
+            <h3 class="text-sm font-medium text-gray-900 mb-4">Trois méthodes d'intégration</h3>
+            <div class="border border-gray-200 rounded-lg divide-y divide-gray-200">
+              <a href="#widget" class="block p-4 hover:bg-gray-50">
+                <div class="flex items-start gap-4">
+                  <span class="text-sm font-medium text-gray-400">1</span>
+                  <div>
+                    <span class="text-sm font-medium text-gray-900">Widget HTML</span>
+                    <p class="text-sm text-gray-500 mt-0.5">Intégration en quelques lignes HTML. Idéal pour débuter.</p>
+                  </div>
+                </div>
+              </a>
+              <a href="#javascript" class="block p-4 hover:bg-gray-50">
+                <div class="flex items-start gap-4">
+                  <span class="text-sm font-medium text-gray-400">2</span>
+                  <div>
+                    <span class="text-sm font-medium text-gray-900">JavaScript</span>
+                    <p class="text-sm text-gray-500 mt-0.5">Contrôle programmatique du paiement avec callbacks.</p>
+                  </div>
+                </div>
+              </a>
+              <a href="#api" class="block p-4 hover:bg-gray-50">
+                <div class="flex items-start gap-4">
+                  <span class="text-sm font-medium text-gray-400">3</span>
+                  <div>
+                    <span class="text-sm font-medium text-gray-900">API REST</span>
+                    <p class="text-sm text-gray-500 mt-0.5">Intégration backend pour un contrôle total.</p>
+                  </div>
+                </div>
+              </a>
+            </div>
           </div>
 
           <div class="bg-amber-50 border-l-2 border-amber-400 pl-4 py-3">
