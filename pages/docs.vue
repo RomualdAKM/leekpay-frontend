@@ -88,16 +88,17 @@
         </h2>
 
         <div class="bg-white rounded-xl  p-6 mb-6">
-          <p class="text-gray-600 mb-4">Ajoutez un bouton de paiement en <strong>2 lignes de code</strong> :</p>
+          <p class="text-gray-600 mb-4">Ajoutez un bouton de paiement en <strong>quelques lignes de code</strong> :</p>
           
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
             <pre class="text-sm"><code class="text-green-400">&lt;!-- 1. Ajouter le script (une seule fois) --&gt;</code>
 <code class="text-white">&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;</code>
 
-<code class="text-green-400">&lt;!-- 2. Ajouter le bouton --&gt;</code>
+<code class="text-green-400">&lt;!-- 2. Ajouter le bouton avec votre clé publique --&gt;</code>
 <code class="text-white">&lt;button 
   data-leekpay-amount="5000" 
-  data-leekpay-currency="XOF"&gt;
+  data-leekpay-currency="XOF"
+  data-leekpay-key="pk_live_votre_cle_publique"&gt;
   Payer 5000 CFA
 &lt;/button&gt;</code></pre>
           </div>
@@ -112,31 +113,40 @@
             </svg>
             Comment savoir si le paiement a réussi ?
           </h3>
-          <p class="text-sm text-gray-600 mb-3">Pour le bouton HTML, ajoutez ce code JavaScript pour être notifié :</p>
+          <p class="text-sm text-gray-600 mb-3">Ajoutez <code class="bg-gray-100 px-2 py-1 rounded">LeekPay.configure()</code> pour être notifié quand le paiement est terminé :</p>
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
             <pre class="text-sm text-white"><code>&lt;script&gt;
-window.addEventListener('message', function(event) {
-  // Vérifier l'origine
-  if (event.origin !== 'https://leekpay.me') return;
-  
-  // Paiement réussi
-  if (event.data.type === 'leekpay_success') {
-    const tx = event.data.transaction;
-    alert('Merci ! Paiement de ' + tx.amount + ' ' + tx.currency + ' validé');
+LeekPay.configure({
+  onSuccess: function(data) {
+    // Paiement réussi !
+    console.log('Montant payé:', data.amount, data.currency);
     
-    // Rediriger ou débloquer du contenu
-    window.location.href = '/merci?id=' + tx.id;
-  }
-  
-  // Paiement annulé
-  if (event.data.type === 'leekpay_cancel') {
+    // Exemple : rediriger vers une page de confirmation
+    window.location.href = '/merci';
+  },
+  onCancel: function() {
+    // L'utilisateur a fermé le popup sans payer
     console.log('Paiement annulé');
   }
 });
 &lt;/script&gt;</code></pre>
           </div>
+          
+          <div class="mt-4 bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-2 text-sm">Données reçues dans onSuccess :</h4>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <tbody class="text-gray-600">
+                  <tr class="border-b"><td class="py-1"><code>data.status</code></td><td class="py-1">"paid"</td></tr>
+                  <tr class="border-b"><td class="py-1"><code>data.amount</code></td><td class="py-1">Montant (ex: 5000)</td></tr>
+                  <tr class="border-b"><td class="py-1"><code>data.currency</code></td><td class="py-1">Devise (ex: "XOF")</td></tr>
+                  <tr><td class="py-1"><code>data.payment_id</code></td><td class="py-1">ID de la transaction</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <p class="text-xs text-gray-500 mt-3">
-            <strong>Alternative :</strong> Utilisez les <strong>Webhooks</strong> (section 5) pour une notification serveur plus fiable.
+            <strong>Note :</strong> Le popup se ferme automatiquement après le paiement et votre callback <code>onSuccess</code> est appelé.
           </p>
         </div>
 
@@ -152,6 +162,11 @@ window.addEventListener('message', function(event) {
                 </tr>
               </thead>
               <tbody class="text-gray-600">
+                <tr class="border-b">
+                  <td class="py-2"><code class="bg-gray-100 px-1 rounded">data-leekpay-key</code></td>
+                  <td class="py-2">Votre clé publique (pk_live_xxx)</td>
+                  <td class="py-2"><code>"pk_live_abc123"</code></td>
+                </tr>
                 <tr class="border-b">
                   <td class="py-2"><code class="bg-gray-100 px-1 rounded">data-leekpay-amount</code></td>
                   <td class="py-2">Montant à payer</td>
@@ -181,119 +196,85 @@ window.addEventListener('message', function(event) {
           <span class="text-sm font-normal text-gray-500 ml-2">Plus de contrôle</span>
         </h2>
 
-        <div class="bg-white rounded-xl  p-6 mb-6">
-          <p class="text-gray-600 mb-4">Pour plus de contrôle, utilisez l'API JavaScript :</p>
+        <div class="bg-white rounded-xl p-6 mb-6">
+          <p class="text-gray-600 mb-4">Lancez le paiement depuis votre code JavaScript :</p>
           
           <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
             <pre class="text-sm text-white"><code>&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  function payer() {
-    LeekPay.checkout({
-      amount: 5000,
-      currency: 'XOF',
-      description: 'Achat sur mon site',
-      
-      // Callbacks (optionnels)
-      onSuccess: function(transaction) {
-        console.log('Paiement réussi!', transaction);
-        // transaction.id
-        // transaction.reference
-        // transaction.amount
-        // transaction.currency
-        // transaction.status
-        // Rediriger vers page de confirmation
-        window.location.href = '/merci?tx=' + transaction.id;
-      },
-      onCancel: function() {
-        console.log('Paiement annulé');
-      }
-    });
-  }
-&lt;/script&gt;
 
-&lt;button onclick="payer()"&gt;Payer maintenant&lt;/button&gt;</code></pre>
+&lt;button onclick="payer()"&gt;Payer maintenant&lt;/button&gt;
+
+&lt;script&gt;
+function payer() {
+  LeekPay.checkout({
+    amount: 5000,
+    currency: 'XOF',
+    apiKey: 'pk_live_votre_cle_publique',
+    
+    onSuccess: function(data) {
+      console.log('Paiement réussi!', data.amount, data.currency);
+      window.location.href = '/merci';
+    },
+    onCancel: function() {
+      console.log('Paiement annulé');
+    }
+  });
+}
+&lt;/script&gt;</code></pre>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl  p-6">
-          <h3 class="font-semibold text-gray-900 mb-4">Options JavaScript</h3>
+        <div class="bg-white rounded-xl p-6 mb-6">
+          <h3 class="font-semibold text-gray-900 mb-4">Options disponibles</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b">
                   <th class="text-left py-2 font-medium">Option</th>
-                  <th class="text-left py-2 font-medium">Type</th>
                   <th class="text-left py-2 font-medium">Description</th>
                 </tr>
               </thead>
               <tbody class="text-gray-600">
                 <tr class="border-b">
                   <td class="py-2"><code>amount</code></td>
-                  <td class="py-2">number</td>
-                  <td class="py-2">Montant (requis)</td>
+                  <td class="py-2">Montant à payer (requis)</td>
                 </tr>
                 <tr class="border-b">
                   <td class="py-2"><code>currency</code></td>
-                  <td class="py-2">string</td>
-                  <td class="py-2">"XOF", "EUR" ou "USD"</td>
+                  <td class="py-2">"XOF", "EUR" ou "USD" (requis)</td>
+                </tr>
+                <tr class="border-b">
+                  <td class="py-2"><code>apiKey</code></td>
+                  <td class="py-2">Votre clé publique pk_live_xxx (requis)</td>
                 </tr>
                 <tr class="border-b">
                   <td class="py-2"><code>description</code></td>
-                  <td class="py-2">string</td>
-                  <td class="py-2">Description affichée</td>
+                  <td class="py-2">Description affichée au client</td>
                 </tr>
                 <tr class="border-b">
                   <td class="py-2"><code>customerEmail</code></td>
-                  <td class="py-2">string</td>
                   <td class="py-2">Email pré-rempli</td>
                 </tr>
                 <tr class="border-b">
-                  <td class="py-2"><code>customerName</code></td>
-                  <td class="py-2">string</td>
-                  <td class="py-2">Nom pré-rempli</td>
-                </tr>
-                <tr class="border-b">
                   <td class="py-2"><code>onSuccess</code></td>
-                  <td class="py-2">function</td>
-                  <td class="py-2">Callback appelé avec les détails : <code>(transaction) => {}</code></td>
+                  <td class="py-2">Fonction appelée après paiement réussi</td>
                 </tr>
-                <tr class="border-b">
+                <tr>
                   <td class="py-2"><code>onCancel</code></td>
-                  <td class="py-2">function</td>
-                  <td class="py-2">Appelé si annulation</td>
+                  <td class="py-2">Fonction appelée si annulation</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-        
-        <div class="bg-white rounded-xl  p-6 mb-6">
-          <h3 class="font-semibold text-gray-900 mb-4">Callback onSuccess</h3>
-          
-          <p class="text-gray-600 mb-4">Le callback <code class="bg-gray-100 px-2 py-1 rounded">onSuccess</code> reçoit automatiquement les détails de la transaction :</p>
-          
-          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-            <pre class="text-sm text-white"><code>LeekPay.checkout({
-  amount: 5000,
-  currency: 'XOF',
-  apiKey: 'pk_live_xxx',
-  onSuccess: function(transaction) {
-    console.log('Paiement réussi !', transaction)
-    
-    // Données disponibles :
-    // transaction.id
-    // transaction.reference
-    // transaction.amount
-    // transaction.currency
-    // transaction.status
-    
-    // Exemples d'actions :
-    alert('Merci ! Votre paiement de ' + transaction.amount + ' CFA a été validé')
-    // Débloquer du contenu premium
-    // Activer un service
-    // Envoyer à votre backend pour validation
-  }
-})</code></pre>
+
+        <div class="bg-gray-50 rounded-xl p-4">
+          <h4 class="font-medium text-gray-900 mb-2 text-sm">Données reçues dans onSuccess :</h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600">
+            <div><code class="bg-white px-2 py-1 rounded">data.status</code></div>
+            <div><code class="bg-white px-2 py-1 rounded">data.amount</code></div>
+            <div><code class="bg-white px-2 py-1 rounded">data.currency</code></div>
+            <div><code class="bg-white px-2 py-1 rounded">data.payment_id</code></div>
           </div>
         </div>
       </section>
