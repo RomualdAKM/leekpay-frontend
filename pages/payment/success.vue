@@ -241,6 +241,56 @@ const currency = computed(() => {
   return { symbol: 'FCFA', code: 'XOF' }
 })
 
+// Fonction pour envoyer un message au parent (si dans une iframe)
+const sendMessageToParent = (messageType, data = {}) => {
+  try {
+    // Vérifier si on est dans une iframe
+    const isInIframe = window.parent && window.parent !== window;
+    
+    if (isInIframe) {
+      const message = { type: messageType, ...data };
+      console.log('[LeekPay Success] Envoi message au parent:', message);
+      
+      // Envoyer à tous les parents potentiels (pour supporter les iframes imbriquées)
+      window.parent.postMessage(message, '*');
+      
+      // Aussi envoyer à window.top si différent
+      if (window.top && window.top !== window.parent) {
+        window.top.postMessage(message, '*');
+      }
+      
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.warn('[LeekPay Success] Erreur envoi message:', e);
+    return false;
+  }
+}
+
+// Fonction pour notifier le succès du paiement au parent
+const notifyPaymentSuccess = () => {
+  if (!transaction.value) return;
+  
+  const transactionData = {
+    id: transaction.value.id,
+    reference: transaction.value.transaction_reference,
+    amount: transaction.value.amount,
+    currency: transaction.value.currency?.code || 'XOF',
+    status: transaction.value.status
+  };
+  
+  // Envoyer le message de succès
+  const sent = sendMessageToParent('leekpay_success', { transaction: transactionData });
+  
+  if (sent) {
+    // Fermer le modal après un court délai
+    setTimeout(() => {
+      sendMessageToParent('leekpay_close_modal');
+    }, 2000);
+  }
+}
+
 // Fonction pour vérifier le statut de la transaction
 const checkStatus = async () => {
   if (!transactionId.value) {
@@ -274,15 +324,16 @@ const checkStatus = async () => {
       transaction.value = response.data
       
       // Redirection automatique si le paiement est réussi et qu'une URL de redirection est définie
-      if (transaction.value.status === 'paid' && transaction.value.payment_link?.redirect_url) {
-        // Fermer le popup/modal du widget si on est dans une iframe
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ type: 'leekpay_close_modal' }, '*');
-        }
+      if (transaction.value.status === 'paid') {
+        // Notifier le parent si on est dans un widget
+        notifyPaymentSuccess();
         
-        setTimeout(() => {
-          window.location.href = transaction.value.payment_link.redirect_url
-        }, 3000) // Redirection après 3 secondes pour laisser le temps de voir le message de succès
+        // Redirection si configurée
+        if (transaction.value.payment_link?.redirect_url) {
+          setTimeout(() => {
+            window.location.href = transaction.value.payment_link.redirect_url
+          }, 3000) // Redirection après 3 secondes pour laisser le temps de voir le message de succès
+        }
       }
     } else {
       error.value = response.message || 'Erreur lors de la récupération du statut'
@@ -368,26 +419,19 @@ const startStatusPolling = () => {
 // Initialisation au montage du composant
 onMounted(() => {
   checkStatus().then(() => {
-    // Si le paiement est réussi et qu'on est dans une iframe (widget)
-    if (transaction.value?.status === 'paid' && window.parent && window.parent !== window) {
-      // Envoyer les détails complets au parent
-      window.parent.postMessage({
-        type: 'leekpay_success',
-        transaction: {
-          id: transaction.value.id,
-          reference: transaction.value.transaction_reference,
-          amount: transaction.value.amount,
-          currency: transaction.value.currency?.code || 'XOF',
-          status: transaction.value.status
-        }
-      }, '*');
+    // Si le paiement est réussi
+    if (transaction.value?.status === 'paid') {
+      // Toujours tenter de notifier le parent (widget popup)
+      notifyPaymentSuccess();
       
-      // Fermer le modal après un court délai
-      setTimeout(() => {
-        window.parent.postMessage({ type: 'leekpay_close_modal' }, '*');
-      }, 2000);
+      // Redirection automatique si une URL est définie (après notification)
+      if (transaction.value.payment_link?.redirect_url) {
+        setTimeout(() => {
+          window.location.href = transaction.value.payment_link.redirect_url
+        }, 3000)
+      }
     }
-    // Sinon, suivre le comportement normal (redirection si configurée)
+    // Si le paiement est en cours, démarrer le polling
     else if (transaction.value?.status === 'pending' || 
         transaction.value?.status === 'processing' || 
         transaction.value?.status === 'initiated') {
