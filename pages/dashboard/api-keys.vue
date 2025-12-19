@@ -1,218 +1,174 @@
 <template>
   <div>
-    <div class="mb-6 flex justify-between items-center">
+    <!-- En-tête -->
+    <div class="mb-8 flex justify-between items-center">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Clés API</h1>
-        <p class="text-gray-500 mt-1">Gérez vos clés pour l'intégration API</p>
+        <h1 class="text-xl font-semibold text-gray-900">Clés API</h1>
+        <p class="text-sm text-gray-500 mt-1">Gérez vos clés d'intégration</p>
       </div>
       <button
         @click="showCreateModal = true"
-        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center gap-2"
+        class="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-800"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Nouvelle clé API
+        Nouvelle clé
       </button>
     </div>
 
-    <!-- Liste des clés API -->
-    <div v-if="loading" class="text-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto"></div>
-      <p class="text-gray-500 mt-2">Chargement...</p>
+    <!-- Chargement -->
+    <div v-if="loading" class="py-12 text-center">
+      <div class="animate-spin rounded-full h-6 w-6 border-2 border-gray-300 border-t-gray-900 mx-auto"></div>
     </div>
 
-    <div v-else-if="apiKeys.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
-      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-        </svg>
-      </div>
-      <h3 class="text-lg font-medium text-gray-900 mb-1">Aucune clé API</h3>
-      <p class="text-gray-500 mb-4">Créez votre première clé API pour commencer l'intégration</p>
+    <!-- État vide -->
+    <div v-else-if="apiKeys.length === 0" class="border border-gray-200 rounded-lg p-8 text-center">
+      <p class="text-gray-500 mb-4">Aucune clé API. Créez votre première clé pour commencer.</p>
       <button
         @click="showCreateModal = true"
-        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+        class="px-4 py-2 bg-gray-900 text-white text-sm rounded hover:bg-gray-800"
       >
-        Créer une clé API
+        Créer une clé
       </button>
     </div>
 
-    <div v-else class="space-y-4">
+    <!-- Liste des clés -->
+    <div v-else class="border border-gray-200 rounded-lg divide-y divide-gray-200">
       <div 
         v-for="key in apiKeys" 
         :key="key.id"
-        class="bg-white rounded-xl shadow-sm p-6"
+        class="p-5"
       >
         <div class="flex justify-between items-start">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <h3 class="font-medium text-gray-900">{{ key.name }}</h3>
-              <span 
-                :class="key.is_live ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'"
-                class="px-2 py-0.5 rounded text-xs font-medium"
-              >
-                {{ key.is_live ? 'Live' : 'Test' }}
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <span class="font-medium text-gray-900">{{ key.name }}</span>
+              <span class="text-xs text-gray-500 border border-gray-200 px-2 py-0.5 rounded">
+                {{ key.is_live ? 'Production' : 'Test' }}
               </span>
-              <span 
-                :class="key.is_active ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'"
-                class="px-2 py-0.5 rounded text-xs font-medium"
-              >
-                {{ key.is_active ? 'Active' : 'Inactive' }}
+              <span v-if="!key.is_active" class="text-xs text-gray-400">
+                Inactive
               </span>
             </div>
             
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Clé publique:</span>
-                <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{ key.public_key }}</code>
-                <button @click="copyToClipboard(key.public_key)" class="text-gray-400 hover:text-gray-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                </button>
-              </div>
-              
-              <div v-if="key.webhook_url" class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Webhook:</span>
-                <code class="bg-gray-100 px-2 py-1 rounded text-sm">{{ key.webhook_url }}</code>
-              </div>
-              
-              <div v-if="key.last_used_at" class="text-sm text-gray-500">
-                Dernière utilisation: {{ formatDate(key.last_used_at) }}
-              </div>
+            <div class="flex items-center gap-2">
+              <code class="text-sm font-mono text-gray-600 bg-gray-50 px-2 py-1 rounded">{{ key.public_key }}</code>
+              <button @click="copyToClipboard(key.public_key)" class="text-gray-400 hover:text-gray-600 text-xs">
+                Copier
+              </button>
+            </div>
+            
+            <div v-if="key.webhook_url" class="text-sm text-gray-500">
+              Webhook: <span class="font-mono">{{ key.webhook_url }}</span>
+            </div>
+            
+            <div v-if="key.last_used_at" class="text-xs text-gray-400">
+              Utilisée le {{ formatDate(key.last_used_at) }}
             </div>
           </div>
           
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1">
             <button
               @click="editKey(key)"
-              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
+              Modifier
             </button>
             <button
               @click="confirmDelete(key)"
-              class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+              class="px-3 py-1.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              Supprimer
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Section Documentation -->
-    <div class="mt-8 bg-white rounded-xl shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Guide d'intégration rapide</h2>
+    <!-- Guide d'intégration -->
+    <div class="mt-10">
+      <h2 class="text-sm font-medium text-gray-900 mb-4">Intégration rapide</h2>
       
-      <div class="space-y-6">
-        <!-- Option 1: Widget HTML -->
-        <div>
-          <h3 class="font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-            Widget HTML (Ultra-simple)
-          </h3>
-          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-            <pre class="text-green-400 text-sm"><code>&lt;!-- Ajouter le script --&gt;
-&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;
-
-&lt;!-- Bouton de paiement --&gt;
-&lt;button 
-  data-leekpay-amount="5000" 
-  data-leekpay-currency="XOF"
-  data-leekpay-key="{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}"
-&gt;
-  Payer 5000 CFA
-&lt;/button&gt;</code></pre>
+      <div class="border border-gray-200 rounded-lg divide-y divide-gray-200">
+        <div class="p-5">
+          <div class="flex items-baseline justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">Widget HTML</span>
+            <NuxtLink to="/docs#widget" class="text-xs text-gray-500 hover:text-gray-700">Documentation</NuxtLink>
+          </div>
+          <div class="bg-gray-900 rounded p-4 overflow-x-auto">
+            <pre class="text-sm font-mono"><code class="text-gray-300">&lt;script src="https://leekpay.fr/js/leekpay.js"&gt;&lt;/script&gt;
+&lt;button data-leekpay-amount="5000" data-leekpay-currency="XOF" data-leekpay-key="{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}"&gt;Payer&lt;/button&gt;</code></pre>
           </div>
         </div>
 
-        <!-- Option 2: JavaScript -->
-        <div>
-          <h3 class="font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>
-            JavaScript (Popup)
-          </h3>
-          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-            <pre class="text-blue-400 text-sm"><code>LeekPay.checkout({
-  amount: 5000,
-  currency: 'XOF',
-  apiKey: '{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}',
-  onSuccess: (tx) => console.log('Payé!', tx),
-  onCancel: () => console.log('Annulé')
-})</code></pre>
+        <div class="p-5">
+          <div class="flex items-baseline justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">JavaScript</span>
+            <NuxtLink to="/docs#javascript" class="text-xs text-gray-500 hover:text-gray-700">Documentation</NuxtLink>
+          </div>
+          <div class="bg-gray-900 rounded p-4 overflow-x-auto">
+            <pre class="text-sm font-mono"><code class="text-gray-300">LeekPay.checkout({ amount: 5000, currency: 'XOF', apiKey: '{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}' })</code></pre>
           </div>
         </div>
 
-        <!-- Option 3: API REST -->
-        <div>
-          <h3 class="font-medium text-gray-700 mb-2 flex items-center gap-2">
-            <span class="w-6 h-6 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-sm font-bold">3</span>
-            API REST (Backend)
-          </h3>
-          <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-            <pre class="text-purple-400 text-sm"><code>curl -X POST https://leekpay.me/api/v1/checkout \
-  -H "Authorization: Bearer sk_live_xxx" \
-  -H "Content-Type: application/json" \
-  -d '{"amount": 5000, "currency": "XOF", "return_url": "https://monsite.com/success"}'</code></pre>
+        <div class="p-5">
+          <div class="flex items-baseline justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">API REST</span>
+            <NuxtLink to="/docs#api" class="text-xs text-gray-500 hover:text-gray-700">Documentation</NuxtLink>
+          </div>
+          <div class="bg-gray-900 rounded p-4 overflow-x-auto">
+            <pre class="text-sm font-mono"><code class="text-gray-300">POST /api/v1/checkout  -H "Authorization: Bearer sk_live_xxx"  -d '{"amount": 5000, "currency": "XOF"}'</code></pre>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal Création -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl max-w-md w-full p-6">
-        <h3 class="text-lg font-semibold mb-4">Nouvelle clé API</h3>
+    <div v-if="showCreateModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-6">Nouvelle clé API</h3>
         
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+            <label class="block text-sm text-gray-600 mb-1">Nom</label>
             <input
               v-model="newKey.name"
               type="text"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="Ex: Production, Mon Site"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none"
+              placeholder="Production, Mon Site..."
             />
           </div>
           
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">URL Webhook (optionnel)</label>
+            <label class="block text-sm text-gray-600 mb-1">URL Webhook (optionnel)</label>
             <input
               v-model="newKey.webhook_url"
               type="url"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="https://monsite.com/webhook/leekpay"
+              class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none"
+              placeholder="https://votresite.com/webhook"
             />
           </div>
           
-          <div class="flex items-center gap-2">
+          <!-- <div class="flex items-center gap-2">
             <input
               v-model="newKey.is_live"
               type="checkbox"
               id="is_live"
-              class="w-4 h-4 text-green-500"
+              class="w-4 h-4 accent-gray-900"
             />
-            <label for="is_live" class="text-sm text-gray-700">Mode Live (production)</label>
-          </div>
+            <label for="is_live" class="text-sm text-gray-600">Mode Production</label>
+          </div> -->
         </div>
         
-        <div class="flex justify-end gap-3 mt-6">
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
           <button
             @click="showCreateModal = false"
-            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
           >
             Annuler
           </button>
           <button
             @click="createApiKey"
             :disabled="creating || !newKey.name"
-            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+            class="px-4 py-2 text-sm bg-gray-900 text-white rounded hover:bg-gray-800 disabled:opacity-50"
           >
             {{ creating ? 'Création...' : 'Créer' }}
           </button>
@@ -220,59 +176,43 @@
       </div>
     </div>
 
-    <!-- Modal clé créée (affiche la clé secrète UNE SEULE FOIS) -->
-    <div v-if="showSecretModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-xl max-w-lg w-full p-6">
-        <div class="text-center mb-4">
-          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold">Clé API créée !</h3>
-        </div>
+    <!-- Modal clé créée -->
+    <div v-if="showSecretModal" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-lg w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Clé API créée</h3>
         
-        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-          <p class="text-yellow-800 text-sm font-medium flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            Copiez votre clé secrète maintenant. Elle ne sera plus jamais affichée.
-          </p>
-        </div>
+        <p class="text-sm text-gray-500 mb-6">
+          Conservez votre clé secrète. Elle ne sera plus affichée.
+        </p>
         
-        <div class="space-y-3">
+        <div class="space-y-4">
           <div>
-            <label class="block text-sm text-gray-500 mb-1">Clé publique</label>
+            <label class="block text-xs text-gray-500 mb-1">Clé publique</label>
             <div class="flex items-center gap-2">
-              <code class="flex-1 bg-gray-100 px-3 py-2 rounded font-mono text-sm break-all">{{ createdKeys.public_key }}</code>
-              <button @click="copyToClipboard(createdKeys.public_key)" class="p-2 hover:bg-gray-100 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+              <code class="flex-1 bg-gray-50 px-3 py-2 rounded font-mono text-sm text-gray-700 break-all">{{ createdKeys.public_key }}</code>
+              <button @click="copyToClipboard(createdKeys.public_key)" class="text-xs text-gray-500 hover:text-gray-700 px-2">
+                Copier
               </button>
             </div>
           </div>
           
           <div>
-            <label class="block text-sm text-gray-500 mb-1">Clé secrète (à conserver)</label>
+            <label class="block text-xs text-gray-500 mb-1">Clé secrète</label>
             <div class="flex items-center gap-2">
-              <code class="flex-1 bg-red-50 border border-red-200 px-3 py-2 rounded font-mono text-sm break-all text-red-800">{{ createdKeys.secret_key }}</code>
-              <button @click="copyToClipboard(createdKeys.secret_key)" class="p-2 hover:bg-gray-100 rounded">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+              <code class="flex-1 bg-gray-900 px-3 py-2 rounded font-mono text-sm text-white break-all">{{ createdKeys.secret_key }}</code>
+              <button @click="copyToClipboard(createdKeys.secret_key)" class="text-xs text-gray-500 hover:text-gray-700 px-2">
+                Copier
               </button>
             </div>
           </div>
         </div>
         
-        <div class="mt-6">
+        <div class="mt-6 pt-4 border-t border-gray-100">
           <button
             @click="closeSecretModal"
-            class="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+            class="w-full px-4 py-2 text-sm bg-gray-900 text-white rounded hover:bg-gray-800"
           >
-            J'ai copié ma clé secrète
+            Fermer
           </button>
         </div>
       </div>
