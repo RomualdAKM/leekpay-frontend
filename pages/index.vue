@@ -6,6 +6,49 @@
   opacity: 0;
 }
 
+@keyframes floatSoft {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes shineSweep {
+  0% { transform: translateX(-120%); }
+  60% { transform: translateX(140%); }
+  100% { transform: translateX(140%); }
+}
+
+.float-soft {
+  animation: floatSoft 6s ease-in-out infinite;
+}
+
+.float-soft.delay-200 {
+  animation-delay: 0.4s;
+}
+
+.glow-pill {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 0 0 8px rgba(247, 148, 30, 0.18);
+  animation: floatSoft 7s ease-in-out infinite;
+}
+
+.shine {
+  position: absolute;
+  inset: -20% auto auto -40%;
+  width: 40%;
+  height: 140%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shineSweep 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.hover-lift {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 40px rgba(0, 0, 0, 0.18);
+}
+
 </style>
 
 <template>
@@ -441,6 +484,96 @@
             </div>
           </div>
 
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Retraits instantanés -->
+    <section id="retraits" class="py-12 px-4 sm:px-8 md:px-12 bg-[#0fab2f] text-white relative overflow-hidden">
+      <div class="container mx-auto">
+        <div class="relative">
+          <div
+              class="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 float-soft"
+              aria-hidden="true"
+          >
+            <div class="relative hover-lift">
+              <div class="bg-white/10 rounded-2xl p-3 shadow-lg shadow-green-900/30">
+                <img src="~/assets/img/Mascotte_LeekPay.png" alt="" class="w-28 h-28 object-contain" />
+              </div>
+              <div class="absolute -right-3 bottom-2 bg-orange-400 rounded-full p-2 shadow-lg shadow-orange-900/30 animate-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div
+              class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 float-soft delay-200"
+              aria-hidden="true"
+          >
+            <div class="relative hover-lift">
+              <div class="bg-white/10 rounded-2xl p-3 shadow-lg shadow-green-900/30">
+                <img src="~/assets/img/Mascotte_LeekPay.png" alt="" class="w-28 h-28 object-contain" />
+              </div>
+              <div class="absolute -left-3 bottom-2 bg-orange-400 rounded-full p-2 shadow-lg shadow-orange-900/30 animate-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H7m0 0l6-6m-6 6l6 6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-5xl mx-auto text-center space-y-6 relative z-10">
+            <div class="space-y-3">
+              <p
+                  class="text-lg sm:text-xl md:text-2xl font-semibold leading-tight"
+                  v-motion="{
+              initial: { opacity: 0, y: 30 },
+              visible: { opacity: 1, y: 0, transition: { duration: 600, easing: 'easeOut' } }
+            }"
+                  v-motion-visibility="{ once: true, threshold: 0.2 }"
+              >
+                AVEC <span class="font-bold italic">LEEKPAY</span>, LES FRAIS DE RETRAIT NE SONT QUE DE <span class="font-extrabold">3 %</span>,
+              </p>
+              <p
+                  class="text-lg sm:text-xl md:text-2xl font-semibold leading-tight"
+                  v-motion="{
+              initial: { opacity: 0, y: 30 },
+              visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 120, easing: 'easeOut' } }
+            }"
+                  v-motion-visibility="{ once: true, threshold: 0.2 }"
+              >
+                VOUS PERMETTANT DE CONSERVER
+                <span class="inline-block bg-[#f7941e] text-slate-900 font-extrabold px-3 py-2 sm:px-4 sm:py-2 rounded-md mt-2 sm:mt-0 sm:ml-2 glow-pill">
+                  JUSQU'À 97 % DU PAIEMENT REÇU
+                </span>
+              </p>
+            </div>
+
+            <div
+                class="bg-white text-slate-900 rounded-lg shadow-md shadow-green-900/10 px-3 sm:px-4 md:px-5 py-2.5 md:py-3.5 font-bold text-sm sm:text-base md:text-lg relative overflow-hidden hover-lift max-w-3xl mx-auto"
+                v-motion="{
+            initial: { opacity: 0, scale: 0.96 },
+            visible: { opacity: 1, scale: 1, transition: { duration: 500, delay: 220, easing: 'easeOut' } }
+          }"
+                v-motion-visibility="{ once: true, threshold: 0.2 }"
+            >
+              <span class="shine"></span>
+              VOS RETRAITS SONT INSTANTANÉS — OU TRAITÉS EN MOINS DE 24 HEURES
+            </div>
+
+            <p
+                class="text-base sm:text-lg md:text-xl font-semibold tracking-tight"
+                v-motion="{
+            initial: { opacity: 0, y: 20 },
+            visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 300, easing: 'easeOut' } }
+          }"
+                v-motion-visibility="{ once: true, threshold: 0.2 }"
+            >
+              POUR UN ACCÈS RAPIDE, FLUIDE ET TOTALEMENT FIABLE À VOTRE ARGENT.
+            </p>
+          </div>
         </div>
       </div>
     </section>
