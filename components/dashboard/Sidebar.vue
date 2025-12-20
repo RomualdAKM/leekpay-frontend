@@ -112,7 +112,8 @@ const menuItems = computed(() => {
       { id: 'dashboard/admin/transactions', label: 'Transactions', icon: CreditCardIcon },
       { id: 'dashboard/admin/links', label: 'Liens de Paiement', icon: LinkIcon },
       { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: WalletIcon },
-      { id: 'dashboard/admin/kyc', label: 'Gestion KYC', icon: UserCheckIcon }
+      { id: 'dashboard/admin/kyc', label: 'Gestion KYC', icon: UserCheckIcon },
+      { id: 'dashboard/admin/broadcast', label: 'Communication', icon: MailIcon }
     )
   }
 
@@ -120,5 +121,5 @@ const menuItems = computed(() => {
 })
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon, UserCheckIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon, UserCheckIcon, MailIcon } from 'lucide-vue-next'
 </script>

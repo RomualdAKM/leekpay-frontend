@@ -70,7 +70,12 @@ const sidebarOpen = ref(false)
 
 // Calcul du titre
 const currentPage = computed(() => {
-  return route.path.split('/')[2] || 'dashboard'
+  const pathParts = route.path.split('/').filter(p => p)
+  // Si c'est une page admin (ex: /dashboard/admin/broadcast)
+  if (pathParts[1] === 'admin' && pathParts[2]) {
+    return `admin/${pathParts[2]}`
+  }
+  return pathParts[1] || 'dashboard'
 })
 
 const pageMap = {
@@ -82,7 +87,14 @@ const pageMap = {
   analytics: 'Analytiques',
   'api-keys': 'Clés API',
   settings: 'Paramètres',
-  support: 'Support'
+  support: 'Support',
+  // Pages admin
+  'admin/stats': 'Statistiques Admin',
+  'admin/transactions': 'Transactions Admin',
+  'admin/links': 'Liens de Paiement',
+  'admin/withdrawals': 'Gestion Retraits',
+  'admin/kyc': 'Gestion KYC',
+  'admin/broadcast': 'Communication'
 }
 
 const pageTitle = computed(() => {
