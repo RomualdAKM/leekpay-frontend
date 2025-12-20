@@ -200,8 +200,8 @@ const error = ref('')
 // Seuil minimum pour carte/PayPal (équivalent 10 EUR)
 const MIN_EUR = 10
 const minCardAmount = computed(() => {
-  const rates = { 'EUR': 10, 'USD': 11, 'XOF': 6560 }
-  return rates[currency.value] || 6560
+  const rates = { 'EUR': 10, 'USD': 11, 'XOF': 6680 }
+  return rates[currency.value] || 6680
 })
 
 const isCardDisabled = computed(() => amount.value < minCardAmount.value)
