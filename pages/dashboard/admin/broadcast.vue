@@ -246,7 +246,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Send, X, Users } from 'lucide-vue-next'
+import { Send, X, Users, Mail } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'dashboard',
@@ -269,6 +269,15 @@ const allUsers = ref([])
 const selectedUsers = ref([])
 const totalUsers = ref(0)
 
+// Historique broadcasts
+const broadcasts = ref([])
+const loadingBroadcasts = ref(false)
+const broadcastsPagination = ref({
+  current_page: 1,
+  last_page: 1,
+  total: 0
+})
+
 let searchTimeout = null
 
 // Computed
@@ -287,6 +296,133 @@ const filteredUsers = computed(() => {
   )
 })
 
+// Methods
+const loadUsers = async () => {
+  try {
+    loadingUsers.value = true
+    const response = await $fetch(`${config.public.apiBaseURL}/admin/users?all=true`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    })
+    
+    if (response.success) {
+      allUsers.value = response.data
+      totalUsers.value = response.total || response.data.length
+    }
+  } catch (error) {
+    console.error('Erreur chargement utilisateurs:', error)
+  } finally {
+    loadingUsers.value = false
+  }
+}
+
+const debouncedSearch = () => {
+  // La recherche est faite côté client via filteredUsers
+}
+
+const isSelected = (userId) => {
+  return selectedUsers.value.some(u => u.id === userId)
+}
+
+const toggleUser = (user) => {
+  if (isSelected(user.id)) {
+    selectedUsers.value = selectedUsers.value.filter(u => u.id !== user.id)
+  } else {
+    selectedUsers.value.push(user)
+  }
+}
+
+const removeUser = (userId) => {
+  selectedUsers.value = selectedUsers.value.filter(u => u.id !== userId)
+}
+
+const selectAllUsers = () => {
+  selectedUsers.value = [...filteredUsers.value]
+}
+
+const deselectAllUsers = () => {
+  selectedUsers.value = []
+}
+
+const sendMessage = async () => {
+  if (!canSend.value) return
+  
+  try {
+    sending.value = true
+    
+    const response = await $fetch(`${config.public.apiBaseURL}/admin/broadcast`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+        'Content-Type': 'application/json'
+      },
+      body: {
+        subject: subject.value,
+        content: content.value,
+        send_to_all: sendToAll.value,
+        user_ids: sendToAll.value ? [] : selectedUsers.value.map(u => u.id)
+      }
+    })
+    
+    if (response.success) {
+      alert(response.message)
+      // Reset form
+      subject.value = ''
+      content.value = ''
+      selectedUsers.value = []
+      sendToAll.value = true
+      // Recharger l'historique
+      loadBroadcasts()
+    }
+  } catch (error) {
+    console.error('Erreur envoi:', error)
+    alert(error.data?.message || 'Erreur lors de l\'envoi du message')
+  } finally {
+    sending.value = false
+  }
+}
+
+const loadBroadcasts = async (page = 1) => {
+  try {
+    loadingBroadcasts.value = true
+    const response = await $fetch(`${config.public.apiBaseURL}/admin/broadcasts?page=${page}&per_page=10`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    })
+    
+    if (response.success) {
+      broadcasts.value = response.data.data
+      broadcastsPagination.value = {
+        current_page: response.data.current_page,
+        last_page: response.data.last_page,
+        total: response.data.total
+      }
+    }
+  } catch (error) {
+    console.error('Erreur chargement historique:', error)
+  } finally {
+    loadingBroadcasts.value = false
+  }
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+onMounted(() => {
+  loadUsers()
+  loadBroadcasts()
+})
+</script>
 // Methods
 const loadUsers = async () => {
   try {
