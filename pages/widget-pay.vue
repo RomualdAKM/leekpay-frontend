@@ -279,7 +279,7 @@ async function processPayment() {
     }
   } catch (err) {
     console.error('Erreur paiement:', err)
-    error.value = err.data?.message || err.message || 'Une erreur est survenue'
+    error.value = err.data?.message || err.message || 'Une erreur est survenuee'
     isProcessing.value = false
   }
 }
