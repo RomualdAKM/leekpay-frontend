@@ -195,31 +195,43 @@
                     <p class="text-sm text-gray-500 mb-2">Recto carte d'identité</p>
                     <img 
                       v-if="selectedKyc.id_card_front_url"
-                      :src="selectedKyc.id_card_front_url"
+                      :src="getDocumentUrl(selectedKyc.id_card_front_url)"
                       alt="Recto carte"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(selectedKyc.id_card_front_url)"
+                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.id_card_front_url))"
+                      @error="handleImageError"
                     />
+                    <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                      Image non disponible
+                    </div>
                   </div>
                   <div class="border rounded-lg p-3">
                     <p class="text-sm text-gray-500 mb-2">Verso carte d'identité</p>
                     <img 
                       v-if="selectedKyc.id_card_back_url"
-                      :src="selectedKyc.id_card_back_url"
+                      :src="getDocumentUrl(selectedKyc.id_card_back_url)"
                       alt="Verso carte"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(selectedKyc.id_card_back_url)"
+                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.id_card_back_url))"
+                      @error="handleImageError"
                     />
+                    <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                      Image non disponible
+                    </div>
                   </div>
                   <div class="border rounded-lg p-3">
                     <p class="text-sm text-gray-500 mb-2">Selfie avec carte</p>
                     <img 
                       v-if="selectedKyc.selfie_with_card_url"
-                      :src="selectedKyc.selfie_with_card_url"
+                      :src="getDocumentUrl(selectedKyc.selfie_with_card_url)"
                       alt="Selfie"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(selectedKyc.selfie_with_card_url)"
+                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.selfie_with_card_url))"
+                      @error="handleImageError"
                     />
+                    <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
+                      Image non disponible
+                    </div>
                   </div>
                 </div>
               </div>
@@ -442,6 +454,21 @@ const closeModal = () => {
 
 const openImageFullscreen = (url) => {
   fullscreenImage.value = url
+}
+
+// Construire l'URL du document avec le token pour l'authentification
+const getDocumentUrl = (url) => {
+  if (!url) return null
+  // Si l'URL est relative, ajouter la base URL
+  const fullUrl = url.startsWith('http') ? url : `${config.public.apiBaseURL}${url.replace('/api', '')}`
+  // Ajouter le token pour l'authentification
+  const separator = fullUrl.includes('?') ? '&' : '?'
+  return `${fullUrl}${separator}token=${token.value}`
+}
+
+const handleImageError = (event) => {
+  console.error('Erreur chargement image:', event.target.src)
+  event.target.style.display = 'none'
 }
 
 const approveKyc = async () => {
