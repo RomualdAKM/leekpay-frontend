@@ -78,6 +78,7 @@ const pageMap = {
   links: 'Mes Liens',
   transactions: 'Transactions',
   withdrawals: 'Retraits',
+  kyc: 'Vérification KYC',
   analytics: 'Analytiques',
   'api-keys': 'Clés API',
   settings: 'Paramètres',
@@ -94,6 +95,7 @@ const pageTitleShort = computed(() => {
     links: 'Liens',
     transactions: 'Trans.',
     withdrawals: 'Retraits',
+    kyc: 'KYC',
     analytics: 'Stats',
     settings: 'Param.'
   }

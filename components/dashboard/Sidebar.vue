@@ -99,6 +99,7 @@ const menuItems = computed(() => {
     { id: 'dashboard/links', label: 'Mes Liens', icon: LinkIcon },
     { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
     { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
+    { id: 'dashboard/kyc', label: 'Vérification KYC', icon: ShieldCheckIcon },
     // { id: 'dashboard/api-keys', label: 'Clés API', icon: KeyIcon },
     { id: 'dashboard/support', label: 'Support', icon: HeadphonesIcon },
     { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
@@ -110,7 +111,8 @@ const menuItems = computed(() => {
       { id: 'dashboard/admin/stats', label: 'Statistiques Admin', icon: BarChart3Icon },
       { id: 'dashboard/admin/transactions', label: 'Transactions', icon: CreditCardIcon },
       { id: 'dashboard/admin/links', label: 'Liens de Paiement', icon: LinkIcon },
-      { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: ShieldCheckIcon }
+      { id: 'dashboard/admin/withdrawals', label: 'Gestion Retraits', icon: WalletIcon },
+      { id: 'dashboard/admin/kyc', label: 'Gestion KYC', icon: UserCheckIcon }
     )
   }
 
@@ -118,5 +120,5 @@ const menuItems = computed(() => {
 })
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon, UserCheckIcon } from 'lucide-vue-next'
 </script>
