@@ -225,12 +225,12 @@
                   {{ formatCurrency(selectedTransaction.amount, selectedTransaction.currency?.code) }}
                 </p>
               </div>
-              <div>
+              <!-- <div>
                 <p class="text-xs text-gray-500 mb-1">Frais LeekPay</p>
                 <p class="text-sm text-gray-900">
                   {{ formatCurrency(selectedTransaction.leekpay_fee, selectedTransaction.currency?.code) }}
                 </p>
-              </div>
+              </div> -->
               <!-- <div>
                 <p class="text-xs text-gray-500 mb-1">Frais agrégateur</p>
                 <p class="text-sm text-gray-900">
