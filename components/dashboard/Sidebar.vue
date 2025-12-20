@@ -100,7 +100,7 @@ const menuItems = computed(() => {
     { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
     { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
     { id: 'dashboard/kyc', label: 'Vérification KYC', icon: ShieldCheckIcon },
-    // { id: 'dashboard/api-keys', label: 'Clés API', icon: KeyIcon },
+    { id: 'dashboard/api-keys', label: 'Clés API', icon: KeyIcon },
     { id: 'dashboard/support', label: 'Support', icon: HeadphonesIcon },
     { id: 'dashboard/settings', label: 'Paramètres', icon: SettingsIcon },
   ]
