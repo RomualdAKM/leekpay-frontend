@@ -241,6 +241,95 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Historique des messages -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-900">Historique des messages</h2>
+        <button 
+          @click="loadBroadcasts" 
+          class="text-sm text-green-600 hover:text-green-700 font-medium"
+        >
+          Actualiser
+        </button>
+      </div>
+
+      <div v-if="loadingBroadcasts" class="py-8 text-center">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+      </div>
+
+      <div v-else-if="broadcasts.length === 0" class="py-8 text-center text-gray-500">
+        <Mail class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+        <p>Aucun message envoyé pour le moment</p>
+      </div>
+
+      <div v-else class="space-y-4">
+        <div 
+          v-for="broadcast in broadcasts" 
+          :key="broadcast.id"
+          class="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="font-medium text-gray-900 truncate">{{ broadcast.subject }}</h3>
+                <span 
+                  v-if="broadcast.sent_to_all" 
+                  class="shrink-0 bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"
+                >
+                  Tous
+                </span>
+                <span 
+                  v-else 
+                  class="shrink-0 bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full"
+                >
+                  Sélection
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 line-clamp-2">{{ broadcast.content }}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-sm font-medium text-gray-900">
+                {{ broadcast.sent_count }}/{{ broadcast.total_recipients }}
+                <span class="text-gray-500 font-normal">envoyé(s)</span>
+              </p>
+              <p v-if="broadcast.failed_count > 0" class="text-xs text-red-500">
+                {{ broadcast.failed_count }} échec(s)
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+            <span class="text-xs text-gray-500">
+              Par {{ broadcast.admin?.name || 'Admin' }}
+            </span>
+            <span class="text-xs text-gray-500">
+              {{ formatDate(broadcast.created_at) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div v-if="broadcastsPagination.last_page > 1" class="flex justify-center gap-2 pt-4">
+          <button
+            @click="loadBroadcasts(broadcastsPagination.current_page - 1)"
+            :disabled="broadcastsPagination.current_page === 1"
+            class="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Précédent
+          </button>
+          <span class="px-3 py-1 text-sm text-gray-600">
+            {{ broadcastsPagination.current_page }} / {{ broadcastsPagination.last_page }}
+          </span>
+          <button
+            @click="loadBroadcasts(broadcastsPagination.current_page + 1)"
+            :disabled="broadcastsPagination.current_page === broadcastsPagination.last_page"
+            class="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Suivant
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -421,94 +510,5 @@ const formatDate = (dateString) => {
 onMounted(() => {
   loadUsers()
   loadBroadcasts()
-})
-</script>
-// Methods
-const loadUsers = async () => {
-  try {
-    loadingUsers.value = true
-    const response = await $fetch(`${config.public.apiBaseURL}/admin/users?all=true`, {
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
-    })
-    
-    if (response.success) {
-      allUsers.value = response.data
-      totalUsers.value = response.total || response.data.length
-    }
-  } catch (error) {
-    console.error('Erreur chargement utilisateurs:', error)
-  } finally {
-    loadingUsers.value = false
-  }
-}
-
-const debouncedSearch = () => {
-  // La recherche est faite côté client via filteredUsers
-}
-
-const isSelected = (userId) => {
-  return selectedUsers.value.some(u => u.id === userId)
-}
-
-const toggleUser = (user) => {
-  if (isSelected(user.id)) {
-    selectedUsers.value = selectedUsers.value.filter(u => u.id !== user.id)
-  } else {
-    selectedUsers.value.push(user)
-  }
-}
-
-const removeUser = (userId) => {
-  selectedUsers.value = selectedUsers.value.filter(u => u.id !== userId)
-}
-
-const selectAllUsers = () => {
-  selectedUsers.value = [...filteredUsers.value]
-}
-
-const deselectAllUsers = () => {
-  selectedUsers.value = []
-}
-
-const sendMessage = async () => {
-  if (!canSend.value) return
-  
-  try {
-    sending.value = true
-    
-    const response = await $fetch(`${config.public.apiBaseURL}/admin/broadcast`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-        'Content-Type': 'application/json'
-      },
-      body: {
-        subject: subject.value,
-        content: content.value,
-        send_to_all: sendToAll.value,
-        user_ids: sendToAll.value ? [] : selectedUsers.value.map(u => u.id)
-      }
-    })
-    
-    if (response.success) {
-      alert(response.message)
-      // Reset form
-      subject.value = ''
-      content.value = ''
-      selectedUsers.value = []
-      sendToAll.value = true
-    }
-  } catch (error) {
-    console.error('Erreur envoi:', error)
-    alert(error.data?.message || 'Erreur lors de l\'envoi du message')
-  } finally {
-    sending.value = false
-  }
-}
-
-onMounted(() => {
-  loadUsers()
 })
 </script>
