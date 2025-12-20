@@ -32,7 +32,7 @@
           <div class="mb-8">
             <h3 class="text-sm font-medium text-gray-900 mb-3">Obtenez vos clés API</h3>
             <ol class="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-              <li>Créez un compte sur <a href="/register" class="text-gray-900 underline">leekpay.fr</a></li>
+              <li>Créez un compte sur <a href="/register" class="text-gray-900 underline">leekpay.me</a></li>
               <li>Allez dans Dashboard → Clés API</li>
               <li>Cliquez sur Nouvelle clé API</li>
               <li>Copiez votre <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">pk_live_xxx</code> (publique) et <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">sk_live_xxx</code> (secrète)</li>
