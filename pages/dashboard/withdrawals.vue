@@ -7,6 +7,29 @@
         <p class="text-sm text-gray-600">Gérez vos demandes de retrait et vos méthodes de paiement</p>
       </div>
 
+      <!-- KYC Alert -->
+      <div v-if="kycStatus !== 'approved'" class="rounded-lg p-4" :class="getKycAlertClass()">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0">
+            <ShieldAlert v-if="kycStatus === 'not_submitted' || kycStatus === 'rejected'" class="w-5 h-5" :class="kycStatus === 'rejected' ? 'text-red-500' : 'text-orange-500'" />
+            <Clock v-else class="w-5 h-5 text-orange-500" />
+          </div>
+          <div class="flex-1">
+            <h4 class="font-medium" :class="getKycAlertTextClass()">{{ getKycAlertTitle() }}</h4>
+            <p class="text-sm mt-1" :class="getKycAlertDescClass()">{{ getKycAlertMessage() }}</p>
+            <NuxtLink 
+              v-if="kycStatus !== 'pending'"
+              to="/dashboard/kyc" 
+              class="inline-flex items-center gap-1 mt-2 text-sm font-medium" 
+              :class="kycStatus === 'rejected' ? 'text-red-700 hover:text-red-800' : 'text-orange-700 hover:text-orange-800'"
+            >
+              {{ kycStatus === 'rejected' ? 'Soumettre de nouveaux documents' : 'Vérifier mon identité' }}
+              <ArrowRight class="w-4 h-4" />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
       <!-- Balance Overview -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white rounded-lg border border-gray-200 p-4">
@@ -667,7 +690,10 @@ import {
   Star,
   X,
   Check,
-  Trash2
+  Trash2,
+  ShieldAlert,
+  Clock,
+  ArrowRight
 } from "lucide-vue-next"
 import { useAuth } from '~/composables/useAuth'
 
@@ -706,6 +732,7 @@ onMounted(() => {
   
   checkScreen()
   window.addEventListener('resize', checkScreen)
+  fetchKycStatus()
   fetchFeesConfig()
   fetchUserBalance()
   fetchWithdrawalMethods()
@@ -752,6 +779,60 @@ const feesConfig = ref({
 })
 
 const currencySymbol = ref('CFA')
+
+// KYC Status
+const kycStatus = ref('not_submitted')
+
+// KYC Helper functions
+const getKycAlertClass = () => {
+  switch (kycStatus.value) {
+    case 'rejected': return 'bg-red-50 border border-red-200'
+    case 'pending': return 'bg-orange-50 border border-orange-200'
+    default: return 'bg-orange-50 border border-orange-200'
+  }
+}
+
+const getKycAlertTextClass = () => {
+  return kycStatus.value === 'rejected' ? 'text-red-800' : 'text-orange-800'
+}
+
+const getKycAlertDescClass = () => {
+  return kycStatus.value === 'rejected' ? 'text-red-700' : 'text-orange-700'
+}
+
+const getKycAlertTitle = () => {
+  switch (kycStatus.value) {
+    case 'rejected': return 'Vérification refusée'
+    case 'pending': return 'Vérification en cours'
+    default: return 'Vérification requise'
+  }
+}
+
+const getKycAlertMessage = () => {
+  switch (kycStatus.value) {
+    case 'rejected': return 'Votre vérification d\'identité a été refusée. Veuillez soumettre de nouveaux documents.'
+    case 'pending': return 'Votre vérification est en cours d\'examen. Nous vous notifierons par email.'
+    default: return 'Pour effectuer des retraits, vous devez d\'abord vérifier votre identité.'
+  }
+}
+
+const fetchKycStatus = async () => {
+  try {
+    const response = await $fetch('/kyc/status', {
+      baseURL: config.public.apiBaseURL,
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/json'
+      }
+    })
+    
+    if (response.success) {
+      kycStatus.value = response.data.kyc_status?.value || response.data.kyc_status || 'not_submitted'
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement du statut KYC:', error)
+  }
+}
 
 // UI State
 const activeTab = ref("request")
