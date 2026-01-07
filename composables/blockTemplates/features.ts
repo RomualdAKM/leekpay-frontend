@@ -1,0 +1,317 @@
+import type { BlockTemplateGroup } from './types'
+
+// Types pour Features
+export type FeaturesLayout = 'grid' | 'list' | 'alternating' | 'masonry' | 'carousel' | 'timeline'
+export type IconStyle = 'filled' | 'outlined' | 'none' | 'number'
+
+export const featuresTemplates: BlockTemplateGroup = {
+  // ===== MINIMAL =====
+  'features-minimal-grid': {
+    id: 'features-minimal-grid',
+    name: 'Minimal Grille',
+    category: 'minimal',
+    description: 'Grille épurée sans ornements',
+    config: { layout: 'grid', columns: 3, iconStyle: 'outlined', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6',
+      container: 'max-w-5xl mx-auto',
+      header: 'text-center mb-12 md:mb-16',
+      title: 'text-2xl md:text-3xl font-light tracking-tight',
+      subtitle: 'text-base opacity-60 mt-4 max-w-2xl mx-auto',
+      grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12',
+      card: 'text-center',
+      iconWrapper: 'w-12 h-12 mx-auto mb-4 flex items-center justify-center',
+      icon: 'w-6 h-6 opacity-70',
+      cardTitle: 'text-lg font-medium mb-2',
+      cardText: 'text-sm opacity-60 leading-relaxed',
+    }
+  },
+  'features-minimal-list': {
+    id: 'features-minimal-list',
+    name: 'Minimal Liste',
+    category: 'minimal',
+    description: 'Liste verticale simple',
+    config: { layout: 'list', iconStyle: 'outlined', showDescription: true },
+    styles: {
+      section: 'py-14 md:py-20 px-6',
+      container: 'max-w-2xl mx-auto',
+      header: 'mb-10 md:mb-14',
+      title: 'text-xl md:text-2xl font-light tracking-tight',
+      subtitle: 'text-sm opacity-60 mt-3',
+      grid: 'space-y-6',
+      card: 'flex items-start gap-4 py-4 border-b last:border-b-0',
+      iconWrapper: 'w-10 h-10 flex-shrink-0 flex items-center justify-center',
+      icon: 'w-5 h-5 opacity-70',
+      cardTitle: 'text-base font-medium',
+      cardText: 'text-sm opacity-60 mt-1',
+    }
+  },
+  'features-minimal-compact': {
+    id: 'features-minimal-compact',
+    name: 'Minimal Compact',
+    category: 'minimal',
+    description: 'Version très compacte',
+    config: { layout: 'grid', columns: 4, iconStyle: 'none', showDescription: false },
+    styles: {
+      section: 'py-10 md:py-14 px-6',
+      container: 'max-w-4xl mx-auto',
+      header: 'text-center mb-8',
+      title: 'text-lg md:text-xl font-normal tracking-tight',
+      subtitle: 'hidden',
+      grid: 'grid grid-cols-2 md:grid-cols-4 gap-6',
+      card: 'text-center',
+      iconWrapper: 'w-8 h-8 mx-auto mb-3 flex items-center justify-center',
+      icon: 'w-5 h-5 opacity-60',
+      cardTitle: 'text-sm font-medium',
+      cardText: 'text-xs opacity-50 mt-1',
+    }
+  },
+  'features-minimal-icons': {
+    id: 'features-minimal-icons',
+    name: 'Minimal Icônes',
+    category: 'minimal',
+    description: 'Focus sur les icônes',
+    config: { layout: 'grid', columns: 6, iconStyle: 'filled', showDescription: false },
+    styles: {
+      section: 'py-12 md:py-16 px-6',
+      container: 'max-w-4xl mx-auto',
+      header: 'text-center mb-10',
+      title: 'text-lg font-light',
+      subtitle: 'hidden',
+      grid: 'grid grid-cols-3 md:grid-cols-6 gap-8',
+      card: 'text-center',
+      iconWrapper: 'w-14 h-14 mx-auto mb-3 rounded-full flex items-center justify-center',
+      icon: 'w-6 h-6',
+      cardTitle: 'text-xs font-medium',
+      cardText: 'hidden',
+    }
+  },
+
+  // ===== MODERN =====
+  'features-modern-cards': {
+    id: 'features-modern-cards',
+    name: 'Modern Cartes',
+    category: 'modern',
+    description: 'Cartes modernes avec bordures',
+    config: { layout: 'grid', columns: 3, iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-14 md:mb-20',
+      title: 'text-3xl md:text-4xl font-semibold tracking-tight',
+      subtitle: 'text-lg opacity-70 mt-4 max-w-2xl mx-auto',
+      grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6',
+      card: 'border p-8 transition-all duration-200 hover:border-current',
+      iconWrapper: 'w-14 h-14 rounded-xl mb-6 flex items-center justify-center',
+      icon: 'w-7 h-7',
+      cardTitle: 'text-xl font-semibold mb-3',
+      cardText: 'text-base opacity-70 leading-relaxed',
+    }
+  },
+  'features-modern-alternating': {
+    id: 'features-modern-alternating',
+    name: 'Modern Alternée',
+    category: 'modern',
+    description: 'Layout alternant gauche/droite',
+    config: { layout: 'alternating', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6',
+      container: 'max-w-4xl mx-auto',
+      header: 'mb-14',
+      title: 'text-3xl md:text-4xl font-semibold tracking-tight',
+      subtitle: 'text-base opacity-70 mt-4',
+      grid: 'space-y-12 md:space-y-16',
+      card: 'flex flex-col md:flex-row items-start gap-6 even:md:flex-row-reverse',
+      iconWrapper: 'w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center',
+      icon: 'w-8 h-8',
+      cardTitle: 'text-xl font-semibold mb-2',
+      cardText: 'text-base opacity-70 leading-relaxed',
+    }
+  },
+  'features-modern-numbered': {
+    id: 'features-modern-numbered',
+    name: 'Modern Numérotée',
+    category: 'modern',
+    description: 'Features avec numérotation',
+    config: { layout: 'grid', columns: 2, iconStyle: 'number', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6 border-t',
+      container: 'max-w-5xl mx-auto',
+      header: 'text-center mb-14',
+      title: 'text-2xl md:text-3xl font-semibold tracking-tight',
+      subtitle: 'text-base opacity-60 mt-4',
+      grid: 'grid grid-cols-1 md:grid-cols-2 gap-10',
+      card: 'flex items-start gap-5',
+      iconWrapper: 'w-12 h-12 flex items-center justify-center border-2 text-lg font-bold flex-shrink-0',
+      icon: 'hidden',
+      cardTitle: 'text-lg font-semibold mb-2',
+      cardText: 'text-sm opacity-70',
+    }
+  },
+  'features-modern-horizontal': {
+    id: 'features-modern-horizontal',
+    name: 'Modern Horizontal',
+    category: 'modern',
+    description: 'Scroll horizontal premium',
+    config: { layout: 'carousel', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6 overflow-hidden',
+      container: 'max-w-7xl mx-auto',
+      header: 'text-center mb-12',
+      title: 'text-2xl md:text-3xl font-semibold',
+      subtitle: 'text-base opacity-60 mt-3',
+      grid: 'flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6',
+      card: 'flex-shrink-0 w-72 md:w-80 border p-6 snap-center',
+      iconWrapper: 'w-12 h-12 rounded-lg mb-4 flex items-center justify-center',
+      icon: 'w-6 h-6',
+      cardTitle: 'text-lg font-semibold mb-2',
+      cardText: 'text-sm opacity-70',
+    }
+  },
+  'features-modern-timeline': {
+    id: 'features-modern-timeline',
+    name: 'Modern Timeline',
+    category: 'modern',
+    description: 'Style chronologique',
+    config: { layout: 'timeline', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-16 md:py-24 px-6',
+      container: 'max-w-3xl mx-auto',
+      header: 'text-center mb-14',
+      title: 'text-2xl md:text-3xl font-semibold',
+      subtitle: 'text-base opacity-60 mt-4',
+      grid: 'relative space-y-8 before:absolute before:left-6 before:top-0 before:bottom-0 before:w-px before:bg-current before:opacity-20',
+      card: 'relative pl-16',
+      iconWrapper: 'absolute left-0 w-12 h-12 rounded-full flex items-center justify-center',
+      icon: 'w-5 h-5',
+      cardTitle: 'text-lg font-semibold mb-2',
+      cardText: 'text-sm opacity-70',
+    }
+  },
+
+  // ===== BOLD =====
+  'features-bold-large': {
+    id: 'features-bold-large',
+    name: 'Bold Grande Grille',
+    category: 'bold',
+    description: 'Grandes cartes audacieuses',
+    config: { layout: 'grid', columns: 2, iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-32 px-6',
+      container: 'max-w-7xl mx-auto',
+      header: 'text-center mb-16 md:mb-24',
+      title: 'text-4xl md:text-5xl font-black tracking-tight uppercase',
+      subtitle: 'text-xl opacity-70 mt-6 max-w-2xl mx-auto',
+      grid: 'grid grid-cols-1 md:grid-cols-2 gap-8',
+      card: 'p-10 md:p-14 border-4',
+      iconWrapper: 'w-20 h-20 rounded-2xl mb-8 flex items-center justify-center',
+      icon: 'w-10 h-10',
+      cardTitle: 'text-2xl font-bold mb-4 uppercase tracking-wide',
+      cardText: 'text-lg opacity-80 leading-relaxed',
+    }
+  },
+  'features-bold-fullwidth': {
+    id: 'features-bold-fullwidth',
+    name: 'Bold Pleine Largeur',
+    category: 'bold',
+    description: 'Features pleine largeur impact',
+    config: { layout: 'list', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-28 px-6',
+      container: 'max-w-6xl mx-auto',
+      header: 'mb-16',
+      title: 'text-3xl md:text-4xl font-black tracking-tight uppercase',
+      subtitle: 'text-lg opacity-70 mt-4',
+      grid: 'space-y-0',
+      card: 'flex flex-col md:flex-row items-center gap-8 py-10 border-b-4 last:border-b-0',
+      iconWrapper: 'w-24 h-24 rounded-2xl flex-shrink-0 flex items-center justify-center',
+      icon: 'w-12 h-12',
+      cardTitle: 'text-2xl font-bold uppercase tracking-wide',
+      cardText: 'text-base opacity-80 mt-3 md:mt-0',
+    }
+  },
+  'features-bold-masonry': {
+    id: 'features-bold-masonry',
+    name: 'Bold Masonry',
+    category: 'bold',
+    description: 'Layout asymétrique dynamique',
+    config: { layout: 'masonry', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-28 px-6',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-16',
+      title: 'text-4xl md:text-5xl font-black tracking-tight uppercase',
+      subtitle: 'text-lg opacity-70 mt-4',
+      grid: 'grid grid-cols-1 md:grid-cols-3 gap-6',
+      card: 'p-8 border-4 first:md:col-span-2 first:md:row-span-2 first:p-12',
+      iconWrapper: 'w-14 h-14 rounded-xl mb-6 flex items-center justify-center',
+      icon: 'w-7 h-7',
+      cardTitle: 'text-xl font-bold mb-3 uppercase',
+      cardText: 'text-sm opacity-70',
+    }
+  },
+
+  // ===== PREMIUM =====
+  'features-premium-showcase': {
+    id: 'features-premium-showcase',
+    name: 'Premium Showcase',
+    category: 'modern',
+    description: 'Présentation premium élégante',
+    config: { layout: 'grid', columns: 3, iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-32 px-6',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-16 md:mb-20',
+      title: 'text-3xl md:text-4xl font-light tracking-tight',
+      subtitle: 'text-lg font-light opacity-60 mt-6 max-w-xl mx-auto',
+      grid: 'grid grid-cols-1 md:grid-cols-3 gap-12',
+      card: 'text-center',
+      iconWrapper: 'w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center',
+      icon: 'w-7 h-7',
+      cardTitle: 'text-xl font-medium mb-4',
+      cardText: 'text-base opacity-60 leading-relaxed',
+    }
+  },
+  'features-premium-elegant': {
+    id: 'features-premium-elegant',
+    name: 'Premium Élégant',
+    category: 'minimal',
+    description: 'Style élégant raffiné',
+    config: { layout: 'grid', columns: 2, iconStyle: 'outlined', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-32 px-6',
+      container: 'max-w-4xl mx-auto',
+      header: 'text-center mb-16',
+      title: 'text-2xl md:text-3xl font-light tracking-wide',
+      subtitle: 'text-base font-light opacity-50 mt-4 max-w-lg mx-auto',
+      grid: 'grid grid-cols-1 md:grid-cols-2 gap-16',
+      card: 'text-center',
+      iconWrapper: 'w-12 h-12 mx-auto mb-6 border flex items-center justify-center',
+      icon: 'w-5 h-5 opacity-70',
+      cardTitle: 'text-lg font-normal tracking-wide mb-3',
+      cardText: 'text-sm opacity-50 leading-relaxed',
+    }
+  },
+  'features-premium-split': {
+    id: 'features-premium-split',
+    name: 'Premium Split',
+    category: 'modern',
+    description: 'Layout divisé professionnel',
+    config: { layout: 'alternating', iconStyle: 'filled', showDescription: true },
+    styles: {
+      section: 'py-20 md:py-32 px-6',
+      container: 'max-w-5xl mx-auto',
+      header: 'mb-16 md:mb-20',
+      title: 'text-3xl md:text-4xl font-semibold tracking-tight',
+      subtitle: 'text-lg opacity-60 mt-4 max-w-2xl',
+      grid: 'space-y-16 md:space-y-24',
+      card: 'flex flex-col md:flex-row items-center gap-10 md:gap-16 even:md:flex-row-reverse',
+      iconWrapper: 'w-20 h-20 md:w-32 md:h-32 rounded-2xl flex-shrink-0 flex items-center justify-center',
+      icon: 'w-10 h-10 md:w-14 md:h-14',
+      cardTitle: 'text-2xl md:text-3xl font-semibold mb-4',
+      cardText: 'text-base md:text-lg opacity-70 leading-relaxed',
+    }
+  },
+}
+
+export default featuresTemplates
