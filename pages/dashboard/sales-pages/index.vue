@@ -113,11 +113,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'dashboard' })
 
 const config = useRuntimeConfig()
-const apiBaseUrl = config.public.apiBaseURL
+const { token } = useAuth()
 
 const salesPages = ref<any[]>([])
 const stats = ref({ total: 0, published: 0, draft: 0 })
@@ -126,9 +127,9 @@ const loading = ref(true)
 const fetchSalesPages = async () => {
   loading.value = true
   try {
-    const token = useCookie('token')
-    const response = await $fetch<{ data: any[]; stats: any }>(`${apiBaseUrl}/sales-pages`, {
-      headers: { Authorization: token.value ? `Bearer ${token.value}` : '' }
+    const response = await $fetch<{ data: any[]; stats: any }>('/sales-pages', {
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
     })
     salesPages.value = response.data || []
     stats.value = response.stats || { total: 0, published: 0, draft: 0 }
@@ -143,10 +144,10 @@ const deletePage = async (id: number) => {
   if (!confirm('Êtes-vous sûr de vouloir supprimer cette page ?')) return
   
   try {
-    const token = useCookie('token')
-    await $fetch(`${apiBaseUrl}/sales-pages/${id}`, {
+    await $fetch(`/sales-pages/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: token.value ? `Bearer ${token.value}` : '' }
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
     })
     await fetchSalesPages()
   } catch (err) {

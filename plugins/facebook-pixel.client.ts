@@ -1,5 +1,11 @@
 export default defineNuxtPlugin(() => {
-  // ID du pixel Facebook
+  // Ne pas injecter le pixel LeekPay sur les pages de vente publiques
+  // car elles ont leur propre pixel configuré par l'utilisateur
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/s/')) {
+    return;
+  }
+
+  // ID du pixel Facebook LeekPay
   const pixelId = '2428692480923365';
 
   // Initialisation du pixel Facebook

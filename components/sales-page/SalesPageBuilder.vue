@@ -225,6 +225,126 @@
               </div>
             </div>
           </div>
+          
+          <!-- Domaine personnalisé -->
+          <div v-if="page.id">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Domaine personnalisé</h3>
+            <CustomDomainConfig
+              :page-id="page.id"
+              :custom-domain="page.custom_domain"
+              :domain-verified="page.domain_verified"
+              @updated="handleDomainUpdate"
+            />
+          </div>
+          
+          <!-- Tracking & Analytics -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+              <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              Tracking & Analytics
+            </h3>
+            <div class="space-y-3">
+              <!-- Facebook Pixel -->
+              <div>
+                <label class="flex items-center text-xs text-gray-500 mb-1">
+                  <svg class="w-4 h-4 mr-1.5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  Facebook Pixel ID
+                </label>
+                <input
+                  v-model="page.settings.tracking.facebookPixelId"
+                  type="text"
+                  placeholder="Ex: 1234567890123456"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              
+              <!-- Google Analytics -->
+              <div>
+                <label class="flex items-center text-xs text-gray-500 mb-1">
+                  <svg class="w-4 h-4 mr-1.5 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                  </svg>
+                  Google Analytics (GA4)
+                </label>
+                <input
+                  v-model="page.settings.tracking.googleAnalyticsId"
+                  type="text"
+                  placeholder="Ex: G-XXXXXXXXXX"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              
+              <!-- Google Tag Manager -->
+              <div>
+                <label class="flex items-center text-xs text-gray-500 mb-1">
+                  <svg class="w-4 h-4 mr-1.5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0L1.5 6v12L12 24l10.5-6V6L12 0zm0 2.25L19.5 6.5v10L12 21.25 4.5 16.5v-10L12 2.25z"/>
+                    <path d="M12 6.75L7.5 9.5v5l4.5 2.75 4.5-2.75v-5L12 6.75z"/>
+                  </svg>
+                  Google Tag Manager
+                </label>
+                <input
+                  v-model="page.settings.tracking.googleTagManagerId"
+                  type="text"
+                  placeholder="Ex: GTM-XXXXXXX"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              
+              <!-- TikTok Pixel -->
+              <div>
+                <label class="flex items-center text-xs text-gray-500 mb-1">
+                  <svg class="w-4 h-4 mr-1.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                  </svg>
+                  TikTok Pixel ID
+                </label>
+                <input
+                  v-model="page.settings.tracking.tiktokPixelId"
+                  type="text"
+                  placeholder="Ex: CXXXXXXXXXX"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+              
+              <!-- Code personnalisé (avancé) -->
+              <div>
+                <label class="flex items-center text-xs text-gray-500 mb-1">
+                  <svg class="w-4 h-4 mr-1.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                  </svg>
+                  Code personnalisé (avancé)
+                </label>
+                <textarea
+                  v-model="page.settings.tracking.customCode"
+                  rows="3"
+                  placeholder="<script>...</script>"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 resize-none font-mono text-xs"
+                />
+                <p class="text-[10px] text-gray-400 mt-1">Pour d'autres scripts de tracking (Hotjar, Clarity, etc.)</p>
+              </div>
+              
+              <!-- Bouton Appliquer -->
+              <button
+                @click="handleSave"
+                :disabled="isSaving"
+                class="w-full mt-4 px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+              >
+                <svg v-if="isSaving" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <svg v-else class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                {{ isSaving ? 'Enregistrement...' : 'Appliquer' }}
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
       
@@ -348,6 +468,7 @@ import draggable from 'vuedraggable'
 import { useSalesPageBuilder } from '~/composables/useSalesPageBuilder'
 import SalesBlockRenderer from '~/components/sales-page/SalesBlockRenderer.vue'
 import BlockPropsEditor from '~/components/sales-page/BlockPropsEditor.vue'
+import CustomDomainConfig from '~/components/sales-page/CustomDomainConfig.vue'
 
 const props = defineProps<{
   pageId?: string | number
@@ -463,6 +584,11 @@ const handlePublish = async () => {
   } catch (err) {
     // Notification d'erreur
   }
+}
+
+const handleDomainUpdate = (data: { custom_domain: string | null; domain_verified: boolean }) => {
+  page.value.custom_domain = data.custom_domain
+  page.value.domain_verified = data.domain_verified
 }
 
 onMounted(async () => {

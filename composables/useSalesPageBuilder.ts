@@ -20,10 +20,18 @@ export interface Theme {
   fontFamily: string
 }
 
+export interface Tracking {
+  facebookPixelId: string | null
+  googleAnalyticsId: string | null
+  googleTagManagerId: string | null
+  tiktokPixelId: string | null
+  customCode: string | null
+}
+
 export interface Settings {
   showBranding: boolean
   customCss: string
-  trackingCode: string
+  tracking: Tracking
 }
 
 export interface SalesPage {
@@ -40,6 +48,9 @@ export interface SalesPage {
   is_published: boolean
   published_at?: string
   public_url?: string
+  custom_domain?: string | null
+  domain_verified?: boolean
+  domain_verified_at?: string
   created_at?: string
   updated_at?: string
 }
@@ -75,7 +86,13 @@ export const useSalesPageBuilder = () => {
     settings: {
       showBranding: true,
       customCss: '',
-      trackingCode: '',
+      tracking: {
+        facebookPixelId: null,
+        googleAnalyticsId: null,
+        googleTagManagerId: null,
+        tiktokPixelId: null,
+        customCode: null,
+      },
     },
     is_published: false,
     payment_link_id: null,
@@ -143,7 +160,31 @@ export const useSalesPageBuilder = () => {
         }
       )
       if (response.success) {
-        page.value = response.data
+        // Normaliser les settings pour la rétrocompatibilité
+        const data = response.data
+        if (!data.settings) {
+          data.settings = {
+            showBranding: true,
+            customCss: '',
+            tracking: {
+              facebookPixelId: null,
+              googleAnalyticsId: null,
+              googleTagManagerId: null,
+              tiktokPixelId: null,
+              customCode: null,
+            },
+          }
+        } else if (!data.settings.tracking) {
+          // Ancienne structure avec trackingCode
+          data.settings.tracking = {
+            facebookPixelId: null,
+            googleAnalyticsId: null,
+            googleTagManagerId: null,
+            tiktokPixelId: null,
+            customCode: (data.settings as any).trackingCode || null,
+          }
+        }
+        page.value = data
         isDirty.value = false
       }
     } catch (err: any) {
@@ -414,7 +455,13 @@ export const useSalesPageBuilder = () => {
       settings: {
         showBranding: true,
         customCss: '',
-        trackingCode: '',
+        tracking: {
+          facebookPixelId: null,
+          googleAnalyticsId: null,
+          googleTagManagerId: null,
+          tiktokPixelId: null,
+          customCode: null,
+        },
       },
       is_published: false,
       payment_link_id: null,
