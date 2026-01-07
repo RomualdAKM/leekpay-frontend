@@ -477,6 +477,54 @@ export const useSalesPageBuilder = () => {
     }
   }
   
+  // Appliquer un template
+  const applyTemplate = async (templateId: number) => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const response = await $fetch<{ success: boolean; data: { blocks: Block[]; theme: Theme; settings: Settings } }>(
+        `/sales-page-templates/${templateId}/data`,
+        { 
+          baseURL: config.public.apiBaseURL,
+          headers: getAuthHeaders() 
+        }
+      )
+      if (response.success && response.data) {
+        // Générer de nouveaux IDs pour les blocs
+        const newBlocks = (response.data.blocks || []).map((block: Block, index: number) => ({
+          ...block,
+          id: generateBlockId(),
+          order: index
+        }))
+        
+        page.value.blocks = newBlocks
+        
+        if (response.data.theme) {
+          page.value.theme = { ...page.value.theme, ...response.data.theme }
+        }
+        
+        if (response.data.settings) {
+          page.value.settings = {
+            ...page.value.settings,
+            showBranding: response.data.settings.showBranding ?? true,
+            customCss: response.data.settings.customCss || '',
+            // Ne pas copier les tracking IDs du template
+          }
+        }
+        
+        isDirty.value = true
+        return true
+      }
+      return false
+    } catch (err: any) {
+      console.error('Erreur application template:', err)
+      error.value = 'Erreur lors de l\'application du template'
+      return false
+    } finally {
+      isLoading.value = false
+    }
+  }
+  
   return {
     // State
     page,
@@ -519,5 +567,6 @@ export const useSalesPageBuilder = () => {
     // Page Actions
     resetPage,
     togglePreview,
+    applyTemplate,
   }
 }

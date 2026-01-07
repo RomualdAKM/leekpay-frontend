@@ -4,7 +4,7 @@
     <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
       <div class="flex items-center space-x-4">
         <NuxtLink 
-          to="/dashboard/sales-pages" 
+          :to="isTemplateMode ? '/dashboard/admin/templates' : '/dashboard/sales-pages'" 
           class="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,7 +15,15 @@
         
         <div class="h-6 w-px bg-gray-300 hidden sm:block" />
         
+        <!-- Mode Template: afficher le nom du template -->
+        <div v-if="isTemplateMode" class="flex items-center">
+          <span class="text-sm text-gray-500 mr-2">Template:</span>
+          <span class="text-lg font-semibold text-gray-900">{{ templateData?.name || 'Chargement...' }}</span>
+        </div>
+        
+        <!-- Mode Page: champ titre éditable -->
         <input
+          v-else
           v-model="page.title"
           type="text"
           placeholder="Entrez le titre de la page"
@@ -54,9 +62,9 @@
           <span class="ml-2 hidden sm:inline">{{ isDirty ? 'Sauvegarder*' : 'Sauvegarder' }}</span>
         </button>
         
-        <!-- Publier -->
+        <!-- Publier (seulement pour les pages, pas les templates) -->
         <button
-          v-if="page.id"
+          v-if="page.id && !isTemplateMode"
           @click="handlePublish"
           class="flex items-center px-4 py-2 rounded-lg transition-colors"
           :class="page.is_published ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-emerald-500 text-white hover:bg-emerald-600'"
@@ -472,6 +480,8 @@ import CustomDomainConfig from '~/components/sales-page/CustomDomainConfig.vue'
 
 const props = defineProps<{
   pageId?: string | number
+  templateId?: number | null
+  editTemplateId?: number | null  // Pour éditer un template existant (mode admin)
 }>()
 
 const {
@@ -496,10 +506,13 @@ const {
   selectBlock,
   reorderBlocks,
   togglePreview,
+  applyTemplate,
 } = useSalesPageBuilder()
 
 const activeTab = ref<'blocks' | 'settings'>('blocks')
 const paymentLinks = ref<any[]>([])
+const isTemplateMode = computed(() => !!props.editTemplateId)
+const templateData = ref<{ name: string; category: string } | null>(null)
 
 // Charger les liens de paiement pour le checkout
 const fetchPaymentLinks = async () => {
@@ -557,7 +570,18 @@ const saveError = ref<string | null>(null)
 const handleSave = async () => {
   saveError.value = null
   
-  // Validation du titre
+  // En mode template, sauvegarder le template
+  if (isTemplateMode.value) {
+    try {
+      await saveTemplateChanges()
+      saveError.value = null
+    } catch (err: any) {
+      saveError.value = err.message || 'Erreur lors de la sauvegarde du template'
+    }
+    return
+  }
+  
+  // Validation du titre (seulement pour les pages)
   if (!page.value.title || page.value.title.trim() === '') {
     saveError.value = 'Le titre de la page est obligatoire'
     // Focus sur le champ titre
@@ -597,6 +621,67 @@ onMounted(async () => {
   
   if (props.pageId) {
     await fetchPage(props.pageId)
+  } else if (props.editTemplateId) {
+    // Charger un template existant pour édition (mode admin)
+    await loadTemplateForEdit(props.editTemplateId)
+  } else if (props.templateId) {
+    // Appliquer le template sélectionné (mode utilisateur)
+    await applyTemplate(props.templateId)
   }
 })
+
+// Charger un template pour édition
+const loadTemplateForEdit = async (templateId: number) => {
+  const config = useRuntimeConfig()
+  const { token } = useAuth()
+  try {
+    const response = await $fetch<any>(`/admin/sales-page-templates/${templateId}`, {
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    if (response.success && response.data) {
+      templateData.value = { name: response.data.name, category: response.data.category }
+      page.value.blocks = response.data.blocks || []
+      page.value.theme = response.data.theme || page.value.theme
+      page.value.settings = {
+        ...page.value.settings,
+        showBranding: response.data.settings?.showBranding ?? true,
+        customCss: response.data.settings?.customCss || '',
+      }
+    }
+  } catch (err) {
+    console.error('Erreur chargement template:', err)
+  }
+}
+
+// Sauvegarder le template (mode admin)
+const saveTemplateChanges = async () => {
+  if (!props.editTemplateId || !templateData.value) return
+  const config = useRuntimeConfig()
+  const { token } = useAuth()
+  try {
+    await $fetch(`/admin/sales-page-templates/${props.editTemplateId}`, {
+      method: 'PUT',
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: {
+        name: templateData.value.name,
+        category: templateData.value.category,
+        blocks: page.value.blocks,
+        theme: page.value.theme,
+        settings: {
+          showBranding: page.value.settings.showBranding,
+          customCss: page.value.settings.customCss,
+        },
+      }
+    })
+    return true
+  } catch (err) {
+    console.error('Erreur sauvegarde template:', err)
+    return false
+  }
+}
+
+// Exposer pour la page parente
+defineExpose({ saveTemplateChanges, templateData, isTemplateMode })
 </script>
