@@ -1,47 +1,51 @@
 <template>
   <div>
     <!-- Écran de choix initial -->
-    <div v-if="showTemplateChoice" class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div class="max-w-4xl w-full">
-        <div class="text-center mb-8">
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">Créer une page de vente</h1>
-          <p class="text-gray-600">Choisissez comment commencer</p>
+    <div v-if="showTemplateChoice" class="min-h-screen bg-white flex items-center justify-center p-4">
+      <div class="max-w-2xl w-full">
+        <!-- Header -->
+        <div class="mb-12">
+          <NuxtLink to="/dashboard/sales-pages" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-8">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Retour
+          </NuxtLink>
+          <h1 class="text-3xl font-light text-gray-900 tracking-tight">Nouvelle page</h1>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <!-- Option: De zéro -->
+        <!-- Info -->
+        <p class="text-sm text-gray-500 border-l-2 border-gray-200 pl-4 mb-10">
+          Pour une meilleure expérience, utilisez un ordinateur ou activez le mode bureau sur mobile.
+        </p>
+        
+        <!-- Options -->
+        <div class="space-y-4">
           <button
             @click="startFromScratch"
-            class="bg-white rounded-xl border-2 border-gray-200 p-6 text-left hover:border-emerald-500 hover:shadow-lg transition-all group"
+            class="w-full flex items-center justify-between p-5 border border-gray-200 hover:border-gray-900 transition-colors text-left group"
           >
-            <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-500 transition-colors">
-              <svg class="w-6 h-6 text-emerald-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-              </svg>
+            <div>
+              <h3 class="font-medium text-gray-900">Page vierge</h3>
+              <p class="text-sm text-gray-500 mt-1">Construire de zéro</p>
             </div>
-            <h3 class="font-semibold text-gray-900 mb-2">Partir de zéro</h3>
-            <p class="text-sm text-gray-500">Créez votre page bloc par bloc avec une liberté totale de personnalisation</p>
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
+            </svg>
           </button>
           
-          <!-- Option: Template -->
           <button
             @click="showTemplateGallery = true"
-            class="bg-white rounded-xl border-2 border-gray-200 p-6 text-left hover:border-emerald-500 hover:shadow-lg transition-all group"
+            class="w-full flex items-center justify-between p-5 border border-gray-200 hover:border-gray-900 transition-colors text-left group"
           >
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-500 transition-colors">
-              <svg class="w-6 h-6 text-blue-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
-              </svg>
+            <div>
+              <h3 class="font-medium text-gray-900">Utiliser un modèle</h3>
+              <p class="text-sm text-gray-500 mt-1">Démarrer avec un design existant</p>
             </div>
-            <h3 class="font-semibold text-gray-900 mb-2">Utiliser un template</h3>
-            <p class="text-sm text-gray-500">Démarrez avec un design prêt à l'emploi et personnalisez-le à votre image</p>
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"/>
+            </svg>
           </button>
-        </div>
-        
-        <div class="text-center">
-          <NuxtLink to="/dashboard/sales-pages" class="text-sm text-gray-500 hover:text-gray-700">
-            ← Retour à mes pages
-          </NuxtLink>
         </div>
       </div>
     </div>
@@ -220,4 +224,6 @@ const useSelectedTemplate = () => {
 onMounted(() => {
   fetchTemplates()
 })
+
+definePageMeta({ layout: 'editor' })
 </script>

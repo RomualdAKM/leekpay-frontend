@@ -1,10 +1,11 @@
 <template>
   <section 
-    :class="template.styles.section"
+    :id="props.cssId || undefined"
+    :class="[template.styles.section, props.customClasses]"
     :style="sectionStyles"
   >
     <!-- Header avec container du template -->
-    <div v-if="props.title || props.subtitle" :class="[template.styles.container, template.styles.header]">
+    <div v-if="props.title || props.subtitle" :class="[template.styles.container, template.styles.header]" :style="headerStyles">
       <h2 
         v-if="props.title"
         :class="template.styles.title"
@@ -71,7 +72,7 @@
           </div>
           
           <!-- Liste des features -->
-          <ul v-if="plan.showFeatures && plan.features?.length" :class="template.styles.features">
+          <ul v-if="plan.showFeatures !== false && plan.features?.length" :class="template.styles.features">
             <li 
               v-for="(feature, index) in plan.features"
               :key="index"
@@ -164,6 +165,7 @@ interface Props {
   // Contenu
   title?: string
   subtitle?: string
+  headerAlignment?: 'left' | 'center' | 'right'
   // Plans multiples
   items?: PricingPlan[]
   // Props legacy (pour rétrocompatibilité)
@@ -195,23 +197,32 @@ interface Props {
   buttonColor?: string
   buttonBgColor?: string
   // Apparence
+  backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
+  gradientStart?: string
+  gradientEnd?: string
   accentColor?: string
   titleColor?: string
+  paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   // Carte
   cardBgColor?: string
   cardBorderColor?: string
   cardBorderWidth?: 'none' | 'thin' | 'medium' | 'thick'
   cardBorderRadius?: 'none' | 'small' | 'medium' | 'large'
   cardPadding?: 'small' | 'medium' | 'large' | 'xlarge'
+  cardShadow?: 'none' | 'small' | 'medium' | 'large'
   // Layout
   columns?: number
+  // Avancé
+  cssId?: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   templateId: 'pricing-minimal-centered',
   title: '',
   subtitle: '',
+  headerAlignment: 'center',
   items: undefined,
   price: '0',
   originalPrice: null,
@@ -236,15 +247,22 @@ const props = withDefaults(defineProps<Props>(), {
   buttonStyle: 'filled',
   buttonColor: '#ffffff',
   buttonBgColor: '',
+  backgroundType: 'solid',
   backgroundColor: '#ffffff',
+  gradientStart: '#f8fafc',
+  gradientEnd: '#ffffff',
   accentColor: '#10B981',
   titleColor: '',
+  paddingY: 'large',
   cardBgColor: '',
   cardBorderColor: '',
   cardBorderWidth: 'none',
   cardBorderRadius: 'none',
   cardPadding: 'large',
+  cardShadow: 'none',
   columns: 1,
+  cssId: '',
+  customClasses: '',
 })
 
 defineEmits(['cta-click'])
@@ -338,8 +356,31 @@ const textColor = computed(() => getTextColor({}))
 const accentColorFinal = computed(() => props.accentColor || '#10B981')
 
 // Styles section
-const sectionStyles = computed(() => ({
-  backgroundColor: props.backgroundColor,
+const sectionStyles = computed(() => {
+  const paddingYMap: Record<string, string> = {
+    small: '2rem',
+    medium: '4rem',
+    large: '6rem',
+    xlarge: '8rem',
+  }
+  const py = paddingYMap[props.paddingY || 'large'] || '6rem'
+  const styles: Record<string, string> = {
+    paddingTop: py,
+    paddingBottom: py,
+  }
+  
+  if (props.backgroundType === 'gradient') {
+    styles.background = `linear-gradient(to bottom, ${props.gradientStart}, ${props.gradientEnd})`
+  } else if (props.backgroundType !== 'transparent') {
+    styles.backgroundColor = props.backgroundColor || '#ffffff'
+  }
+  
+  return styles
+})
+
+// Styles header
+const headerStyles = computed(() => ({
+  textAlign: (props.headerAlignment || 'center') as 'left' | 'center' | 'right',
 }))
 
 // Styles titre

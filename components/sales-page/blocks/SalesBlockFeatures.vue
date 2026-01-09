@@ -1,15 +1,16 @@
 <template>
   <section 
-    :class="template.styles.section"
+    :id="props.cssId || undefined"
+    :class="[template.styles.section, props.customClasses, animationClass]"
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" :class="template.styles.header">
+      <div v-if="props.title || props.subtitle" :class="template.styles.header" :style="headerStyles">
         <h2 
           v-if="props.title"
           :class="template.styles.title"
-          :style="titleStyles"
+          :style="sectionTitleStyles"
         >
           {{ props.title }}
         </h2>
@@ -27,7 +28,7 @@
         <div 
           v-for="(item, index) in props.items"
           :key="index"
-          :class="template.styles.card"
+          :class="[template.styles.card, cardHoverClass]"
           :style="cardStyles"
         >
           <!-- Icône -->
@@ -103,29 +104,47 @@ interface Props {
   title?: string
   subtitle?: string
   items?: FeatureItem[]
+  headerAlignment?: 'left' | 'center' | 'right'
   // Layout
   layout?: Layout
   columns?: 2 | 3 | 4 | 6
+  itemGap?: 'small' | 'medium' | 'large' | 'xlarge'
   // Icône
   showIcon?: boolean
   iconStyle?: IconStyle
   iconColor?: string
   iconBgColor?: string
   iconSize?: 'small' | 'medium' | 'large'
+  iconRadius?: 'none' | 'small' | 'medium' | 'full'
   // Texte
   showDescription?: boolean
   titleColor?: string
+  sectionTitleFont?: string
+  sectionTitleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  sectionTitleWeight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold'
   // Apparence
+  backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
+  gradientStart?: string
+  gradientEnd?: string
   accentColor?: string
+  paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   // Carte
   cardBgColor?: string
   cardBorderColor?: string
   cardBorderWidth?: 'none' | 'thin' | 'medium' | 'thick'
   cardBorderRadius?: 'none' | 'small' | 'medium' | 'large'
   cardPadding?: 'none' | 'small' | 'medium' | 'large'
+  cardShadow?: 'none' | 'small' | 'medium' | 'large'
+  cardHoverEffect?: 'none' | 'lift' | 'scale' | 'glow' | 'border'
+  cardTextAlign?: 'left' | 'center' | 'right'
   // Animation
-  animation?: 'none' | 'fade' | 'slide-up' | 'scale'
+  animation?: 'none' | 'fade' | 'slide-up' | 'scale' | 'stagger'
+  animationDuration?: number
+  animationDelay?: number
+  // Avancé
+  cssId?: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -137,23 +156,40 @@ const props = withDefaults(defineProps<Props>(), {
     { icon: 'check', title: 'Fonctionnalité 2', description: 'Description de la fonctionnalité' },
     { icon: 'check', title: 'Fonctionnalité 3', description: 'Description de la fonctionnalité' },
   ],
+  headerAlignment: 'center',
   layout: 'grid',
   columns: 3,
+  itemGap: 'medium',
   showIcon: true,
   iconStyle: 'filled',
   iconColor: '#ffffff',
   iconBgColor: '',
   iconSize: 'medium',
+  iconRadius: 'full',
   showDescription: true,
   titleColor: '',
+  sectionTitleFont: '',
+  sectionTitleSize: 'medium',
+  sectionTitleWeight: 'medium',
+  backgroundType: 'solid',
   backgroundColor: '#ffffff',
+  gradientStart: '#f8fafc',
+  gradientEnd: '#ffffff',
   accentColor: '#10B981',
+  paddingY: 'large',
   cardBgColor: '',
   cardBorderColor: '',
   cardBorderWidth: 'none',
   cardBorderRadius: 'none',
   cardPadding: 'medium',
+  cardShadow: 'none',
+  cardHoverEffect: 'none',
+  cardTextAlign: 'center',
   animation: 'none',
+  animationDuration: 500,
+  animationDelay: 0,
+  cssId: '',
+  customClasses: '',
 })
 
 // Template actif
@@ -198,16 +234,65 @@ const iconTextColor = computed(() => {
 })
 
 // Styles section
-const sectionStyles = computed(() => ({
-  backgroundColor: props.backgroundColor,
+const paddingYMap: Record<string, string> = {
+  small: '2rem',
+  medium: '4rem',
+  large: '6rem',
+  xlarge: '8rem',
+}
+
+const sectionStyles = computed(() => {
+  const py = paddingYMap[props.paddingY || 'large'] || '6rem'
+  const styles: Record<string, string> = {
+    paddingTop: py,
+    paddingBottom: py,
+  }
+  
+  if (props.backgroundType === 'gradient') {
+    styles.background = `linear-gradient(to bottom, ${props.gradientStart}, ${props.gradientEnd})`
+  } else if (props.backgroundType !== 'transparent') {
+    styles.backgroundColor = props.backgroundColor || '#ffffff'
+  }
+  
+  return styles
+})
+
+// Styles header
+const headerStyles = computed(() => ({
+  textAlign: props.headerAlignment || 'center',
 }))
 
-// Styles titre
-const titleStyles = computed(() => ({
+// Styles titre section
+const sectionTitleSizeMap: Record<string, string> = {
+  small: '1.5rem',
+  medium: '2rem',
+  large: '2.5rem',
+  xlarge: '3rem',
+}
+
+const sectionTitleWeightMap: Record<string, number> = {
+  light: 300,
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+}
+
+const sectionTitleStyles = computed(() => ({
   color: props.titleColor || textColor.value,
+  fontFamily: props.sectionTitleFont || undefined,
+  fontSize: sectionTitleSizeMap[props.sectionTitleSize || 'medium'],
+  fontWeight: sectionTitleWeightMap[props.sectionTitleWeight || 'medium'],
 }))
 
 // Classes colonnes dynamiques - OVERRIDE le template avec !important classes
+const itemGapMap: Record<string, string> = {
+  small: '1rem',
+  medium: '1.5rem',
+  large: '2rem',
+  xlarge: '3rem',
+}
+
 const gridClasses = computed(() => {
   const baseClasses = ['gap-6', 'md:gap-8']
   
@@ -231,32 +316,44 @@ const gridClasses = computed(() => {
         4: ['grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-4'],
         6: ['grid', 'grid-cols-2', 'md:grid-cols-3', 'lg:grid-cols-6'],
       }
-      return [...baseClasses, ...(colsMap[props.columns || 3] || colsMap[3])]
+      const cols = colsMap[props.columns || 3] || colsMap[3] || []
+      return [...baseClasses, ...cols]
   }
 })
 
 // Styles additionnels pour certains layouts
 const gridStyles = computed(() => {
-  if (props.layout === 'timeline') {
-    return {
-      paddingLeft: '3rem',
-    }
+  const styles: Record<string, string> = {
+    gap: itemGapMap[props.itemGap || 'medium'] || '1.5rem',
   }
-  return {}
+  
+  if (props.layout === 'timeline') {
+    styles.paddingLeft = '3rem'
+  }
+  return styles
 })
 
 // Styles icône wrapper
+const iconRadiusMap: Record<string, string> = {
+  none: '0',
+  small: '0.375rem',
+  medium: '0.75rem',
+  full: '50%',
+}
+
 const iconWrapperStyles = computed(() => {
   const sizeMap: Record<string, string> = {
     small: '2rem',
     medium: '3rem',
     large: '4rem',
   }
-  const size = sizeMap[props.iconSize || 'medium']
+  const size = sizeMap[props.iconSize || 'medium'] || '3rem'
+  const radius = iconRadiusMap[props.iconRadius || 'full'] || '50%'
   
   const styles: Record<string, string> = {
     width: size,
     height: size,
+    borderRadius: radius,
   }
   
   if (props.iconStyle === 'filled') {
@@ -269,8 +366,17 @@ const iconWrapperStyles = computed(() => {
 })
 
 // Styles carte
+const cardShadowMap: Record<string, string> = {
+  none: 'none',
+  small: '0 1px 3px rgba(0,0,0,0.1)',
+  medium: '0 4px 6px rgba(0,0,0,0.1)',
+  large: '0 10px 25px rgba(0,0,0,0.15)',
+}
+
 const cardStyles = computed(() => {
-  const styles: Record<string, string> = {}
+  const styles: Record<string, string> = {
+    textAlign: props.cardTextAlign || 'center',
+  }
   
   if (props.cardBgColor) {
     styles.backgroundColor = props.cardBgColor
@@ -282,7 +388,7 @@ const cardStyles = computed(() => {
       medium: '2px',
       thick: '4px',
     }
-    styles.borderWidth = borderWidthMap[props.cardBorderWidth]
+    styles.borderWidth = borderWidthMap[props.cardBorderWidth] || '1px'
     styles.borderStyle = 'solid'
     styles.borderColor = props.cardBorderColor || textColor.value
   }
@@ -293,7 +399,7 @@ const cardStyles = computed(() => {
       medium: '0.75rem',
       large: '1.5rem',
     }
-    styles.borderRadius = radiusMap[props.cardBorderRadius]
+    styles.borderRadius = radiusMap[props.cardBorderRadius] || '0.75rem'
   }
   
   if (props.cardPadding !== 'none') {
@@ -302,10 +408,34 @@ const cardStyles = computed(() => {
       medium: '1.5rem',
       large: '2rem',
     }
-    styles.padding = paddingMap[props.cardPadding]
+    const padding = paddingMap[props.cardPadding]
+    if (padding) styles.padding = padding
+  }
+  
+  if (props.cardShadow && props.cardShadow !== 'none') {
+    const shadow = cardShadowMap[props.cardShadow]
+    if (shadow) styles.boxShadow = shadow
   }
   
   return styles
+})
+
+// Classe hover carte
+const cardHoverClass = computed(() => {
+  const effectMap: Record<string, string> = {
+    none: '',
+    lift: 'transition-all duration-300 hover:-translate-y-1 hover:shadow-lg',
+    scale: 'transition-transform duration-300 hover:scale-105',
+    glow: 'transition-shadow duration-300 hover:shadow-xl hover:shadow-emerald-500/20',
+    border: 'transition-colors duration-300 hover:border-emerald-500',
+  }
+  return effectMap[props.cardHoverEffect || 'none'] || ''
+})
+
+// Animation
+const animationClass = computed(() => {
+  if (props.animation === 'none') return ''
+  return `animate-${props.animation}`
 })
 
 // Styles titre carte
@@ -329,6 +459,6 @@ function getIconPath(icon: string): string {
     rocket: 'M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01',
     users: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
   }
-  return icons[icon] || icons.check
+  return icons[icon] || 'M5 13l4 4L19 7'
 }
 </script>

@@ -204,11 +204,121 @@
 
 
       </TabsContent>
+
+      <!-- Affiliation (visible pour tous) -->
+      <TabsContent value="affiliation" class="space-y-6">
+        <!-- Message pour non-premium -->
+        <div v-if="!user?.is_premium" class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
+          <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+              <Gift class="w-6 h-6 text-white" />
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-lg text-gray-900 mb-2">Programme d'affiliation Premium</h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Passez en Premium pour générer votre code promo personnel. Vos amis obtiennent 15% de réduction et vous gagnez 15% de commission sur chaque abonnement.
+              </p>
+              <NuxtLink 
+                to="/dashboard/subscription" 
+                class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all"
+              >
+                <span>Passer en Premium</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu pour premium -->
+        <template v-else>
+          <!-- Votre code promo -->
+          <Card>
+          <div class="flex items-center gap-2 mb-3">
+            <Gift class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Votre code promo</h3>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-500 mb-4">
+            Partagez votre code avec vos amis. Ils obtiennent {{ affiliation.discount_percent }}% de réduction et vous gagnez {{ affiliation.commission_percent }}% de commission.
+          </p>
+
+          <div v-if="affiliationLoading" class="py-8 text-center text-gray-500">
+            <RefreshCw class="w-6 h-6 animate-spin mx-auto mb-2" />
+            Chargement...
+          </div>
+
+          <div v-else>
+            <!-- Code existant -->
+            <div v-if="affiliation.code" class="space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="flex-1 px-4 py-3 bg-gray-100 rounded-lg font-mono text-lg font-bold text-center tracking-wider">
+                  {{ affiliation.code }}
+                </div>
+                <button
+                  @click="copyCode"
+                  class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  :class="{ 'bg-green-600': codeCopied }"
+                >
+                  <Copy class="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Générer un code -->
+            <div v-else class="text-center py-4">
+              <p class="text-gray-500 mb-4">Vous n'avez pas encore de code promo</p>
+              <Button
+                @click="generateCode"
+                :disabled="codeGenerating"
+                class="gap-2"
+                style="background-color: #2ECC71; color: white"
+              >
+                <RefreshCw v-if="codeGenerating" class="w-4 h-4 animate-spin" />
+                <span>{{ codeGenerating ? 'Génération...' : 'Générer mon code' }}</span>
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        <!-- Statistiques -->
+        <Card>
+          <div class="flex items-center gap-2 mb-3">
+            <Users class="w-5 h-5 text-gray-500" />
+            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Statistiques d'affiliation</h3>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-gray-50 rounded-lg text-center">
+              <p class="text-2xl font-bold text-gray-900">{{ affiliation.usage_count }}</p>
+              <p class="text-sm text-gray-500">Utilisations</p>
+            </div>
+            <div class="p-4 bg-emerald-50 rounded-lg text-center">
+              <p class="text-2xl font-bold text-emerald-600">{{ affiliation.total_earned.toLocaleString() }} FCFA</p>
+              <p class="text-sm text-gray-500">Gains totaux</p>
+            </div>
+          </div>
+
+          <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div class="flex items-start gap-3">
+              <Wallet class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p class="text-sm font-medium text-amber-800">Retirer vos gains</p>
+                <p class="text-xs text-amber-600 mt-1">
+                  Vos commissions d'affiliation sont créditées dans votre solde disponible. 
+                  Rendez-vous sur la page <NuxtLink to="/dashboard/withdrawals" class="underline font-medium">Retraits</NuxtLink> pour effectuer un retrait.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+        </template>
+      </TabsContent>
     </Tabs>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({
   layout: 'dashboard'
 })
@@ -219,7 +329,12 @@ import {
   Shield,
   CheckIcon,
   Eye,
-  EyeOff
+  EyeOff,
+  Users,
+  Copy,
+  RefreshCw,
+  Gift,
+  Wallet
 } from "lucide-vue-next"
 
 // Import des composants UI
@@ -234,7 +349,8 @@ import TabsTrigger from "~/components/ui/TabsTrigger.vue"
 import TabsContent from "~/components/ui/TabsContent.vue"
 
 // Composables
-const { user, updateProfile, changePassword } = useAuth()
+const { user, updateProfile, changePassword, token } = useAuth()
+const config = useRuntimeConfig()
 
 // État réactif
 const activeTab = ref("profile")
@@ -250,11 +366,14 @@ const toastMessage = ref('')
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-// Tabs data - seulement Profil et Sécurité
-const tabs = [
-  { value: "profile", label: "Profil" },
-  { value: "security", label: "Sécurité" }
-]
+// Tabs data - Profil, Sécurité et Affiliation (toujours visible)
+const tabs = computed(() => {
+  return [
+    { value: "profile", label: "Profil" },
+    { value: "security", label: "Sécurité" },
+    { value: "affiliation", label: "Affiliation" }
+  ]
+})
 
 // Profil - initialisé avec les données utilisateur réelles
 const profile = ref({
@@ -352,5 +471,87 @@ const changePasswordHandler = async () => {
 // Calculé
 const canChangePassword = computed(() => {
   return security.value.currentPassword && security.value.newPassword && security.value.newPassword === security.value.confirmPassword
+})
+
+// === Affiliation ===
+const affiliation = ref({
+  code: null as string | null,
+  usage_count: 0,
+  total_earned: 0,
+  discount_percent: 15,
+  commission_percent: 15
+})
+const affiliationLoading = ref(false)
+const codeGenerating = ref(false)
+const codeCopied = ref(false)
+
+const fetchAffiliation = async () => {
+  if (!user.value?.is_premium) return
+  
+  affiliationLoading.value = true
+  try {
+    const response = await $fetch<any>('/affiliation/my-code', {
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    if (response.success && response.data) {
+      affiliation.value = {
+        code: response.data.code,
+        usage_count: response.data.usage_count || 0,
+        total_earned: response.data.total_earnings || 0,
+        discount_percent: response.data.discount_percent || 15,
+        commission_percent: response.data.commission_percent || 15
+      }
+    }
+  } catch (err) {
+    console.error('Erreur fetch affiliation:', err)
+  } finally {
+    affiliationLoading.value = false
+  }
+}
+
+const generateCode = async () => {
+  codeGenerating.value = true
+  try {
+    const response = await $fetch<any>('/affiliation/generate-code', {
+      method: 'POST',
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    if (response.success && response.data) {
+      affiliation.value.code = response.data.code
+      displayToast('Code promo généré avec succès')
+    }
+  } catch (err: any) {
+    apiErrors.value = { global: [err.data?.message || 'Erreur lors de la génération du code'] }
+  } finally {
+    codeGenerating.value = false
+  }
+}
+
+const copyCode = async () => {
+  if (!affiliation.value.code) return
+  try {
+    await navigator.clipboard.writeText(affiliation.value.code)
+    codeCopied.value = true
+    displayToast('Code copié dans le presse-papier')
+    setTimeout(() => { codeCopied.value = false }, 2000)
+  } catch (err) {
+    console.error('Erreur copie:', err)
+  }
+}
+
+// Charger les données d'affiliation au montage si premium
+onMounted(() => {
+  if (user.value?.is_premium) {
+    fetchAffiliation()
+  }
+})
+
+// Watcher pour charger l'affiliation si l'utilisateur devient premium
+watch(() => user.value?.is_premium, (isPremium) => {
+  if (isPremium) {
+    fetchAffiliation()
+  }
 })
 </script>

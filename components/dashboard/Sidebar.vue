@@ -37,10 +37,15 @@
         <button
             @click="onSectionChange(item.id)"
             class="w-full flex items-center gap-3 px-4 py-3 rounded-sm text-left transition-colors"
-            :class="{ 'bg-green-600 text-white': activeSection === item.id, 'text-gray-600 hover:bg-gray-50': activeSection !== item.id }"
+            :class="{ 
+              'bg-green-600 text-white': activeSection === item.id, 
+              'text-gray-600 hover:bg-gray-50': activeSection !== item.id,
+              'bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200': item.premium && !user?.is_premium && activeSection !== item.id
+            }"
         >
-          <component :is="item.icon" class="w-5 h-5" />
-          <span>{{ item.label }}</span>
+          <component :is="item.icon" class="w-5 h-5" :class="{ 'text-amber-500': item.premium && !user?.is_premium && activeSection !== item.id }" />
+          <span class="flex-1">{{ item.label }}</span>
+          <span v-if="item.premium && user?.is_premium" class="w-2 h-2 rounded-full bg-amber-400"></span>
         </button>
       </template>
     </nav>
@@ -48,10 +53,19 @@
     <!-- User Profile -->
     <div class="p-2 border-t border-gray-200">
       <div class="flex items-center gap-2">
-        <NuxtLink to="/dashboard/settings">
-          <p v-if="user" class="font-medium" style="color: #0A1F44">
-            {{ user.name }}
-          </p>
+        <NuxtLink to="/dashboard/settings" class="flex-1">
+          <div class="flex items-center gap-2">
+            <p v-if="user" class="font-medium" style="color: #0A1F44">
+              {{ user.name }}
+            </p>
+            <span 
+              v-if="user?.is_premium" 
+              class="px-1.5 py-0.5 text-xs font-medium rounded bg-gradient-to-r from-amber-400 to-orange-500 text-white flex items-center gap-1"
+            >
+              <Crown class="w-3 h-3" />
+              Premium
+            </span>
+          </div>
           <p v-if="user" class="text-sm text-gray-500">
             {{ user.email }}
           </p>
@@ -72,7 +86,7 @@
 </template>
 
 <script setup>
-import { HomeIcon, PlusIcon, UserIcon } from 'lucide-vue-next'
+import { HomeIcon, PlusIcon, UserIcon, Crown } from 'lucide-vue-next'
 
 const props = defineProps({
   activeSection: {
@@ -99,6 +113,8 @@ const menuItems = computed(() => {
     { id: 'dashboard/links', label: 'Mes Liens', icon: LinkIcon },
     { id: 'dashboard/transactions', label: 'Transactions', icon: CreditCardIcon },
     { id: 'dashboard/withdrawals', label: 'Retraits', icon: WalletIcon },
+    // { id: 'dashboard/sales-pages', label: 'Pages de vente', icon: FileTextIcon },
+    // { id: 'dashboard/subscription', label: 'Abonnement', icon: CrownIcon, premium: true },
     { id: 'dashboard/kyc', label: 'Vérification KYC', icon: ShieldCheckIcon },
     { id: 'dashboard/api-keys', label: 'Clés API', icon: KeyIcon },
     { id: 'dashboard/support', label: 'Support', icon: HeadphonesIcon },
@@ -121,5 +137,5 @@ const menuItems = computed(() => {
 })
 
 // Import des icônes manquantes
-import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon, UserCheckIcon, MailIcon } from 'lucide-vue-next'
+import { LinkIcon, CreditCardIcon, WalletIcon, BarChart3Icon, SettingsIcon, LogOutIcon, ShieldCheckIcon, HeadphonesIcon, KeyIcon, UserCheckIcon, MailIcon, FileTextIcon, Crown as CrownIcon } from 'lucide-vue-next'
 </script>

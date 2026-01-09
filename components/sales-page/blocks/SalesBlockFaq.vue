@@ -1,11 +1,12 @@
 <template>
   <section 
-    :class="template.styles.section"
+    :id="props.cssId || undefined"
+    :class="[template.styles.section, props.customClasses]"
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" class="mb-12 md:mb-16" :class="headerAlignment">
+      <div v-if="props.title || props.subtitle" class="mb-12 md:mb-16" :style="headerStyles">
         <h2 
           v-if="props.title"
           :class="template.styles.title"
@@ -16,8 +17,7 @@
         <p 
           v-if="props.subtitle"
           class="mt-4 text-base md:text-lg font-light max-w-2xl"
-          :class="headerAlignment"
-          :style="{ color: textColor, opacity: 0.7 }"
+          :style="{ color: textColor, opacity: 0.7, margin: props.headerAlignment === 'center' ? '1rem auto 0' : '1rem 0 0' }"
         >
           {{ props.subtitle }}
         </p>
@@ -92,28 +92,44 @@ interface Props {
   templateId?: string
   title?: string
   subtitle?: string
+  headerAlignment?: 'left' | 'center' | 'right'
   items?: FaqItem[]
+  backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
+  gradientStart?: string
+  gradientEnd?: string
   accentColor?: string
+  paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   allowMultiple?: boolean
+  expandFirstByDefault?: boolean
+  cssId?: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   templateId: 'faq-minimal-1',
   title: 'Questions fréquentes',
   subtitle: '',
+  headerAlignment: 'center',
   items: () => [
     { question: 'Comment ça fonctionne ?', answer: 'C\'est très simple. Suivez les étapes indiquées et vous serez opérationnel en quelques minutes.' },
     { question: 'Quels sont les délais de livraison ?', answer: 'Nous livrons sous 24 à 48 heures en France métropolitaine.' },
     { question: 'Puis-je me faire rembourser ?', answer: 'Oui, nous offrons une garantie satisfait ou remboursé de 30 jours.' },
   ],
+  backgroundType: 'solid',
   backgroundColor: '#ffffff',
+  gradientStart: '#f8fafc',
+  gradientEnd: '#ffffff',
   accentColor: '#10b981',
+  paddingY: 'large',
   allowMultiple: false,
+  expandFirstByDefault: true,
+  cssId: '',
+  customClasses: '',
 })
 
 // Support pour plusieurs items ouverts ou un seul
-const openItems = ref<number[]>([0])
+const openItems = ref<number[]>(props.expandFirstByDefault ? [0] : [])
 
 const toggleItem = (index: number) => {
   if (props.allowMultiple) {
@@ -155,10 +171,9 @@ const template = computed(() => {
 })
 
 // Détermine si le header doit être centré
-const headerAlignment = computed(() => {
-  const titleClass = template.value.styles.title || ''
-  return titleClass.includes('text-center') ? 'text-center mx-auto' : ''
-})
+const headerStyles = computed(() => ({
+  textAlign: (props.headerAlignment || 'center') as 'left' | 'center' | 'right',
+}))
 
 const textColor = computed(() => {
   const bg = props.backgroundColor || '#ffffff'
@@ -171,9 +186,27 @@ const textColor = computed(() => {
   return luminance > 0.5 ? '#1f2937' : '#ffffff'
 })
 
-const sectionStyles = computed(() => ({
-  backgroundColor: props.backgroundColor,
-}))
+const sectionStyles = computed(() => {
+  const paddingYMap: Record<string, string> = {
+    small: '2rem',
+    medium: '4rem',
+    large: '6rem',
+    xlarge: '8rem',
+  }
+  const py = paddingYMap[props.paddingY || 'large'] || '6rem'
+  const styles: Record<string, string> = {
+    paddingTop: py,
+    paddingBottom: py,
+  }
+  
+  if (props.backgroundType === 'gradient') {
+    styles.background = `linear-gradient(to bottom, ${props.gradientStart}, ${props.gradientEnd})`
+  } else if (props.backgroundType !== 'transparent') {
+    styles.backgroundColor = props.backgroundColor || '#ffffff'
+  }
+  
+  return styles
+})
 
 const cardStyles = computed(() => {
   const bg = props.backgroundColor || '#ffffff'

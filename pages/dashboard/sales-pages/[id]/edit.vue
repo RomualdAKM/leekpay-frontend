@@ -17,5 +17,5 @@ import SalesPageBuilder from '~/components/sales-page/SalesPageBuilder.vue'
 
 const route = useRoute()
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: 'editor' })
 </script>

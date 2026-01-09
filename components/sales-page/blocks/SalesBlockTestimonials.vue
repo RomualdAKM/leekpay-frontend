@@ -1,11 +1,12 @@
 <template>
   <section 
-    :class="template.styles.section"
+    :id="props.cssId || undefined"
+    :class="[template.styles.section, props.customClasses, animationClass]"
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" :class="template.styles.header">
+      <div v-if="props.title || props.subtitle" :class="template.styles.header" :style="headerStyles">
         <h2 
           v-if="props.title"
           :class="template.styles.title"
@@ -23,11 +24,11 @@
       </div>
       
       <!-- Grille -->
-      <div :class="template.styles.grid">
+      <div :class="gridClasses">
         <div 
           v-for="(item, index) in props.items"
           :key="index"
-          :class="template.styles.card"
+          :class="[template.styles.card, cardHoverClass]"
           :style="cardStyles"
         >
           <!-- Icône citation -->
@@ -132,9 +133,10 @@ interface Props {
   title?: string
   subtitle?: string
   items?: TestimonialItem[]
+  headerAlignment?: 'left' | 'center' | 'right'
   // Layout
   layout?: Layout
-  columns?: 2 | 3
+  columns?: 1 | 2 | 3
   // Affichage
   showQuoteIcon?: boolean
   showRating?: boolean
@@ -148,15 +150,26 @@ interface Props {
   quoteStyle?: 'normal' | 'italic'
   quoteFontSize?: 'small' | 'medium' | 'large'
   // Apparence
+  backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
+  gradientStart?: string
+  gradientEnd?: string
   accentColor?: string
   titleColor?: string
+  paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   // Carte
   cardBgColor?: string
   cardBorderColor?: string
   cardBorderWidth?: 'none' | 'thin' | 'medium' | 'thick'
   cardBorderRadius?: 'none' | 'small' | 'medium' | 'large'
   cardPadding?: 'none' | 'small' | 'medium' | 'large'
+  cardShadow?: 'none' | 'small' | 'medium' | 'large'
+  cardHoverEffect?: 'none' | 'lift' | 'scale' | 'glow'
+  // Animation
+  animation?: 'none' | 'fade' | 'slide-up' | 'scale'
+  // Avancé
+  cssId?: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -166,6 +179,7 @@ const props = withDefaults(defineProps<Props>(), {
   items: () => [
     { name: 'Client 1', role: 'Entrepreneur', text: 'Un service exceptionnel qui a transformé mon business.', avatar: null, rating: 5 },
   ],
+  headerAlignment: 'center',
   layout: 'grid',
   columns: 3,
   showQuoteIcon: false,
@@ -177,14 +191,23 @@ const props = withDefaults(defineProps<Props>(), {
   avatarSize: 'medium',
   quoteStyle: 'normal',
   quoteFontSize: 'medium',
+  backgroundType: 'solid',
   backgroundColor: '#ffffff',
+  gradientStart: '#f8fafc',
+  gradientEnd: '#ffffff',
   accentColor: '#10B981',
   titleColor: '',
+  paddingY: 'large',
   cardBgColor: '',
   cardBorderColor: '',
   cardBorderWidth: 'none',
   cardBorderRadius: 'none',
   cardPadding: 'medium',
+  cardShadow: 'none',
+  cardHoverEffect: 'none',
+  animation: 'none',
+  cssId: '',
+  customClasses: '',
 })
 
 // Template actif
@@ -227,9 +250,60 @@ const textColor = computed(() => {
 })
 
 // Styles section
-const sectionStyles = computed(() => ({
-  backgroundColor: props.backgroundColor,
+const paddingYMap: Record<string, string> = {
+  small: '2rem',
+  medium: '4rem',
+  large: '6rem',
+  xlarge: '8rem',
+}
+
+const sectionStyles = computed(() => {
+  const py = paddingYMap[props.paddingY || 'large'] || '6rem'
+  const styles: Record<string, string> = {
+    paddingTop: py,
+    paddingBottom: py,
+  }
+  
+  if (props.backgroundType === 'gradient') {
+    styles.background = `linear-gradient(to bottom, ${props.gradientStart}, ${props.gradientEnd})`
+  } else if (props.backgroundType !== 'transparent') {
+    styles.backgroundColor = props.backgroundColor || '#ffffff'
+  }
+  
+  return styles
+})
+
+// Styles header
+const headerStyles = computed(() => ({
+  textAlign: (props.headerAlignment || 'center') as 'left' | 'center' | 'right',
 }))
+
+// Classes grille
+const gridClasses = computed(() => {
+  const colsMap: Record<number, string[]> = {
+    1: ['space-y-8'],
+    2: ['grid', 'grid-cols-1', 'md:grid-cols-2', 'gap-8'],
+    3: ['grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'gap-8'],
+  }
+  return colsMap[props.columns || 3] || colsMap[3]
+})
+
+// Classe hover carte
+const cardHoverClass = computed(() => {
+  const effectMap: Record<string, string> = {
+    none: '',
+    lift: 'transition-all duration-300 hover:-translate-y-1 hover:shadow-lg',
+    scale: 'transition-transform duration-300 hover:scale-105',
+    glow: 'transition-shadow duration-300 hover:shadow-xl hover:shadow-emerald-500/20',
+  }
+  return effectMap[props.cardHoverEffect || 'none'] || ''
+})
+
+// Animation
+const animationClass = computed(() => {
+  if (props.animation === 'none') return ''
+  return `animate-${props.animation}`
+})
 
 // Styles titre
 const titleStyles = computed(() => ({

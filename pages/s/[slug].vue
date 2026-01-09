@@ -9,7 +9,7 @@
     </div>
     
     <!-- Erreur 404 -->
-    <div v-else-if="error" class="min-h-screen flex flex-col items-center justify-center px-4">
+    <div v-else-if="error && !subscriptionExpired" class="min-h-screen flex flex-col items-center justify-center px-4">
       <div class="text-6xl mb-4">😕</div>
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Page non trouvée</h1>
       <p class="text-gray-500 mb-6 text-center">Cette page de vente n'existe pas ou n'est pas publiée.</p>
@@ -19,6 +19,27 @@
       >
         Retour à l'accueil
       </NuxtLink>
+    </div>
+    
+    <!-- Abonnement expiré -->
+    <div v-else-if="subscriptionExpired" class="min-h-screen flex flex-col items-center justify-center px-4 bg-gradient-to-br from-amber-50 to-orange-50">
+      <div class="max-w-md text-center">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-amber-100 flex items-center justify-center">
+          <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Page temporairement indisponible</h1>
+        <p class="text-gray-600 mb-6">
+          L'abonnement du propriétaire de cette page a expiré. La page sera de nouveau accessible une fois l'abonnement renouvelé.
+        </p>
+        <NuxtLink 
+          to="/" 
+          class="inline-flex items-center px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+        >
+          <span>Retour à l'accueil</span>
+        </NuxtLink>
+      </div>
     </div>
     
     <!-- Contenu de la page -->
@@ -82,6 +103,7 @@ const slug = computed(() => route.params.slug as string)
 const pageData = ref<any>(null)
 const loading = ref(true)
 const error = ref(false)
+const subscriptionExpired = ref(false)
 
 const sortedBlocks = computed(() => {
   if (!pageData.value?.blocks) return []
@@ -206,6 +228,7 @@ watch(() => pageData.value, (newData) => {
 const fetchPageData = async () => {
   loading.value = true
   error.value = false
+  subscriptionExpired.value = false
   
   try {
     const response = await $fetch<{ success: boolean; data: any }>(
@@ -217,9 +240,16 @@ const fetchPageData = async () => {
     } else {
       error.value = true
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Erreur chargement page:', err)
-    error.value = true
+    
+    // Vérifier si c'est une erreur d'abonnement expiré
+    if (err.data?.subscription_expired) {
+      subscriptionExpired.value = true
+      pageData.value = err.data.data // Garder le titre pour le SEO
+    } else {
+      error.value = true
+    }
   } finally {
     loading.value = false
   }

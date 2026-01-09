@@ -1,118 +1,80 @@
 <template>
-  <div class="space-y-4">
-    <TemplatePicker
-      block-type="testimonials"
-      :model-value="localProps.templateId"
-      @select="localProps.templateId = $event; emitUpdate()"
-    />
+  <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+    <TemplatePicker block-type="testimonials" :model-value="localProps.templateId" @select="updateProp('templateId', $event)"/>
     
-    <!-- CONTENU -->
-    <div class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Contenu</h4>
-      
-      <div class="space-y-3">
+    <!-- ===== CONTENU ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.content = !sections.content" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Contenu</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.content ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.content" class="mt-3 space-y-3">
         <div>
           <label class="block text-xs text-gray-500 mb-1">Titre</label>
-          <input v-model="localProps.title" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input v-model="localProps.title" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
         </div>
-        
         <div>
           <label class="block text-xs text-gray-500 mb-1">Sous-titre</label>
-          <input v-model="localProps.subtitle" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <input v-model="localProps.subtitle" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
         </div>
-      </div>
-    </div>
-    
-    <!-- TÉMOIGNAGES -->
-    <div class="border-t border-gray-200 pt-4">
-      <div class="flex items-center justify-between mb-3">
-        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Témoignages</h4>
-        <button 
-          @click="addItem" 
-          class="text-xs text-emerald-600 hover:text-emerald-700 font-medium"
-        >
-          + Ajouter
-        </button>
-      </div>
-      
-      <div class="space-y-3">
-        <div 
-          v-for="(item, index) in localProps.items" 
-          :key="index"
-          class="border border-gray-200 rounded-lg p-3"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-gray-600">#{{ index + 1 }}</span>
-            <button 
-              v-if="localProps.items.length > 1"
-              @click="removeItem(index)" 
-              class="text-xs text-red-500 hover:text-red-600"
-            >
-              Supprimer
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Alignement en-tête</label>
+          <div class="grid grid-cols-3 gap-1">
+            <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('headerAlignment', a)" :class="['px-3 py-1.5 text-xs rounded border', localProps.headerAlignment === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+              {{ a === 'left' ? 'Gauche' : a === 'center' ? 'Centre' : 'Droite' }}
             </button>
           </div>
-          
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== TÉMOIGNAGES ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.items = !sections.items" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Témoignages ({{ localProps.items?.length || 0 }})</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.items ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.items" class="mt-3 space-y-3">
+        <div class="flex justify-end">
+          <button @click="addItem" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium">+ Ajouter</button>
+        </div>
+        <div v-for="(item, index) in localProps.items" :key="index" class="border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-600">#{{ index + 1 }}</span>
+            <button v-if="localProps.items.length > 1" @click="removeItem(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+          </div>
           <div class="space-y-2">
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Nom</label>
-              <input 
-                v-model="item.name" 
-                @input="emitUpdate" 
-                type="text" 
-                class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm" 
-              />
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Nom</label>
+                <input v-model="item.name" @input="emitUpdate" type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"/>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Note</label>
+                <select v-model.number="item.rating" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                  <option v-for="n in 5" :key="n" :value="n">{{ n }} étoiles</option>
+                </select>
+              </div>
             </div>
-            
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Rôle / Fonction</label>
-              <input 
-                v-model="item.role" 
-                @input="emitUpdate" 
-                type="text" 
-                placeholder="CEO, Entrepreneur..." 
-                class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm" 
-              />
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Rôle</label>
+                <input v-model="item.role" @input="emitUpdate" type="text" placeholder="CEO..." class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"/>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Entreprise</label>
+                <input v-model="item.company" @input="emitUpdate" type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"/>
+              </div>
             </div>
-            
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Entreprise</label>
-              <input 
-                v-model="item.company" 
-                @input="emitUpdate" 
-                type="text" 
-                class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm" 
-              />
-            </div>
-            
             <div>
               <label class="block text-xs text-gray-500 mb-1">Témoignage</label>
-              <textarea 
-                v-model="item.text" 
-                @input="emitUpdate" 
-                rows="3"
-                class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none" 
-              ></textarea>
+              <textarea v-model="item.text" @input="emitUpdate" rows="2" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none"></textarea>
             </div>
-            
             <div>
-              <label class="block text-xs text-gray-500 mb-1">Note (1-5 étoiles)</label>
-              <select v-model.number="item.rating" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
-                <option :value="5">5 étoiles</option>
-                <option :value="4">4 étoiles</option>
-                <option :value="3">3 étoiles</option>
-                <option :value="2">2 étoiles</option>
-                <option :value="1">1 étoile</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">URL Avatar (optionnel)</label>
-              <input 
-                v-model="item.avatar" 
-                @input="emitUpdate" 
-                type="url" 
-                placeholder="https://..." 
-                class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm" 
+              <UiImageUploader
+                v-model="item.avatar"
+                label="Avatar"
+                @update:model-value="emitUpdate"
               />
             </div>
           </div>
@@ -120,209 +82,346 @@
       </div>
     </div>
     
-    <!-- AFFICHAGE -->
-    <div class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Affichage</h4>
-      
-      <div class="space-y-3">
-        <div class="flex items-center space-x-2">
-          <input v-model="localProps.showQuoteIcon" @change="emitUpdate" type="checkbox" class="rounded" />
-          <label class="text-xs text-gray-500">Icône de citation</label>
+    <!-- ===== AFFICHAGE ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.display = !sections.display" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Affichage</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.display ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.display" class="mt-3 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showQuoteIcon" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600">Icône citation</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showRating" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600">Étoiles</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showAvatar" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600">Avatar</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showRole" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600">Rôle</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showCompany" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600">Entreprise</span>
+          </label>
         </div>
-        
-        <div class="flex items-center space-x-2">
-          <input v-model="localProps.showRating" @change="emitUpdate" type="checkbox" class="rounded" />
-          <label class="text-xs text-gray-500">Étoiles de notation</label>
-        </div>
-        
-        <div class="flex items-center space-x-2">
-          <input v-model="localProps.showAvatar" @change="emitUpdate" type="checkbox" class="rounded" />
-          <label class="text-xs text-gray-500">Avatar</label>
-        </div>
-        
-        <div class="flex items-center space-x-2">
-          <input v-model="localProps.showRole" @change="emitUpdate" type="checkbox" class="rounded" />
-          <label class="text-xs text-gray-500">Rôle/Fonction</label>
-        </div>
-        
-        <div class="flex items-center space-x-2">
-          <input v-model="localProps.showCompany" @change="emitUpdate" type="checkbox" class="rounded" />
-          <label class="text-xs text-gray-500">Entreprise</label>
-        </div>
-      </div>
-    </div>
-    
-    <!-- AVATAR -->
-    <div v-if="localProps.showAvatar" class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Avatar</h4>
-      
-      <div class="space-y-3">
         <div>
-          <label class="block text-xs text-gray-500 mb-1">Forme</label>
-          <select v-model="localProps.avatarShape" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="circle">Cercle</option>
-            <option value="square">Carré</option>
-            <option value="rounded">Arrondi</option>
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Taille</label>
-          <select v-model="localProps.avatarSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="small">Petit</option>
-            <option value="medium">Moyen</option>
-            <option value="large">Grand</option>
+          <label class="block text-xs text-gray-500 mb-1">Colonnes</label>
+          <select v-model.number="localProps.columns" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <option :value="1">1 colonne</option>
+            <option :value="2">2 colonnes</option>
+            <option :value="3">3 colonnes</option>
           </select>
         </div>
       </div>
     </div>
     
-    <!-- CITATION -->
-    <div class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Citation</h4>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Style</label>
-          <select v-model="localProps.quoteStyle" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="normal">Normal</option>
-            <option value="italic">Italique</option>
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Taille texte</label>
-          <select v-model="localProps.quoteFontSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="small">Petit</option>
-            <option value="medium">Moyen</option>
-            <option value="large">Grand</option>
-          </select>
+    <!-- ===== AVATAR ===== -->
+    <div v-if="localProps.showAvatar" class="border-b border-gray-200 pb-4">
+      <button @click="sections.avatar = !sections.avatar" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Avatar</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.avatar ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.avatar" class="mt-3 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Forme</label>
+            <select v-model="localProps.avatarShape" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="circle">Cercle</option>
+              <option value="square">Carré</option>
+              <option value="rounded">Arrondi</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Taille</label>
+            <select v-model="localProps.avatarSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- CARTE -->
-    <div class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Carte</h4>
-      
-      <div class="space-y-3">
+    <!-- ===== CITATION ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.quote = !sections.quote" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Citation</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.quote ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.quote" class="mt-3 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Style</label>
+            <select v-model="localProps.quoteStyle" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="normal">Normal</option>
+              <option value="italic">Italique</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Taille</label>
+            <select v-model="localProps.quoteFontSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== CARTE ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.card = !sections.card" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Carte</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.card ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.card" class="mt-3 space-y-3">
         <div>
           <label class="block text-xs text-gray-500 mb-1">Fond carte</label>
-          <div class="flex items-center space-x-2">
-            <input v-model="localProps.cardBgColor" @input="emitUpdate" type="color" class="w-10 h-10 rounded-lg cursor-pointer border-0" />
-            <input v-model="localProps.cardBgColor" @input="emitUpdate" type="text" placeholder="Transparent" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.cardBgColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.cardBgColor" @input="emitUpdate" type="text" placeholder="Transparent" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
           </div>
         </div>
-        
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Bordure</label>
-          <select v-model="localProps.cardBorderWidth" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="none">Aucune</option>
-            <option value="thin">Fine</option>
-            <option value="medium">Moyenne</option>
-            <option value="thick">Épaisse</option>
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Bordure</label>
+            <select v-model="localProps.cardBorderWidth" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="none">Aucune</option>
+              <option value="thin">Fine</option>
+              <option value="medium">Moyenne</option>
+              <option value="thick">Épaisse</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Coins</label>
+            <select v-model="localProps.cardBorderRadius" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="none">Aucun</option>
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+            </select>
+          </div>
         </div>
-        
         <div v-if="localProps.cardBorderWidth !== 'none'">
           <label class="block text-xs text-gray-500 mb-1">Couleur bordure</label>
-          <div class="flex items-center space-x-2">
-            <input v-model="localProps.cardBorderColor" @input="emitUpdate" type="color" class="w-10 h-10 rounded-lg cursor-pointer border-0" />
-            <input v-model="localProps.cardBorderColor" @input="emitUpdate" type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.cardBorderColor" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.cardBorderColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
           </div>
         </div>
-        
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Coins arrondis</label>
-          <select v-model="localProps.cardBorderRadius" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option value="none">Aucun</option>
-            <option value="small">Petit</option>
-            <option value="medium">Moyen</option>
-            <option value="large">Grand</option>
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Padding</label>
+            <select v-model="localProps.cardPadding" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="none">Aucun</option>
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Ombre</label>
+            <select v-model="localProps.cardShadow" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="none">Aucune</option>
+              <option value="small">Légère</option>
+              <option value="medium">Moyenne</option>
+              <option value="large">Forte</option>
+            </select>
+          </div>
         </div>
-        
         <div>
-          <label class="block text-xs text-gray-500 mb-1">Padding</label>
-          <select v-model="localProps.cardPadding" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+          <label class="block text-xs text-gray-500 mb-1">Effet hover</label>
+          <select v-model="localProps.cardHoverEffect" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
             <option value="none">Aucun</option>
-            <option value="small">Petit</option>
-            <option value="medium">Moyen</option>
-            <option value="large">Grand</option>
+            <option value="lift">Soulever</option>
+            <option value="scale">Agrandir</option>
+            <option value="glow">Lueur</option>
           </select>
         </div>
       </div>
     </div>
     
-    <!-- APPARENCE -->
-    <div class="border-t border-gray-200 pt-4">
-      <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3">Apparence</h4>
-      
-      <div class="space-y-3">
+    <!-- ===== APPARENCE ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.appearance = !sections.appearance" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Apparence</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.appearance ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.appearance" class="mt-3 space-y-3">
         <div>
-          <label class="block text-xs text-gray-500 mb-1">Couleur de fond</label>
-          <div class="flex items-center space-x-2">
-            <input v-model="localProps.backgroundColor" @input="emitUpdate" type="color" class="w-10 h-10 rounded-lg cursor-pointer border-0" />
-            <input v-model="localProps.backgroundColor" @input="emitUpdate" type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <label class="block text-xs text-gray-500 mb-1">Type de fond</label>
+          <select v-model="localProps.backgroundType" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <option value="solid">Couleur unie</option>
+            <option value="gradient">Dégradé</option>
+            <option value="transparent">Transparent</option>
+          </select>
+        </div>
+        <div v-if="localProps.backgroundType === 'solid'">
+          <label class="block text-xs text-gray-500 mb-1">Couleur fond</label>
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.backgroundColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.backgroundColor" @input="emitUpdate" type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
         </div>
-        
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Couleur d'accent</label>
-          <div class="flex items-center space-x-2">
-            <input v-model="localProps.accentColor" @input="emitUpdate" type="color" class="w-10 h-10 rounded-lg cursor-pointer border-0" />
-            <input v-model="localProps.accentColor" @input="emitUpdate" type="text" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+        <div v-if="localProps.backgroundType === 'gradient'" class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Début</label>
+            <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Fin</label>
+            <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
           </div>
         </div>
-        
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Couleur accent (étoiles)</label>
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.accentColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.accentColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+          </div>
+        </div>
         <div>
           <label class="block text-xs text-gray-500 mb-1">Couleur titre</label>
-          <div class="flex items-center space-x-2">
-            <input v-model="localProps.titleColor" @input="emitUpdate" type="color" class="w-10 h-10 rounded-lg cursor-pointer border-0" />
-            <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" />
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.titleColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
           </div>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Espacement vertical</label>
+          <select v-model="localProps.paddingY" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <option value="small">Petit</option>
+            <option value="medium">Moyen</option>
+            <option value="large">Grand</option>
+            <option value="xlarge">Très grand</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== ANIMATION ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.animation = !sections.animation" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Animation</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.animation ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.animation" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Animation</label>
+          <select v-model="localProps.animation" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <option value="none">Aucune</option>
+            <option value="fade">Fondu</option>
+            <option value="slide-up">Glisser haut</option>
+            <option value="scale">Zoom</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== AVANCÉ ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Avancé</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.advanced ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.advanced" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">ID CSS (ancre)</label>
+          <input v-model="localProps.cssId" @input="emitUpdate" type="text" placeholder="testimonials" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Classes CSS</label>
+          <input v-model="localProps.customClasses" @input="emitUpdate" type="text" placeholder="my-class" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
+import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
 
-// Initialiser items si non défini
+const sections = reactive({
+  content: true,
+  items: false,
+  display: false,
+  avatar: false,
+  quote: false,
+  card: false,
+  appearance: false,
+  animation: false,
+  advanced: false,
+})
+
 const defaultItems = [
   { name: 'Client 1', role: 'Entrepreneur', company: '', text: 'Un service exceptionnel qui a transformé mon business.', avatar: null, rating: 5 },
 ]
 
-const localProps = reactive({ 
-  ...props.props,
-  items: props.props.items || defaultItems
+const localProps = reactive({
+  templateId: props.props.templateId || 'testimonials-minimal-centered',
+  title: props.props.title || "Ce qu'ils en disent",
+  subtitle: props.props.subtitle || '',
+  headerAlignment: props.props.headerAlignment || 'center',
+  items: props.props.items || defaultItems,
+  columns: props.props.columns || 3,
+  showQuoteIcon: props.props.showQuoteIcon !== false ? false : props.props.showQuoteIcon,
+  showRating: props.props.showRating !== false,
+  showAvatar: props.props.showAvatar !== false,
+  showRole: props.props.showRole !== false,
+  showCompany: props.props.showCompany || false,
+  avatarShape: props.props.avatarShape || 'circle',
+  avatarSize: props.props.avatarSize || 'medium',
+  quoteStyle: props.props.quoteStyle || 'normal',
+  quoteFontSize: props.props.quoteFontSize || 'medium',
+  cardBgColor: props.props.cardBgColor || '',
+  cardBorderWidth: props.props.cardBorderWidth || 'none',
+  cardBorderColor: props.props.cardBorderColor || '',
+  cardBorderRadius: props.props.cardBorderRadius || 'none',
+  cardPadding: props.props.cardPadding || 'medium',
+  cardShadow: props.props.cardShadow || 'none',
+  cardHoverEffect: props.props.cardHoverEffect || 'none',
+  backgroundType: props.props.backgroundType || 'solid',
+  backgroundColor: props.props.backgroundColor || '#ffffff',
+  gradientStart: props.props.gradientStart || '#f8fafc',
+  gradientEnd: props.props.gradientEnd || '#ffffff',
+  accentColor: props.props.accentColor || '#10B981',
+  titleColor: props.props.titleColor || '',
+  paddingY: props.props.paddingY || 'large',
+  animation: props.props.animation || 'none',
+  cssId: props.props.cssId || '',
+  customClasses: props.props.customClasses || '',
 })
 
-watch(() => props.props, (newVal) => { 
-  Object.assign(localProps, { 
-    ...newVal,
-    items: newVal.items || defaultItems
-  }) 
+watch(() => props.props, (newVal) => {
+  Object.keys(newVal).forEach(key => {
+    if (key in localProps) (localProps as any)[key] = newVal[key]
+  })
+  if (!localProps.items?.length) localProps.items = defaultItems
 }, { deep: true })
 
-const emitUpdate = () => { emit('update', { ...localProps }) }
+const emitUpdate = () => emit('update', { ...localProps })
+const updateProp = (key: string, value: any) => {
+  (localProps as any)[key] = value
+  emitUpdate()
+}
 
-// Gestion des items
 function addItem() {
   if (!localProps.items) localProps.items = []
-  localProps.items.push({ 
-    name: 'Nouveau client', 
-    role: '', 
-    company: '',
-    text: 'Votre témoignage ici...', 
-    avatar: null,
-    rating: 5 
-  })
+  localProps.items.push({ name: 'Nouveau client', role: '', company: '', text: 'Votre témoignage ici...', avatar: null, rating: 5 })
   emitUpdate()
 }
 

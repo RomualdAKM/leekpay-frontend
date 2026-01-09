@@ -2,8 +2,9 @@
   <!-- LAYOUT: SLIDER -->
   <section 
     v-if="layout === 'slider'"
-    :class="template.styles.section"
-    :style="sectionStyles"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
     <!-- Slides -->
     <div class="relative w-full h-full">
@@ -24,7 +25,7 @@
       </div>
       
       <!-- Content -->
-      <div :class="template.styles.container" class="min-h-screen">
+      <div :class="[template.styles.container, contentAlignmentClass]" class="min-h-screen">
         <div :class="template.styles.content">
           <span 
             v-if="props.badge && template.config?.showBadge !== false"
@@ -34,12 +35,13 @@
           
           <h1 
             :class="template.styles.title"
-            :style="titleStyles"
+            :style="titleStylesFullscreen"
           >{{ currentSlideData?.title || props.title }}</h1>
           
           <p 
             v-if="currentSlideData?.subtitle || props.subtitle"
             :class="template.styles.subtitle"
+            :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
           >{{ currentSlideData?.subtitle || props.subtitle }}</p>
           
           <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -48,17 +50,26 @@
               v-if="props.ctaText"
               :href="props.ctaUrl || undefined"
               :target="props.ctaUrl ? props.ctaTarget : undefined"
-              :class="template.styles.button"
+              :class="[template.styles.button, buttonHoverClass]"
               :style="buttonStyles"
               @click="!props.ctaUrl && $emit('cta-click')"
-            >{{ props.ctaText }}</component>
+            >
+              <span class="flex items-center gap-2">
+                {{ props.ctaText }}
+                <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              </span>
+            </component>
             
             <component
               :is="props.secondaryButtonUrl ? 'a' : 'button'"
               v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
               :href="props.secondaryButtonUrl || undefined"
               :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-              :class="template.styles.buttonSecondary"
+              :class="[template.styles.buttonSecondary, buttonHoverClass]"
               :style="secondaryButtonStyles"
             >{{ props.secondaryButtonText }}</component>
           </div>
@@ -100,12 +111,13 @@
   <!-- LAYOUT: SPLIT (Image + Texte côte à côte) -->
   <section 
     v-else-if="layout === 'split-right' || layout === 'split-left'"
-    :class="template.styles.section"
-    :style="sectionStyles"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
     <div :class="template.styles.container">
       <!-- Content -->
-      <div :class="template.styles.content">
+      <div :class="[template.styles.content, contentAlignmentClass]">
         <span 
           v-if="props.badge && template.config?.showBadge !== false"
           :class="template.styles.badge"
@@ -120,7 +132,7 @@
         <p 
           v-if="props.subtitle"
           :class="template.styles.subtitle"
-          :style="{ color: textColor }"
+          :style="subtitleStyles"
         >{{ props.subtitle }}</p>
         
         <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -129,17 +141,26 @@
             v-if="props.ctaText"
             :href="props.ctaUrl || undefined"
             :target="props.ctaUrl ? props.ctaTarget : undefined"
-            :class="template.styles.button"
+            :class="[template.styles.button, buttonHoverClass]"
             :style="buttonStyles"
             @click="!props.ctaUrl && $emit('cta-click')"
-          >{{ props.ctaText }}</component>
+          >
+            <span class="flex items-center gap-2">
+              {{ props.ctaText }}
+              <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </span>
+          </component>
           
           <component
             :is="props.secondaryButtonUrl ? 'a' : 'button'"
             v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
             :href="props.secondaryButtonUrl || undefined"
             :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-            :class="template.styles.buttonSecondary"
+            :class="[template.styles.buttonSecondary, buttonHoverClass]"
             :style="secondaryButtonStyles"
           >{{ props.secondaryButtonText }}</component>
         </div>
@@ -163,7 +184,9 @@
   <!-- LAYOUT: FULLSCREEN (Image plein écran avec overlay) -->
   <section 
     v-else-if="layout === 'fullscreen'"
-    :class="template.styles.section"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="animationStyles"
   >
     <!-- Background Image -->
     <div :class="template.styles.imageWrapper">
@@ -180,7 +203,7 @@
     <div :class="template.styles.overlay" :style="overlayStyles"></div>
     
     <!-- Content -->
-    <div :class="template.styles.container">
+    <div :class="[template.styles.container, contentAlignmentClass]">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -195,6 +218,7 @@
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
+        :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
       >{{ props.subtitle }}</p>
       
       <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -203,17 +227,26 @@
           v-if="props.ctaText"
           :href="props.ctaUrl || undefined"
           :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="template.styles.button"
+          :class="[template.styles.button, buttonHoverClass]"
           :style="buttonStyles"
           @click="!props.ctaUrl && $emit('cta-click')"
-        >{{ props.ctaText }}</component>
+        >
+          <span class="flex items-center gap-2">
+            {{ props.ctaText }}
+            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </span>
+        </component>
         
         <component
           :is="props.secondaryButtonUrl ? 'a' : 'button'"
           v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
           :href="props.secondaryButtonUrl || undefined"
           :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="template.styles.buttonSecondary"
+          :class="[template.styles.buttonSecondary, buttonHoverClass]"
           :style="secondaryButtonStyles"
         >{{ props.secondaryButtonText }}</component>
       </div>
@@ -223,7 +256,9 @@
   <!-- LAYOUT: VIDEO BACKGROUND -->
   <section 
     v-else-if="layout === 'video'"
-    :class="template.styles.section"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="animationStyles"
   >
     <!-- Background Video -->
     <div :class="template.styles.videoWrapper">
@@ -242,7 +277,7 @@
     <div :class="template.styles.overlay" :style="overlayStyles"></div>
     
     <!-- Content -->
-    <div :class="template.styles.container">
+    <div :class="[template.styles.container, contentAlignmentClass]">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -257,6 +292,7 @@
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
+        :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
       >{{ props.subtitle }}</p>
       
       <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -265,17 +301,26 @@
           v-if="props.ctaText"
           :href="props.ctaUrl || undefined"
           :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="template.styles.button"
+          :class="[template.styles.button, buttonHoverClass]"
           :style="buttonStyles"
           @click="!props.ctaUrl && $emit('cta-click')"
-        >{{ props.ctaText }}</component>
+        >
+          <span class="flex items-center gap-2">
+            {{ props.ctaText }}
+            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </span>
+        </component>
         
         <component
           :is="props.secondaryButtonUrl ? 'a' : 'button'"
           v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
           :href="props.secondaryButtonUrl || undefined"
           :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="template.styles.buttonSecondary"
+          :class="[template.styles.buttonSecondary, buttonHoverClass]"
           :style="secondaryButtonStyles"
         >{{ props.secondaryButtonText }}</component>
       </div>
@@ -285,8 +330,9 @@
   <!-- LAYOUT: STACKED (Image au-dessus du texte) -->
   <section 
     v-else-if="layout === 'stacked'"
-    :class="template.styles.section"
-    :style="sectionStyles"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
     <!-- Image -->
     <div 
@@ -302,7 +348,7 @@
     </div>
     
     <!-- Content -->
-    <div :class="template.styles.content">
+    <div :class="[template.styles.content, contentAlignmentClass]">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -317,7 +363,7 @@
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
-        :style="{ color: textColor }"
+        :style="subtitleStyles"
       >{{ props.subtitle }}</p>
       
       <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -326,17 +372,26 @@
           v-if="props.ctaText"
           :href="props.ctaUrl || undefined"
           :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="template.styles.button"
+          :class="[template.styles.button, buttonHoverClass]"
           :style="buttonStyles"
           @click="!props.ctaUrl && $emit('cta-click')"
-        >{{ props.ctaText }}</component>
+        >
+          <span class="flex items-center gap-2">
+            {{ props.ctaText }}
+            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </span>
+        </component>
         
         <component
           :is="props.secondaryButtonUrl ? 'a' : 'button'"
           v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
           :href="props.secondaryButtonUrl || undefined"
           :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="template.styles.buttonSecondary"
+          :class="[template.styles.buttonSecondary, buttonHoverClass]"
           :style="secondaryButtonStyles"
         >{{ props.secondaryButtonText }}</component>
       </div>
@@ -346,10 +401,11 @@
   <!-- LAYOUT: CENTERED (Défaut - Texte centré) -->
   <section 
     v-else
-    :class="template.styles.section"
-    :style="sectionStyles"
+    :id="sectionId"
+    :class="[template.styles.section, sectionClasses, animationClass]"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
-    <div :class="template.styles.container">
+    <div :class="[template.styles.container, contentAlignmentClass]" :style="containerDynamicStyles">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -364,7 +420,7 @@
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
-        :style="{ color: textColor }"
+        :style="subtitleStyles"
       >{{ props.subtitle }}</p>
       
       <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
@@ -373,17 +429,26 @@
           v-if="props.ctaText"
           :href="props.ctaUrl || undefined"
           :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="template.styles.button"
+          :class="[template.styles.button, buttonHoverClass]"
           :style="buttonStyles"
           @click="!props.ctaUrl && $emit('cta-click')"
-        >{{ props.ctaText }}</component>
+        >
+          <span class="flex items-center gap-2">
+            {{ props.ctaText }}
+            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </span>
+        </component>
         
         <component
           :is="props.secondaryButtonUrl ? 'a' : 'button'"
           v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
           :href="props.secondaryButtonUrl || undefined"
           :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="template.styles.buttonSecondary"
+          :class="[template.styles.buttonSecondary, buttonHoverClass]"
           :style="secondaryButtonStyles"
         >{{ props.secondaryButtonText }}</component>
       </div>
@@ -407,54 +472,84 @@ interface Props {
   title?: string
   subtitle?: string
   badge?: string
+  // Contenu
+  contentAlignment?: 'left' | 'center' | 'right'
+  contentMaxWidth?: 'small' | 'medium' | 'large' | 'xlarge' | 'full'
   // Media
   mediaUrl?: string | null
   videoUrl?: string | null
+  imageRadius?: 'none' | 'small' | 'medium' | 'large' | 'full'
   // Background
+  backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
+  gradientStart?: string
+  gradientEnd?: string
+  gradientDirection?: 'to-r' | 'to-l' | 'to-b' | 'to-t' | 'to-br' | 'to-bl'
+  // Section
+  sectionHeight?: 'auto' | 'small' | 'medium' | 'large' | 'fullscreen' | 'custom'
+  sectionHeightCustom?: number
   // Bouton principal
   ctaText?: string
   ctaUrl?: string
   ctaTarget?: '_self' | '_blank'
   ctaColor?: string
+  ctaTextColor?: string
+  ctaIcon?: string
+  buttonHoverEffect?: 'none' | 'darken' | 'lighten' | 'scale' | 'lift'
   // Bouton secondaire
   secondaryButtonText?: string
   secondaryButtonUrl?: string
   secondaryButtonTarget?: '_self' | '_blank'
   secondaryButtonColor?: string
+  secondaryButtonStyle?: 'outline' | 'filled' | 'ghost' | 'link'
   // Style des boutons
   buttonRadius?: 'none' | 'small' | 'medium' | 'large' | 'full'
   buttonShadow?: 'none' | 'small' | 'medium' | 'large'
-  secondaryButtonStyle?: 'outline' | 'filled' | 'ghost'
-  buttonSize?: 'small' | 'medium' | 'large'
+  buttonSize?: 'small' | 'medium' | 'large' | 'xlarge'
   buttonWidth?: 'auto' | 'full'
   buttonBorderWidth?: 'thin' | 'medium' | 'thick'
   buttonAlignment?: 'left' | 'center' | 'right'
   // Overlay
   overlayOpacity?: number
   overlayColor?: string
-  // Typography
+  // Typography titre
   fontFamily?: string
-  titleSize?: 'small' | 'medium' | 'large' | 'xlarge' | 'custom'
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'custom'
   titleSizeCustom?: number
   titleWeight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'black'
-  titleLetterSpacing?: 'tight' | 'normal' | 'wide' | 'wider'
+  titleColor?: string
+  titleLetterSpacing?: 'tighter' | 'tight' | 'normal' | 'wide' | 'wider'
   titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleLineHeight?: 'tight' | 'normal' | 'relaxed' | 'loose'
+  // Typography sous-titre
+  subtitleFontFamily?: string
+  subtitleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  subtitleOpacity?: number
+  subtitleColor?: string
   // Espacements
-  paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
-  contentGap?: 'small' | 'medium' | 'large'
+  paddingY?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
+  paddingX?: 'none' | 'small' | 'medium' | 'large'
+  contentGap?: 'small' | 'medium' | 'large' | 'xlarge'
+  verticalAlignment?: 'start' | 'center' | 'end'
   // Badge
   badgeColor?: string
   badgeStyle?: 'pill' | 'rounded' | 'square'
+  badgeSize?: 'small' | 'medium' | 'large'
   // Animation
-  animation?: 'none' | 'fade' | 'slide-up' | 'slide-down' | 'zoom'
+  animation?: 'none' | 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right' | 'zoom' | 'bounce'
+  animationDuration?: number
+  animationDelay?: number
+  animateOnScroll?: boolean
   // Image
   imagePosition?: 'top' | 'center' | 'bottom'
-  imageFilter?: 'none' | 'grayscale' | 'blur' | 'sepia'
+  imageFilter?: 'none' | 'grayscale' | 'blur' | 'sepia' | 'brightness' | 'contrast'
   // Slider
   slides?: SlideItem[]
   autoplay?: boolean
   autoplayInterval?: number
+  // Avancé
+  cssId?: string
+  customClasses?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -462,20 +557,32 @@ const props = withDefaults(defineProps<Props>(), {
   title: 'Titre principal',
   subtitle: 'Sous-titre de votre offre',
   badge: '',
+  contentAlignment: 'center',
+  contentMaxWidth: 'large',
   mediaUrl: null,
   videoUrl: null,
+  imageRadius: 'none',
+  backgroundType: 'solid',
   backgroundColor: '#ffffff',
+  gradientStart: '#667eea',
+  gradientEnd: '#764ba2',
+  gradientDirection: 'to-r',
+  sectionHeight: 'auto',
+  sectionHeightCustom: 600,
   ctaText: 'Acheter maintenant',
   ctaUrl: '',
   ctaTarget: '_self',
   ctaColor: '#1f2937',
+  ctaTextColor: '',
+  ctaIcon: '',
+  buttonHoverEffect: 'none',
   secondaryButtonText: '',
   secondaryButtonUrl: '',
   secondaryButtonTarget: '_self',
   secondaryButtonColor: '',
+  secondaryButtonStyle: 'outline',
   buttonRadius: 'none',
   buttonShadow: 'none',
-  secondaryButtonStyle: 'outline',
   buttonSize: 'medium',
   buttonWidth: 'auto',
   buttonBorderWidth: 'medium',
@@ -486,18 +593,32 @@ const props = withDefaults(defineProps<Props>(), {
   titleSize: 'medium',
   titleSizeCustom: 48,
   titleWeight: 'bold',
+  titleColor: '',
   titleLetterSpacing: 'normal',
   titleTransform: 'none',
+  titleLineHeight: 'normal',
+  subtitleFontFamily: '',
+  subtitleSize: 'medium',
+  subtitleOpacity: 70,
+  subtitleColor: '',
   paddingY: 'large',
+  paddingX: 'medium',
   contentGap: 'medium',
+  verticalAlignment: 'center',
   badgeColor: '',
   badgeStyle: 'pill',
+  badgeSize: 'medium',
   animation: 'none',
+  animationDuration: 500,
+  animationDelay: 0,
+  animateOnScroll: false,
   imagePosition: 'center',
   imageFilter: 'none',
   slides: () => [],
   autoplay: true,
   autoplayInterval: 5000,
+  cssId: '',
+  customClasses: '',
 })
 
 defineEmits(['cta-click'])
@@ -566,8 +687,42 @@ const layout = computed<HeroLayout>(() => {
 const sectionStyles = computed(() => {
   const styles: Record<string, string> = {}
   
+  // Background
   if (layout.value !== 'fullscreen' && layout.value !== 'video') {
-    styles.backgroundColor = props.backgroundColor
+    if (props.backgroundType === 'gradient') {
+      const dirMap: Record<string, string> = {
+        'to-r': 'to right',
+        'to-l': 'to left',
+        'to-b': 'to bottom',
+        'to-t': 'to top',
+        'to-br': 'to bottom right',
+        'to-bl': 'to bottom left',
+      }
+      const dir = dirMap[props.gradientDirection || 'to-r'] || 'to right'
+      styles.background = `linear-gradient(${dir}, ${props.gradientStart}, ${props.gradientEnd})`
+    } else if (props.backgroundType !== 'transparent') {
+      styles.backgroundColor = props.backgroundColor
+    }
+  }
+  
+  // Hauteur section
+  if (props.sectionHeight === 'custom' && props.sectionHeightCustom) {
+    styles.minHeight = `${props.sectionHeightCustom}px`
+  } else if (props.sectionHeight && props.sectionHeight !== 'auto') {
+    styles.minHeight = sectionHeightMap[props.sectionHeight] || 'auto'
+  }
+  
+  // Padding
+  const py = paddingYMap[props.paddingY || 'large'] || '8rem'
+  const px = paddingXMap[props.paddingX || 'medium'] || '1.5rem'
+  styles.paddingTop = py
+  styles.paddingBottom = py
+  styles.paddingLeft = px
+  styles.paddingRight = px
+  
+  // ID CSS
+  if (props.cssId) {
+    styles.scrollMarginTop = '80px'
   }
   
   return styles
@@ -596,6 +751,7 @@ const titleSizeMap: Record<string, string> = {
   'medium': '2.5rem',
   'large': '3.5rem',
   'xlarge': '4.5rem',
+  'xxlarge': '5.5rem',
   'custom': 'custom'
 }
 
@@ -609,29 +765,76 @@ const titleWeightMap: Record<string, string> = {
 }
 
 const letterSpacingMap: Record<string, string> = {
+  'tighter': '-0.05em',
   'tight': '-0.025em',
   'normal': '0',
   'wide': '0.025em',
   'wider': '0.05em'
 }
 
+const lineHeightMap: Record<string, string> = {
+  'tight': '1.1',
+  'normal': '1.3',
+  'relaxed': '1.5',
+  'loose': '1.75'
+}
+
 const paddingYMap: Record<string, string> = {
+  'none': '0',
   'small': '3rem',
   'medium': '5rem',
   'large': '8rem',
   'xlarge': '12rem'
 }
 
+const paddingXMap: Record<string, string> = {
+  'none': '0',
+  'small': '1rem',
+  'medium': '1.5rem',
+  'large': '2rem'
+}
+
 const contentGapMap: Record<string, string> = {
   'small': '1rem',
   'medium': '1.5rem',
-  'large': '2.5rem'
+  'large': '2.5rem',
+  'xlarge': '4rem'
+}
+
+const contentMaxWidthMap: Record<string, string> = {
+  'small': '640px',
+  'medium': '768px',
+  'large': '1024px',
+  'xlarge': '1280px',
+  'full': '100%'
+}
+
+const sectionHeightMap: Record<string, string> = {
+  'auto': 'auto',
+  'small': '400px',
+  'medium': '600px',
+  'large': '800px',
+  'fullscreen': '100vh'
+}
+
+const subtitleSizeMap: Record<string, string> = {
+  'small': '0.875rem',
+  'medium': '1.125rem',
+  'large': '1.375rem',
+  'xlarge': '1.5rem'
+}
+
+const badgeSizeMap: Record<string, { px: string, py: string, fontSize: string }> = {
+  'small': { px: '0.5rem', py: '0.25rem', fontSize: '0.625rem' },
+  'medium': { px: '0.75rem', py: '0.35rem', fontSize: '0.75rem' },
+  'large': { px: '1rem', py: '0.5rem', fontSize: '0.875rem' }
 }
 
 const buttonSizeMap: Record<string, { px: string, py: string, fontSize: string }> = {
   'small': { px: '1rem', py: '0.5rem', fontSize: '0.75rem' },
   'medium': { px: '1.5rem', py: '0.875rem', fontSize: '0.875rem' },
-  'large': { px: '2rem', py: '1.125rem', fontSize: '1rem' }
+  'large': { px: '2rem', py: '1.125rem', fontSize: '1rem' },
+  'xlarge': { px: '2.5rem', py: '1.375rem', fontSize: '1.125rem' }
 }
 
 const borderWidthMap: Record<string, string> = {
@@ -656,14 +859,18 @@ const imageFilterMap: Record<string, string> = {
   'none': 'none',
   'grayscale': 'grayscale(100%)',
   'blur': 'blur(2px)',
-  'sepia': 'sepia(100%)'
+  'sepia': 'sepia(100%)',
+  'brightness': 'brightness(1.1)',
+  'contrast': 'contrast(1.2)'
 }
 
 const titleStyles = computed(() => {
-  const styles: Record<string, string> = {
-    color: textColor.value
-  }
+  const styles: Record<string, string> = {}
   
+  // Couleur
+  styles.color = props.titleColor || textColor.value
+  
+  // Police
   if (props.fontFamily) {
     styles.fontFamily = props.fontFamily
   }
@@ -681,10 +888,39 @@ const titleStyles = computed(() => {
   // Espacement des lettres
   styles.letterSpacing = letterSpacingMap[props.titleLetterSpacing || 'normal'] || '0'
   
+  // Interligne
+  styles.lineHeight = lineHeightMap[props.titleLineHeight || 'normal'] || '1.3'
+  
   // Transformation
   if (props.titleTransform && props.titleTransform !== 'none') {
     styles.textTransform = props.titleTransform
   }
+  
+  return styles
+})
+
+const subtitleStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  
+  // Couleur
+  if (props.subtitleColor) {
+    styles.color = props.subtitleColor
+  } else {
+    styles.color = textColor.value
+  }
+  
+  // Opacité
+  styles.opacity = String((props.subtitleOpacity ?? 70) / 100)
+  
+  // Police
+  if (props.subtitleFontFamily) {
+    styles.fontFamily = props.subtitleFontFamily
+  } else if (props.fontFamily) {
+    styles.fontFamily = props.fontFamily
+  }
+  
+  // Taille
+  styles.fontSize = subtitleSizeMap[props.subtitleSize || 'medium'] || '1.125rem'
   
   return styles
 })
@@ -692,6 +928,9 @@ const titleStyles = computed(() => {
 const titleStylesFullscreen = computed(() => {
   const styles: Record<string, string> = {}
   
+  // Couleur explicitement blanche pour fullscreen
+  styles.color = props.titleColor || '#ffffff'
+  
   if (props.fontFamily) {
     styles.fontFamily = props.fontFamily
   }
@@ -709,6 +948,9 @@ const titleStylesFullscreen = computed(() => {
   // Espacement des lettres
   styles.letterSpacing = letterSpacingMap[props.titleLetterSpacing || 'normal'] || '0'
   
+  // Interligne
+  styles.lineHeight = lineHeightMap[props.titleLineHeight || 'normal'] || '1.3'
+  
   // Transformation
   if (props.titleTransform && props.titleTransform !== 'none') {
     styles.textTransform = props.titleTransform
@@ -717,15 +959,33 @@ const titleStylesFullscreen = computed(() => {
   return styles
 })
 
+const contentAlignmentClass = computed(() => {
+  const alignMap: Record<string, string> = {
+    'left': 'text-left items-start',
+    'center': 'text-center items-center',
+    'right': 'text-right items-end'
+  }
+  return alignMap[props.contentAlignment || 'center'] || 'text-center items-center'
+})
+
+const containerMaxWidthStyle = computed(() => {
+  return {
+    maxWidth: contentMaxWidthMap[props.contentMaxWidth || 'large'] || '1024px'
+  }
+})
+
+const verticalAlignmentClass = computed(() => {
+  const alignMap: Record<string, string> = {
+    'start': 'justify-start',
+    'center': 'justify-center',
+    'end': 'justify-end'
+  }
+  return alignMap[props.verticalAlignment || 'center'] || 'justify-center'
+})
+
 const sectionDynamicStyles = computed(() => {
-  const styles: Record<string, string> = {}
-  
-  // Padding vertical
-  const py = paddingYMap[props.paddingY || 'large'] || '8rem'
-  styles.paddingTop = py
-  styles.paddingBottom = py
-  
-  return styles
+  // Maintenant intégré dans sectionStyles
+  return {}
 })
 
 const containerDynamicStyles = computed(() => {
@@ -733,6 +993,9 @@ const containerDynamicStyles = computed(() => {
   
   // Gap entre éléments
   styles.gap = contentGapMap[props.contentGap || 'medium'] || '1.5rem'
+  
+  // Max width
+  styles.maxWidth = contentMaxWidthMap[props.contentMaxWidth || 'large'] || '1024px'
   
   return styles
 })
@@ -763,6 +1026,11 @@ const imageStyles = computed(() => {
     styles.filter = filter
   }
   
+  // Arrondi image
+  if (props.imageRadius && props.imageRadius !== 'none') {
+    styles.borderRadius = radiusMap[props.imageRadius] || '0'
+  }
+  
   return styles
 })
 
@@ -771,6 +1039,18 @@ const animationClass = computed(() => {
   if (anim === 'none') return ''
   return `animate-${anim}`
 })
+
+const animationStyles = computed(() => {
+  if (props.animation === 'none') return {}
+  return {
+    animationDuration: `${props.animationDuration || 500}ms`,
+    animationDelay: `${props.animationDelay || 0}ms`,
+    animationFillMode: 'both'
+  }
+})
+
+const sectionId = computed(() => props.cssId || undefined)
+const sectionClasses = computed(() => props.customClasses || '')
 
 // Mapping des valeurs de border-radius
 const radiusMap: Record<string, string> = {
@@ -799,9 +1079,9 @@ const buttonStyles = computed(() => {
   const defaultBtnSize = { px: '1.5rem', py: '0.875rem', fontSize: '0.875rem' }
   const btnSize = buttonSizeMap[props.buttonSize || 'medium'] ?? defaultBtnSize
   
-  return {
+  const styles: Record<string, string> = {
     backgroundColor: ctaColor,
-    color: luminance > 0.5 ? '#1f2937' : '#ffffff',
+    color: props.ctaTextColor || (luminance > 0.5 ? '#1f2937' : '#ffffff'),
     borderRadius: radiusMap[props.buttonRadius || 'none'] || '0',
     boxShadow: shadowMap[props.buttonShadow || 'none'] || 'none',
     paddingLeft: btnSize.px,
@@ -810,7 +1090,21 @@ const buttonStyles = computed(() => {
     paddingBottom: btnSize.py,
     fontSize: btnSize.fontSize,
     width: props.buttonWidth === 'full' ? '100%' : 'auto',
+    transition: 'all 0.2s ease',
   }
+  
+  return styles
+})
+
+const buttonHoverClass = computed(() => {
+  const effectMap: Record<string, string> = {
+    'none': '',
+    'darken': 'hover:brightness-90',
+    'lighten': 'hover:brightness-110',
+    'scale': 'hover:scale-105',
+    'lift': 'hover:-translate-y-1 hover:shadow-lg'
+  }
+  return effectMap[props.buttonHoverEffect || 'none'] || ''
 })
 
 const secondaryButtonStyles = computed(() => {
@@ -830,6 +1124,7 @@ const secondaryButtonStyles = computed(() => {
     fontSize: btnSize.fontSize,
     borderWidth: bw,
     width: props.buttonWidth === 'full' ? '100%' : 'auto',
+    transition: 'all 0.2s ease',
   }
   
   if (style === 'filled') {
@@ -851,6 +1146,16 @@ const secondaryButtonStyles = computed(() => {
       borderColor: 'transparent',
       color: color,
     }
+  } else if (style === 'link') {
+    return {
+      ...baseStyles,
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      borderWidth: '0',
+      color: color,
+      textDecoration: 'underline',
+      padding: '0',
+    }
   } else {
     // outline (default)
     return {
@@ -865,11 +1170,18 @@ const secondaryButtonStyles = computed(() => {
 const badgeStyles = computed(() => {
   const badgeColor = props.badgeColor || props.ctaColor || '#1f2937'
   const badgeRadius = badgeStyleMap[props.badgeStyle || 'pill'] || '9999px'
+  const defaultBadgeSize = { px: '0.75rem', py: '0.35rem', fontSize: '0.75rem' }
+  const badgeS = badgeSizeMap[props.badgeSize || 'medium'] ?? defaultBadgeSize
   
   return {
     backgroundColor: `${badgeColor}15`,
     color: badgeColor,
     borderRadius: badgeRadius,
+    paddingLeft: badgeS.px,
+    paddingRight: badgeS.px,
+    paddingTop: badgeS.py,
+    paddingBottom: badgeS.py,
+    fontSize: badgeS.fontSize,
   }
 })
 </script>

@@ -83,6 +83,8 @@ const pageMap = {
   links: 'Mes Liens',
   transactions: 'Transactions',
   withdrawals: 'Retraits',
+  'sales-pages': 'Pages de vente',
+  subscription: 'Abonnement',
   kyc: 'Vérification KYC',
   analytics: 'Analytiques',
   'api-keys': 'Clés API',
@@ -94,7 +96,8 @@ const pageMap = {
   'admin/links': 'Liens de Paiement',
   'admin/withdrawals': 'Gestion Retraits',
   'admin/kyc': 'Gestion KYC',
-  'admin/broadcast': 'Communication'
+  'admin/broadcast': 'Communication',
+  'admin/templates': 'Templates'
 }
 
 const pageTitle = computed(() => {

@@ -103,6 +103,15 @@
             Personnaliser
           </NuxtLink>
           <button
+            @click="openEditModal(template)"
+            class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            title="Modifier"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          </button>
+          <button
             @click="toggleTemplate(template)"
             class="px-3 py-2 text-sm border rounded-lg hover:bg-gray-100"
             :class="template.is_active ? 'border-orange-300 text-orange-600' : 'border-emerald-300 text-emerald-600'"
@@ -133,12 +142,12 @@
       </button>
     </div>
     
-    <!-- Modal Création -->
+    <!-- Modal Création/Édition -->
     <div v-if="showModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-black/50" @click="closeModal"/>
         <div class="relative bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Nouveau template</h2>
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ editingTemplate ? 'Modifier le template' : 'Nouveau template' }}</h2>
           
           <form @submit.prevent="saveTemplate" class="space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -194,7 +203,7 @@
               <label for="is_active" class="ml-2 text-sm text-gray-700">Activer ce template</label>
             </div>
             
-            <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+            <div v-if="!editingTemplate" class="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
               <p class="text-sm text-emerald-800">
                 Après la création, cliquez sur <strong>Personnaliser</strong> pour définir les blocs du template avec le builder.
               </p>
@@ -213,7 +222,7 @@
                 :disabled="saving"
                 class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 disabled:opacity-50"
               >
-                {{ saving ? 'Création...' : 'Créer le template' }}
+                {{ saving ? 'Enregistrement...' : (editingTemplate ? 'Enregistrer' : 'Créer le template') }}
               </button>
             </div>
           </form>
@@ -237,6 +246,7 @@ const saving = ref(false)
 const templates = ref<any[]>([])
 const categories = ref<Record<string, string>>({})
 const showModal = ref(false)
+const editingTemplate = ref<any>(null)
 
 const filters = reactive({
   category: '',
@@ -282,6 +292,7 @@ const debouncedSearch = () => {
 }
 
 const openCreateModal = () => {
+  editingTemplate.value = null
   form.name = ''
   form.description = ''
   form.category = 'general'
@@ -290,8 +301,19 @@ const openCreateModal = () => {
   showModal.value = true
 }
 
+const openEditModal = (template: any) => {
+  editingTemplate.value = template
+  form.name = template.name
+  form.description = template.description || ''
+  form.category = template.category
+  form.is_active = template.is_active
+  form.thumbnail = null
+  showModal.value = true
+}
+
 const closeModal = () => {
   showModal.value = false
+  editingTemplate.value = null
 }
 
 const handleThumbnail = (e: Event) => {
@@ -313,18 +335,28 @@ const saveTemplate = async () => {
       formData.append('thumbnail', form.thumbnail)
     }
     
-    await $fetch('/admin/sales-page-templates', {
-      method: 'POST',
-      baseURL: config.public.apiBaseURL,
-      headers: { Authorization: `Bearer ${token.value}` },
-      body: formData
-    })
+    if (editingTemplate.value) {
+      formData.append('_method', 'PUT')
+      await $fetch(`/admin/sales-page-templates/${editingTemplate.value.id}`, {
+        method: 'POST',
+        baseURL: config.public.apiBaseURL,
+        headers: { Authorization: `Bearer ${token.value}` },
+        body: formData
+      })
+    } else {
+      await $fetch('/admin/sales-page-templates', {
+        method: 'POST',
+        baseURL: config.public.apiBaseURL,
+        headers: { Authorization: `Bearer ${token.value}` },
+        body: formData
+      })
+    }
     
     closeModal()
     await fetchTemplates()
   } catch (err: any) {
     console.error('Erreur:', err)
-    alert(err.data?.message || 'Erreur lors de la création')
+    alert(err.data?.message || 'Erreur lors de l\'enregistrement')
   } finally {
     saving.value = false
   }

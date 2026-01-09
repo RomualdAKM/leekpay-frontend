@@ -33,6 +33,40 @@
       </div>
       
       <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Sélecteur de viewport responsive -->
+        <div class="hidden sm:flex items-center bg-gray-100 rounded-lg p-1">
+          <button
+            @click="previewViewport = 'desktop'"
+            class="p-2 rounded-md transition-colors"
+            :class="previewViewport === 'desktop' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'"
+            title="Desktop"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </button>
+          <button
+            @click="previewViewport = 'tablet'"
+            class="p-2 rounded-md transition-colors"
+            :class="previewViewport === 'tablet' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'"
+            title="Tablette"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </button>
+          <button
+            @click="previewViewport = 'mobile'"
+            class="p-2 rounded-md transition-colors"
+            :class="previewViewport === 'mobile' ? 'bg-white shadow text-emerald-600' : 'text-gray-500 hover:text-gray-700'"
+            title="Mobile"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        
         <!-- Toggle Preview -->
         <button
           @click="togglePreview"
@@ -80,20 +114,80 @@
     <!-- Message d'erreur -->
     <div 
       v-if="saveError" 
-      class="bg-red-50 border-b border-red-200 px-4 py-2 flex items-center justify-between"
+      class="bg-red-50 border-b border-red-200 px-4 py-3 flex items-center justify-between"
     >
       <div class="flex items-center text-red-700">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span class="text-sm font-medium">{{ saveError }}</span>
+        <span class="text-sm font-medium">
+          {{ saveError }}
+          <NuxtLink 
+            v-if="showPremiumPrompt" 
+            to="/dashboard/subscription" 
+            class="ml-2 underline font-bold text-emerald-600 hover:text-emerald-800"
+          >
+            S'abonner maintenant →
+          </NuxtLink>
+        </span>
       </div>
-      <button @click="saveError = null" class="text-red-500 hover:text-red-700">
+      <button @click="saveError = null; showPremiumPrompt = false" class="text-red-500 hover:text-red-700 ml-4">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
+    
+    <!-- Toast de succès -->
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="transform -translate-y-full opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform -translate-y-full opacity-0"
+    >
+      <div 
+        v-if="successMessage" 
+        class="bg-emerald-50 border-b border-emerald-200 px-4 py-3 flex items-center justify-center"
+      >
+        <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span class="text-sm font-medium text-emerald-700">{{ successMessage }}</span>
+      </div>
+    </Transition>
+    
+    <!-- Undo suppression bloc -->
+    <Transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="transform -translate-y-full opacity-0"
+      enter-to-class="transform translate-y-0 opacity-100"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="transform translate-y-0 opacity-100"
+      leave-to-class="transform -translate-y-full opacity-0"
+    >
+      <div 
+        v-if="deletedBlocksHistory.length > 0" 
+        class="bg-gray-800 px-4 py-3 flex items-center justify-center space-x-4"
+      >
+        <span class="text-sm text-white">Bloc supprimé</span>
+        <button 
+          @click="undoDeleteBlock"
+          class="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+          </svg>
+          Annuler (Ctrl+Z)
+        </button>
+        <button @click="deletedBlocksHistory = []" class="text-gray-400 hover:text-gray-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </Transition>
     
     <!-- Contenu principal -->
     <div class="flex-1 flex overflow-hidden">
@@ -131,7 +225,7 @@
               class="flex flex-col items-center p-3 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
             >
               <div class="w-10 h-10 rounded-lg bg-gray-100 group-hover:bg-emerald-100 flex items-center justify-center mb-2">
-                <span class="text-xl">{{ getBlockIcon(blockType.value) }}</span>
+                <component :is="getBlockIcon(blockType.value)" class="w-5 h-5 text-gray-600 group-hover:text-emerald-600" />
               </div>
               <span class="text-xs text-gray-700 text-center">{{ blockType.label }}</span>
             </button>
@@ -145,22 +239,22 @@
             <h3 class="text-sm font-semibold text-gray-900 mb-3">Informations</h3>
             <div class="space-y-3">
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Slug (URL)</label>
+                <label class="block text-xs text-gray-500 mb-1">Sous-domaine</label>
                 <div class="flex">
-                  <span class="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-sm text-gray-500">
-                    leekpay.me/
-                  </span>
                   <input
                     v-model="page.slug"
                     type="text"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-r-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
+                    class="flex-1 px-2 py-2 border border-gray-300 rounded-l-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
                     placeholder="mon-offre"
                   />
+                  <span class="inline-flex items-center px-3 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-sm text-gray-500">
+                    .leekpay.me
+                  </span>
                 </div>
               </div>
               
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Titre SEO</label>
+                <label class="block text-xs text-gray-500 mb-1">Titre SEO <span class="text-gray-400">(optionnel)</span></label>
                 <input
                   v-model="page.meta_title"
                   type="text"
@@ -171,7 +265,7 @@
               </div>
               
               <div>
-                <label class="block text-xs text-gray-500 mb-1">Description SEO</label>
+                <label class="block text-xs text-gray-500 mb-1">Description SEO <span class="text-gray-400">(optionnel)</span></label>
                 <textarea
                   v-model="page.meta_description"
                   rows="2"
@@ -185,17 +279,25 @@
           
           <!-- Lien de paiement -->
           <div>
-            <h3 class="text-sm font-semibold text-gray-900 mb-3">Checkout</h3>
-            <select
-              v-model="page.payment_link_id"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500"
-            >
-              <option :value="null">Aucun lien de paiement</option>
-              <option v-for="link in paymentLinks" :key="link.id" :value="link.id">
-                {{ link.title }} - {{ link.amount }} {{ link.currency }}
-              </option>
-            </select>
-            <p class="text-xs text-gray-500 mt-1">Les boutons CTA redirigeront vers ce lien</p>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+              <svg class="w-4 h-4 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+              </svg>
+              Lien de paiement
+            </h3>
+            <div class="space-y-2">
+              <label class="block text-xs text-gray-500">Checkout associé <span class="text-gray-400">(optionnel)</span></label>
+              <select
+                v-model="page.payment_link_id"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+              >
+                <option :value="null">Aucun lien de paiement</option>
+                <option v-for="link in paymentLinks" :key="link.id" :value="link.id">
+                  {{ link.title }} - {{ link.amount }}
+                </option>
+              </select>
+              <p class="text-[11px] text-gray-400">Les boutons CTA redirigeront vers ce lien</p>
+            </div>
           </div>
           
           <!-- Thème -->
@@ -236,7 +338,7 @@
           
           <!-- Domaine personnalisé -->
           <div v-if="page.id">
-            <h3 class="text-sm font-semibold text-gray-900 mb-3">Domaine personnalisé</h3>
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Domaine personnalisé <span class="text-xs font-normal text-gray-400">(optionnel)</span></h3>
             <CustomDomainConfig
               :page-id="page.id"
               :custom-domain="page.custom_domain"
@@ -251,7 +353,7 @@
               <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
               </svg>
-              Tracking & Analytics
+              Tracking & Analytics <span class="text-xs font-normal text-gray-400">(optionnel)</span>
             </h3>
             <div class="space-y-3">
               <!-- Facebook Pixel -->
@@ -357,9 +459,55 @@
       </aside>
       
       <!-- Zone de Preview/Édition -->
-      <main class="flex-1 overflow-y-auto bg-gray-200">
+      <main class="flex-1 overflow-y-auto bg-gray-200 flex justify-center items-start">
+        <!-- Preview iframe pour mobile/tablet (pages sauvegardées) -->
         <div 
-          class="max-w-5xl mx-auto my-4 sm:my-8 bg-white shadow-xl rounded-lg overflow-hidden"
+          v-if="previewViewport !== 'desktop' && page.id"
+          class="relative my-4 sm:my-8 bg-white shadow-xl overflow-hidden transition-all duration-300 flex flex-col"
+          :class="[
+            previewViewport === 'mobile' ? 'w-[375px] h-[667px] rounded-[2.5rem]' : '',
+            previewViewport === 'tablet' ? 'w-[768px] h-[1024px] rounded-xl' : ''
+          ]"
+          :style="{ border: '8px solid #1f2937' }"
+        >
+          <!-- Barre de notification simulée -->
+          <div v-if="previewViewport === 'mobile'" class="h-6 bg-gray-900 flex items-center justify-center">
+            <div class="w-20 h-4 bg-gray-800 rounded-full"></div>
+          </div>
+          <iframe
+            :src="`/dashboard/sales-pages/${page.id}/preview-frame`"
+            class="flex-1 w-full border-0 bg-white"
+            :key="previewRefreshKey"
+          />
+          <!-- Bouton refresh -->
+          <button 
+            @click="previewRefreshKey++"
+            class="absolute bottom-12 right-2 p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 z-10"
+            title="Rafraîchir après sauvegarde"
+          >
+            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Message si viewport mobile/tablet mais page non sauvegardée -->
+        <div 
+          v-else-if="previewViewport !== 'desktop' && !page.id"
+          class="my-8 p-8 bg-white rounded-xl shadow-xl text-center max-w-md"
+        >
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Sauvegardez d'abord</h3>
+          <p class="text-gray-500 text-sm mb-4">La prévisualisation responsive nécessite que la page soit sauvegardée.</p>
+          <button @click="handleSave" class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600">Sauvegarder</button>
+        </div>
+        
+        <!-- Rendu direct pour desktop -->
+        <div 
+          v-else
+          class="my-4 sm:my-8 bg-white shadow-xl overflow-y-auto transition-all duration-300 w-full max-w-5xl rounded-lg"
           :class="{ 'ring-2 ring-emerald-400': !previewMode }"
         >
           <!-- Message si vide -->
@@ -424,7 +572,7 @@
                     </svg>
                   </button>
                   <button
-                    @click.stop="removeBlock(block.id)"
+                    @click.stop="handleRemoveBlock(block.id)"
                     class="p-1.5 bg-white rounded shadow hover:bg-red-50"
                     title="Supprimer"
                   >
@@ -471,12 +619,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, type Component } from 'vue'
 import draggable from 'vuedraggable'
 import { useSalesPageBuilder } from '~/composables/useSalesPageBuilder'
 import SalesBlockRenderer from '~/components/sales-page/SalesBlockRenderer.vue'
 import BlockPropsEditor from '~/components/sales-page/BlockPropsEditor.vue'
 import CustomDomainConfig from '~/components/sales-page/CustomDomainConfig.vue'
+import {
+  LayoutTemplate,
+  Target,
+  Type,
+  Image,
+  Video,
+  CheckSquare,
+  MessageSquare,
+  DollarSign,
+  HelpCircle,
+  MousePointer,
+  Timer,
+  ShoppingCart,
+  Grid3X3,
+  FileText,
+  Package
+} from 'lucide-vue-next'
 
 const props = defineProps<{
   pageId?: string | number
@@ -511,6 +676,8 @@ const {
 
 const activeTab = ref<'blocks' | 'settings'>('blocks')
 const paymentLinks = ref<any[]>([])
+const previewViewport = ref<'desktop' | 'tablet' | 'mobile'>('desktop')
+const previewRefreshKey = ref(0)
 const isTemplateMode = computed(() => !!props.editTemplateId)
 const templateData = ref<{ name: string; category: string } | null>(null)
 
@@ -545,36 +712,66 @@ const checkoutUrl = computed(() => {
   return `${baseUrl}/${link.custom_url}`
 })
 
-const getBlockIcon = (type: string): string => {
-  const icons: Record<string, string> = {
-    header: '📑',
-    hero: '🎯',
-    text: '📝',
-    image: '🖼️',
-    video: '🎬',
-    features: '✅',
-    testimonials: '💬',
-    pricing: '💰',
-    faq: '❓',
-    cta: '🔘',
-    countdown: '⏰',
-    product: '🛒',
-    grid: '⊞',
-    footer: '📄',
+const getBlockIcon = (type: string): Component => {
+  const icons: Record<string, Component> = {
+    header: LayoutTemplate,
+    hero: Target,
+    text: Type,
+    image: Image,
+    video: Video,
+    features: CheckSquare,
+    testimonials: MessageSquare,
+    pricing: DollarSign,
+    faq: HelpCircle,
+    cta: MousePointer,
+    countdown: Timer,
+    product: ShoppingCart,
+    grid: Grid3X3,
+    footer: FileText,
   }
-  return icons[type] || '📦'
+  return icons[type] || Package
 }
 
 const saveError = ref<string | null>(null)
+const showPremiumPrompt = ref(false)
+const successMessage = ref<string | null>(null)
+const deletedBlocksHistory = ref<Array<{ block: any; index: number }>>([]) // Historique pour undo
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+
+// Fonction pour formater les erreurs API (validation ou autres)
+const formatApiError = (err: any): string => {
+  const data = err.data || err
+  
+  // Si c'est une erreur de validation avec des champs détaillés
+  if (data.errors && typeof data.errors === 'object') {
+    const errorMessages: string[] = []
+    for (const field in data.errors) {
+      const fieldErrors = data.errors[field]
+      if (Array.isArray(fieldErrors)) {
+        errorMessages.push(...fieldErrors)
+      } else if (typeof fieldErrors === 'string') {
+        errorMessages.push(fieldErrors)
+      }
+    }
+    if (errorMessages.length > 0) {
+      return errorMessages.join(' | ')
+    }
+  }
+  
+  // Message générique
+  return data.message || 'Une erreur est survenue'
+}
 
 const handleSave = async () => {
   saveError.value = null
+  successMessage.value = null
   
   // En mode template, sauvegarder le template
   if (isTemplateMode.value) {
     try {
       await saveTemplateChanges()
       saveError.value = null
+      showSuccessToast('Template sauvegardé')
     } catch (err: any) {
       saveError.value = err.message || 'Erreur lors de la sauvegarde du template'
     }
@@ -593,9 +790,22 @@ const handleSave = async () => {
   try {
     await savePage()
     saveError.value = null
+    showSuccessToast('Page sauvegardée')
+    // Rafraîchir la preview si en mode mobile/tablet
+    if (previewViewport.value !== 'desktop') {
+      previewRefreshKey.value++
+    }
   } catch (err: any) {
-    saveError.value = err.data?.message || 'Erreur lors de la sauvegarde'
+    saveError.value = formatApiError(err)
   }
+}
+
+// Toast de succès
+const showSuccessToast = (message: string) => {
+  successMessage.value = message
+  setTimeout(() => {
+    successMessage.value = null
+  }, 3000)
 }
 
 const handlePublish = async () => {
@@ -605,8 +815,19 @@ const handlePublish = async () => {
     } else {
       await publishPage()
     }
-  } catch (err) {
-    // Notification d'erreur
+    saveError.value = null
+    showPremiumPrompt.value = false
+  } catch (err: any) {
+    const errorData = err.data || {}
+    
+    // Gestion spéciale pour requires_premium
+    if (errorData.requires_premium) {
+      saveError.value = errorData.message
+      showPremiumPrompt.value = true
+    } else {
+      saveError.value = formatApiError(err)
+      showPremiumPrompt.value = false
+    }
   }
 }
 
@@ -614,6 +835,81 @@ const handleDomainUpdate = (data: { custom_domain: string | null; domain_verifie
   page.value.custom_domain = data.custom_domain
   page.value.domain_verified = data.domain_verified
 }
+
+// Wrapper pour removeBlock avec historique
+const handleRemoveBlock = (blockId: string) => {
+  const block = page.value.blocks.find(b => b.id === blockId)
+  if (block) {
+    const index = page.value.blocks.findIndex(b => b.id === blockId)
+    // Sauvegarder dans l'historique pour undo
+    deletedBlocksHistory.value = [{ block: JSON.parse(JSON.stringify(block)), index }]
+    // Supprimer après 10 secondes si pas de undo
+    setTimeout(() => {
+      deletedBlocksHistory.value = deletedBlocksHistory.value.filter(h => h.block.id !== blockId)
+    }, 10000)
+  }
+  removeBlock(blockId)
+}
+
+// Undo suppression bloc
+const undoDeleteBlock = () => {
+  if (deletedBlocksHistory.value.length === 0) return
+  const last = deletedBlocksHistory.value.pop()!
+  // Réinsérer le bloc à sa position d'origine
+  page.value.blocks.splice(last.index, 0, last.block)
+  // Réindexer
+  page.value.blocks.forEach((block, idx) => { block.order = idx })
+}
+
+// Raccourcis clavier
+const handleKeyboard = (e: KeyboardEvent) => {
+  // Ctrl+S ou Cmd+S pour sauvegarder
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault()
+    if (!isSaving.value) {
+      handleSave()
+    }
+  }
+  // Ctrl+Z ou Cmd+Z pour undo
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+    if (deletedBlocksHistory.value.length > 0) {
+      e.preventDefault()
+      undoDeleteBlock()
+    }
+  }
+}
+
+// Confirmation avant quitter si modifications non sauvegardées
+const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  if (isDirty.value) {
+    e.preventDefault()
+    e.returnValue = 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?'
+    return e.returnValue
+  }
+}
+
+// Auto-save (30 secondes après la dernière modification)
+const scheduleAutoSave = () => {
+  // Annuler le timer précédent
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+  }
+  // Programmer un nouveau timer seulement si la page existe déjà
+  if (page.value.id && isDirty.value && !isSaving.value) {
+    autoSaveTimer = setTimeout(async () => {
+      if (isDirty.value && !isSaving.value && page.value.id) {
+        await handleSave()
+      }
+    }, 30000) // 30 secondes
+  }
+}
+
+// Watch pour déclencher l'auto-save
+watch(() => isDirty.value, (newVal) => {
+  if (newVal) {
+    scheduleAutoSave()
+  }
+})
 
 onMounted(async () => {
   await fetchBlockTypes()
@@ -627,6 +923,20 @@ onMounted(async () => {
   } else if (props.templateId) {
     // Appliquer le template sélectionné (mode utilisateur)
     await applyTemplate(props.templateId)
+  }
+  
+  // Ajouter les event listeners
+  window.addEventListener('keydown', handleKeyboard)
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+onUnmounted(() => {
+  // Nettoyer les event listeners
+  window.removeEventListener('keydown', handleKeyboard)
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+  // Nettoyer le timer auto-save
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
   }
 })
 
