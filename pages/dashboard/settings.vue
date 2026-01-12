@@ -22,7 +22,7 @@
     >
       <div
         v-if="showToast"
-        class="fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+        class="fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-3 flex items-center space-x-2"
       >
         <CheckIcon class="h-5 w-5" />
         <span>{{ toastMessage }}</span>
@@ -31,17 +31,16 @@
 
     <!-- Header -->
     <div>
-      <!-- <h1 class="text-xl sm:text-2xl font-bold mb-1 sm:mb-2" style="color: #0A1F44">Paramètres</h1> -->
-      <p class="text-gray-600 text-sm sm:text-base">Gérez votre compte et configurez vos préférences</p>
+      <p class="text-gray-500 text-sm">Gérez votre compte</p>
     </div>
 
     <!-- Message de succès global -->
-    <div v-if="successMessage" class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+    <div v-if="successMessage" class="border-l-2 border-green-600 text-gray-700 px-4 py-3">
       {{ successMessage }}
     </div>
 
     <!-- Erreur globale -->
-    <div v-if="apiErrors.global" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+    <div v-if="apiErrors.global" class="border-l-2 border-red-500 text-gray-700 px-4 py-3">
       <ul class="list-disc list-inside">
         <li v-for="error in apiErrors.global" :key="error">{{ error }}</li>
       </ul>
@@ -69,18 +68,17 @@
         <!-- Informations personnelles -->
         <Card >
           <div class="flex items-center gap-2 mb-3">
-            <User class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Informations personnelles</h3>
+            <User class="w-5 h-5 text-gray-400" />
+            <h3 class="font-medium text-gray-900">Informations personnelles</h3>
           </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Gérez vos informations de profil et de contact</p>
 
-          <div class="space-y-3">
+          <div class="space-y-4">
             <div class="space-y-2">
-              <Label for="name" class="text-xs sm:text-sm">Nom complet</Label>
+              <Label for="name" class="text-sm text-gray-600">Nom complet</Label>
               <Input 
                 id="name"
                 v-model="profile.name" 
-                class="text-sm py-2"
+                class="text-sm"
                 :class="{ 'border-red-500': apiErrors.name }"
               />
               <div v-if="apiErrors.name" class="text-red-500 text-sm">
@@ -89,12 +87,12 @@
             </div>
 
             <div class="space-y-2">
-              <Label for="email" class="text-xs sm:text-sm">Email</Label>
+              <Label for="email" class="text-sm text-gray-600">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
                 v-model="profile.email" 
-                class="text-sm py-2"
+                class="text-sm"
                 :class="{ 'border-red-500': apiErrors.email }"
               />
               <div v-if="apiErrors.email" class="text-red-500 text-sm">
@@ -105,11 +103,9 @@
             <Button 
               @click="saveProfile" 
               :disabled="profileLoading"
-              class="gap-2 py-2 text-sm" 
-              style="background-color: #2ECC71; color: white"
+              class="bg-green-600 text-white hover:bg-green-700 text-sm"
             >
-              <span v-if="profileLoading">Sauvegarde...</span>
-              <span v-else>Sauvegarder</span>
+              {{ profileLoading ? 'Sauvegarde...' : 'Sauvegarder' }}
             </Button>
           </div>
         </Card>
@@ -121,20 +117,19 @@
       <TabsContent value="security" class="space-y-6">
         <!-- Mot de passe -->
         <Card >
-          <div class="flex items-center gap-2 mb-3">
-            <Shield class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Sécurité</h3>
+          <div class="flex items-center gap-2 mb-4">
+            <Shield class="w-5 h-5 text-gray-400" />
+            <h3 class="font-medium text-gray-900">Mot de passe</h3>
           </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">Gérez la sécurité de votre compte</p>
 
-          <div class="space-y-3">
+          <div class="space-y-4">
             <div class="space-y-2">
-              <Label for="current-password" class="text-xs sm:text-sm">Mot de passe actuel</Label>
+              <Label for="current-password" class="text-sm text-gray-600">Mot de passe actuel</Label>
               <Input 
                 id="current-password" 
                 v-model="security.currentPassword" 
                 type="password" 
-                class="text-sm py-2"
+                class="text-sm"
                 :class="{ 'border-red-500': apiErrors.current_password }"
               />
               <div v-if="apiErrors.current_password" class="text-red-500 text-sm">
@@ -143,13 +138,13 @@
             </div>
 
             <div class="space-y-2">
-              <Label for="new-password" class="text-xs sm:text-sm">Nouveau mot de passe</Label>
+              <Label for="new-password" class="text-sm text-gray-600">Nouveau mot de passe</Label>
               <div class="relative">
                 <Input 
                   id="new-password" 
                   v-model="security.newPassword" 
                   :type="showNewPassword ? 'text' : 'password'"
-                  class="text-sm py-2 pr-10"
+                  class="text-sm pr-10"
                   :class="{ 'border-red-500': apiErrors.password }"
                 />
                 <button 
@@ -167,13 +162,13 @@
             </div>
 
             <div class="space-y-2">
-              <Label for="confirm-password" class="text-xs sm:text-sm">Confirmer le mot de passe</Label>
+              <Label for="confirm-password" class="text-sm text-gray-600">Confirmer</Label>
               <div class="relative">
                 <Input 
                   id="confirm-password" 
                   v-model="security.confirmPassword" 
                   :type="showConfirmPassword ? 'text' : 'password'"
-                  class="text-sm py-2 pr-10"
+                  class="text-sm pr-10"
                   :class="{ 'border-red-500': apiErrors.password_confirmation }"
                 />
                 <button 
@@ -193,11 +188,9 @@
             <Button
                 @click="changePasswordHandler"
                 :disabled="!canChangePassword || passwordLoading"
-                class="gap-2 py-2 text-sm"
-                style="background-color: #2ECC71; color: white"
+                class="bg-green-600 text-white hover:bg-green-700 text-sm"
             >
-              <span v-if="passwordLoading">Changement...</span>
-              <span v-else>Changer le mot de passe</span>
+              {{ passwordLoading ? 'Changement...' : 'Changer' }}
             </Button>
           </div>
         </Card>
@@ -208,21 +201,19 @@
       <!-- Affiliation (visible pour tous) -->
       <TabsContent value="affiliation" class="space-y-6">
         <!-- Message pour non-premium -->
-        <div v-if="!user?.is_premium" class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
+        <div v-if="!user?.is_premium" class="border border-gray-200 p-6">
           <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-              <Gift class="w-6 h-6 text-white" />
-            </div>
+            <Gift class="w-6 h-6 text-gray-400 flex-shrink-0" />
             <div class="flex-1">
-              <h3 class="font-semibold text-lg text-gray-900 mb-2">Programme d'affiliation Premium</h3>
-              <p class="text-sm text-gray-600 mb-4">
-                Passez en Premium pour générer votre code promo personnel. Vos amis obtiennent 15% de réduction et vous gagnez 15% de commission sur chaque abonnement.
+              <h3 class="font-medium text-gray-900 mb-2">Programme d'affiliation</h3>
+              <p class="text-sm text-gray-500 mb-4">
+                Passez Premium pour générer votre code promo. 15% pour vos amis, 15% pour vous.
               </p>
               <NuxtLink 
                 to="/dashboard/subscription" 
-                class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg hover:from-amber-600 hover:to-orange-600 transition-all"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm hover:bg-green-700 transition-colors"
               >
-                <span>Passer en Premium</span>
+                <span>Passer Premium</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -236,43 +227,40 @@
           <!-- Votre code promo -->
           <Card>
           <div class="flex items-center gap-2 mb-3">
-            <Gift class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Votre code promo</h3>
+            <Gift class="w-5 h-5 text-gray-400" />
+            <h3 class="font-medium text-gray-900">Votre code promo</h3>
           </div>
-          <p class="text-xs sm:text-sm text-gray-500 mb-4">
-            Partagez votre code avec vos amis. Ils obtiennent {{ affiliation.discount_percent }}% de réduction et vous gagnez {{ affiliation.commission_percent }}% de commission.
+          <p class="text-sm text-gray-500 mb-4">
+            Partagez votre code. {{ affiliation.discount_percent }}% de réduction pour eux, {{ affiliation.commission_percent }}% de commission pour vous.
           </p>
 
           <div v-if="affiliationLoading" class="py-8 text-center text-gray-500">
-            <RefreshCw class="w-6 h-6 animate-spin mx-auto mb-2" />
+            <RefreshCw class="w-5 h-5 animate-spin mx-auto mb-2" />
             Chargement...
           </div>
 
           <div v-else>
             <!-- Code existant -->
-            <div v-if="affiliation.code" class="space-y-4">
-              <div class="flex items-center gap-3">
-                <div class="flex-1 px-4 py-3 bg-gray-100 rounded-lg font-mono text-lg font-bold text-center tracking-wider">
-                  {{ affiliation.code }}
-                </div>
-                <button
-                  @click="copyCode"
-                  class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                  :class="{ 'bg-green-600': codeCopied }"
-                >
-                  <Copy class="w-5 h-5" />
-                </button>
+            <div v-if="affiliation.code" class="flex items-center gap-3">
+              <div class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 font-mono text-base font-semibold text-center tracking-widest">
+                {{ affiliation.code }}
               </div>
+              <button
+                @click="copyCode"
+                class="p-3 bg-green-600 text-white hover:bg-green-700 transition-colors"
+                :class="{ 'bg-emerald-600': codeCopied }"
+              >
+                <Copy class="w-5 h-5" />
+              </button>
             </div>
 
             <!-- Générer un code -->
             <div v-else class="text-center py-4">
-              <p class="text-gray-500 mb-4">Vous n'avez pas encore de code promo</p>
+              <p class="text-gray-500 mb-4">Aucun code généré</p>
               <Button
                 @click="generateCode"
                 :disabled="codeGenerating"
-                class="gap-2"
-                style="background-color: #2ECC71; color: white"
+                class="gap-2 bg-green-600 text-white hover:bg-green-700"
               >
                 <RefreshCw v-if="codeGenerating" class="w-4 h-4 animate-spin" />
                 <span>{{ codeGenerating ? 'Génération...' : 'Générer mon code' }}</span>
@@ -283,34 +271,26 @@
 
         <!-- Statistiques -->
         <Card>
-          <div class="flex items-center gap-2 mb-3">
-            <Users class="w-5 h-5 text-gray-500" />
-            <h3 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">Statistiques d'affiliation</h3>
+          <div class="flex items-center gap-2 mb-4">
+            <Users class="w-5 h-5 text-gray-400" />
+            <h3 class="font-medium text-gray-900">Statistiques</h3>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <div class="p-4 bg-gray-50 rounded-lg text-center">
-              <p class="text-2xl font-bold text-gray-900">{{ affiliation.usage_count }}</p>
+            <div class="p-4 border border-gray-200 text-center">
+              <p class="text-2xl font-semibold text-gray-900">{{ affiliation.usage_count }}</p>
               <p class="text-sm text-gray-500">Utilisations</p>
             </div>
-            <div class="p-4 bg-emerald-50 rounded-lg text-center">
-              <p class="text-2xl font-bold text-emerald-600">{{ affiliation.total_earned.toLocaleString() }} FCFA</p>
+            <div class="p-4 border border-gray-200 text-center">
+              <p class="text-2xl font-semibold text-gray-900">{{ affiliation.total_earned.toLocaleString() }} FCFA</p>
               <p class="text-sm text-gray-500">Gains totaux</p>
             </div>
           </div>
 
-          <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <div class="flex items-start gap-3">
-              <Wallet class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p class="text-sm font-medium text-amber-800">Retirer vos gains</p>
-                <p class="text-xs text-amber-600 mt-1">
-                  Vos commissions d'affiliation sont créditées dans votre solde disponible. 
-                  Rendez-vous sur la page <NuxtLink to="/dashboard/withdrawals" class="underline font-medium">Retraits</NuxtLink> pour effectuer un retrait.
-                </p>
-              </div>
-            </div>
-          </div>
+          <p class="mt-4 text-sm text-gray-500 border-l-2 border-gray-200 pl-3">
+            Vos commissions sont créditées dans votre solde. 
+            <NuxtLink to="/dashboard/withdrawals" class="text-gray-900 underline">Retirer</NuxtLink>
+          </p>
         </Card>
         </template>
       </TabsContent>
