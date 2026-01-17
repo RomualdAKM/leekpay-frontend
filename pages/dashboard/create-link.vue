@@ -36,177 +36,79 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Form -->
-      <Card class="p-2 sm:p-2">
+      <Card class="p-4 sm:p-6">
         <form @submit.prevent="handleSubmit" class="space-y-6" :class="{ 'opacity-75 pointer-events-none': loading }">
-          <!-- Title -->
-          <div class="space-y-2">
-            <Label for="title" class="text-sm">Titre *</Label>
-            <Input
-                id="title"
-                v-model="formData.title"
-                @input="generateUrlFromTitle"
-                required
-                class="text-sm py-2"
-            />
-          </div>
-
-          <!-- Description -->
-          <div class="space-y-2">
-            <Label for="description" class="text-sm">Description *</Label>
-            <RichTextEditor
-                v-model="formData.description"
-                placeholder="Décrivez votre lien de paiement..."
-                class="text-sm"
-            />
-          </div>
-
-          <!-- Custom URL -->
-          <div class="space-y-2">
-            <Label for="customUrl" class="text-sm">URL personnalisée *</Label>
-            <div class="flex">
-              <div class="bg-gray-100 px-3 py-2 border border-r-0 rounded-l-md text-xs sm:text-sm text-gray-600">
-                leekpay.me/
-              </div>
-              <Input
-                  id="customUrl"
-                  v-model="formData.customUrl"
-                  @input="onUrlManualEdit"
-                  placeholder="mon-lien-unique"
-                  class="rounded-l-none text-sm py-2"
-                  :class="{
-                    'border-red-500': urlError,
-                    'border-green-500': urlAvailable && formData.customUrl
-                  }"
-                  pattern="[a-zA-Z0-9_\-]+"
-                  title="Uniquement lettres, chiffres, tirets et underscores"
-                  required
-              />
-            </div>
-            <p v-if="urlChecking" class="text-xs text-blue-600">Vérification...</p>
-            <p v-else-if="urlError" class="text-xs text-red-600">{{ urlError }}</p>
-            <p v-else-if="urlAvailable && formData.customUrl" class="text-xs text-green-600">URL disponible</p>
-          </div>
-
-          <!-- Image Upload -->
-          <div class="space-y-2">
-            <Label for="image" class="text-sm">Image (optionnel)</Label>
-            <div class="text-center">
-            <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center"> -->
-              <UploadIcon class="w-8 h-8 text-gray-400 mx-auto mb-2" />
-              <p class="text-xs sm:text-sm text-gray-600 mb-2">
-                Cliquez pour sélectionner une image
-              </p>
-              <Button
-                  type="button"
-                  variant="outline"
-                  @click="$refs.imageInput.click()"
-                  class="w-full text-sm py-2 sm:py-3"
-              >
-                Choisir un fichier
-              </Button>
-              <input
-                  ref="imageInput"
-                  type="file"
-                  accept="image/*"
-                  @change="handleImageUpload"
-                  class="hidden"
-              />
-              <p v-if="formData.image" class="text-xs text-green-600 mt-2">
-                {{ formData.image.name }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Invoice Attach -->
-          <div class="space-y-2 mt-4">
-            <Label class="text-sm">Facture existante (optionnel)</Label>
-            <Input
-                v-model="invoiceSearch"
-                type="text"
-                placeholder="Rechercher une facture..."
-                class="text-sm py-2"
-                @keydown.enter.prevent
-            />
-            <Select
-                v-model="formData.invoiceId"
-                :options="invoiceOptions"
-                placeholder="Choisir une facture"
-                class="text-sm"
-            />
-            <p v-if="invoiceError" class="text-xs text-red-600">{{ invoiceError }}</p>
-            <p v-else-if="invoiceLoading" class="text-xs text-gray-500">Chargement des factures...</p>
-            <p v-else-if="!invoiceOptions.length" class="text-xs text-gray-500">Aucune facture disponible.</p>
-            <p class="text-xs text-gray-500">
-              Si vous choisissez une facture, son PDF sera joint automatiquement.
-            </p>
-            <div v-if="selectedInvoice" class="text-xs text-emerald-600">
-              Facture selectionnee: {{ formatInvoiceLabel(selectedInvoice) }}
-            </div>
-            <Button
-                v-if="formData.invoiceId"
-                type="button"
-                variant="outline"
-                class="text-xs py-1"
-                @click="clearInvoiceSelection"
-            >
-              Retirer la facture
-            </Button>
-          </div>
-
-          <!-- PDF Upload -->
-          <div class="space-y-2v mt-4">
-            <Label for="pdf" class="text-sm mt-8">PDF à télécharger (optionnel)</Label>
-            <div class="text-center">
-            <!-- <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"> -->
-              <Button
-                  type="button"
-                  variant="outline"
-                  @click="$refs.pdfInput.click()"
-                  class="w-full gap-2 text-sm py-2 sm:py-2 mt-2"
-                  :disabled="Boolean(formData.invoiceId)"
-                  :class="formData.invoiceId ? 'opacity-60 cursor-not-allowed' : ''"
-              >
-                <UploadIcon class="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                Ajouter un PDF
-              </Button>
-              <input
-                  ref="pdfInput"
-                  type="file"
-                  accept=".pdf"
-                  @change="handlePdfUpload"
-                  class="hidden"
-              />
-              <p v-if="formData.pdf" class="text-xs text-green-600 mt-2">
-                {{ formData.pdf.name }}
-              </p>
-              <p v-if="formData.invoiceId" class="text-xs text-gray-500 mt-2">
-                PDF gere par la facture selectionnee.
-              </p>
-            </div>
-          </div>
-
-          <!-- Amount Configuration -->
+          
+          <!-- SECTION: Informations principales -->
           <div class="space-y-4">
-            <Label class="text-sm">Type de montant</Label>
-            <div class="flex items-center space-x-2">
-              <Switch
-                  :checked="formData.amountType === 'flexible'"
-                  @update:checked="toggleAmountType"
+            <div class="space-y-2">
+              <Label for="title" class="text-sm">Titre *</Label>
+              <Input
+                  id="title"
+                  v-model="formData.title"
+                  @input="generateUrlFromTitle"
+                  required
+                  class="text-sm py-2"
               />
-              <span class="text-xs sm:text-sm">
-      {{ formData.amountType === 'flexible' ? 'Montant libre' : 'Montant fixe' }}
-    </span>
             </div>
 
-            <!-- Champ Montant si fixe -->
+            <div class="space-y-2">
+              <Label for="description" class="text-sm">Description *</Label>
+              <RichTextEditor
+                  v-model="formData.description"
+                  placeholder="Décrivez votre lien de paiement..."
+                  class="text-sm"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <Label for="customUrl" class="text-sm">URL personnalisée *</Label>
+              <div class="flex">
+                <div class="bg-gray-100 px-3 py-2 border border-r-0 text-xs sm:text-sm text-gray-600">
+                  leekpay.me/
+                </div>
+                <Input
+                    id="customUrl"
+                    v-model="formData.customUrl"
+                    @input="onUrlManualEdit"
+                    placeholder="mon-lien-unique"
+                    class="rounded-l-none text-sm py-2"
+                    :class="{
+                      'border-red-500': urlError,
+                      'border-green-500': urlAvailable && formData.customUrl
+                    }"
+                    pattern="[a-zA-Z0-9_\-]+"
+                    title="Uniquement lettres, chiffres, tirets et underscores"
+                    required
+                />
+              </div>
+              <p v-if="urlChecking" class="text-xs text-blue-600">Vérification...</p>
+              <p v-else-if="urlError" class="text-xs text-red-600">{{ urlError }}</p>
+              <p v-else-if="urlAvailable && formData.customUrl" class="text-xs text-green-600">URL disponible</p>
+            </div>
+          </div>
+
+          <!-- SECTION: Tarification -->
+          <div class="space-y-4 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between">
+              <Label class="text-sm">Montant</Label>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-500">{{ formData.amountType === 'flexible' ? 'Libre' : 'Fixe' }}</span>
+                <Switch
+                    :checked="formData.amountType === 'flexible'"
+                    @update:checked="toggleAmountType"
+                />
+              </div>
+            </div>
+
             <div v-if="formData.amountType === 'fixed'" class="space-y-2">
-              <Label for="amount" class="text-sm">Montant *</Label>
               <Input
                   id="amount"
                   type="number"
                   step="0.01"
                   min="0.01"
                   v-model="formData.fixedAmount"
+                  placeholder="Montant"
                   class="text-sm py-2 w-full"
                   required
               />
@@ -216,34 +118,170 @@
             </div>
           </div>
 
-          <!-- Expiration Date -->
-          <div class="space-y-2">
-            <Label for="expiration" class="text-sm">Date d'expiration (optionnel)</Label>
-            <Input
-                id="expiration"
-                type="date"
-                v-model="formData.expirationDate"
-                class="text-sm py-2"
-            />
+          <!-- SECTION: Média (collapsible) -->
+          <div class="border-t border-gray-100">
+            <button
+              type="button"
+              @click="toggleSection('media')"
+              class="w-full flex items-center justify-between py-4 text-left"
+            >
+              <span class="text-sm font-medium text-gray-700">Média</span>
+              <div class="flex items-center gap-2">
+                <span v-if="formData.image || formData.pdf || formData.invoiceId" class="text-xs text-green-600">Configuré</span>
+                <span v-else class="text-xs text-gray-400">Optionnel</span>
+                <ChevronDown 
+                  class="w-4 h-4 text-gray-400 transition-transform" 
+                  :class="{ 'rotate-180': openSections.media }" 
+                />
+              </div>
+            </button>
+            
+            <div v-show="openSections.media" class="pb-4 space-y-4">
+              <div class="space-y-2">
+                <Label class="text-sm">Image</Label>
+                <div class="flex items-center gap-3">
+                  <Button
+                      type="button"
+                      variant="outline"
+                      @click="$refs.imageInput.click()"
+                      class="text-sm py-2"
+                  >
+                    Choisir un fichier
+                  </Button>
+                  <span v-if="formData.image" class="text-xs text-green-600">{{ formData.image.name }}</span>
+                  <span v-else class="text-xs text-gray-400">Aucun fichier</span>
+                </div>
+                <input
+                    ref="imageInput"
+                    type="file"
+                    accept="image/*"
+                    @change="handleImageUpload"
+                    class="hidden"
+                />
+              </div>
+
+              <div class="space-y-3">
+                <Label class="text-sm">Document</Label>
+                
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    @click="documentType = 'pdf'"
+                    class="flex-1 py-2 text-sm border transition-colors"
+                    :class="documentType === 'pdf' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+                  >
+                    Ajouter un PDF
+                  </button>
+                  <button
+                    type="button"
+                    @click="documentType = 'invoice'"
+                    class="flex-1 py-2 text-sm border transition-colors"
+                    :class="documentType === 'invoice' ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+                  >
+                    Lier une facture
+                  </button>
+                </div>
+
+                <div v-if="documentType === 'invoice'" class="space-y-2">
+                  <Input
+                      v-model="invoiceSearch"
+                      type="text"
+                      placeholder="Rechercher une facture..."
+                      class="text-sm py-2"
+                      @keydown.enter.prevent
+                  />
+                  <Select
+                      v-model="formData.invoiceId"
+                      :options="invoiceOptions"
+                      placeholder="Sélectionner une facture"
+                      class="text-sm"
+                  />
+                  <p v-if="invoiceError" class="text-xs text-red-600">{{ invoiceError }}</p>
+                  <p v-if="selectedInvoice" class="text-xs text-green-600">
+                    {{ formatInvoiceLabel(selectedInvoice) }}
+                  </p>
+                  <button
+                      v-if="formData.invoiceId"
+                      type="button"
+                      @click="clearInvoiceSelection"
+                      class="text-xs text-gray-500 underline"
+                  >
+                    Retirer
+                  </button>
+                </div>
+
+                <div v-else-if="documentType === 'pdf'" class="space-y-2">
+                  <div class="flex items-center gap-3">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        @click="$refs.pdfInput.click()"
+                        class="text-sm py-2"
+                    >
+                      Choisir un fichier
+                    </Button>
+                    <span v-if="formData.pdf" class="text-xs text-green-600">{{ formData.pdf.name }}</span>
+                    <span v-else class="text-xs text-gray-400">Aucun fichier</span>
+                  </div>
+                  <input
+                      ref="pdfInput"
+                      type="file"
+                      accept=".pdf"
+                      @change="handlePdfUpload"
+                      class="hidden"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Redirect URL -->
-          <div class="space-y-2">
-            <Label for="redirectUrl" class="text-sm">URL de redirection après paiement (optionnel)</Label>
-            <Input
-                id="redirectUrl"
-                type="url"
-                v-model="formData.redirectUrl"
-                placeholder="https://example.com/success"
-                class="text-sm py-2"
-            />
-            <p class="text-xs text-gray-500">
-              Les utilisateurs seront redirigés vers cette URL après un paiement réussi
-            </p>
+          <!-- SECTION: Options avancées (collapsible) -->
+          <div class="border-t border-gray-100">
+            <button
+              type="button"
+              @click="toggleSection('advanced')"
+              class="w-full flex items-center justify-between py-4 text-left"
+            >
+              <span class="text-sm font-medium text-gray-700">Options avancées</span>
+              <div class="flex items-center gap-2">
+                <span v-if="formData.expirationDate || formData.redirectUrl" class="text-xs text-green-600">Configuré</span>
+                <span v-else class="text-xs text-gray-400">Optionnel</span>
+                <ChevronDown 
+                  class="w-4 h-4 text-gray-400 transition-transform" 
+                  :class="{ 'rotate-180': openSections.advanced }" 
+                />
+              </div>
+            </button>
+            
+            <div v-show="openSections.advanced" class="pb-4 space-y-4">
+              <div class="space-y-2">
+                <Label for="expiration" class="text-sm">Date d'expiration</Label>
+                <Input
+                    id="expiration"
+                    type="date"
+                    v-model="formData.expirationDate"
+                    class="text-sm py-2"
+                />
+              </div>
+
+              <div class="space-y-2">
+                <Label for="redirectUrl" class="text-sm">URL de redirection après paiement</Label>
+                <Input
+                    id="redirectUrl"
+                    type="url"
+                    v-model="formData.redirectUrl"
+                    placeholder="https://example.com/success"
+                    class="text-sm py-2"
+                />
+                <p class="text-xs text-gray-500">
+                  Redirection automatique après un paiement réussi
+                </p>
+              </div>
+            </div>
           </div>
 
           <!-- Erreur API -->
-          <div v-if="error" class="text-red-600 text-sm p-2 bg-red-50 rounded text-center">
+          <div v-if="error" class="text-red-600 text-sm p-3 bg-red-50 border border-red-200">
             {{ error }}
           </div>
 
@@ -251,14 +289,15 @@
           <Button
               type="submit"
               :disabled="loading"
-              class="w-full gap-2 py-3 text-sm sm:text-base"
+              class="w-full py-3 text-sm"
               :style="{ backgroundColor: '#2ECC71', color: 'white' }"
           >
-            <svg v-if="loading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            {{ loading ? 'Création...' : 'Créer le lien de paiement' }}
+            <span v-if="loading" class="flex items-center justify-center gap-2">
+              <span class="w-1 h-1 bg-white rounded-full animate-pulse"></span>
+              <span class="w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 0.2s"></span>
+              <span class="w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 0.4s"></span>
+            </span>
+            <span v-else>Créer le lien</span>
           </Button>
         </form>
       </Card>
@@ -400,7 +439,8 @@ import {
   UploadIcon,
   QrCodeIcon,
   CopyIcon,
-  CheckIcon
+  CheckIcon,
+  ChevronDown
 } from 'lucide-vue-next'
 import Button from "~/components/ui/Button.vue"
 import Card from "~/components/ui/Card.vue"
@@ -458,6 +498,17 @@ const invoiceDetails = ref(null)
 const invoiceError = ref('')
 let urlCheckTimeout = null
 let invoiceSearchTimeout = null
+
+const openSections = ref({
+  media: false,
+  advanced: false
+})
+
+const documentType = ref('pdf')
+
+const toggleSection = (section) => {
+  openSections.value[section] = !openSections.value[section]
+}
 
 // Auto-génération d'URL à partir du titre
 const generateUrlFromTitle = () => {
@@ -671,6 +722,19 @@ watch(
   { immediate: true }
 )
 
+watch(
+  () => documentType.value,
+  (newType) => {
+    if (newType === 'invoice') {
+      formData.value.pdf = null
+      if (pdfInput.value) pdfInput.value.value = ''
+    } else {
+      formData.value.invoiceId = null
+      invoiceDetails.value = null
+    }
+  }
+)
+
 // Afficher un toast
 const displayToast = (message) => {
   toastMessage.value = message
@@ -848,6 +912,7 @@ const resetForm = () => {
     expirationDate: '',
     redirectUrl: ''
   }
+  documentType.value = 'pdf'
   invoiceSearch.value = ''
   invoiceDetails.value = null
   invoiceError.value = ''

@@ -22,14 +22,25 @@
         </div>
         
         <!-- Mode Page: champ titre éditable -->
-        <input
-          v-else
-          v-model="page.title"
-          type="text"
-          placeholder="Entrez le titre de la page"
-          class="text-lg font-semibold bg-transparent border-b-2 focus:outline-none focus:ring-0 w-40 sm:w-64 transition-colors"
-          :class="page.title ? 'border-transparent' : 'border-red-300 placeholder-red-400'"
-        />
+        <div v-if="!isTemplateMode" class="flex items-center gap-3">
+          <input
+            v-model="page.title"
+            type="text"
+            placeholder="Titre de la page"
+            class="text-lg font-semibold bg-transparent border-b-2 focus:outline-none focus:ring-0 w-32 sm:w-48 transition-colors"
+            :class="page.title ? 'border-transparent' : 'border-red-300 placeholder-red-400'"
+          />
+          <div class="hidden md:flex items-center text-sm">
+            <input
+              v-model="page.slug"
+              type="text"
+              placeholder="sous-domaine"
+              class="px-2 py-1 border border-gray-300 rounded-l text-gray-700 w-32 focus:outline-none focus:border-gray-400"
+              :class="!page.slug ? 'border-red-300' : ''"
+            />
+            <span class="px-2 py-1 bg-gray-100 border border-l-0 border-gray-300 rounded-r text-gray-500">.leekpay.me</span>
+          </div>
+        </div>
       </div>
       
       <div class="flex items-center space-x-2 sm:space-x-3">

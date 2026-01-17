@@ -1,311 +1,273 @@
 <template>
-  <div class="p-2 sm:p-2 space-y-4">
-    <div>
-      <!-- <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Tableau de bord</h1> -->
-      <p class="text-sm text-gray-600">Vue d'ensemble de vos performances</p>
-    </div>
-
-    <div class="bg-white rounded-md">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">Filtrer par lien</label>
-          <select
-            v-model="selectedLink"
-            @change="fetchDashboard"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
-            :disabled="loading"
-          >
-            <option value="">Tous les liens</option>
-            <option v-for="link in allLinks" :key="link.id" :value="link.id">
-              {{ link.title }}
-            </option>
-          </select>
+  <div class="p-4 sm:p-6 space-y-6">
+    <!-- Carrousel Bannières -->
+    <div v-if="banners.length > 0" class="relative overflow-hidden">
+      <div class="relative">
+        <a 
+          v-if="banners[currentBannerIndex]"
+          :href="banners[currentBannerIndex].url || '#'"
+          :target="banners[currentBannerIndex].url ? '_blank' : '_self'"
+          rel="noopener noreferrer"
+          class="block"
+        >
+          <img 
+            :src="banners[currentBannerIndex].image_url" 
+            :alt="banners[currentBannerIndex].title"
+            class="w-full h-32 sm:h-40 md:h-48 object-cover transition-opacity duration-500"
+          />
+        </a>
+        
+        <!-- Indicateurs -->
+        <div v-if="banners.length > 1" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+          <button
+            v-for="(_, index) in banners"
+            :key="index"
+            @click="currentBannerIndex = index"
+            :class="[
+              'w-2 h-2 rounded-full transition-colors',
+              index === currentBannerIndex ? 'bg-white' : 'bg-white/50 hover:bg-white/70'
+            ]"
+          />
         </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-700 mb-1">Période</label>
-          <select
-            v-model="selectedPeriod"
-            @change="fetchDashboard"
-            class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
-            :disabled="loading"
+        
+        <!-- Flèches navigation -->
+        <template v-if="banners.length > 1">
+          <button 
+            @click="prevBanner"
+            class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
           >
-            <option value="">Toute la période</option>
-            <option value="today">Aujourd'hui</option>
-            <option value="this_week">Cette semaine</option>
-            <option value="this_month">Ce mois-ci</option>
-            <option value="last_month">Mois dernier</option>
-            <option value="this_year">Cette année</option>
-          </select>
-        </div>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <button 
+            @click="nextBanner"
+            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </template>
       </div>
-      <p v-if="selectedLink || selectedPeriod" class="text-xs text-gray-500 mt-3">
-        <span v-if="selectedLink">Lien : <strong>{{ getSelectedLinkTitle() }}</strong></span>
-        <span v-if="selectedLink && selectedPeriod"> • </span>
-        <span v-if="selectedPeriod">Période : <strong>{{ getPeriodLabel() }}</strong></span>
-        <button @click="resetFilters" class="ml-2 text-blue-600 hover:underline" :disabled="loading">Réinitialiser</button>
-      </p>
     </div>
 
-    <div v-if="loading" class="flex items-center justify-center py-12">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+    <!-- Header + Actions rapides -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          <span>👋</span>
+          <span>Salut {{ user?.first_name || user?.name || 'there' }}</span>
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">Vue d'ensemble de votre activité</p>
+      </div>
+      
+      <!-- 3 Boutons d'action rapide -->
+      <div class="flex flex-wrap gap-2">
+        <NuxtLink
+          to="/dashboard/create-link"
+          class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Lien
+        </NuxtLink>
+        <NuxtLink
+          to="/dashboard/invoices/create"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Facture
+        </NuxtLink>
+        <NuxtLink
+          to="/dashboard/sales-pages/create"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Page
+        </NuxtLink>
+      </div>
     </div>
 
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4">
-      <p class="text-sm text-red-700">{{ error }}</p>
+    <!-- Filtre période -->
+    <div class="flex items-center gap-3">
+      <select
+        v-model="selectedPeriod"
+        @change="fetchDashboard"
+        class="px-3 py-2 border border-gray-200 text-sm focus:outline-none focus:border-gray-400"
+        :disabled="loading"
+      >
+        <option value="">Toute la période</option>
+        <option value="today">Aujourd'hui</option>
+        <option value="this_week">Cette semaine</option>
+        <option value="this_month">Ce mois</option>
+        <option value="last_month">Mois dernier</option>
+        <option value="this_year">Cette année</option>
+      </select>
+      <button
+        v-if="selectedPeriod"
+        @click="selectedPeriod = ''; fetchDashboard()"
+        class="text-sm text-gray-500 hover:text-gray-700"
+      >
+        Réinitialiser
+      </button>
     </div>
 
+    <!-- Loading -->
+    <div v-if="loading" class="flex items-center justify-center py-16">
+      <div class="w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="border border-red-200 p-4">
+      <p class="text-sm text-red-600">{{ error }}</p>
+    </div>
+
+    <!-- Dashboard Content -->
     <div v-else class="space-y-6">
-      <div v-if="selectedLink" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div class="flex items-start gap-3">
-          <InfoIcon class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      <!-- Métriques globales -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total collecté -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Total collecté</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ formatAmount(data.transactions.collected) }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ user?.currency?.symbol || 'XOF' }}</p>
+        </div>
+        
+        <!-- Transactions -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Transactions</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ data.transactions.total }}</p>
+          <p class="text-xs mt-1">
+            <span class="text-green-600">{{ data.transactions.paid }} payées</span>
+            <span v-if="data.transactions.pending > 0" class="text-gray-400"> · {{ data.transactions.pending }} en attente</span>
+          </p>
+        </div>
+        
+        <!-- Liens de paiement -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Liens</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ data.links.total }}</p>
+          <p class="text-xs text-gray-400 mt-1">{{ data.links.active }} actifs · {{ data.links.clicks }} clics</p>
+        </div>
+        
+        <!-- Factures -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Factures</p>
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ data.invoices.total }}</p>
+          <p class="text-xs mt-1">
+            <span class="text-green-600">{{ data.invoices.paid }} payées</span>
+            <span v-if="data.invoices.pending > 0" class="text-gray-400"> · {{ data.invoices.pending }} en attente</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Section Pages de vente -->
+      <div class="border border-gray-200 p-4">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Pages de vente</p>
+          <NuxtLink to="/dashboard/sales-pages" class="text-xs text-green-600 hover:text-green-700">
+            Voir tout
+          </NuxtLink>
+        </div>
+        <div class="flex items-baseline gap-6">
           <div>
-            <p class="text-sm font-medium text-blue-900">Statistiques du lien sélectionné</p>
-            <p class="text-xs text-blue-700 mt-1">
-              Vous consultez les données uniquement pour "{{ getSelectedLinkTitle() }}". 
-              Les chiffres ci-dessous reflètent uniquement ce lien.
-            </p>
+            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.total }}</p>
+            <p class="text-xs text-gray-400">pages créées</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.published }}</p>
+            <p class="text-xs text-gray-400">publiées</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.views }}</p>
+            <p class="text-xs text-gray-400">vues</p>
           </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm text-gray-600">Liens</span>
-            <Link2Icon class="w-4 h-4 text-gray-400" />
-          </div>
-          <p class="text-2xl font-semibold text-gray-900">{{ metrics.total_links }}</p>
-          <div class="flex items-center gap-2 mt-2 text-xs">
-            <span class="text-green-600">{{ linkStatus.active_links }} actifs</span>
-            <span class="text-gray-400">•</span>
-            <span class="text-gray-500">{{ linkStatus.inactive_links }} inactifs</span>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm text-gray-600">Clics</span>
-            <EyeIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <p class="text-2xl font-semibold text-gray-900">{{ formatNumber(metrics.total_clicks) }}</p>
-          <p class="text-xs text-gray-500 mt-2">Taux: {{ metrics.conversion_rate }}%</p>
-        </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm text-gray-600">Transactions</span>
-            <ActivityIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <p class="text-2xl font-semibold text-gray-900">{{ formatNumber(metrics.total_transactions) }}</p>
-          <div class="flex items-center gap-2 mt-2 text-xs">
-            <span class="text-green-600">{{ metrics.paid_transactions }} payées</span>
-            <span class="text-gray-400">•</span>
-            <span class="text-orange-500">{{ metrics.pending_transactions }} en attente</span>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm text-gray-600">Collecté</span>
-            <DollarSignIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <p class="text-2xl font-semibold text-gray-900">{{ formatAmount(metrics.total_collected) }}</p>
-          <p class="text-xs text-gray-500 mt-2">{{ user?.currency?.symbol || 'XOF' }}</p>
-        </div>
-      </div>
-
+      <!-- Graphique revenus + Performance -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Évolution des revenus (7 derniers jours)</h3>
-            <BarChartIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <div v-if="dailyStats.length > 0" class="space-y-2">
-            <div v-for="stat in dailyStats" :key="stat.date" class="flex items-center gap-3">
-              <span class="text-xs text-gray-500 w-20">{{ formatShortDate(stat.date) }}</span>
-              <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
-                <div 
+        <!-- Revenus 7 jours -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide mb-4">Revenus (7 derniers jours)</p>
+          <div v-if="data.daily_stats.length > 0" class="space-y-2">
+            <div v-for="stat in data.daily_stats" :key="stat.date" class="flex items-center gap-3">
+              <span class="text-xs text-gray-500 w-16">{{ formatShortDate(stat.date) }}</span>
+              <div class="flex-1 bg-gray-100 h-2">
+                <div
                   class="bg-green-600 h-full transition-all"
                   :style="{ width: getBarWidth(stat.revenue) + '%' }"
                 ></div>
               </div>
-              <span class="text-xs font-medium text-gray-900 w-24 text-right">
-                {{ formatAmount(stat.revenue) }} {{ user?.currency?.symbol || 'XOF' }}
-              </span>
+              <span class="text-xs font-medium text-gray-700 w-20 text-right">{{ formatAmount(stat.revenue) }}</span>
             </div>
           </div>
-          <div v-else class="text-center py-8 text-sm text-gray-500">
-            Aucune donnée disponible
-          </div>
+          <p v-else class="text-sm text-gray-400 text-center py-6">Aucune donnée</p>
         </div>
 
-        <div v-if="monthlyPerformance.growth_rate !== 0" class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Performance mensuelle</h3>
-            <CalendarIcon class="w-4 h-4 text-gray-400" />
-          </div>
+        <!-- Performance mensuelle -->
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide mb-4">Performance mensuelle</p>
           <div class="space-y-4">
             <div>
-              <p class="text-xs text-gray-500 mb-1">Mois en cours</p>
-              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.current_month_revenue) }} {{ user?.currency?.symbol || 'XOF' }}</p>
+              <p class="text-xs text-gray-400">Ce mois</p>
+              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(data.monthly_performance.current) }} {{ user?.currency?.symbol || 'XOF' }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-500 mb-1">Mois précédent</p>
-              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(monthlyPerformance.last_month_revenue) }} {{ user?.currency?.symbol || 'XOF' }}</p>
+              <p class="text-xs text-gray-400">Mois précédent</p>
+              <p class="text-xl font-semibold text-gray-900">{{ formatAmount(data.monthly_performance.previous) }} {{ user?.currency?.symbol || 'XOF' }}</p>
             </div>
-            <div>
-              <p class="text-xs text-gray-500 mb-1">Évolution</p>
-              <p :class="[
-                'text-xl font-semibold',
-                monthlyPerformance.growth_rate > 0 ? 'text-green-600' : 'text-red-600'
-              ]">
-                {{ monthlyPerformance.growth_rate > 0 ? '+' : '' }}{{ monthlyPerformance.growth_rate }}%
+            <div v-if="data.monthly_performance.growth_rate !== 0">
+              <p class="text-xs text-gray-400">Évolution</p>
+              <p :class="['text-xl font-semibold', data.monthly_performance.growth_rate > 0 ? 'text-green-600' : 'text-red-600']">
+                {{ data.monthly_performance.growth_rate > 0 ? '+' : '' }}{{ data.monthly_performance.growth_rate }}%
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="allLinks.length > 1" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Liens les plus rentables</h3>
-            <TrendingUpIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <div v-if="topEarningLinks.length > 0" class="space-y-3">
-            <div v-for="link in topEarningLinks" :key="link.id" class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ link.title }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ link.custom_url }}</p>
-              </div>
-              <span class="text-sm font-semibold text-gray-900 ml-4">
-                {{ formatAmount(link.total_collected) }} {{ getCurrencySymbol(link.currency_id) }}
-              </span>
-            </div>
-          </div>
-          <div v-else class="text-center py-8 text-sm text-gray-500">
-            Aucune donnée disponible
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Liens les plus cliqués</h3>
-            <MousePointerClickIcon class="w-4 h-4 text-gray-400" />
-          </div>
-          <div v-if="topClickedLinks.length > 0" class="space-y-3">
-            <div v-for="link in topClickedLinks" :key="link.id" class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">{{ link.title }}</p>
-                <p class="text-xs text-gray-500 truncate">{{ link.custom_url }}</p>
-              </div>
-              <span class="text-sm font-semibold text-gray-900 ml-4">{{ link.click_count }}</span>
-            </div>
-          </div>
-          <div v-else class="text-center py-8 text-sm text-gray-500">
-            Aucune donnée disponible
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <!-- Dernières transactions -->
+      <div class="border border-gray-200 p-4">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold text-gray-900">Dernières transactions</h3>
-          <button
-            @click="$router.push('/dashboard/transactions')"
-            class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-          >
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Dernières transactions</p>
+          <NuxtLink to="/dashboard/transactions" class="text-xs text-green-600 hover:text-green-700">
             Voir tout
-          </button>
+          </NuxtLink>
         </div>
-        <div v-if="recentTransactions.length > 0" class="space-y-3">
-          <div v-for="transaction in recentTransactions" :key="transaction.id" class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-            <div class="flex-1">
-              <p class="text-sm font-medium text-gray-900">{{ transaction.payment_link?.title || 'Lien supprimé' }}</p>
-              <p class="text-xs text-gray-500">{{ formatDate(transaction.created_at) }}</p>
+        <div v-if="data.recent_transactions.length > 0" class="divide-y divide-gray-100">
+          <div v-for="tx in data.recent_transactions" :key="tx.id" class="flex items-center justify-between py-3">
+            <div>
+              <p class="text-sm font-medium text-gray-900">{{ tx.payment_link?.title || 'Transaction' }}</p>
+              <p class="text-xs text-gray-400">{{ formatDate(tx.created_at) }}</p>
             </div>
             <div class="flex items-center gap-3">
-              <span class="text-sm font-semibold text-gray-900">
-                {{ formatAmount(transaction.amount) }} {{ transaction.currency?.symbol }}
-              </span>
+              <span class="text-sm font-medium text-gray-900">{{ formatAmount(tx.amount) }} {{ tx.currency?.symbol }}</span>
               <span :class="[
-                'text-xs px-2 py-1 rounded-full',
-                transaction.status === 'paid' ? 'bg-green-100 text-green-700' :
-                transaction.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                'bg-red-100 text-red-700'
+                'text-xs px-2 py-0.5',
+                tx.status === 'paid' ? 'bg-green-50 text-green-700' :
+                tx.status === 'pending' ? 'bg-amber-50 text-amber-700' :
+                'bg-red-50 text-red-700'
               ]">
-                {{ getStatusLabel(transaction.status) }}
+                {{ getStatusLabel(tx.status) }}
               </span>
             </div>
           </div>
         </div>
-        <div v-else class="text-center py-8 text-sm text-gray-500">
-          Aucune transaction récente
-        </div>
-      </div>
-
-      <div v-if="analytics.top_countries.length > 0 || analytics.top_referrers.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Pays principaux</h3>
-            <span class="text-xs text-gray-500">{{ analytics.total_clicks }} clics</span>
-          </div>
-          <div v-if="analytics.top_countries.length > 0" class="space-y-3">
-            <div v-for="country in analytics.top_countries" :key="country.country" class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-gray-900">{{ country.country || 'Inconnu' }}</p>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="flex-1 bg-gray-100 rounded-full h-2 w-24">
-                  <div 
-                    class="bg-green-600 h-full rounded-full"
-                    :style="{ width: getCountryBarWidth(country.total) + '%' }"
-                  ></div>
-                </div>
-                <span class="text-sm font-semibold text-gray-900 w-12 text-right">{{ country.total }}</span>
-              </div>
-            </div>
-          </div>
-          <div v-else class="text-center py-8 text-sm text-gray-500">
-            Aucune donnée disponible
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-gray-900">Sources principales</h3>
-          </div>
-          <div v-if="analytics.top_referrers.length > 0" class="space-y-3">
-            <div v-for="referrer in analytics.top_referrers" :key="referrer.referrer" class="py-2 border-b border-gray-100 last:border-0">
-              <div class="flex items-center justify-between mb-1">
-                <p class="text-sm font-medium text-gray-900 truncate flex-1">{{ getDomainFromUrl(referrer.referrer) }}</p>
-                <span class="text-sm font-semibold text-gray-900 ml-2">{{ referrer.total }}</span>
-              </div>
-              <p class="text-xs text-gray-500 truncate">{{ referrer.referrer }}</p>
-            </div>
-          </div>
-          <div v-else class="text-center py-8 text-sm text-gray-500">
-            Aucune donnée disponible
-          </div>
-        </div>
+        <p v-else class="text-sm text-gray-400 text-center py-6">Aucune transaction</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import {
-  Link2Icon,
-  EyeIcon,
-  DollarSignIcon,
-  ActivityIcon,
-  TrendingUpIcon,
-  MousePointerClickIcon,
-  BarChartIcon,
-  CalendarIcon,
-  InfoIcon
-} from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'dashboard' })
@@ -315,41 +277,52 @@ const { token, user } = useAuth()
 
 const loading = ref(true)
 const error = ref('')
-const metrics = ref({
-  total_links: 0,
-  total_clicks: 0,
-  total_collected: 0,
-  total_transactions: 0,
-  paid_transactions: 0,
-  pending_transactions: 0,
-  conversion_rate: 0
-})
-
-const linkStatus = ref({
-  active_links: 0,
-  inactive_links: 0,
-  expired_links: 0
-})
-
-const topEarningLinks = ref([])
-const topClickedLinks = ref([])
-const recentTransactions = ref([])
-const userCurrencySymbol = ref('XOF')
-
 const selectedPeriod = ref('')
-const selectedLink = ref('')
-const allLinks = ref([])
-const dailyStats = ref([])
-const monthlyPerformance = ref({
-  current_month_revenue: 0,
-  last_month_revenue: 0,
-  growth_rate: 0
-})
 
-const analytics = ref({
-  top_countries: [],
-  top_referrers: [],
-  total_clicks: 0
+// Bannières
+const banners = ref([])
+const currentBannerIndex = ref(0)
+let bannerInterval = null
+
+const fetchBanners = async () => {
+  try {
+    const response = await $fetch('/banners/active', {
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    banners.value = response.data || []
+    if (banners.value.length > 1) {
+      startBannerAutoplay()
+    }
+  } catch (err) {
+    console.error('Erreur chargement bannières:', err)
+  }
+}
+
+const startBannerAutoplay = () => {
+  bannerInterval = setInterval(() => {
+    currentBannerIndex.value = (currentBannerIndex.value + 1) % banners.value.length
+  }, 5000)
+}
+
+const prevBanner = () => {
+  currentBannerIndex.value = currentBannerIndex.value === 0 
+    ? banners.value.length - 1 
+    : currentBannerIndex.value - 1
+}
+
+const nextBanner = () => {
+  currentBannerIndex.value = (currentBannerIndex.value + 1) % banners.value.length
+}
+
+const data = ref({
+  links: { total: 0, active: 0, clicks: 0, collected: 0 },
+  invoices: { total: 0, paid: 0, pending: 0, amount_total: 0, amount_paid: 0 },
+  sales_pages: { total: 0, published: 0, views: 0 },
+  transactions: { total: 0, paid: 0, pending: 0, collected: 0 },
+  daily_stats: [],
+  recent_transactions: [],
+  monthly_performance: { current: 0, previous: 0, growth_rate: 0 }
 })
 
 const fetchDashboard = async () => {
@@ -360,26 +333,13 @@ const fetchDashboard = async () => {
     if (selectedPeriod.value) {
       params.append('period', selectedPeriod.value)
     }
-    if (selectedLink.value) {
-      params.append('link_id', selectedLink.value)
-    }
 
-    const response = await $fetch(`/dashboard?${params.toString()}`, {
+    const response = await $fetch(`/dashboard/global?${params.toString()}`, {
       baseURL: config.public.apiBaseURL,
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
+      headers: { Authorization: `Bearer ${token.value}` }
     })
 
-    const data = response.data
-    metrics.value = data.global_metrics
-    linkStatus.value = data.link_status
-    topEarningLinks.value = data.top_performers.top_earning_links || []
-    topClickedLinks.value = data.top_performers.top_clicked_links || []
-    recentTransactions.value = data.recent_activity.recent_transactions || []
-    dailyStats.value = data.daily_stats || []
-    monthlyPerformance.value = data.monthly_performance || monthlyPerformance.value
-    analytics.value = data.analytics || analytics.value
+    data.value = response.data
   } catch (err) {
     console.error('Erreur chargement dashboard:', err)
     error.value = 'Impossible de charger les données'
@@ -388,48 +348,8 @@ const fetchDashboard = async () => {
   }
 }
 
-const fetchAllLinks = async () => {
-  try {
-    const response = await $fetch('/payment-links?per_page=100', {
-      baseURL: config.public.apiBaseURL,
-      headers: {
-        Authorization: `Bearer ${token.value}`
-      }
-    })
-    allLinks.value = response.data || []
-  } catch (err) {
-    console.error('Erreur chargement liens:', err)
-  }
-}
-
-const resetFilters = () => {
-  selectedPeriod.value = ''
-  selectedLink.value = ''
-  fetchDashboard()
-}
-
-const getSelectedLinkTitle = () => {
-  const link = allLinks.value.find(l => l.id === Number(selectedLink.value))
-  return link ? link.title : ''
-}
-
-const getPeriodLabel = () => {
-  const labels = {
-    today: "Aujourd'hui",
-    this_week: 'Cette semaine',
-    this_month: 'Ce mois-ci',
-    last_month: 'Mois dernier',
-    this_year: 'Cette année'
-  }
-  return labels[selectedPeriod.value] || ''
-}
-
-const formatNumber = (value) => {
-  return Number(value || 0).toLocaleString()
-}
-
 const formatAmount = (value) => {
-  return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+  return Number(value || 0).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 }
 
 const formatDate = (dateString) => {
@@ -438,7 +358,7 @@ const formatDate = (dateString) => {
   const diff = now - date
   const hours = Math.floor(diff / (1000 * 60 * 60))
   
-  if (hours < 1) return 'Il y a quelques minutes'
+  if (hours < 1) return 'À l\'instant'
   if (hours < 24) return `Il y a ${hours}h`
   
   const days = Math.floor(hours / 24)
@@ -447,49 +367,30 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
-const getBarWidth = (revenue) => {
-  if (dailyStats.value.length === 0) return 0
-  const maxRevenue = Math.max(...dailyStats.value.map(s => s.revenue))
-  return maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0
-}
-
 const formatShortDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
-const getCurrencySymbol = (currencyId) => {
-  const map = { 1: '€', 2: '$', 3: 'XOF', 4: 'XAF' }
-  return map[currencyId] || 'XOF'
+const getBarWidth = (revenue) => {
+  if (data.value.daily_stats.length === 0) return 0
+  const maxRevenue = Math.max(...data.value.daily_stats.map(s => s.revenue))
+  return maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0
 }
 
 const getStatusLabel = (status) => {
-  const labels = {
-    paid: 'Payée',
-    pending: 'En attente',
-    failed: 'Échouée'
-  }
+  const labels = { paid: 'Payée', pending: 'En attente', failed: 'Échouée' }
   return labels[status] || status
 }
 
-const getCountryBarWidth = (total) => {
-  if (analytics.value.top_countries.length === 0) return 0
-  const maxTotal = Math.max(...analytics.value.top_countries.map(c => c.total))
-  return maxTotal > 0 ? (total / maxTotal) * 100 : 0
-}
-
-const getDomainFromUrl = (url) => {
-  if (!url) return 'Direct'
-  try {
-    const urlObj = new URL(url)
-    return urlObj.hostname.replace('www.', '')
-  } catch {
-    return url.length > 30 ? url.substring(0, 30) + '...' : url
-  }
-}
-
 onMounted(() => {
-  fetchAllLinks()
+  fetchBanners()
   fetchDashboard()
+})
+
+onUnmounted(() => {
+  if (bannerInterval) {
+    clearInterval(bannerInterval)
+  }
 })
 </script>

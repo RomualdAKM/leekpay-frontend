@@ -123,7 +123,7 @@
           
           <!-- Prix avec réduction -->
           <p v-if="promoValid && promoDiscount > 0" class="text-sm text-white mb-3">
-            Prix après réduction : <span class="font-semibold">{{ 4700 - promoDiscount }} FCFA</span>
+            Prix après réduction : <span class="font-semibold">{{ 9700 - promoDiscount }} FCFA</span>
           </p>
           
           <button
@@ -218,7 +218,7 @@ const status = ref({
   is_premium: false,
   days_remaining: 0,
   expires_at: null as string | null,
-  price: 4700,
+  price: 9700,
 })
 
 const history = ref<any[]>([])

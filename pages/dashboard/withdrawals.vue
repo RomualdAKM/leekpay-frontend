@@ -8,70 +8,36 @@
       </div>
 
       <!-- KYC Alert -->
-      <div v-if="kycStatus !== 'approved'" class="rounded-lg p-4" :class="getKycAlertClass()">
+      <div v-if="kycStatus !== 'approved'" class="border border-gray-200 p-4">
         <div class="flex items-start gap-3">
-          <div class="flex-shrink-0">
-            <ShieldAlert v-if="kycStatus === 'not_submitted' || kycStatus === 'rejected'" class="w-5 h-5" :class="kycStatus === 'rejected' ? 'text-red-500' : 'text-orange-500'" />
-            <Clock v-else class="w-5 h-5 text-orange-500" />
-          </div>
+          <ShieldAlert class="w-5 h-5 flex-shrink-0" :class="kycStatus === 'rejected' ? 'text-red-600' : 'text-gray-500'" />
           <div class="flex-1">
-            <h4 class="font-medium" :class="getKycAlertTextClass()">{{ getKycAlertTitle() }}</h4>
-            <p class="text-sm mt-1" :class="getKycAlertDescClass()">{{ getKycAlertMessage() }}</p>
+            <p class="font-medium text-gray-900">{{ getKycAlertTitle() }}</p>
+            <p class="text-sm text-gray-500 mt-1">{{ getKycAlertMessage() }}</p>
             <NuxtLink 
               v-if="kycStatus !== 'pending'"
               to="/dashboard/kyc" 
-              class="inline-flex items-center gap-1 mt-2 text-sm font-medium" 
-              :class="kycStatus === 'rejected' ? 'text-red-700 hover:text-red-800' : 'text-orange-700 hover:text-orange-800'"
+              class="inline-block mt-2 text-sm text-green-600 hover:text-green-700"
             >
-              {{ kycStatus === 'rejected' ? 'Soumettre de nouveaux documents' : 'Vérifier mon identité' }}
-              <ArrowRight class="w-4 h-4" />
+              {{ kycStatus === 'rejected' ? 'Nouveaux documents →' : 'Vérifier mon identité →' }}
             </NuxtLink>
           </div>
         </div>
       </div>
 
       <!-- Balance Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs text-gray-500">Solde disponible</p>
-              <p class="text-xl font-semibold text-gray-900 mt-1">
-                {{ formatCurrency(userBalance.available_balance) }}
-              </p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-              <Wallet class="w-5 h-5 text-green-600" />
-            </div>
-          </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Solde disponible</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(userBalance.available_balance) }}</p>
         </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs text-gray-500">En cours de retrait</p>
-              <p class="text-xl font-semibold text-gray-900 mt-1">
-                {{ formatCurrency(userBalance.pending_balance) }}
-              </p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center flex-shrink-0">
-              <ArrowUpRight class="w-5 h-5 text-orange-500" />
-            </div>
-          </div>
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">En cours</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(userBalance.pending_balance) }}</p>
         </div>
-
-        <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs text-gray-500">Total retiré</p>
-              <p class="text-xl font-semibold text-gray-900 mt-1">
-                {{ formatCurrency(userBalance.total_withdrawn) }}
-              </p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
-              <AlertCircle class="w-5 h-5 text-blue-500" />
-            </div>
-          </div>
+        <div class="border border-gray-200 p-4">
+          <p class="text-xs text-gray-500 uppercase tracking-wide">Total retiré</p>
+          <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(userBalance.total_withdrawn) }}</p>
         </div>
       </div>
 
@@ -80,19 +46,19 @@
         <TabsList class="flex w-full border-b border-gray-200">
           <TabsTrigger
               value="request"
-              class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500"
+              class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b data-[state=active]:border-gray-900"
           >
             Nouveau retrait
           </TabsTrigger>
           <TabsTrigger
               value="methods"
-              class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500"
+              class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b data-[state=active]:border-gray-900"
           >
             Moyens de paiement
           </TabsTrigger>
           <TabsTrigger
               value="history"
-              class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-green-500"
+              class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 data-[state=active]:text-gray-900 data-[state=active]:border-b data-[state=active]:border-gray-900"
           >
             Historique
           </TabsTrigger>
@@ -141,7 +107,7 @@
                       :min="feesConfig.minimum_withdrawal"
                       :max="userBalance.available_balance"
                       placeholder="0"
-                      class="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      class="w-full pl-4 pr-12 py-2.5 border border-gray-300 focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
                   />
                   <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
                     <span class="text-gray-500 text-sm">{{ currencySymbol }}</span>
@@ -155,7 +121,7 @@
               <!-- Résumé Calcul -->
               <div
                   v-if="withdrawalAmount && parseFloat(withdrawalAmount) >= feesConfig.minimum_withdrawal"
-                  class="bg-gray-50 rounded-lg p-4"
+                  class="border border-gray-200 p-4"
               >
                 <div class="space-y-3">
                   <div class="flex justify-between text-sm">
@@ -186,10 +152,10 @@
                   <div
                       v-for="method in withdrawalMethods"
                       :key="method.id"
-                      class="p-4 border rounded-lg cursor-pointer transition-colors"
+                      class="p-4 border cursor-pointer transition-colors"
                       :class="
                         selectedMethod === method.id
-                          ? 'border-green-500 bg-green-50'
+                          ? 'border-gray-900 bg-gray-50'
                           : 'border-gray-200 hover:border-gray-300'
                       "
                       @click="selectedMethod = method.id"
@@ -200,9 +166,9 @@
                         <p class="font-medium text-gray-900">{{ method.provider_name }}</p>
                         <p class="text-sm text-gray-500">{{ method.account_number }}</p>
                       </div>
-                      <div v-if="method.is_default" class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                      <span v-if="method.is_default" class="text-xs px-2 py-0.5 border border-gray-300 text-gray-600">
                         Par défaut
-                      </div>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -216,12 +182,11 @@
                     !selectedMethod ||
                     requestingWithdrawal
                   "
-                  class="w-full py-3 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                  class="w-full py-2.5 px-4 bg-green-600 text-white text-sm hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                   @click="handleWithdrawalRequest"
               >
-                <div v-if="requestingWithdrawal" class="w-5 h-5 border border-white border-t-transparent rounded-full animate-spin"></div>
-                <Wallet v-else class="w-5 h-5" />
-                {{ requestingWithdrawal ? 'Demande en cours...' : 'Demander le retrait' }}
+                <div v-if="requestingWithdrawal" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                {{ requestingWithdrawal ? 'Envoi...' : 'Demander le retrait' }}
               </button>
             </div>
           </div>
@@ -273,19 +238,17 @@
             <div
                 v-for="method in withdrawalMethods"
                 :key="method.id"
-                class="bg-white rounded-lg border border-gray-200 p-5"
+                class="border border-gray-200 p-4"
             >
               <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                    <component :is="getMethodIcon(method.method_type)" class="w-5 h-5 text-gray-500" />
-                  </div>
+                <div class="flex items-center gap-3">
+                  <component :is="getMethodIcon(method.method_type)" class="w-5 h-5 text-gray-500" />
                   <div>
-                    <h3 class="font-medium text-gray-900">{{ method.provider_name }}</h3>
+                    <p class="font-medium text-gray-900">{{ method.provider_name }}</p>
                     <p class="text-sm text-gray-500">{{ method.account_number }}</p>
-                    <div v-if="method.is_default" class="mt-1 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                      Méthode par défaut
-                    </div>
+                    <span v-if="method.is_default" class="inline-block mt-1 text-xs px-2 py-0.5 border border-gray-300 text-gray-600">
+                      Par défaut
+                    </span>
                   </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -508,11 +471,11 @@
     </div>
     
     <!-- Modal pour ajouter une méthode de retrait -->
-    <div v-if="showAddMethodModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 z-50">
-      <div class="bg-white rounded-md w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div class="px-6 py-5 border-b border-gray-200">
+    <div v-if="showAddMethodModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div class="px-5 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
-            <h3 class="text-md font-semibold text-gray-900">Ajouter une méthode de retrait</h3>
+            <h3 class="font-medium text-gray-900">Ajouter une méthode de retrait</h3>
             <button 
               type="button" 
               class="text-gray-400 hover:text-gray-500"
@@ -523,13 +486,13 @@
           </div>
         </div>
         
-        <form @submit.prevent="submitNewMethod" class="p-6 space-y-5">
+        <form @submit.prevent="submitNewMethod" class="p-5 space-y-4">
           <div>
-            <label for="methodType" class="block text-sm font-medium text-gray-700 mb-1">Type de méthode</label>
+            <label for="methodType" class="block text-sm text-gray-700 mb-1">Type de méthode</label>
             <select
               id="methodType"
               v-model="newMethod.method_type"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             >
               <option value="">Sélectionnez un type</option>
@@ -540,11 +503,11 @@
           </div>
           
           <div>
-            <label for="providerName" class="block text-sm font-medium text-gray-700 mb-1">Nom du fournisseur</label>
+            <label for="providerName" class="block text-sm text-gray-700 mb-1">Fournisseur</label>
             <select
               id="providerName"
               v-model="newMethod.provider_name"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              class="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             >
               <option value="">Sélectionnez un fournisseur</option>
@@ -597,26 +560,26 @@
           </div>
           
           <div>
-            <label for="accountNumber" class="block text-sm font-medium text-gray-700 mb-1">Numéro de compte</label>
+            <label for="accountNumber" class="block text-sm text-gray-700 mb-1">Numéro de compte</label>
             <input
               id="accountNumber"
               v-model="newMethod.account_number"
               type="text"
-              placeholder="Ex: 22996123456 (avec indicatif pays)"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="Ex: 22996123456"
+              class="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             />
-            <p class="mt-1 text-xs text-gray-500">Format international : indicatif + numéro (sans +,ni espaces ou ni tirets)</p>
+            <p class="mt-1 text-xs text-gray-500">Format: indicatif + numéro (sans +, espaces ou tirets)</p>
           </div>
           
           <div>
-            <label for="accountName" class="block text-sm font-medium text-gray-700 mb-1">Nom du titulaire</label>
+            <label for="accountName" class="block text-sm text-gray-700 mb-1">Nom du titulaire</label>
             <input
               id="accountName"
               v-model="newMethod.account_name"
               type="text"
-              placeholder="Nom complet du titulaire"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="Nom complet"
+              class="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400"
               required
             />
           </div>
@@ -634,17 +597,17 @@
           <div class="flex gap-3 pt-2">
             <button
               type="button"
-              class="flex-1 py-2 px-4 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500"
+              class="flex-1 py-2 px-4 border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
               @click="closeAddMethodModal"
             >
               Annuler
             </button>
             <button
               type="submit"
-              class="flex-1 py-2 px-4 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 flex items-center justify-center"
+              class="flex-1 py-2 px-4 bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-50 flex items-center justify-center"
               :disabled="submittingMethod"
             >
-              <div v-if="submittingMethod" class="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              <div v-if="submittingMethod" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
               {{ submittingMethod ? 'Ajout...' : 'Ajouter' }}
             </button>
           </div>
@@ -656,7 +619,7 @@
     <Transition name="fade">
       <div
         v-if="toast.show"
-        class="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 z-50"
+        class="fixed bottom-6 right-6 bg-gray-900 text-white px-4 py-2 text-sm z-50"
       >
         {{ toast.message }}
       </div>
@@ -1032,13 +995,13 @@ const getMethodIcon = (methodType) => {
 const getStatusBadge = (status) => {
   switch (status) {
     case 'processed':
-      return h("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700" }, "Traité")
+      return h("span", { class: "inline-flex items-center px-2 py-0.5 text-xs bg-green-600 text-white" }, "Traité")
     case 'pending':
-      return h("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700" }, "En attente")
+      return h("span", { class: "inline-flex items-center px-2 py-0.5 text-xs bg-gray-200 text-gray-700" }, "En attente")
     case 'rejected':
-      return h("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700" }, "Refusé")
+      return h("span", { class: "inline-flex items-center px-2 py-0.5 text-xs bg-red-600 text-white" }, "Refusé")
     default:
-      return h("span", { class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700" }, "Inconnu")
+      return h("span", { class: "inline-flex items-center px-2 py-0.5 text-xs bg-gray-200 text-gray-700" }, "Inconnu")
   }
 }
 

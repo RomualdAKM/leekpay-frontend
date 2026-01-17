@@ -73,54 +73,58 @@ const isMobile = ref(false)
 const sidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
 
-// Calcul du titre
+// Calcul de la section active
 const currentPage = computed(() => {
-  const pathParts = route.path.split('/').filter(p => p)
-  // Si c'est une page admin (ex: /dashboard/admin/broadcast)
-  if (pathParts[1] === 'admin' && pathParts[2]) {
-    return `admin/${pathParts[2]}`
+  const path = route.path
+  
+  // Pages admin
+  if (path.includes('/dashboard/admin/')) {
+    const adminPage = path.split('/dashboard/admin/')[1]?.split('/')[0]
+    return `dashboard/admin/${adminPage}`
   }
-  return pathParts[1] || 'dashboard'
+  
+  // Pages spéciales avec sous-routes
+  if (path.includes('/dashboard/sales-pages')) return 'dashboard/sales-pages'
+  if (path.includes('/dashboard/invoices')) return 'dashboard/invoices'
+  if (path.includes('/dashboard/links') || path.includes('/dashboard/edit-link')) return 'dashboard/links'
+  if (path.includes('/dashboard/create-link')) return 'dashboard/create-link'
+  
+  // Pages simples
+  const pathParts = path.split('/').filter(p => p)
+  if (pathParts.length === 1 && pathParts[0] === 'dashboard') return 'dashboard'
+  if (pathParts.length >= 2) return `dashboard/${pathParts[1]}`
+  
+  return 'dashboard'
 })
 
 const pageMap = {
-  dashboard: 'Tableau de bord',
-  links: 'Mes Liens',
-  transactions: 'Transactions',
-  invoices: 'Factures',
-  withdrawals: 'Retraits',
-  'sales-pages': 'Pages de vente',
-  subscription: 'Abonnement',
-  kyc: 'Vérification KYC',
-  analytics: 'Analytiques',
-  'api-keys': 'Clés API',
-  settings: 'Paramètres',
-  support: 'Support',
-  // Pages admin
-  'admin/stats': 'Statistiques Admin',
-  'admin/transactions': 'Transactions Admin',
-  'admin/links': 'Liens de Paiement',
-  'admin/withdrawals': 'Gestion Retraits',
-  'admin/kyc': 'Gestion KYC',
-  'admin/broadcast': 'Communication',
-  'admin/templates': 'Templates'
+  'dashboard': 'Tableau de bord',
+  'dashboard/links': 'Liens de paiement',
+  'dashboard/create-link': 'Créer un lien',
+  'dashboard/transactions': 'Transactions',
+  'dashboard/invoices': 'Factures',
+  'dashboard/withdrawals': 'Retraits',
+  'dashboard/sales-pages': 'Pages de vente',
+  'dashboard/subscription': 'Abonnement',
+  'dashboard/affiliation': 'Affiliation',
+  'dashboard/kyc': 'Vérification KYC',
+  'dashboard/api-keys': 'Clés API',
+  'dashboard/settings': 'Paramètres',
+  'dashboard/support': 'Support',
+  'dashboard/admin/stats': 'Statistiques',
+  'dashboard/admin/transactions': 'Transactions',
+  'dashboard/admin/links': 'Liens',
+  'dashboard/admin/sales-pages': 'Pages de vente',
+  'dashboard/admin/invoices': 'Factures',
+  'dashboard/admin/withdrawals': 'Retraits',
+  'dashboard/admin/kyc': 'KYC',
+  'dashboard/admin/broadcast': 'Communication',
+  'dashboard/admin/templates': 'Templates',
+  'dashboard/admin/banners': 'Bannières'
 }
 
 const pageTitle = computed(() => {
   return pageMap[currentPage.value] || 'Dashboard'
-})
-
-const pageTitleShort = computed(() => {
-  const shortMap = {
-    dashboard: 'Accueil',
-    links: 'Liens',
-    transactions: 'Trans.',
-    withdrawals: 'Retraits',
-    kyc: 'KYC',
-    analytics: 'Stats',
-    settings: 'Param.'
-  }
-  return shortMap[currentPage.value] || 'Accueil'
 })
 
 // Gérer la taille de l'écran
