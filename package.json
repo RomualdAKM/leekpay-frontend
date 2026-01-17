@@ -43,5 +43,8 @@
     "vue-router": "^4.5.1",
     "vue-toastification": "^2.0.0-rc.5",
     "vuedraggable": "^4.1.0"
+  },
+  "devDependencies": {
+    "baseline-browser-mapping": "^2.9.14"
   }
 }

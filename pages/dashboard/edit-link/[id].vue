@@ -158,6 +158,42 @@
             </div>
           </div>
 
+          <!-- Invoice Attach -->
+          <div class="space-y-2">
+            <Label class="text-sm">Facture existante (optionnel)</Label>
+            <Input
+                v-model="invoiceSearch"
+                type="text"
+                placeholder="Rechercher une facture..."
+                class="text-sm py-2"
+                @keydown.enter.prevent
+            />
+            <Select
+                v-model="formData.invoiceId"
+                :options="invoiceOptions"
+                placeholder="Choisir une facture"
+                class="text-sm"
+            />
+            <p v-if="invoiceError" class="text-xs text-red-600">{{ invoiceError }}</p>
+            <p v-else-if="invoiceLoading" class="text-xs text-gray-500">Chargement des factures...</p>
+            <p v-else-if="!invoiceOptions.length" class="text-xs text-gray-500">Aucune facture disponible.</p>
+            <p class="text-xs text-gray-500">
+              Si vous choisissez une facture, son PDF sera joint automatiquement.
+            </p>
+            <div v-if="selectedInvoice" class="text-xs text-emerald-600">
+              Facture selectionnee: {{ formatInvoiceLabel(selectedInvoice) }}
+            </div>
+            <Button
+                v-if="formData.invoiceId"
+                type="button"
+                variant="outline"
+                class="text-xs py-1"
+                @click="clearInvoiceSelection"
+            >
+              Retirer la facture
+            </Button>
+          </div>
+
           <!-- PDF Upload -->
           <div class="space-y-2">
             <Label for="pdf" class="text-sm">PDF (optionnel)</Label>
@@ -169,6 +205,8 @@
                   variant="outline"
                   @click="$refs.pdfInput.click()"
                   class="w-full gap-2 text-sm py-2 sm:py-3"
+                  :disabled="Boolean(formData.invoiceId)"
+                  :class="formData.invoiceId ? 'opacity-60 cursor-not-allowed' : ''"
               >
                 <UploadIcon class="w-4 h-4" />
                 Remplacer le PDF
@@ -182,6 +220,9 @@
               />
               <p v-if="formData.pdf" class="text-xs text-green-600 mt-2">
                 {{ formData.pdf.name }}
+              </p>
+              <p v-if="formData.invoiceId" class="text-xs text-gray-500 mt-2">
+                PDF gere par la facture selectionnee.
               </p>
             </div>
           </div>
@@ -277,6 +318,7 @@ import Input from '~/components/ui/Input.vue'
 import RichTextEditor from '~/components/ui/RichTextEditor.vue'
 import Switch from '~/components/ui/Switch.vue'
 import Label from '~/components/ui/Label.vue'
+import Select from '~/components/ui/Select.vue'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -291,12 +333,14 @@ const formData = ref({
   customUrl: '',
   image: null,
   pdf: null,
+  invoiceId: null,
   amountType: 'fixed',
   fixedAmount: null,
   expirationDate: '',
   redirectUrl: ''
 })
 
+const pdfInput = ref(null)
 const imagePreview = ref(null)
 const loading = ref(false)
 const error = ref('')
@@ -309,7 +353,14 @@ const isUrlManuallyEdited = ref(false)
 const originalUrl = ref('')
 const hasUrlChanged = ref(false)
 const currencySymbol = ref('')
+const invoices = ref([])
+const invoiceLoading = ref(false)
+const invoiceSearch = ref('')
+const invoiceDetails = ref(null)
+const invoiceError = ref('')
+const invoiceCleared = ref(false)
 let urlCheckTimeout = null
+let invoiceSearchTimeout = null
 
 // Auto-génération d'URL à partir du titre
 const generateUrlFromTitle = () => {
@@ -390,16 +441,133 @@ const checkUrlAvailability = async () => {
   }, 500)
 }
 
-watch(() => formData.value.customUrl, () => {
-  validateCustomUrl()
-})
-
 const previewUrl = computed(() => {
   if (formData.value.customUrl) {
     return `https://leekpay.me/${formData.value.customUrl}`
   }
   return 'https://leekpay.me/votre-lien'
 })
+
+const formatAmount = (value) => {
+  const numberValue = Number(value || 0)
+  return numberValue.toLocaleString('fr-FR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  })
+}
+
+const formatInvoiceLabel = (invoice) => {
+  if (!invoice) return 'Facture'
+  const number = invoice.number || `#${invoice.id}`
+  const client = invoice.client_name || 'Client'
+  const total = formatAmount(invoice.total)
+  const currency = invoice.currency?.symbol || invoice.currency?.code || ''
+  return `${number} • ${client} • ${total} ${currency}`.trim()
+}
+
+const normalizeInvoiceList = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.data)) return payload.data
+  if (Array.isArray(payload?.data?.data)) return payload.data.data
+  if (Array.isArray(payload?.items)) return payload.items
+  return []
+}
+
+const invoiceOptions = computed(() => {
+  const base = invoices.value.map((invoice) => ({
+    label: formatInvoiceLabel(invoice),
+    value: invoice.id
+  }))
+  if (invoiceDetails.value && !base.some((option) => option.value === invoiceDetails.value.id)) {
+    base.unshift({
+      label: formatInvoiceLabel(invoiceDetails.value),
+      value: invoiceDetails.value.id
+    })
+  }
+  return base
+})
+
+const selectedInvoice = computed(() => {
+  if (!formData.value.invoiceId) return null
+  return (
+    invoices.value.find((invoice) => invoice.id === formData.value.invoiceId) ||
+    (invoiceDetails.value?.id === formData.value.invoiceId ? invoiceDetails.value : null)
+  )
+})
+
+const fetchInvoices = async (query = '') => {
+  if (!token.value) return
+  invoiceLoading.value = true
+  invoiceError.value = ''
+  try {
+    const params = new URLSearchParams({ per_page: '30' })
+    if (query) params.append('search', query)
+    const response = await $fetch(`/invoices?${params.toString()}`, {
+      baseURL: config.public.apiBaseURL,
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    })
+    invoices.value = normalizeInvoiceList(response)
+  } catch (err) {
+    console.error('Erreur chargement factures:', err)
+    invoices.value = []
+    invoiceError.value = err?.data?.message || 'Impossible de charger les factures.'
+  } finally {
+    invoiceLoading.value = false
+  }
+}
+
+const fetchInvoiceById = async (invoiceId) => {
+  if (!token.value || !invoiceId) return
+  try {
+    const response = await $fetch(`/invoices/${invoiceId}`, {
+      baseURL: config.public.apiBaseURL,
+      headers: {
+        Authorization: `Bearer ${token.value}`
+      }
+    })
+    invoiceDetails.value = response?.data || response || null
+  } catch (err) {
+    console.error('Erreur chargement facture:', err)
+    invoiceDetails.value = null
+  }
+}
+
+const debouncedInvoiceSearch = () => {
+  if (invoiceSearchTimeout) clearTimeout(invoiceSearchTimeout)
+  invoiceSearchTimeout = setTimeout(() => {
+    fetchInvoices(invoiceSearch.value)
+  }, 400)
+}
+
+const clearInvoiceSelection = () => {
+  formData.value.invoiceId = null
+  invoiceDetails.value = null
+  invoiceCleared.value = true
+}
+
+watch(() => formData.value.customUrl, () => {
+  validateCustomUrl()
+})
+
+watch(() => invoiceSearch.value, () => {
+  debouncedInvoiceSearch()
+})
+
+watch(
+  () => formData.value.invoiceId,
+  (value) => {
+    if (value) {
+      formData.value.pdf = null
+      if (pdfInput.value) pdfInput.value.value = ''
+      invoiceCleared.value = false
+      fetchInvoiceById(value)
+    } else {
+      invoiceDetails.value = null
+    }
+  }
+)
 
 const displayToast = (message) => {
   toastMessage.value = message
@@ -410,7 +578,8 @@ const displayToast = (message) => {
 }
 
 // Charger le lien existant
-onMounted(async () => {
+const loadLink = async () => {
+  if (!token.value) return
   try {
     const linkId = route.params.id
     const response = await $fetch(`/payment-links/${linkId}`, {
@@ -418,6 +587,7 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${token.value}` }
     })
     const link = response.data
+    await fetchInvoices()
 
     originalUrl.value = link.custom_url
     
@@ -427,6 +597,7 @@ onMounted(async () => {
       customUrl: link.custom_url,
       image: null,
       pdf: null,
+      invoiceId: link.invoice_id || null,
       amountType: link.amount_type,
       fixedAmount: link.fixed_amount,
       expirationDate: link.expires_at ? link.expires_at.substring(0, 10) : '',
@@ -442,11 +613,25 @@ onMounted(async () => {
           ? link.image_url
           : `${config.public.apiBaseURL}${link.image_url}`
     }
+
+    if (link.invoice) {
+      invoiceDetails.value = link.invoice
+    } else if (link.invoice_id) {
+      fetchInvoiceById(link.invoice_id)
+    }
   } catch (err) {
     console.error(err)
     error.value = 'Impossible de charger le lien'
   }
-})
+}
+
+watch(
+  () => token.value,
+  (value) => {
+    if (value) loadLink()
+  },
+  { immediate: true }
+)
 
 const handleImageUpload = (e) => {
   const file = e.target.files?.[0]
@@ -461,7 +646,12 @@ const handleImageUpload = (e) => {
 
 const handlePdfUpload = (e) => {
   const file = e.target.files?.[0]
-  if (file) formData.value.pdf = file
+  if (file) {
+    formData.value.pdf = file
+    formData.value.invoiceId = null
+    invoiceDetails.value = null
+    invoiceCleared.value = true
+  }
 }
 
 const toggleAmountType = (checked) => {
@@ -508,7 +698,14 @@ const handleSubmit = async () => {
     }
     
     if (formData.value.image) body.append('image', formData.value.image)
-    if (formData.value.pdf) body.append('pdf', formData.value.pdf)
+    if (formData.value.invoiceId) {
+      body.append('invoice_id', String(formData.value.invoiceId))
+    } else if (invoiceCleared.value) {
+      body.append('invoice_id', '')
+    }
+    if (formData.value.pdf && !formData.value.invoiceId) {
+      body.append('pdf', formData.value.pdf)
+    }
 
     const response = await $fetch(`/payment-links/${route.params.id}`, {
       method: 'POST',

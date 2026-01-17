@@ -12,11 +12,15 @@
         :class="[
           'fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          'lg:translate-x-0 lg:shadow-none'
+          'lg:translate-x-0 lg:shadow-none',
+          sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'
         ]"
     >
       <DashboardSidebar
           :active-section="currentPage"
+          :collapsed="sidebarCollapsed && !isMobile"
+          :can-collapse="!isMobile"
+          @toggle-collapse="toggleSidebarCollapsed"
           @section-change="handleSectionChange"
       />
     </aside>
@@ -67,6 +71,7 @@ const isMobile = ref(false)
 
 // État sidebar
 const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
 
 // Calcul du titre
 const currentPage = computed(() => {
@@ -82,6 +87,7 @@ const pageMap = {
   dashboard: 'Tableau de bord',
   links: 'Mes Liens',
   transactions: 'Transactions',
+  invoices: 'Factures',
   withdrawals: 'Retraits',
   'sales-pages': 'Pages de vente',
   subscription: 'Abonnement',
@@ -128,6 +134,10 @@ const checkScreenSize = () => {
 }
 
 onMounted(() => {
+  if (process.client) {
+    const saved = localStorage.getItem('leekpay_sidebar_collapsed')
+    sidebarCollapsed.value = saved === '1'
+  }
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
 })
@@ -142,6 +152,13 @@ const handleSectionChange = (section) => {
     sidebarOpen.value = false // Fermer sidebar après navigation sur mobile
   }
 }
+
+const toggleSidebarCollapsed = () => {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  if (process.client) {
+    localStorage.setItem('leekpay_sidebar_collapsed', sidebarCollapsed.value ? '1' : '0')
+  }
+}
 </script>
 
 <style scoped>
@@ -150,3 +167,10 @@ html, body {
   overflow-x: hidden;
 }
 </style>
+
+
+
+
+
+
+

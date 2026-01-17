@@ -1,7 +1,8 @@
 <!-- components/ui/Select.vue -->
 <template>
-  <div class="relative" @click.outside="isOpen = false">
+  <div ref="selectRef" class="relative">
     <button
+        type="button"
         @click="isOpen = !isOpen"
         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 flex items-center justify-between"
         :class="props.class"
@@ -30,7 +31,7 @@
 
 <script setup>
 import { ChevronDownIcon } from 'lucide-vue-next'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   modelValue: [String, Number],
@@ -45,6 +46,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const isOpen = ref(false)
+const selectRef = ref(null)
 
 const selectedLabel = computed(() => {
   const selected = props.options.find(opt => opt.value === props.modelValue)
@@ -55,4 +57,19 @@ const selectOption = (value) => {
   emit('update:modelValue', value)
   isOpen.value = false
 }
+
+const handleClickOutside = (event) => {
+  if (!selectRef.value) return
+  if (!selectRef.value.contains(event.target)) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
