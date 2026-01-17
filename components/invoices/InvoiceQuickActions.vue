@@ -13,7 +13,7 @@
       </div>
       <div v-if="autoSave" class="text-[10px] text-green-600">Auto-save ON</div>
     </div>
-    <div class="grid grid-cols-2 gap-2">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
       <button
         class="w-full bg-green-600 text-white rounded-md py-2 text-xs font-semibold"
         :disabled="saving"
@@ -26,31 +26,16 @@
         :disabled="!invoiceId || sending"
         @click="emit('send')"
       >
-        {{ sending ? 'Envoi...' : 'Envoyer' }}
+        <span>{{ sending ? 'Envoi...' : 'Envoyer' }}</span>
+        <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">PRO</span>
       </button>
       <button
-        class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700"
-        :disabled="!invoiceId || markingPaid"
-        @click="emit('mark-paid')"
-      >
-        {{ markingPaid ? 'Maj...' : 'Marquer payee' }}
-      </button>
-      <button
-        class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700"
+        class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700 sm:col-span-2 flex items-center justify-center"
         :disabled="!invoiceId || pdfLoading"
         @click="emit('preview-pdf')"
       >
-        {{ pdfLoading ? 'PDF...' : 'Apercu PDF' }}
-      </button>
-    </div>
-    <div v-if="publicUrl" class="flex items-center gap-2">
-      <input
-        :value="publicUrl"
-        readonly
-        class="flex-1 border border-gray-200 rounded-md px-2 py-1 text-[10px] bg-gray-50"
-      />
-      <button class="px-2 py-1 text-[10px] border border-gray-200 rounded-md" @click="emit('copy-link')">
-        Copier
+        <span>{{ pdfLoading ? 'PDF...' : 'Apercu PDF' }}</span>
+        <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">PRO</span>
       </button>
     </div>
   </Card>
@@ -63,16 +48,14 @@ const props = defineProps({
   number: String,
   status: String,
   invoiceId: [String, Number],
-  publicUrl: String,
   lastSavedAt: String,
   saving: Boolean,
   sending: Boolean,
-  markingPaid: Boolean,
   pdfLoading: Boolean,
   autoSave: Boolean
 })
 
-const emit = defineEmits(['save', 'send', 'mark-paid', 'preview-pdf', 'copy-link'])
+const emit = defineEmits(['save', 'send', 'preview-pdf'])
 
 const statusLabel = computed(() => props.status || 'Brouillon')
 

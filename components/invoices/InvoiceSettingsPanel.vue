@@ -29,6 +29,10 @@
           <option value="gray">Gris</option>
           <option value="blue">Bleu</option>
           <option value="beige">Beige</option>
+          <option value="sage">Vert doux</option>
+          <option value="amber">Jaune doux</option>
+          <option value="rose">Rose doux</option>
+          <option value="slate">Ardoise</option>
         </select>
       </div>
       <div class="flex items-center justify-between gap-3">
@@ -69,21 +73,15 @@
         @click="emit('download')"
       >
         <Download class="w-4 h-4" />
-        Telecharger ma facture
-      </button>
-      <button
-        class="w-full border border-[#2ECC71] text-[#0A1F44] font-semibold rounded-md py-2.5 text-sm flex items-center justify-center gap-2"
-        @click="emit('print')"
-      >
-        <Printer class="w-4 h-4" />
-        Imprimer ma facture
+        <span>Telecharger ma facture</span>
+        <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">PRO</span>
       </button>
     </div>
   </Card>
 </template>
 
 <script setup>
-import { Download, Printer } from 'lucide-vue-next'
+import { Download } from 'lucide-vue-next'
 import Card from '~/components/ui/Card.vue'
 import BinaryToggle from '~/components/invoices/BinaryToggle.vue'
 
@@ -102,5 +100,5 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['download', 'print'])
+const emit = defineEmits(['download'])
 </script>

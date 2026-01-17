@@ -144,16 +144,14 @@
                     <div v-else class="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
                   </button>
                   <button
-                    v-if="invoice.public_url"
-                    class="p-2 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                    title="Lien public"
-                    @click="openPublic(invoice)"
-                  >
-                    <ExternalLinkIcon class="w-4 h-4" />
-                  </button>
-                  <button
-                    class="p-2 rounded-lg text-gray-600 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    title="Supprimer"
+                    :disabled="!isDeletable(invoice)"
+                    :class="[
+                      'p-2 rounded-lg transition-colors',
+                      isDeletable(invoice)
+                        ? 'text-gray-600 hover:text-red-600 hover:bg-red-50'
+                        : 'text-gray-300 cursor-not-allowed'
+                    ]"
+                    :title="isDeletable(invoice) ? 'Supprimer' : 'Suppression indisponible pour les factures payees'"
                     @click="confirmDelete(invoice)"
                   >
                     <TrashIcon class="w-4 h-4" />
@@ -254,7 +252,7 @@
 </template>
 
 <script setup>
-import { CheckCircle, XCircle, DownloadIcon, EditIcon, TrashIcon, ExternalLinkIcon } from 'lucide-vue-next'
+import { CheckCircle, XCircle, DownloadIcon, EditIcon, TrashIcon } from 'lucide-vue-next'
 import Button from '~/components/ui/Button.vue'
 import Card from '~/components/ui/Card.vue'
 import Input from '~/components/ui/Input.vue'
@@ -442,6 +440,10 @@ const resolveStatus = (invoice) => {
   return invoice?.status
 }
 
+const isDeletable = (invoice) => {
+  return !['paid', 'partially_paid'].includes(invoice?.status)
+}
+
 const formatDate = (value) => {
   if (!value) return '-'
   const date = new Date(value)
@@ -508,13 +510,11 @@ const previewPdf = async (invoice) => {
   }
 }
 
-const openPublic = (invoice) => {
-  if (invoice?.public_url) {
-    window.open(invoice.public_url, '_blank')
-  }
-}
-
 const confirmDelete = (invoice) => {
+  if (!isDeletable(invoice)) {
+    showToast('Impossible de supprimer une facture payee ou partiellement payee.', 'error')
+    return
+  }
   deleteModal.value = {
     open: true,
     loading: false,
@@ -546,7 +546,7 @@ const deleteInvoice = async () => {
     fetchInvoices()
   } catch (err) {
     console.error('Erreur suppression facture:', err)
-    showToast('Erreur lors de la suppression', 'error')
+    showToast(err?.data?.message || 'Erreur lors de la suppression', 'error')
   } finally {
     deleteModal.value.loading = false
   }
