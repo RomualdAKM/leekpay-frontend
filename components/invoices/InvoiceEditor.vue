@@ -51,25 +51,20 @@
             :number="invoice.number"
             :status="invoice.status"
             :invoice-id="invoiceId"
-            :public-url="publicUrl"
             :last-saved-at="lastSavedAt"
             :saving="saving"
             :sending="sending"
-            :marking-paid="markingPaid"
             :pdf-loading="pdfLoading"
             :auto-save="settings.autoSave"
             @save="saveInvoice"
             @send="openSendModal"
-            @mark-paid="openPaidModal"
             @preview-pdf="previewPdf"
-            @copy-link="copyPublicLink"
           />
           <InvoiceSettingsPanel
             :settings="settings"
             :currencies="currencies"
             :currencies-loading="currenciesLoading"
             @download="downloadPdf"
-            @print="previewPdf"
           />
         </div>
       </div>
@@ -112,38 +107,6 @@
       </div>
     </Transition>
 
-    <Transition name="fade">
-      <div
-        v-if="paidModal.open"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-        @click.self="closePaidModal"
-      >
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md">
-          <div class="p-6 space-y-4">
-            <h3 class="text-lg font-semibold text-gray-900">Marquer payee</h3>
-            <div class="space-y-2">
-              <label class="text-xs text-gray-500">Montant paye (optionnel)</label>
-              <input v-model="paidModal.amount" type="number" class="w-full border border-gray-200 rounded-md px-3 py-2 text-sm" />
-            </div>
-            <div class="flex gap-3">
-              <button
-                class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg"
-                @click="closePaidModal"
-              >
-                Annuler
-              </button>
-              <button
-                class="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg"
-                :disabled="markingPaid"
-                @click="markPaid"
-              >
-                {{ markingPaid ? 'Maj...' : 'Confirmer' }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -171,9 +134,7 @@ const invoiceId = ref(props.invoiceId)
 const loading = ref(false)
 const saving = ref(false)
 const sending = ref(false)
-const markingPaid = ref(false)
 const pdfLoading = ref(false)
-const publicUrl = ref('')
 const lastSavedAt = ref('')
 const isReady = ref(false)
 
@@ -257,10 +218,6 @@ const sendModal = reactive({
   message: ''
 })
 
-const paidModal = reactive({
-  open: false,
-  amount: ''
-})
 
 const showToast = (message, type = 'success') => {
   toast.value = { show: true, message, type }
@@ -598,7 +555,6 @@ const loadInvoice = async () => {
 
     invoice.footerNote = data.terms || invoice.footerNote
     invoice.notes = data.notes || invoice.notes
-    publicUrl.value = data.public_url || publicUrl.value
     const logoCandidate =
       data.issuer_logo ||
       data.issuer_logo_path ||
@@ -725,7 +681,6 @@ const saveInvoice = async (options = {}) => {
     if (data?.number || data?.invoice_number) {
       invoice.number = data.number || data.invoice_number
     }
-    if (data?.public_url) publicUrl.value = data.public_url
     if (data?.status) invoice.status = data.status
     lastSavedAt.value = new Date().toLocaleString('fr-FR')
     if (!options.silent) showToast('Facture sauvegardee')
@@ -864,50 +819,6 @@ const sendInvoice = async () => {
     showToast(err?.data?.message || 'Erreur lors de l\'envoi', 'error')
   } finally {
     sending.value = false
-  }
-}
-
-const openPaidModal = () => {
-  if (!invoiceId.value) {
-    showToast('Sauvegardez d\'abord la facture', 'error')
-    return
-  }
-  paidModal.open = true
-}
-
-const closePaidModal = () => {
-  paidModal.open = false
-  paidModal.amount = ''
-}
-
-const markPaid = async () => {
-  if (!invoiceId.value) return
-  markingPaid.value = true
-  try {
-    await $fetch(`/invoices/${invoiceId.value}/mark-paid`, {
-      method: 'POST',
-      baseURL: config.public.apiBaseURL,
-      headers: authHeaders.value,
-      body: paidModal.amount ? { paid_amount: Number(paidModal.amount) } : {}
-    })
-    showToast('Facture marquee payee')
-    invoice.status = 'paid'
-    closePaidModal()
-  } catch (err) {
-    console.error('Erreur mark paid:', err)
-    showToast(err?.data?.message || 'Erreur lors de la mise a jour', 'error')
-  } finally {
-    markingPaid.value = false
-  }
-}
-
-const copyPublicLink = async () => {
-  if (!publicUrl.value) return
-  try {
-    await navigator.clipboard.writeText(publicUrl.value)
-    showToast('Lien public copie')
-  } catch (err) {
-    showToast('Impossible de copier le lien', 'error')
   }
 }
 

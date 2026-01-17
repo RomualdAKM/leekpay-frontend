@@ -267,6 +267,10 @@ const cellBgClass = computed(() => {
   const color = props.settings.cellColor
   if (color === 'blue') return 'bg-blue-50'
   if (color === 'beige') return 'bg-[#f2ece6]'
+  if (color === 'sage') return 'bg-emerald-50'
+  if (color === 'amber') return 'bg-amber-50'
+  if (color === 'rose') return 'bg-rose-50'
+  if (color === 'slate') return 'bg-slate-100'
   return 'bg-[#e8e6e4]'
 })
 
