@@ -56,6 +56,7 @@
             :sending="sending"
             :pdf-loading="pdfLoading"
             :auto-save="settings.autoSave"
+            :is-premium="isPremium"
             @save="saveInvoice"
             @send="openSendModal"
             @preview-pdf="previewPdf"
@@ -64,7 +65,12 @@
             :settings="settings"
             :currencies="currencies"
             :currencies-loading="currenciesLoading"
+            :templates="premiumTemplates"
+            :selected-template-id="selectedTemplateId"
+            :is-premium="isPremium"
             @download="downloadPdf"
+            @apply-template="applyTemplate"
+            @upgrade="() => showToast('Passez au plan Premium pour debloquer cette fonctionnalite.', 'error')"
           />
         </div>
       </div>
@@ -107,6 +113,36 @@
       </div>
     </Transition>
 
+    <Transition name="fade">
+      <div
+        v-if="previewModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        @click.self="previewModal = false"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[94vh] overflow-hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-gray-200">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Apercu instantane</h3>
+              <p class="text-xs text-gray-500">Rendu identique au PDF final.</p>
+            </div>
+            <button
+              class="text-sm text-gray-500 hover:text-gray-900"
+              @click="previewModal = false"
+            >
+              Fermer
+            </button>
+          </div>
+          <div class="p-6 overflow-y-auto max-h-[calc(94vh-72px)]">
+            <InvoiceCanvas
+              :invoice="invoice"
+              :settings="settings"
+              :preview="true"
+            />
+          </div>
+        </div>
+      </div>
+    </Transition>
+
   </div>
 </template>
 
@@ -144,6 +180,8 @@ const toast = ref({
   type: 'success'
 })
 
+const previewModal = ref(false)
+
 const settings = reactive({
   vatEnabled: true,
   vatPerLine: true,
@@ -158,16 +196,304 @@ const settings = reactive({
   autoSave: false,
   primaryColor: '#2ECC71',
   secondaryColor: '#0A1F44',
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: 'Poppins',
   textColor: '#1F2937',
   backgroundColor: '#FFFFFF',
+  templateStyle: 'classic',
+  headerStyle: 'split',
+  tableStyle: 'bordered',
+  totalsStyle: 'card',
+  density: 'comfortable',
+  cornerStyle: 'rounded',
+  signatureStyle: 'dot',
+  patternStyle: 'none',
+  accentStyle: 'none',
+  watermarkStyle: 'none',
+  watermarkText: '',
   layout: []
 })
+
+const premiumTemplates = [
+  {
+    id: 'leekpay-modern',
+    name: 'LeekPay Modern',
+    label: 'SaaS clean',
+    primaryColor: '#0A1F44',
+    secondaryColor: '#2ECC71',
+    backgroundColor: '#FFFFFF',
+    textColor: '#111827',
+    fontFamily: 'Poppins',
+    cellColor: 'sage',
+    templateStyle: 'classic',
+    headerStyle: 'split',
+    tableStyle: 'bordered',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'dot',
+    patternStyle: 'none',
+    accentStyle: 'top-bar',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'aurora-flow',
+    name: 'Aurora Flow',
+    label: 'Gradient soft',
+    primaryColor: '#16A34A',
+    secondaryColor: '#0F172A',
+    backgroundColor: '#FFFFFF',
+    textColor: '#0F172A',
+    fontFamily: 'Poppins',
+    cellColor: 'sage',
+    templateStyle: 'aurora',
+    headerStyle: 'split',
+    tableStyle: 'bordered',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'dot',
+    patternStyle: 'dots',
+    accentStyle: 'left-band',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'noir-executive',
+    name: 'Noir Executive',
+    label: 'Dark executive',
+    primaryColor: '#111827',
+    secondaryColor: '#374151',
+    backgroundColor: '#FFFFFF',
+    textColor: '#0F172A',
+    fontFamily: 'DejaVu Sans',
+    cellColor: 'slate',
+    templateStyle: 'noir',
+    headerStyle: 'compact',
+    tableStyle: 'minimal',
+    totalsStyle: 'inline',
+    density: 'compact',
+    cornerStyle: 'sharp',
+    signatureStyle: 'line',
+    patternStyle: 'grid',
+    accentStyle: 'top-bar',
+    watermarkStyle: 'outline',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'royal-blue',
+    name: 'Royal Blue',
+    label: 'Bold bandeau',
+    primaryColor: '#1D4ED8',
+    secondaryColor: '#0EA5E9',
+    backgroundColor: '#FFFFFF',
+    textColor: '#0F172A',
+    fontFamily: 'Poppins',
+    cellColor: 'blue',
+    templateStyle: 'banner',
+    headerStyle: 'split',
+    tableStyle: 'bordered',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'badge',
+    patternStyle: 'lines',
+    accentStyle: 'diagonal',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'copper-heritage',
+    name: 'Copper Heritage',
+    label: 'Editorial warm',
+    primaryColor: '#7C2D12',
+    secondaryColor: '#B45309',
+    backgroundColor: '#FFF7ED',
+    textColor: '#3F1D0B',
+    fontFamily: 'DejaVu Sans',
+    cellColor: 'amber',
+    templateStyle: 'editorial',
+    headerStyle: 'stacked',
+    tableStyle: 'minimal',
+    totalsStyle: 'inline',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'line',
+    patternStyle: 'grid',
+    accentStyle: 'top-bar',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'contrast-night',
+    name: 'Contrast Night',
+    label: 'High contrast',
+    primaryColor: '#0F172A',
+    secondaryColor: '#64748B',
+    backgroundColor: '#FFFFFF',
+    textColor: '#0F172A',
+    fontFamily: 'DejaVu Sans',
+    cellColor: 'slate',
+    templateStyle: 'contrast',
+    headerStyle: 'split',
+    tableStyle: 'striped',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'badge',
+    patternStyle: 'dots',
+    accentStyle: 'left-band',
+    watermarkStyle: 'outline',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'paper-ledger',
+    name: 'Paper Ledger',
+    label: 'Ledger minimal',
+    primaryColor: '#111827',
+    secondaryColor: '#9CA3AF',
+    backgroundColor: '#FFFFFF',
+    textColor: '#111827',
+    fontFamily: 'DejaVu Sans',
+    cellColor: 'gray',
+    templateStyle: 'paper',
+    headerStyle: 'stacked',
+    tableStyle: 'minimal',
+    totalsStyle: 'inline',
+    density: 'compact',
+    cornerStyle: 'sharp',
+    signatureStyle: 'dot',
+    patternStyle: 'grid',
+    accentStyle: 'none',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'studio-sage',
+    name: 'Studio Sage',
+    label: 'Soft studio',
+    primaryColor: '#0F766E',
+    secondaryColor: '#5EEAD4',
+    backgroundColor: '#FFFFFF',
+    textColor: '#0F172A',
+    fontFamily: 'Poppins',
+    cellColor: 'sage',
+    templateStyle: 'classic',
+    headerStyle: 'compact',
+    tableStyle: 'striped',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'dot',
+    patternStyle: 'lines',
+    accentStyle: 'top-bar',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'rose-atelier',
+    name: 'Rose Atelier',
+    label: 'Soft contrast',
+    primaryColor: '#BE185D',
+    secondaryColor: '#F472B6',
+    backgroundColor: '#FFFFFF',
+    textColor: '#1F2937',
+    fontFamily: 'Poppins',
+    cellColor: 'rose',
+    templateStyle: 'aurora',
+    headerStyle: 'split',
+    tableStyle: 'bordered',
+    totalsStyle: 'card',
+    density: 'comfortable',
+    cornerStyle: 'rounded',
+    signatureStyle: 'badge',
+    patternStyle: 'dots',
+    accentStyle: 'diagonal',
+    watermarkStyle: 'subtle',
+    watermarkText: 'LeekPay Premium'
+  },
+  {
+    id: 'minimal-cloud',
+    name: 'Minimal Cloud',
+    label: 'Ultra clean',
+    primaryColor: '#334155',
+    secondaryColor: '#94A3B8',
+    backgroundColor: '#F8FAFC',
+    textColor: '#0F172A',
+    fontFamily: 'DejaVu Sans',
+    cellColor: 'slate',
+    templateStyle: 'minimal',
+    headerStyle: 'compact',
+    tableStyle: 'minimal',
+    totalsStyle: 'inline',
+    density: 'compact',
+    cornerStyle: 'sharp',
+    signatureStyle: 'none',
+    patternStyle: 'none',
+    accentStyle: 'none',
+    watermarkStyle: 'none',
+    watermarkText: ''
+  }
+]
+
+const normalizeColor = (value) => String(value || '').trim().toLowerCase()
+const normalizeFont = (value) => String(value || '').split(',')[0].trim().toLowerCase()
+
+// Temporary: premium access is always enabled; backend gating will be added later.
+const isPremium = computed(() => true)
+
+const selectedTemplateId = computed(() => {
+  const match = premiumTemplates.find((template) => (
+    normalizeColor(template.primaryColor) === normalizeColor(settings.primaryColor) &&
+    normalizeColor(template.secondaryColor) === normalizeColor(settings.secondaryColor) &&
+    normalizeColor(template.backgroundColor) === normalizeColor(settings.backgroundColor) &&
+    normalizeColor(template.textColor) === normalizeColor(settings.textColor) &&
+    normalizeFont(template.fontFamily) === normalizeFont(settings.fontFamily) &&
+    (template.templateStyle || 'classic') === (settings.templateStyle || 'classic') &&
+    (template.tableStyle || 'bordered') === (settings.tableStyle || 'bordered')
+  ))
+  return match?.id || ''
+})
+
+const appliedTemplate = computed(() => premiumTemplates.find((template) => template.id === selectedTemplateId.value))
+const appliedTemplateLabel = computed(() => appliedTemplate.value?.name || 'Personnalise')
+const appliedTemplateSlug = computed(() => appliedTemplate.value?.id || 'personnalise')
+
+const applyTemplate = (template) => {
+  if (!template) return
+  if (!isPremium.value) {
+    showToast('Option reservee aux abonnements premium.', 'error')
+    return
+  }
+  settings.primaryColor = template.primaryColor
+  settings.secondaryColor = template.secondaryColor
+  settings.backgroundColor = template.backgroundColor
+  settings.textColor = template.textColor
+  settings.fontFamily = template.fontFamily
+  if (template.cellColor) {
+    settings.cellColor = template.cellColor
+  }
+  if (template.templateStyle) settings.templateStyle = template.templateStyle
+  if (template.headerStyle) settings.headerStyle = template.headerStyle
+  if (template.tableStyle) settings.tableStyle = template.tableStyle
+  if (template.totalsStyle) settings.totalsStyle = template.totalsStyle
+  if (template.density) settings.density = template.density
+  if (template.cornerStyle) settings.cornerStyle = template.cornerStyle
+  if (template.signatureStyle) settings.signatureStyle = template.signatureStyle
+  if (template.patternStyle) settings.patternStyle = template.patternStyle
+  if (template.accentStyle) settings.accentStyle = template.accentStyle
+  if (template.watermarkStyle) settings.watermarkStyle = template.watermarkStyle
+  if (Object.prototype.hasOwnProperty.call(template, 'watermarkText')) {
+    settings.watermarkText = template.watermarkText
+  }
+  showToast(`Modele "${template.name}" applique. Il sera utilise au telechargement.`, 'success')
+}
+
 
 const defaultIssueDate = new Date().toISOString().slice(0, 10)
 
 const invoice = reactive({
-  number: 'Facture N1',
+  number: '',
   status: 'draft',
   currency: 'EUR',
   metaRows: [
@@ -176,10 +502,10 @@ const invoice = reactive({
     { id: 'meta-3', label: 'Echeance de paiement', value: '' }
   ],
   issuer: {
-    name: 'Votre nom / societe',
-    address: 'Adresse',
-    zip: 'Code postal',
-    city: 'Ville',
+    name: '',
+    address: '',
+    zip: '',
+    city: '',
     logo: '',
     fields: [
       { id: 'issuer-1', label: 'Email', value: '' },
@@ -188,10 +514,10 @@ const invoice = reactive({
     ]
   },
   client: {
-    name: 'Nom client',
-    address: 'Adresse',
-    zip: 'Code postal',
-    city: 'Ville',
+    name: '',
+    address: '',
+    zip: '',
+    city: '',
     fields: [
       { id: 'client-1', label: 'Email', value: '' },
       { id: 'client-2', label: 'Tel', value: '' }
@@ -200,17 +526,18 @@ const invoice = reactive({
   items: [
     {
       id: 'item-1',
-      title: 'Titre prestation',
-      description: 'Description prestation',
-      quantity: 1,
+      title: '',
+      description: '',
+      quantity: '',
       unit: '',
-      unitPrice: 0,
-      taxRate: 20
+      unitPrice: '',
+      taxRate: ''
     }
   ],
   notes: '',
-  footerNote: 'Paiement securise par LeekPay. Merci pour votre confiance.'
+  footerNote: ''
 })
+
 
 const sendModal = reactive({
   open: false,
@@ -424,6 +751,13 @@ const loadSettings = async () => {
     settings.fontFamily = theme.font_family || theme.fontFamily || data.theme_font_family || settings.fontFamily
     settings.textColor = theme.text_color || theme.textColor || settings.textColor
     settings.backgroundColor = theme.background_color || theme.backgroundColor || settings.backgroundColor
+    settings.templateStyle = theme.template_style || theme.templateStyle || settings.templateStyle
+    settings.headerStyle = theme.header_style || theme.headerStyle || settings.headerStyle
+    settings.tableStyle = theme.table_style || theme.tableStyle || settings.tableStyle
+    settings.totalsStyle = theme.totals_style || theme.totalsStyle || settings.totalsStyle
+    settings.density = theme.density || settings.density
+    settings.cornerStyle = theme.corner_style || theme.cornerStyle || settings.cornerStyle
+    settings.signatureStyle = theme.signature_style || theme.signatureStyle || settings.signatureStyle
     const currencyItem = currencyMap.value[settings.currency]
     if (currencyItem) {
       settings.currencyId = currencyItem.id || settings.currencyId
@@ -498,6 +832,35 @@ const loadInvoice = async () => {
     settings.fontFamily = theme.fontFamily || theme.font_family || settings.fontFamily
     settings.textColor = theme.textColor || theme.text_color || settings.textColor
     settings.backgroundColor = theme.backgroundColor || theme.background_color || settings.backgroundColor
+    settings.templateStyle = theme.templateStyle || theme.template_style || settings.templateStyle
+    settings.headerStyle = theme.headerStyle || theme.header_style || settings.headerStyle
+    settings.tableStyle = theme.tableStyle || theme.table_style || settings.tableStyle
+    settings.totalsStyle = theme.totalsStyle || theme.totals_style || settings.totalsStyle
+    settings.density = theme.density || settings.density
+    settings.cornerStyle = theme.cornerStyle || theme.corner_style || settings.cornerStyle
+    settings.signatureStyle = theme.signatureStyle || theme.signature_style || settings.signatureStyle
+    settings.patternStyle = theme.patternStyle || theme.pattern_style || settings.patternStyle
+    settings.accentStyle = theme.accentStyle || theme.accent_style || settings.accentStyle
+    settings.watermarkStyle = theme.watermarkStyle || theme.watermark_style || settings.watermarkStyle
+    settings.watermarkText = theme.watermarkText || theme.watermark_text || settings.watermarkText
+    if (theme.cellColor || theme.cell_color) {
+      settings.cellColor = theme.cellColor || theme.cell_color
+    }
+    if (Object.prototype.hasOwnProperty.call(theme, 'showQuantity') || Object.prototype.hasOwnProperty.call(theme, 'show_quantity')) {
+      settings.showQuantity = Boolean(theme.showQuantity ?? theme.show_quantity)
+    }
+    if (Object.prototype.hasOwnProperty.call(theme, 'showUnit') || Object.prototype.hasOwnProperty.call(theme, 'show_unit')) {
+      settings.showUnit = Boolean(theme.showUnit ?? theme.show_unit)
+    }
+    if (Object.prototype.hasOwnProperty.call(theme, 'vatEnabled') || Object.prototype.hasOwnProperty.call(theme, 'vat_enabled')) {
+      settings.vatEnabled = Boolean(theme.vatEnabled ?? theme.vat_enabled)
+    }
+    if (Object.prototype.hasOwnProperty.call(theme, 'vatPerLine') || Object.prototype.hasOwnProperty.call(theme, 'vat_per_line')) {
+      settings.vatPerLine = Boolean(theme.vatPerLine ?? theme.vat_per_line)
+    }
+    if (Object.prototype.hasOwnProperty.call(theme, 'vatRate') || Object.prototype.hasOwnProperty.call(theme, 'vat_rate')) {
+      settings.vatRate = Number(theme.vatRate ?? theme.vat_rate ?? settings.vatRate)
+    }
     const currencyItem = currencyMap.value[currencyCode]
     if (currencyItem) {
       settings.currencyId = currencyItem.id || settings.currencyId
@@ -507,11 +870,20 @@ const loadInvoice = async () => {
       settings.layout = data.layout.filter((section) => section !== 'payment')
     }
 
-    invoice.metaRows = [
-      { id: 'meta-1', label: 'Date de facture', value: normalizeDate(data.issue_date) || defaultIssueDate },
-      { id: 'meta-2', label: 'Date de livraison', value: normalizeDate(data.delivery_date) },
-      { id: 'meta-3', label: 'Echeance de paiement', value: normalizeDate(data.due_date) }
-    ]
+    const savedMetaRows = theme.metaRows || theme.meta_rows
+    if (Array.isArray(savedMetaRows) && savedMetaRows.length) {
+      invoice.metaRows = savedMetaRows.map((row, index) => ({
+        id: row.id || `meta-${index + 1}`,
+        label: row.label || '',
+        value: row.value || ''
+      }))
+    } else {
+      invoice.metaRows = [
+        { id: 'meta-1', label: 'Date de facture', value: normalizeDate(data.issue_date) || defaultIssueDate },
+        { id: 'meta-2', label: 'Date de livraison', value: normalizeDate(data.delivery_date) },
+        { id: 'meta-3', label: 'Echeance de paiement', value: normalizeDate(data.due_date) }
+      ]
+    }
 
     const issuerAddressRaw = [data.issuer_address_line1, data.issuer_address_line2]
       .filter(Boolean)
@@ -531,12 +903,30 @@ const loadInvoice = async () => {
     invoice.client.city = data.client_city || clientAddress.city || invoice.client.city
     invoice.client.name = data.client_name || invoice.client.name
 
-    upsertField(invoice.issuer.fields, 'Email', data.issuer_email)
-    upsertField(invoice.issuer.fields, 'Tel', data.issuer_phone)
-    upsertField(invoice.issuer.fields, 'N TVA', data.issuer_tax_id)
+    const savedIssuerFields = theme.issuerFields || theme.issuer_fields
+    if (Array.isArray(savedIssuerFields) && savedIssuerFields.length) {
+      invoice.issuer.fields = savedIssuerFields.map((field, index) => ({
+        id: field.id || `issuer-${index + 1}`,
+        label: field.label || 'Libelle',
+        value: field.value || ''
+      }))
+    } else {
+      upsertField(invoice.issuer.fields, 'Email', data.issuer_email)
+      upsertField(invoice.issuer.fields, 'Tel', data.issuer_phone)
+      upsertField(invoice.issuer.fields, 'N TVA', data.issuer_tax_id)
+    }
 
-    upsertField(invoice.client.fields, 'Email', data.client_email)
-    upsertField(invoice.client.fields, 'Tel', data.client_phone)
+    const savedClientFields = theme.clientFields || theme.client_fields
+    if (Array.isArray(savedClientFields) && savedClientFields.length) {
+      invoice.client.fields = savedClientFields.map((field, index) => ({
+        id: field.id || `client-${index + 1}`,
+        label: field.label || 'Libelle',
+        value: field.value || ''
+      }))
+    } else {
+      upsertField(invoice.client.fields, 'Email', data.client_email)
+      upsertField(invoice.client.fields, 'Tel', data.client_phone)
+    }
 
     invoice.items = Array.isArray(data.items)
       ? data.items.map((item, index) => {
@@ -646,7 +1036,39 @@ const buildPayload = () => {
       secondaryColor: settings.secondaryColor,
       backgroundColor: settings.backgroundColor,
       textColor: settings.textColor,
-      fontFamily: settings.fontFamily
+      fontFamily: settings.fontFamily,
+      templateStyle: settings.templateStyle,
+      headerStyle: settings.headerStyle,
+      tableStyle: settings.tableStyle,
+      totalsStyle: settings.totalsStyle,
+      density: settings.density,
+      cornerStyle: settings.cornerStyle,
+      signatureStyle: settings.signatureStyle,
+      cellColor: settings.cellColor,
+      patternStyle: settings.patternStyle,
+      accentStyle: settings.accentStyle,
+      watermarkStyle: settings.watermarkStyle,
+      watermarkText: settings.watermarkText,
+      showQuantity: settings.showQuantity,
+      showUnit: settings.showUnit,
+      vatEnabled: settings.vatEnabled,
+      vatPerLine: settings.vatPerLine,
+      vatRate: settings.vatRate,
+      metaRows: invoice.metaRows.map((row) => ({
+        id: row.id,
+        label: row.label,
+        value: row.value
+      })),
+      issuerFields: invoice.issuer.fields.map((field) => ({
+        id: field.id,
+        label: field.label,
+        value: field.value
+      })),
+      clientFields: invoice.client.fields.map((field) => ({
+        id: field.id,
+        label: field.label,
+        value: field.value
+      }))
     }
   }
 }
@@ -698,33 +1120,26 @@ const saveInvoice = async (options = {}) => {
   }
 }
 
-const previewPdf = async () => {
-  if (!invoiceId.value) return
-  pdfLoading.value = true
-  try {
-    const response = await fetch(`${config.public.apiBaseURL}/invoices/${invoiceId.value}/pdf?refresh=1`, {
-      headers: {
-        Authorization: token.value ? `Bearer ${token.value}` : '',
-        Accept: 'application/pdf'
-      }
-    })
-    if (!response.ok) throw new Error('PDF error')
-    const blob = await response.blob()
-    const url = window.URL.createObjectURL(blob)
-    window.open(url, '_blank')
-    setTimeout(() => window.URL.revokeObjectURL(url), 1500)
-  } catch (err) {
-    console.error('Erreur PDF:', err)
-    showToast('Erreur lors du chargement PDF', 'error')
-  } finally {
-    pdfLoading.value = false
+const previewPdf = () => {
+  if (!isPremium.value) {
+    showToast('Apercu instantane reserve au plan Premium.', 'error')
+    return
   }
+  previewModal.value = true
 }
 
 const downloadPdf = async () => {
-  if (!invoiceId.value) return
+  if (!isPremium.value) {
+    showToast('Le telechargement PDF est reserve au plan Premium.', 'error')
+    return
+  }
+  if (!invoiceId.value) {
+    showToast('Sauvegardez la facture avant de telecharger le PDF.', 'error')
+    return
+  }
   pdfLoading.value = true
   try {
+    await saveInvoice({ silent: true })
     const response = await fetch(`${config.public.apiBaseURL}/invoices/${invoiceId.value}/pdf?refresh=1`, {
       headers: {
         Authorization: token.value ? `Bearer ${token.value}` : '',
@@ -736,11 +1151,12 @@ const downloadPdf = async () => {
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `facture-${invoice.number || invoiceId.value}.pdf`
+    link.download = `facture-${invoice.number || invoiceId.value}-${appliedTemplateSlug.value}.pdf`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     setTimeout(() => window.URL.revokeObjectURL(url), 1500)
+    showToast(`Telechargement en cours (modele: ${appliedTemplateLabel.value}).`)
   } catch (err) {
     console.error('Erreur download PDF:', err)
     showToast('Erreur lors du telechargement', 'error')
@@ -785,6 +1201,10 @@ const uploadLogo = async (file) => {
 }
 
 const openSendModal = () => {
+  if (!isPremium.value) {
+    showToast('L\'envoi de facture est reserve au plan Premium.', 'error')
+    return
+  }
   if (!invoiceId.value) {
     showToast('Sauvegardez d\'abord la facture', 'error')
     return
