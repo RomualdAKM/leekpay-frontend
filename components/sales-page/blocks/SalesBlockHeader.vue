@@ -17,12 +17,16 @@
               class="object-contain"
             />
             <span 
-              v-else-if="props.logoText"
-              class="font-bold text-xl"
+              v-else-if="props.logoText || isEditMode"
+              :class="['font-bold text-xl', editableClasses('logoText')]"
               :style="{ color: props.textColor || '#1f2937' }"
-            >
-              {{ props.logoText }}
-            </span>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Logo'"
+              @focus="onFocus('logoText')"
+              @blur="onBlur($event, 'logoText')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+            >{{ props.logoText }}</span>
             <div v-else class="h-10 w-28 bg-gray-100 flex items-center justify-center text-gray-400 text-xs rounded">
               Logo
             </div>
@@ -39,25 +43,33 @@
           <a 
             v-for="(item, index) in props.navItems" 
             :key="index"
-            :href="item.url || '#'"
-            :class="linkClasses"
+            :href="isEditMode ? undefined : (item.url || '#')"
+            :class="[linkClasses, editableClasses(`navItems[${index}].text`)]"
             :style="linkStyles"
-            @mouseenter="(e: MouseEvent) => onLinkHover(e, true)"
-            @mouseleave="(e: MouseEvent) => onLinkHover(e, false)"
-          >
-            {{ item.text }}
-          </a>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Lien'"
+            @focus="onArrayFocus('navItems', index, 'text')"
+            @blur="onArrayBlur($event, 'navItems', index, 'text')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+            @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+          >{{ item.text }}</a>
         </nav>
         
-        <!-- CTA Button -->
+        <!-- CTA Button (éditable inline) -->
         <div v-if="props.showCta" :class="{ 'order-3': props.layout === 'logo-right' }" class="hidden md:block">
           <a 
-            :href="props.ctaUrl || '#'"
-            :class="ctaClasses"
+            :href="isEditMode ? undefined : (props.ctaUrl || '#')"
+            :class="[ctaClasses, editableClasses('ctaText')]"
             :style="ctaStyles"
-          >
-            {{ props.ctaText || 'Acheter' }}
-          </a>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Bouton'"
+            @focus="onFocus('ctaText')"
+            @blur="onBlur($event, 'ctaText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.ctaText || 'Acheter' }}</a>
         </div>
         
         <!-- Mobile Menu Toggle -->
@@ -90,14 +102,18 @@
           <a 
             v-for="(item, index) in leftNavItems" 
             :key="index"
-            :href="item.url || '#'"
-            :class="linkClasses"
+            :href="isEditMode ? undefined : (item.url || '#')"
+            :class="[linkClasses, editableClasses(`navItems[${index}].text`)]"
             :style="linkStyles"
-            @mouseenter="(e: MouseEvent) => onLinkHover(e, true)"
-            @mouseleave="(e: MouseEvent) => onLinkHover(e, false)"
-          >
-            {{ item.text }}
-          </a>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Lien'"
+            @focus="onArrayFocus('navItems', index, 'text')"
+            @blur="onArrayBlur($event, 'navItems', index, 'text')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+            @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+          >{{ item.text }}</a>
         </nav>
         
         <!-- Logo Center -->
@@ -111,12 +127,16 @@
               class="object-contain"
             />
             <span 
-              v-else-if="props.logoText"
-              class="font-bold text-xl"
+              v-else-if="props.logoText || isEditMode"
+              :class="['font-bold text-xl', editableClasses('logoText')]"
               :style="{ color: props.textColor || '#1f2937' }"
-            >
-              {{ props.logoText }}
-            </span>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Logo'"
+              @focus="onFocus('logoText')"
+              @blur="onBlur($event, 'logoText')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+            >{{ props.logoText }}</span>
           </a>
         </div>
         
@@ -124,26 +144,33 @@
         <div class="hidden md:flex items-center flex-1 justify-end" :style="navStyles">
           <nav v-if="props.showNavigation && rightNavItems.length" class="flex items-center">
             <a 
-              v-for="(item, index) in rightNavItems" 
-              :key="index"
-              :href="item.url || '#'"
-              :class="linkClasses"
+              v-for="(item, navIdx) in rightNavItems" 
+              :key="navIdx"
+              :href="isEditMode ? undefined : (item.url || '#')"
+              :class="[linkClasses, editableClasses(`navItems[${leftNavItems.length + navIdx}].text`)]"
               :style="linkStyles"
-              @mouseenter="(e: MouseEvent) => onLinkHover(e, true)"
-              @mouseleave="(e: MouseEvent) => onLinkHover(e, false)"
-            >
-              {{ item.text }}
-            </a>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Lien'"
+              @focus="onArrayFocus('navItems', leftNavItems.length + navIdx, 'text')"
+              @blur="onArrayBlur($event, 'navItems', leftNavItems.length + navIdx, 'text')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+              @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+              @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+            >{{ item.text }}</a>
           </nav>
           <a 
             v-if="props.showCta"
-            :href="props.ctaUrl || '#'"
-            :class="ctaClasses"
+            :href="isEditMode ? undefined : (props.ctaUrl || '#')"
+            :class="[ctaClasses, 'ml-6', editableClasses('ctaText')]"
             :style="ctaStyles"
-            class="ml-6"
-          >
-            {{ props.ctaText || 'Acheter' }}
-          </a>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Bouton'"
+            @focus="onFocus('ctaText')"
+            @blur="onBlur($event, 'ctaText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.ctaText || 'Acheter' }}</a>
         </div>
         
         <!-- Mobile Toggle -->
@@ -209,6 +236,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface NavItem {
   text: string
@@ -216,6 +244,7 @@ interface NavItem {
 }
 
 interface Props {
+  blockId?: string
   // Logo
   logoUrl?: string | null
   logoText?: string
@@ -274,6 +303,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   logoUrl: null,
   logoText: '',
   logoWidth: 120,
@@ -324,6 +354,61 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const mobileMenuOpen = ref(false)
+
+// Édition inline
+const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+const isFieldActive = (field: string) => activeEditField.value === field
+
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none', 'cursor-text', 'transition-all', 'duration-150', 'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+const onFocus = (field: string) => {
+  if (props.blockId) startEditing(props.blockId, field)
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onArrayFocus = (arrayKey: string, index: number, propKey: string) => {
+  if (props.blockId) startEditing(props.blockId, `${arrayKey}[${index}].${propKey}`)
+}
+
+const onArrayBlur = (e: FocusEvent, arrayKey: string, index: number, propKey: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitArrayPropUpdate(props.blockId, arrayKey, index, propKey, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Split nav items for center layout
 const leftNavItems = computed(() => {
@@ -377,7 +462,7 @@ const headerStyles = computed(() => {
     large: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
   }
   if (props.shadow && props.shadow !== 'none') {
-    styles.boxShadow = shadowMap[props.shadow]
+    styles.boxShadow = shadowMap[props.shadow] || 'none'
   }
   
   return styles
@@ -419,7 +504,7 @@ const containerStyles = computed(() => {
   }
   styles.height = props.height === 'custom' 
     ? `${props.heightCustom}px` 
-    : heightMap[props.height || 'medium']
+    : (heightMap[props.height || 'medium'] || '64px')
   
   // Padding X
   const paddingMap: Record<string, string> = {
@@ -428,8 +513,8 @@ const containerStyles = computed(() => {
     large: '48px',
     xlarge: '64px',
   }
-  styles.paddingLeft = paddingMap[props.paddingX || 'medium']
-  styles.paddingRight = paddingMap[props.paddingX || 'medium']
+  styles.paddingLeft = paddingMap[props.paddingX || 'medium'] || '24px'
+  styles.paddingRight = paddingMap[props.paddingX || 'medium'] || '24px'
   
   return styles
 })

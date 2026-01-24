@@ -5,21 +5,30 @@
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" class="text-center" :class="{ 'mb-8 md:mb-12': props.title }">
+      <div v-if="props.title || props.subtitle || isEditMode" class="text-center" :class="{ 'mb-8 md:mb-12': props.title || isEditMode }">
         <h3 
-          v-if="props.title"
-          :class="template.styles.title"
+          v-if="props.title || isEditMode"
+          :class="[template.styles.title, editableClasses('title')]"
           :style="{ color: props.textColor }"
-        >
-          {{ props.title }}
-        </h3>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre du countdown'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h3>
         <p 
-          v-if="props.subtitle"
+          v-if="props.subtitle || isEditMode"
           class="mt-2 text-sm md:text-base opacity-70"
+          :class="editableClasses('subtitle')"
           :style="{ color: props.textColor }"
-        >
-          {{ props.subtitle }}
-        </p>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre (optionnel)'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
       </div>
       
       <!-- Timer -->
@@ -113,12 +122,17 @@
       
       <!-- Message expiré -->
       <p 
-        v-if="isExpired"
+        v-if="isExpired || isEditMode"
         class="mt-6 text-base font-medium text-center"
-        :style="{ color: props.textColor }"
-      >
-        {{ props.expiredMessage || 'Cette offre a expiré' }}
-      </p>
+        :class="editableClasses('expiredMessage')"
+        :style="{ color: props.textColor, opacity: isExpired ? 1 : 0.5 }"
+        :contenteditable="isEditMode"
+        :data-placeholder="'Message quand expiré'"
+        @focus="onFocus('expiredMessage')"
+        @blur="onBlur($event, 'expiredMessage')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.expiredMessage || 'Cette offre a expiré' }}</p>
     </div>
   </section>
 </template>
@@ -126,8 +140,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   title?: string
   subtitle?: string
@@ -150,6 +166,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'countdown-minimal-1',
   title: 'Offre expire dans',
   subtitle: '',
@@ -170,6 +187,60 @@ const props = withDefaults(defineProps<Props>(), {
   textColor: '#92400e',
   accentColor: '',
 })
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 const template = computed(() => {
   return getTemplate('countdown', props.templateId) || {

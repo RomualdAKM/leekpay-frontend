@@ -405,25 +405,49 @@
     :class="[template.styles.section, sectionClasses, animationClass]"
     :style="{ ...sectionStyles, ...animationStyles }"
   >
-    <div :class="[template.styles.container, contentAlignmentClass]" :style="containerDynamicStyles">
+    <div 
+      :class="[template.styles.container, contentAlignmentClass]" 
+      :style="{ ...containerDynamicStyles, display: 'flex', flexDirection: 'column' }"
+    >
       <span 
-        v-if="props.badge && template.config?.showBadge !== false"
-        :class="template.styles.badge"
-        :style="badgeStyles"
+        v-if="(props.badge || isEditMode) && template.config?.showBadge !== false"
+        :class="[template.styles.badge, editableClasses('badge')]"
+        :style="{ ...badgeStyles, ...badgePositionStyles }"
+        :contenteditable="isEditMode"
+        :data-placeholder="'Badge'"
+        @focus="onFocus('badge')"
+        @blur="onBlur($event, 'badge')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
       >{{ props.badge }}</span>
       
       <h1 
-        :class="template.styles.title"
-        :style="titleStyles"
+        :class="[template.styles.title, editableClasses('title')]"
+        :style="{ ...titleStyles, ...titlePositionStyles }"
+        :contenteditable="isEditMode"
+        :data-placeholder="'Titre principal'"
+        @focus="onFocus('title')"
+        @blur="onBlur($event, 'title')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
       >{{ props.title }}</h1>
       
       <p 
-        v-if="props.subtitle"
-        :class="template.styles.subtitle"
-        :style="subtitleStyles"
+        v-if="props.subtitle || isEditMode"
+        :class="[template.styles.subtitle, editableClasses('subtitle')]"
+        :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
+        :contenteditable="isEditMode"
+        :data-placeholder="'Sous-titre'"
+        @focus="onFocus('subtitle')"
+        @blur="onBlur($event, 'subtitle')"
+        @keydown="onKeydown($event, false)"
+        @paste="onPaste"
       >{{ props.subtitle }}</p>
       
-      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+      <div 
+        :class="[template.styles.buttonGroup, buttonAlignmentClass]" 
+        :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }"
+      >
         <component
           :is="props.ctaUrl ? 'a' : 'button'"
           v-if="props.ctaText"
@@ -459,6 +483,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 import type { HeroLayout } from '~/composables/blockTemplates/hero'
 
 interface SlideItem {
@@ -468,6 +493,7 @@ interface SlideItem {
 }
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   title?: string
   subtitle?: string
@@ -550,9 +576,16 @@ interface Props {
   // Avancé
   cssId?: string
   customClasses?: string
+  // Positionnement des éléments (Option 1 + 2)
+  elementsOrder?: ('badge' | 'title' | 'subtitle' | 'buttons')[]
+  badgeOffsetY?: number
+  titleOffsetY?: number
+  subtitleOffsetY?: number
+  buttonsOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'hero-centered-clean',
   title: 'Titre principal',
   subtitle: 'Sous-titre de votre offre',
@@ -619,9 +652,69 @@ const props = withDefaults(defineProps<Props>(), {
   autoplayInterval: 5000,
   cssId: '',
   customClasses: '',
+  // Positionnement des éléments (Option 1 + 2)
+  elementsOrder: () => ['badge', 'title', 'subtitle', 'buttons'] as ('badge' | 'title' | 'subtitle' | 'buttons')[],
+  badgeOffsetY: 0,
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
+  buttonsOffsetY: 0,
 })
 
 defineEmits(['cta-click'])
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Slider state
 const currentSlide = ref(0)
@@ -1051,6 +1144,60 @@ const animationStyles = computed(() => {
 
 const sectionId = computed(() => props.cssId || undefined)
 const sectionClasses = computed(() => props.customClasses || '')
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS (Option 1 + 2) ============
+
+// Calcul de l'ordre CSS pour chaque élément
+const getElementOrder = (element: string): number => {
+  const order = props.elementsOrder || ['badge', 'title', 'subtitle', 'buttons']
+  return order.indexOf(element as any)
+}
+
+// Styles avec offset pour le badge
+const badgePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.badgeOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('badge'))
+  return styles
+})
+
+// Styles avec offset pour le titre
+const titlePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.titleOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('title'))
+  return styles
+})
+
+// Styles avec offset pour le sous-titre
+const subtitlePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.subtitleOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('subtitle'))
+  return styles
+})
+
+// Styles avec offset pour les boutons
+const buttonsPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.buttonsOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('buttons'))
+  return styles
+})
+
+// ============ FIN POSITIONNEMENT ============
 
 // Mapping des valeurs de border-radius
 const radiusMap: Record<string, string> = {

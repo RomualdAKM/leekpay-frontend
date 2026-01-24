@@ -5,8 +5,22 @@
   >
     <div :class="template.styles.container" :style="containerStyles">
       <div 
+        v-if="!isEditMode"
         :class="template.styles.text"
         :style="textStyles"
+        v-html="props.content"
+      />
+      <!-- Mode édition: contenteditable avec HTML -->
+      <div 
+        v-else
+        :class="[template.styles.text, editableClasses('content')]"
+        :style="textStyles"
+        contenteditable="true"
+        data-placeholder="Écrivez votre contenu ici..."
+        @focus="onFocus('content')"
+        @blur="onBlur($event, 'content')"
+        @keydown="onKeydown"
+        ref="contentRef"
         v-html="props.content"
       />
     </div>
@@ -14,10 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, nextTick } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   content?: string
   // Couleurs
@@ -46,6 +62,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'text-minimal-centered',
   content: '<p>Votre contenu ici...</p>',
   backgroundColor: '#ffffff',
@@ -67,6 +84,55 @@ const props = withDefaults(defineProps<Props>(), {
   borderRadius: 'none',
   animation: 'none',
 })
+
+// Référence DOM
+const contentRef = ref<HTMLElement | null>(null)
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-h-[2em]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  // Pour le rich text, on garde le HTML
+  const newValue = target.innerHTML || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent) => {
+  // Escape pour quitter l'édition
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
 
 // Template actif
 const template = computed(() => {

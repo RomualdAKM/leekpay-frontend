@@ -6,21 +6,29 @@
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" :class="template.styles.header" :style="headerStyles">
+      <div v-if="props.title || props.subtitle || isEditMode" :class="template.styles.header" :style="headerStyles">
         <h2 
-          v-if="props.title"
-          :class="template.styles.title"
+          v-if="props.title || isEditMode"
+          :class="[template.styles.title, editableClasses('title')]"
           :style="titleStyles"
-        >
-          {{ props.title }}
-        </h2>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre de la section'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h2>
         <p 
-          v-if="props.subtitle"
-          :class="template.styles.subtitle"
+          v-if="props.subtitle || isEditMode"
+          :class="[template.styles.subtitle, editableClasses('subtitle')]"
           :style="{ color: textColor }"
-        >
-          {{ props.subtitle }}
-        </p>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre (optionnel)'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
       </div>
       
       <!-- Grille -->
@@ -44,11 +52,15 @@
           
           <!-- Texte du témoignage -->
           <blockquote 
-            :class="template.styles.quote"
+            :class="[template.styles.quote, editableClasses(`items[${index}].text`)]"
             :style="quoteStyles"
-          >
-            "{{ item.text }}"
-          </blockquote>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Témoignage...'"
+            @focus="onArrayFocus('items', index, 'text')"
+            @blur="onArrayBlur($event, 'items', index, 'text')"
+            @keydown="onKeydown($event, false)"
+            @paste="onPaste"
+          >"{{ item.text }}"</blockquote>
           
           <!-- Étoiles -->
           <div v-if="props.showRating && item.rating" :class="template.styles.rating">
@@ -85,16 +97,27 @@
             
             <!-- Nom et rôle -->
             <div :class="template.styles.authorInfo">
-              <p :class="template.styles.author" :style="{ color: textColor }">
-                {{ item.name }}
-              </p>
               <p 
-                v-if="props.showRole && item.role" 
-                :class="template.styles.role" 
+                :class="[template.styles.author, editableClasses(`items[${index}].name`)]"
                 :style="{ color: textColor }"
-              >
-                {{ item.role }}
-              </p>
+                :contenteditable="isEditMode"
+                :data-placeholder="'Nom'"
+                @focus="onArrayFocus('items', index, 'name')"
+                @blur="onArrayBlur($event, 'items', index, 'name')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+              >{{ item.name }}</p>
+              <p 
+                v-if="props.showRole && (item.role || isEditMode)" 
+                :class="[template.styles.role, editableClasses(`items[${index}].role`)]" 
+                :style="{ color: textColor }"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Rôle'"
+                @focus="onArrayFocus('items', index, 'role')"
+                @blur="onArrayBlur($event, 'items', index, 'role')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+              >{{ item.role }}</p>
               <p 
                 v-if="props.showCompany && item.company" 
                 :class="template.styles.company" 
@@ -113,6 +136,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 // Types
 type Layout = 'grid' | 'carousel' | 'single' | 'masonry' | 'list'
@@ -128,6 +152,7 @@ interface TestimonialItem {
 }
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   // Contenu
   title?: string
@@ -173,6 +198,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'testimonials-minimal-centered',
   title: "Ce qu'ils en disent",
   subtitle: '',
@@ -209,6 +235,77 @@ const props = withDefaults(defineProps<Props>(), {
   cssId: '',
   customClasses: '',
 })
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition - champs simples
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+// Handlers d'édition - champs dans array
+const onArrayFocus = (arrayKey: string, index: number, propKey: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, `${arrayKey}[${index}].${propKey}`)
+  }
+}
+
+const onArrayBlur = (e: FocusEvent, arrayKey: string, index: number, propKey: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitArrayPropUpdate(props.blockId, arrayKey, index, propKey, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Template actif
 const template = computed(() => {
@@ -325,7 +422,7 @@ const quoteStyles = computed(() => {
     medium: '1rem',
     large: '1.25rem',
   }
-  styles.fontSize = fontSizeMap[props.quoteFontSize || 'medium']
+  styles.fontSize = fontSizeMap[props.quoteFontSize || 'medium'] || '1rem'
   
   return styles
 })

@@ -6,21 +6,29 @@
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" :class="template.styles.header" :style="headerStyles">
+      <div v-if="props.title || props.subtitle || isEditMode" :class="template.styles.header" :style="headerStyles">
         <h2 
-          v-if="props.title"
-          :class="template.styles.title"
+          v-if="props.title || isEditMode"
+          :class="[template.styles.title, editableClasses('title')]"
           :style="sectionTitleStyles"
-        >
-          {{ props.title }}
-        </h2>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre de la section'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h2>
         <p 
-          v-if="props.subtitle"
-          :class="template.styles.subtitle"
+          v-if="props.subtitle || isEditMode"
+          :class="[template.styles.subtitle, editableClasses('subtitle')]"
           :style="{ color: textColor }"
-        >
-          {{ props.subtitle }}
-        </p>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre (optionnel)'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
       </div>
       
       <!-- Grille de features -->
@@ -63,20 +71,28 @@
           <div :class="props.layout === 'list' || props.layout === 'alternating' ? 'flex-1' : ''">
             <!-- Titre -->
             <h3 
-              :class="template.styles.cardTitle"
+              :class="[template.styles.cardTitle, editableClasses(`items[${index}].title`)]"
               :style="cardTitleStyles"
-            >
-              {{ item.title }}
-            </h3>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Titre'"
+              @focus="onArrayFocus('items', index, 'title')"
+              @blur="onArrayBlur($event, 'items', index, 'title')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+            >{{ item.title }}</h3>
             
             <!-- Description -->
             <p 
-              v-if="props.showDescription && item.description"
-              :class="template.styles.cardText"
+              v-if="props.showDescription && (item.description || isEditMode)"
+              :class="[template.styles.cardText, editableClasses(`items[${index}].description`)]"
               :style="{ color: textColor }"
-            >
-              {{ item.description }}
-            </p>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Description'"
+              @focus="onArrayFocus('items', index, 'description')"
+              @blur="onArrayBlur($event, 'items', index, 'description')"
+              @keydown="onKeydown($event, false)"
+              @paste="onPaste"
+            >{{ item.description }}</p>
           </div>
         </div>
       </div>
@@ -87,6 +103,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 // Types
 type IconStyle = 'filled' | 'outlined' | 'none' | 'number'
@@ -99,6 +116,7 @@ interface FeatureItem {
 }
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   // Contenu
   title?: string
@@ -148,6 +166,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'features-minimal-grid',
   title: 'Ce que vous allez obtenir',
   subtitle: '',
@@ -191,6 +210,77 @@ const props = withDefaults(defineProps<Props>(), {
   cssId: '',
   customClasses: '',
 })
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition - champs simples
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+// Handlers d'édition - champs dans array
+const onArrayFocus = (arrayKey: string, index: number, propKey: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, `${arrayKey}[${index}].${propKey}`)
+  }
+}
+
+const onArrayBlur = (e: FocusEvent, arrayKey: string, index: number, propKey: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitArrayPropUpdate(props.blockId, arrayKey, index, propKey, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Template actif
 const template = computed(() => {

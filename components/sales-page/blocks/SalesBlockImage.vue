@@ -35,14 +35,18 @@
           />
         </div>
         
-        <!-- Caption -->
+        <!-- Caption (éditable inline) -->
         <figcaption 
-          v-if="props.caption"
-          :class="template.styles.caption"
+          v-if="props.caption || isEditMode"
+          :class="[template.styles.caption, editableClasses('caption')]"
           :style="captionStyles"
-        >
-          {{ props.caption }}
-        </figcaption>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Légende de l\'image'"
+          @focus="onFocus('caption')"
+          @blur="onBlur($event, 'caption')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.caption }}</figcaption>
       </figure>
     </div>
   </section>
@@ -51,8 +55,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface Props {
+  blockId?: string
   templateId?: string
   src?: string | null
   alt?: string
@@ -85,6 +91,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'image-minimal-centered',
   src: null,
   alt: '',
@@ -107,6 +114,49 @@ const props = withDefaults(defineProps<Props>(), {
   captionSize: 'small',
   animation: 'none',
 })
+
+// Édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+const isFieldActive = (field: string) => activeEditField.value === field
+
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none', 'cursor-text', 'transition-all', 'duration-150', 'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+const onFocus = (field: string) => {
+  if (props.blockId) startEditing(props.blockId, field)
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Template actif
 const template = computed(() => {

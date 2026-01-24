@@ -12,6 +12,44 @@ export interface Block {
   props: BlockProps
 }
 
+// ============ NOUVELLE ARCHITECTURE: SECTIONS + COLONNES (Phase 3) ============
+
+export interface SectionSettings {
+  backgroundColor?: string
+  backgroundImage?: string
+  backgroundSize?: 'cover' | 'contain' | 'auto'
+  backgroundPosition?: 'center' | 'top' | 'bottom'
+  paddingTop?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
+  paddingBottom?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
+  marginTop?: 'none' | 'small' | 'medium' | 'large'
+  marginBottom?: 'none' | 'small' | 'medium' | 'large'
+  maxWidth?: 'full' | '7xl' | '6xl' | '5xl' | '4xl'
+  minHeight?: 'auto' | 'screen' | 'half'
+  customClass?: string
+}
+
+export interface ColumnSettings {
+  verticalAlign?: 'top' | 'center' | 'bottom' | 'stretch'
+  padding?: 'none' | 'small' | 'medium' | 'large'
+  customClass?: string
+}
+
+export interface Column {
+  id: string
+  width: number // Pourcentage (100, 50, 33, 25, 66, 75)
+  settings: ColumnSettings
+  blocks: Block[]
+}
+
+export interface Section {
+  id: string
+  order: number
+  settings: SectionSettings
+  columns: Column[]
+}
+
+// ============ FIN NOUVELLE ARCHITECTURE ============
+
 export interface Theme {
   primaryColor: string
   secondaryColor: string
@@ -41,7 +79,8 @@ export interface SalesPage {
   meta_title?: string
   meta_description?: string
   favicon_url?: string
-  blocks: Block[]
+  blocks: Block[]  // Legacy - pour rétrocompatibilité
+  sections?: Section[]  // Nouvelle architecture (Phase 3)
   theme: Theme
   settings: Settings
   payment_link_id?: number | null
@@ -65,6 +104,30 @@ export interface BlockType {
 // Génère un ID unique pour les blocs
 const generateBlockId = (): string => {
   return 'block_' + Math.random().toString(36).substring(2, 10)
+}
+
+// Génère un ID unique pour les sections
+const generateSectionId = (): string => {
+  return 'section_' + Math.random().toString(36).substring(2, 10)
+}
+
+// Génère un ID unique pour les colonnes
+const generateColumnId = (): string => {
+  return 'column_' + Math.random().toString(36).substring(2, 10)
+}
+
+// Layouts de colonnes prédéfinis
+export const COLUMN_LAYOUTS = {
+  '1': [100],
+  '2': [50, 50],
+  '3': [33.33, 33.33, 33.33],
+  '4': [25, 25, 25, 25],
+  '1-2': [33.33, 66.66],
+  '2-1': [66.66, 33.33],
+  '1-3': [25, 75],
+  '3-1': [75, 25],
+  '1-1-2': [25, 25, 50],
+  '2-1-1': [50, 25, 25],
 }
 
 export const useSalesPageBuilder = () => {
@@ -109,7 +172,22 @@ export const useSalesPageBuilder = () => {
   // Computed
   const selectedBlock = computed(() => {
     if (!selectedBlockId.value) return null
-    return page.value.blocks.find(b => b.id === selectedBlockId.value) || null
+    
+    // Chercher d'abord dans les blocs legacy
+    const legacyBlock = page.value.blocks.find(b => b.id === selectedBlockId.value)
+    if (legacyBlock) return legacyBlock
+    
+    // Chercher dans les sections (mode sections)
+    if (page.value.sections && page.value.sections.length > 0) {
+      for (const section of page.value.sections) {
+        for (const column of section.columns) {
+          const block = column.blocks.find(b => b.id === selectedBlockId.value)
+          if (block) return block
+        }
+      }
+    }
+    
+    return null
   })
   
   const hasBlocks = computed(() => page.value.blocks.length > 0)
@@ -216,6 +294,7 @@ export const useSalesPageBuilder = () => {
             meta_title: page.value.meta_title,
             meta_description: page.value.meta_description,
             blocks: page.value.blocks,
+            sections: page.value.sections, // Phase 3: Sections + Colonnes
             theme: page.value.theme,
             settings: page.value.settings,
             payment_link_id: page.value.payment_link_id,
@@ -412,9 +491,45 @@ export const useSalesPageBuilder = () => {
   }
   
   const updateBlockProps = (blockId: string, props: Partial<BlockProps>) => {
-    const block = page.value.blocks.find(b => b.id === blockId)
-    if (block) {
-      block.props = { ...block.props, ...props }
+    // Fonction helper pour appliquer la mise à jour
+    const applyUpdate = (block: Block) => {
+      // Vérifier si c'est une mise à jour d'élément dans un array (édition inline)
+      if (props.__arrayUpdate) {
+        const { arrayKey, index, propKey, value } = props.__arrayUpdate as {
+          arrayKey: string
+          index: number
+          propKey: string
+          value: any
+        }
+        const arr = [...(block.props[arrayKey] || [])]
+        if (arr[index]) {
+          arr[index] = { ...arr[index], [propKey]: value }
+          block.props = { ...block.props, [arrayKey]: arr }
+        }
+      } else {
+        // Mise à jour standard des props
+        block.props = { ...block.props, ...props }
+      }
+    }
+    
+    // Chercher d'abord dans les blocs legacy
+    const legacyBlock = page.value.blocks.find(b => b.id === blockId)
+    if (legacyBlock) {
+      applyUpdate(legacyBlock)
+      return
+    }
+    
+    // Chercher dans les sections (mode sections)
+    if (page.value.sections && page.value.sections.length > 0) {
+      for (const section of page.value.sections) {
+        for (const column of section.columns) {
+          const block = column.blocks.find(b => b.id === blockId)
+          if (block) {
+            applyUpdate(block)
+            return
+          }
+        }
+      }
     }
   }
   
@@ -476,7 +591,364 @@ export const useSalesPageBuilder = () => {
       selectedBlockId.value = null
     }
   }
+
+  // ============ GESTION DES SECTIONS (Phase 3) ============
   
+  const selectedSectionId = ref<string | null>(null)
+  const selectedColumnId = ref<string | null>(null)
+  
+  // Computed pour vérifier si on utilise le nouveau mode sections
+  // IMPORTANT: Une fois qu'on a des sections, on reste en mode sections
+  const useSectionsMode = computed(() => {
+    return page.value.sections && page.value.sections.length > 0
+  })
+  
+  // ============ ADD BLOCK SMART - Création intelligente de blocs ============
+  // Cette fonction crée automatiquement une section si nécessaire
+  // C'est la méthode principale pour ajouter des blocs (utilisée par la sidebar)
+  const addBlockSmart = (blockType: string) => {
+    // Trouver les props par défaut du type de bloc
+    const typeInfo = blockTypes.value.find(bt => bt.value === blockType)
+    const defaultProps = typeInfo?.defaultProps || {}
+    
+    const newBlock: Block = {
+      id: generateBlockId(),
+      type: blockType,
+      order: 0,
+      props: { ...defaultProps },
+    }
+    
+    // Si on utilise déjà le mode sections OU si on n'a pas de blocs legacy
+    // → Ajouter dans une section
+    if (useSectionsMode.value || page.value.blocks.length === 0) {
+      // Initialiser sections si nécessaire
+      if (!page.value.sections) {
+        page.value.sections = []
+      }
+      
+      // Créer une nouvelle section avec le bloc
+      const newSection: Section = {
+        id: generateSectionId(),
+        order: page.value.sections.length,
+        settings: {
+          paddingTop: 'medium',
+          paddingBottom: 'medium',
+          maxWidth: '7xl',
+        },
+        columns: [{
+          id: generateColumnId(),
+          width: 100,
+          settings: {
+            verticalAlign: 'top',
+            padding: 'none',
+          },
+          blocks: [newBlock],
+        }],
+      }
+      
+      page.value.sections.push(newSection)
+      selectedSectionId.value = newSection.id
+      selectedBlockId.value = newBlock.id
+    } else {
+      // Mode legacy - ajouter au tableau de blocs
+      newBlock.order = page.value.blocks.length
+      page.value.blocks.push(newBlock)
+      selectedBlockId.value = newBlock.id
+    }
+  }
+  
+  // Sélection d'une section
+  const selectedSection = computed(() => {
+    if (!selectedSectionId.value || !page.value.sections) return null
+    return page.value.sections.find(s => s.id === selectedSectionId.value) || null
+  })
+  
+  // Sélection d'une colonne
+  const selectedColumn = computed(() => {
+    if (!selectedColumnId.value || !selectedSection.value) return null
+    return selectedSection.value.columns.find(c => c.id === selectedColumnId.value) || null
+  })
+  
+  // Ajouter une nouvelle section
+  const addSection = (layout: keyof typeof COLUMN_LAYOUTS = '1') => {
+    if (!page.value.sections) {
+      page.value.sections = []
+    }
+    
+    const widths = COLUMN_LAYOUTS[layout]
+    const columns: Column[] = widths.map((width) => ({
+      id: generateColumnId(),
+      width,
+      settings: {
+        verticalAlign: 'top',
+        padding: 'medium',
+      },
+      blocks: [],
+    }))
+    
+    const newSection: Section = {
+      id: generateSectionId(),
+      order: page.value.sections.length,
+      settings: {
+        paddingTop: 'large',
+        paddingBottom: 'large',
+        maxWidth: '7xl',
+      },
+      columns,
+    }
+    
+    page.value.sections.push(newSection)
+    selectedSectionId.value = newSection.id
+  }
+  
+  // Supprimer une section
+  const removeSection = (sectionId: string) => {
+    if (!page.value.sections) return
+    
+    page.value.sections = page.value.sections.filter(s => s.id !== sectionId)
+    reindexSections()
+    
+    if (selectedSectionId.value === sectionId) {
+      selectedSectionId.value = null
+      selectedColumnId.value = null
+    }
+  }
+  
+  // Dupliquer une section
+  const duplicateSection = (sectionId: string) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (!section) return
+    
+    const newSection: Section = {
+      id: generateSectionId(),
+      order: section.order + 1,
+      settings: { ...section.settings },
+      columns: section.columns.map(col => ({
+        id: generateColumnId(),
+        width: col.width,
+        settings: { ...col.settings },
+        blocks: col.blocks.map(block => ({
+          id: generateBlockId(),
+          type: block.type,
+          order: block.order,
+          props: JSON.parse(JSON.stringify(block.props)),
+        })),
+      })),
+    }
+    
+    const index = page.value.sections.findIndex(s => s.id === sectionId)
+    page.value.sections.splice(index + 1, 0, newSection)
+    reindexSections()
+    
+    selectedSectionId.value = newSection.id
+  }
+  
+  // Mettre à jour les settings d'une section
+  const updateSectionSettings = (sectionId: string, settings: Partial<SectionSettings>) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (section) {
+      section.settings = { ...section.settings, ...settings }
+    }
+  }
+  
+  // Changer le layout des colonnes d'une section
+  const changeSectionLayout = (sectionId: string, layout: keyof typeof COLUMN_LAYOUTS) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (!section) return
+    
+    const widths = COLUMN_LAYOUTS[layout]
+    const existingBlocks = section.columns.flatMap(col => col.blocks)
+    
+    // Créer les nouvelles colonnes avec les largeurs
+    section.columns = widths.map((width, i) => ({
+      id: generateColumnId(),
+      width,
+      settings: {
+        verticalAlign: 'top',
+        padding: 'medium',
+      },
+      blocks: i === 0 ? existingBlocks : [], // Mettre tous les blocs dans la première colonne
+    }))
+  }
+  
+  // Réindexer les sections
+  const reindexSections = () => {
+    if (!page.value.sections) return
+    page.value.sections.forEach((section, index) => {
+      section.order = index
+    })
+  }
+  
+  // Ajouter un bloc dans une colonne
+  const addBlockToColumn = (sectionId: string, columnId: string, blockType: string) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (!section) return
+    
+    const column = section.columns.find(c => c.id === columnId)
+    if (!column) return
+    
+    // Trouver les props par défaut du type de bloc
+    const typeInfo = blockTypes.value.find(bt => bt.value === blockType)
+    const defaultProps = typeInfo?.defaultProps || {}
+    
+    const newBlock: Block = {
+      id: generateBlockId(),
+      type: blockType,
+      order: column.blocks.length,
+      props: { ...defaultProps },
+    }
+    
+    column.blocks.push(newBlock)
+    selectedBlockId.value = newBlock.id
+  }
+  
+  // Supprimer un bloc d'une colonne
+  const removeBlockFromColumn = (sectionId: string, columnId: string, blockId: string) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (!section) return
+    
+    const column = section.columns.find(c => c.id === columnId)
+    if (!column) return
+    
+    column.blocks = column.blocks.filter(b => b.id !== blockId)
+    
+    // Réindexer les blocs dans la colonne
+    column.blocks.forEach((block, index) => {
+      block.order = index
+    })
+    
+    if (selectedBlockId.value === blockId) {
+      selectedBlockId.value = null
+    }
+  }
+  
+  // Déplacer un bloc dans une colonne (ou entre colonnes)
+  const moveBlockInColumn = (
+    fromSectionId: string,
+    fromColumnId: string,
+    toSectionId: string,
+    toColumnId: string,
+    blockId: string,
+    newIndex: number
+  ) => {
+    if (!page.value.sections) return
+    
+    const fromSection = page.value.sections.find(s => s.id === fromSectionId)
+    const toSection = page.value.sections.find(s => s.id === toSectionId)
+    if (!fromSection || !toSection) return
+    
+    const fromColumn = fromSection.columns.find(c => c.id === fromColumnId)
+    const toColumn = toSection.columns.find(c => c.id === toColumnId)
+    if (!fromColumn || !toColumn) return
+    
+    const blockIndex = fromColumn.blocks.findIndex(b => b.id === blockId)
+    if (blockIndex === -1) return
+    
+    const [block] = fromColumn.blocks.splice(blockIndex, 1)
+    if (!block) return
+    block.order = newIndex
+    toColumn.blocks.splice(newIndex, 0, block)
+    
+    // Réindexer les blocs dans les deux colonnes
+    fromColumn.blocks.forEach((b, i) => { b.order = i })
+    toColumn.blocks.forEach((b, i) => { b.order = i })
+  }
+  
+  // Mettre à jour les props d'un bloc dans une section
+  const updateBlockPropsInSection = (
+    sectionId: string,
+    columnId: string,
+    blockId: string,
+    props: Partial<BlockProps>
+  ) => {
+    if (!page.value.sections) return
+    
+    const section = page.value.sections.find(s => s.id === sectionId)
+    if (!section) return
+    
+    const column = section.columns.find(c => c.id === columnId)
+    if (!column) return
+    
+    const block = column.blocks.find(b => b.id === blockId)
+    if (!block) return
+    
+    // Gérer la mise à jour d'array (édition inline)
+    if (props.__arrayUpdate) {
+      const { arrayKey, index, propKey, value } = props.__arrayUpdate as {
+        arrayKey: string
+        index: number
+        propKey: string
+        value: any
+      }
+      const arr = [...(block.props[arrayKey] || [])]
+      if (arr[index]) {
+        arr[index] = { ...arr[index], [propKey]: value }
+        block.props = { ...block.props, [arrayKey]: arr }
+      }
+    } else {
+      block.props = { ...block.props, ...props }
+    }
+  }
+  
+  // Sélection
+  const selectSection = (sectionId: string | null) => {
+    selectedSectionId.value = sectionId
+    if (!sectionId) {
+      selectedColumnId.value = null
+      selectedBlockId.value = null
+    }
+  }
+  
+  const selectColumn = (columnId: string | null) => {
+    selectedColumnId.value = columnId
+    if (!columnId) {
+      selectedBlockId.value = null
+    }
+  }
+  
+  // Convertir l'ancienne structure (blocks[]) vers la nouvelle (sections[])
+  const migrateToSectionsMode = () => {
+    if (page.value.blocks.length === 0) {
+      page.value.sections = []
+      return
+    }
+    
+    // Créer une section avec une colonne pour chaque bloc existant
+    page.value.sections = page.value.blocks.map((block, index) => ({
+      id: generateSectionId(),
+      order: index,
+      settings: {
+        paddingTop: 'medium',
+        paddingBottom: 'medium',
+        maxWidth: '7xl',
+      },
+      columns: [{
+        id: generateColumnId(),
+        width: 100,
+        settings: {
+          verticalAlign: 'top',
+          padding: 'none',
+        },
+        blocks: [block],
+      }],
+    }))
+    
+    // Vider l'ancien tableau de blocs
+    page.value.blocks = []
+  }
+  
+  // ============ FIN GESTION DES SECTIONS ============
+
   // Appliquer un template
   const applyTemplate = async (templateId: number) => {
     isLoading.value = true
@@ -537,6 +1009,13 @@ export const useSalesPageBuilder = () => {
     error,
     previewMode,
     
+    // State - Sections (Phase 3)
+    selectedSectionId,
+    selectedColumnId,
+    selectedSection,
+    selectedColumn,
+    useSectionsMode,
+    
     // Computed
     hasBlocks,
     sortedBlocks,
@@ -551,14 +1030,29 @@ export const useSalesPageBuilder = () => {
     checkSlugAvailability,
     uploadImage,
     
-    // Block Actions
+    // Block Actions (legacy)
     addBlock,
+    addBlockSmart, // Méthode intelligente pour ajouter des blocs (crée section automatiquement)
     removeBlock,
     duplicateBlock,
     moveBlock,
     updateBlockProps,
     selectBlock,
     reorderBlocks,
+    
+    // Section Actions (Phase 3)
+    addSection,
+    removeSection,
+    duplicateSection,
+    updateSectionSettings,
+    changeSectionLayout,
+    selectSection,
+    selectColumn,
+    addBlockToColumn,
+    removeBlockFromColumn,
+    moveBlockInColumn,
+    updateBlockPropsInSection,
+    migrateToSectionsMode,
     
     // Theme & Settings
     updateTheme,

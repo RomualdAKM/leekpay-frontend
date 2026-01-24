@@ -232,7 +232,7 @@
             <button
               v-for="blockType in blockTypes"
               :key="blockType.value"
-              @click="addBlock(blockType.value)"
+              @click="addBlockSmart(blockType.value)"
               class="flex flex-col items-center p-3 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
             >
               <div class="w-10 h-10 rounded-lg bg-gray-100 group-hover:bg-emerald-100 flex items-center justify-center mb-2">
@@ -240,6 +240,79 @@
               </div>
               <span class="text-xs text-gray-700 text-center">{{ blockType.label }}</span>
             </button>
+          </div>
+          
+          <!-- Séparateur Layouts -->
+          <div class="mt-6 pt-4 border-t border-gray-200">
+            <p class="text-xs font-semibold text-gray-700 mb-3">Layouts de section</p>
+            <div class="grid grid-cols-3 gap-2">
+              <!-- Layout 1 colonne -->
+              <button
+                @click="addSection('1')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="1 colonne (100%)"
+              >
+                <div class="h-8 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+              </button>
+              <!-- Layout 2 colonnes -->
+              <button
+                @click="addSection('2')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="2 colonnes (50/50)"
+              >
+                <div class="h-8 flex gap-1">
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                </div>
+              </button>
+              <!-- Layout 3 colonnes -->
+              <button
+                @click="addSection('3')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="3 colonnes (33/33/33)"
+              >
+                <div class="h-8 flex gap-1">
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                </div>
+              </button>
+              <!-- Layout 1-2 -->
+              <button
+                @click="addSection('1-2')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="2 colonnes (33/66)"
+              >
+                <div class="h-8 flex gap-1">
+                  <div class="w-1/3 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="w-2/3 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                </div>
+              </button>
+              <!-- Layout 2-1 -->
+              <button
+                @click="addSection('2-1')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="2 colonnes (66/33)"
+              >
+                <div class="h-8 flex gap-1">
+                  <div class="w-2/3 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="w-1/3 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                </div>
+              </button>
+              <!-- Layout 4 colonnes -->
+              <button
+                @click="addSection('4')"
+                class="p-2 rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all group"
+                title="4 colonnes (25/25/25/25)"
+              >
+                <div class="h-8 flex gap-1">
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                  <div class="flex-1 bg-gray-300 group-hover:bg-emerald-300 rounded"></div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
         
@@ -521,9 +594,9 @@
           class="my-4 sm:my-8 bg-white shadow-xl overflow-y-auto transition-all duration-300 w-full max-w-5xl rounded-lg"
           :class="{ 'ring-2 ring-emerald-400': !previewMode }"
         >
-          <!-- Message si vide -->
+          <!-- Message si vide (pas de blocs et pas de sections) -->
           <div 
-            v-if="!hasBlocks"
+            v-if="!hasBlocks && (!page.sections || page.sections.length === 0)"
             class="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center"
           >
             <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
@@ -535,17 +608,75 @@
             <p class="text-gray-500 mb-6 max-w-sm">
               Ajoutez des blocs depuis le panneau de gauche pour construire votre page de vente
             </p>
-            <button
-              @click="addBlock('hero')"
-              class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
-            >
-              Ajouter un Hero
-            </button>
+            <div class="flex gap-3">
+              <button
+                @click="addBlock('hero')"
+                class="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+              >
+                Ajouter un Hero
+              </button>
+              <button
+                @click="addSection('1')"
+                class="px-4 py-2 border border-emerald-500 text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors"
+              >
+                Mode Sections
+              </button>
+            </div>
           </div>
           
-          <!-- Blocs -->
+          <!-- ========== MODE SECTIONS (Phase 3) ========== -->
+          <div v-else-if="useSectionsMode" class="min-h-[60vh]">
+            <!-- Sections -->
+            <draggable
+              v-model="page.sections"
+              item-key="id"
+              :disabled="previewMode"
+              handle=".drag-section-handle"
+              ghost-class="opacity-50"
+              class="space-y-0"
+            >
+              <template #item="{ element: section }">
+                <SalesSection
+                  :section="section"
+                  :is-edit-mode="!previewMode"
+                  :preview-mode="previewMode"
+                  :is-selected="selectedSectionId === section.id"
+                  :selected-column-id="selectedColumnId"
+                  :checkout-url="checkoutUrl"
+                  @select="selectSection"
+                  @select-column="selectColumn"
+                  @remove="handleRemoveSection"
+                  @duplicate="duplicateSection"
+                  @change-layout="changeSectionLayout"
+                  @add-block="handleAddBlockToColumn"
+                  @remove-block="handleRemoveBlockFromColumn"
+                  @update-block="handleUpdateBlockInSection"
+                  @block-moved="handleBlockMoved"
+                  @reorder-blocks="handleReorderBlocksInColumn"
+                />
+              </template>
+            </draggable>
+            
+            <!-- Bouton ajouter section -->
+            <div 
+              v-if="!previewMode"
+              class="p-6 border-t border-dashed border-gray-300"
+            >
+              <button
+                @click="addSection('1')"
+                class="w-full py-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-emerald-400 hover:text-emerald-600 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Ajouter une section
+              </button>
+            </div>
+          </div>
+          
+          <!-- ========== MODE LEGACY (Blocs simples) ========== -->
           <draggable
-            v-if="hasBlocks"
+            v-else-if="hasBlocks"
             v-model="page.blocks"
             item-key="id"
             :disabled="previewMode"
@@ -604,13 +735,14 @@
         </div>
       </main>
       
-      <!-- Sidebar Droite - Propriétés du bloc sélectionné -->
+      <!-- Sidebar Droite - Propriétés du bloc ou de la section sélectionné(e) -->
       <aside 
-        v-if="!previewMode && selectedBlock"
+        v-if="!previewMode && (selectedBlock || (selectedSection && !selectedBlock))"
         class="w-72 lg:w-80 bg-white border-l border-gray-200 flex flex-col overflow-hidden flex-shrink-0"
       >
-        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="font-semibold text-gray-900">Propriétés</h3>
+        <!-- Header bloc sélectionné -->
+        <div v-if="selectedBlock" class="p-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 class="font-semibold text-gray-900">Propriétés du bloc</h3>
           <button @click="selectBlock(null)" class="text-gray-400 hover:text-gray-600">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -618,10 +750,29 @@
           </button>
         </div>
         
-        <div class="flex-1 overflow-y-auto p-4">
+        <!-- Header section sélectionnée -->
+        <div v-else-if="selectedSection" class="p-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 class="font-semibold text-gray-900">Paramètres section</h3>
+          <button @click="selectSection(null)" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Contenu bloc -->
+        <div v-if="selectedBlock" class="flex-1 overflow-y-auto p-4">
           <BlockPropsEditor
             :block="selectedBlock"
             @update="updateBlockProps(selectedBlock.id, $event)"
+          />
+        </div>
+        
+        <!-- Contenu section -->
+        <div v-else-if="selectedSection" class="flex-1 overflow-y-auto p-4">
+          <SectionSettingsEditor
+            :section="selectedSection"
+            @update="updateSectionSettings(selectedSection.id, $event)"
           />
         </div>
       </aside>
@@ -633,8 +784,11 @@
 import { ref, computed, onMounted, onUnmounted, watch, type Component } from 'vue'
 import draggable from 'vuedraggable'
 import { useSalesPageBuilder } from '~/composables/useSalesPageBuilder'
+import { useInlineEditProvider } from '~/composables/useInlineEdit'
 import SalesBlockRenderer from '~/components/sales-page/SalesBlockRenderer.vue'
+import SalesSection from '~/components/sales-page/SalesSection.vue'
 import BlockPropsEditor from '~/components/sales-page/BlockPropsEditor.vue'
+import SectionSettingsEditor from '~/components/sales-page/SectionSettingsEditor.vue'
 import CustomDomainConfig from '~/components/sales-page/CustomDomainConfig.vue'
 import {
   LayoutTemplate,
@@ -676,6 +830,7 @@ const {
   publishPage,
   unpublishPage,
   addBlock,
+  addBlockSmart, // Méthode intelligente qui crée une section automatiquement
   removeBlock,
   duplicateBlock,
   updateBlockProps,
@@ -683,7 +838,27 @@ const {
   reorderBlocks,
   togglePreview,
   applyTemplate,
+  // Phase 3: Sections + Colonnes
+  useSectionsMode,
+  selectedSectionId,
+  selectedColumnId,
+  selectedSection,
+  addSection,
+  removeSection,
+  duplicateSection,
+  updateSectionSettings,
+  changeSectionLayout,
+  selectSection,
+  selectColumn,
+  addBlockToColumn,
+  removeBlockFromColumn,
+  moveBlockInColumn,
+  updateBlockPropsInSection,
+  migrateToSectionsMode,
 } = useSalesPageBuilder()
+
+// Initialiser le contexte d'édition inline pour tous les blocs enfants
+const inlineEditContext = useInlineEditProvider(updateBlockProps, previewMode)
 
 const activeTab = ref<'blocks' | 'settings'>('blocks')
 const paymentLinks = ref<any[]>([])
@@ -861,6 +1036,66 @@ const handleRemoveBlock = (blockId: string) => {
   }
   removeBlock(blockId)
 }
+
+// ============ HANDLERS SECTIONS (Phase 3) ============
+
+// Supprimer une section
+const handleRemoveSection = (sectionId: string) => {
+  removeSection(sectionId)
+}
+
+// Ajouter un bloc dans une colonne
+const handleAddBlockToColumn = (sectionId: string, columnId: string, blockType: string) => {
+  addBlockToColumn(sectionId, columnId, blockType)
+}
+
+// Supprimer un bloc d'une colonne
+const handleRemoveBlockFromColumn = (sectionId: string, columnId: string, blockId: string) => {
+  removeBlockFromColumn(sectionId, columnId, blockId)
+}
+
+// Mettre à jour un bloc dans une section
+const handleUpdateBlockInSection = (sectionId: string, columnId: string, payload: { blockId: string; props: any }) => {
+  updateBlockPropsInSection(sectionId, columnId, payload.blockId, payload.props)
+}
+
+// Déplacer un bloc entre colonnes (Drag & Drop)
+const handleBlockMoved = (payload: {
+  sectionId: string
+  fromColumnId: string
+  toColumnId: string
+  blockId: string
+  newIndex: number
+}) => {
+  // Utiliser la fonction existante dans le composable
+  moveBlockInColumn(
+    payload.sectionId,
+    payload.fromColumnId,
+    payload.sectionId,
+    payload.toColumnId,
+    payload.blockId,
+    payload.newIndex
+  )
+}
+
+// Réordonner les blocs dans une colonne
+const handleReorderBlocksInColumn = (sectionId: string, columnId: string, blocks: any[]) => {
+  if (!page.value.sections) return
+  
+  const section = page.value.sections.find(s => s.id === sectionId)
+  if (!section) return
+  
+  const column = section.columns.find(c => c.id === columnId)
+  if (!column) return
+  
+  // Mettre à jour l'ordre des blocs
+  column.blocks = blocks.map((block, index) => ({
+    ...block,
+    order: index
+  }))
+}
+
+// ============ FIN HANDLERS SECTIONS ============
 
 // Undo suppression bloc
 const undoDeleteBlock = () => {

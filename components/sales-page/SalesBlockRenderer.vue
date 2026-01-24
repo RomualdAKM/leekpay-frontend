@@ -2,6 +2,7 @@
   <component
     :is="blockComponent"
     v-if="blockComponent"
+    :block-id="block.id"
     v-bind="block.props"
     @cta-click="handleCtaClick"
   />

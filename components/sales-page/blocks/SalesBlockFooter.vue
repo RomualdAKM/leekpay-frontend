@@ -82,11 +82,15 @@
       
       <!-- Texte copyright -->
       <p 
-        :class="template.styles.copyright || 'text-center text-sm'"
+        :class="[template.styles.copyright || 'text-center text-sm', editableClasses('text')]"
         :style="{ color: props.textColor, opacity: 0.6 }"
-      >
-        {{ props.text }}
-      </p>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Texte copyright'"
+        @focus="onFocus('text')"
+        @blur="onBlur($event, 'text')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.text }}</p>
     </div>
   </footer>
 </template>
@@ -94,6 +98,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface SocialLink {
   type: string
@@ -106,6 +111,7 @@ interface FooterLink {
 }
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   text?: string
   showSocials?: boolean
@@ -116,6 +122,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'footer-minimal-1',
   text: '© 2026 Tous droits réservés',
   showSocials: false,
@@ -124,6 +131,60 @@ const props = withDefaults(defineProps<Props>(), {
   backgroundColor: '#1f2937',
   textColor: '#9ca3af',
 })
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 const template = computed(() => {
   return getTemplate('footer', props.templateId) || {

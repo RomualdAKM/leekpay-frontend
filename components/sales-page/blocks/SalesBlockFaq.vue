@@ -6,21 +6,30 @@
   >
     <div :class="template.styles.container">
       <!-- Header -->
-      <div v-if="props.title || props.subtitle" class="mb-12 md:mb-16" :style="headerStyles">
+      <div v-if="props.title || props.subtitle || isEditMode" class="mb-12 md:mb-16" :style="headerStyles">
         <h2 
-          v-if="props.title"
-          :class="template.styles.title"
+          v-if="props.title || isEditMode"
+          :class="[template.styles.title, editableClasses('title')]"
           :style="{ color: textColor }"
-        >
-          {{ props.title }}
-        </h2>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre de la FAQ'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h2>
         <p 
-          v-if="props.subtitle"
+          v-if="props.subtitle || isEditMode"
           class="mt-4 text-base md:text-lg font-light max-w-2xl"
+          :class="editableClasses('subtitle')"
           :style="{ color: textColor, opacity: 0.7, margin: props.headerAlignment === 'center' ? '1rem auto 0' : '1rem 0 0' }"
-        >
-          {{ props.subtitle }}
-        </p>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre (optionnel)'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
       </div>
       
       <!-- Liste des FAQ -->
@@ -39,9 +48,19 @@
             class="w-full flex items-center justify-between text-left group"
             :class="template.styles.question"
             :style="{ color: textColor }"
-            @click="toggleItem(index)"
+            @click="!isEditMode && toggleItem(index)"
           >
-            <span class="pr-4">{{ item.question }}</span>
+            <span 
+              class="pr-4"
+              :class="editableClasses(`items[${index}].question`)"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Question'"
+              @focus="onArrayFocus('items', index, 'question')"
+              @blur="onArrayBlur($event, 'items', index, 'question')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+              @click.stop
+            >{{ item.question }}</span>
             <div 
               class="flex-shrink-0 transition-all duration-300"
               :class="[
@@ -64,14 +83,18 @@
           <!-- Réponse -->
           <div 
             class="overflow-hidden transition-all duration-300 ease-in-out"
-            :style="{ maxHeight: openItems.includes(index) ? '500px' : '0px' }"
+            :style="{ maxHeight: openItems.includes(index) || isEditMode ? '500px' : '0px' }"
           >
             <p 
-              :class="template.styles.answer"
+              :class="[template.styles.answer, editableClasses(`items[${index}].answer`)]"
               :style="{ color: textColor }"
-            >
-              {{ item.answer }}
-            </p>
+              :contenteditable="isEditMode"
+              :data-placeholder="'Réponse'"
+              @focus="onArrayFocus('items', index, 'answer')"
+              @blur="onArrayBlur($event, 'items', index, 'answer')"
+              @keydown="onKeydown($event, false)"
+              @paste="onPaste"
+            >{{ item.answer }}</p>
           </div>
         </div>
       </div>
@@ -82,6 +105,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface FaqItem {
   question: string
@@ -89,6 +113,7 @@ interface FaqItem {
 }
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   title?: string
   subtitle?: string
@@ -107,6 +132,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'faq-minimal-1',
   title: 'Questions fréquentes',
   subtitle: '',
@@ -127,6 +153,77 @@ const props = withDefaults(defineProps<Props>(), {
   cssId: '',
   customClasses: '',
 })
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition - champs simples
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+// Handlers d'édition - champs dans array
+const onArrayFocus = (arrayKey: string, index: number, propKey: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, `${arrayKey}[${index}].${propKey}`)
+  }
+}
+
+const onArrayBlur = (e: FocusEvent, arrayKey: string, index: number, propKey: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitArrayPropUpdate(props.blockId, arrayKey, index, propKey, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Support pour plusieurs items ouverts ou un seul
 const openItems = ref<number[]>(props.expandFirstByDefault ? [0] : [])

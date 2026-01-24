@@ -5,21 +5,29 @@
     :style="sectionStyles"
   >
     <!-- Header avec container du template -->
-    <div v-if="props.title || props.subtitle" :class="[template.styles.container, template.styles.header]" :style="headerStyles">
+    <div v-if="props.title || props.subtitle || isEditMode" :class="[template.styles.container, template.styles.header]" :style="headerStyles">
       <h2 
-        v-if="props.title"
-        :class="template.styles.title"
+        v-if="props.title || isEditMode"
+        :class="[template.styles.title, editableClasses('title')]"
         :style="titleStyles"
-      >
-        {{ props.title }}
-      </h2>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Titre de la section'"
+        @focus="onFocus('title')"
+        @blur="onBlur($event, 'title')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.title }}</h2>
       <p 
-        v-if="props.subtitle"
-        :class="template.styles.subtitle"
+        v-if="props.subtitle || isEditMode"
+        :class="[template.styles.subtitle, editableClasses('subtitle')]"
         :style="{ color: textColor }"
-      >
-        {{ props.subtitle }}
-      </p>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Sous-titre de la section'"
+        @focus="onFocus('subtitle')"
+        @blur="onBlur($event, 'subtitle')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.subtitle }}</p>
     </div>
     
     <!-- Grille de cartes - hors container pour être responsive -->
@@ -31,19 +39,31 @@
           :class="[template.styles.card, plan.highlighted ? 'ring-2 ring-offset-2 scale-105 z-10' : '']" 
           :style="getCardStyles(plan)"
         >
-          <!-- Badge -->
+          <!-- Badge (éditable inline) -->
           <span 
-            v-if="plan.showBadge && plan.badgeText"
-            :class="template.styles.badge"
+            v-if="(plan.showBadge && plan.badgeText) || (isEditMode && plan.showBadge)"
+            :class="[template.styles.badge, editableClasses(`items[${planIndex}].badgeText`)]"
             :style="getBadgeStyles(plan)"
-          >
-            {{ plan.badgeText }}
-          </span>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Badge'"
+            @focus="onArrayFocus('items', planIndex, 'badgeText')"
+            @blur="onArrayBlur($event, 'items', planIndex, 'badgeText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ plan.badgeText }}</span>
           
-          <!-- Nom du plan -->
-          <h3 v-if="plan.name" class="text-lg font-semibold mb-2" :style="{ color: getTextColor(plan) }">
-            {{ plan.name }}
-          </h3>
+          <!-- Nom du plan (éditable inline) -->
+          <h3 
+            v-if="plan.name || isEditMode" 
+            :class="['text-lg font-semibold mb-2', editableClasses(`items[${planIndex}].name`)]"
+            :style="{ color: getTextColor(plan) }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Nom du plan'"
+            @focus="onArrayFocus('items', planIndex, 'name')"
+            @blur="onArrayBlur($event, 'items', planIndex, 'name')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ plan.name }}</h3>
           
           <!-- Prix -->
           <div :class="template.styles.priceWrapper">
@@ -66,9 +86,18 @@
               </span>
             </div>
             
-            <p v-if="plan.showPeriod && plan.period" :class="template.styles.period" :style="{ color: getTextColor(plan) }">
-              {{ plan.period }}
-            </p>
+            <!-- Période (éditable inline) -->
+            <p 
+              v-if="(plan.showPeriod && plan.period) || isEditMode" 
+              :class="[template.styles.period, editableClasses(`items[${planIndex}].period`)]"
+              :style="{ color: getTextColor(plan) }"
+              :contenteditable="isEditMode"
+              :data-placeholder="'/mois'"
+              @focus="onArrayFocus('items', planIndex, 'period')"
+              @blur="onArrayBlur($event, 'items', planIndex, 'period')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+            >{{ plan.period }}</p>
           </div>
           
           <!-- Liste des features -->
@@ -92,33 +121,46 @@
             </li>
           </ul>
           
-          <!-- Garantie -->
+          <!-- Garantie (éditable inline) -->
           <p 
-            v-if="plan.showGuarantee && plan.guaranteeText"
-            :class="template.styles.guarantee"
+            v-if="(plan.showGuarantee && plan.guaranteeText) || (isEditMode && plan.showGuarantee)"
+            :class="[template.styles.guarantee, editableClasses(`items[${planIndex}].guaranteeText`)]"
             :style="{ color: getTextColor(plan) }"
-          >
-            {{ plan.guaranteeText }}
-          </p>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Garantie satisfait ou remboursé'"
+            @focus="onArrayFocus('items', planIndex, 'guaranteeText')"
+            @blur="onArrayBlur($event, 'items', planIndex, 'guaranteeText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ plan.guaranteeText }}</p>
           
-          <!-- Bouton CTA -->
+          <!-- Bouton CTA (éditable inline pour le texte) -->
           <a
             v-if="plan.ctaUrl"
-            :href="plan.ctaUrl"
+            :href="isEditMode ? undefined : plan.ctaUrl"
             :target="plan.ctaTarget || '_self'"
-            :class="template.styles.button"
+            :class="[template.styles.button, editableClasses(`items[${planIndex}].ctaText`)]"
             :style="getButtonStyles(plan)"
-          >
-            {{ plan.ctaText || 'Commander' }}
-          </a>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Commander'"
+            @focus="onArrayFocus('items', planIndex, 'ctaText')"
+            @blur="onArrayBlur($event, 'items', planIndex, 'ctaText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            @click.prevent="handleCtaClick(plan, planIndex)"
+          >{{ plan.ctaText || 'Commander' }}</a>
           <button
             v-else
-            :class="template.styles.button"
+            :class="[template.styles.button, editableClasses(`items[${planIndex}].ctaText`)]"
             :style="getButtonStyles(plan)"
-            @click="$emit('cta-click', planIndex)"
-          >
-            {{ plan.ctaText || 'Commander' }}
-          </button>
+            :contenteditable="isEditMode"
+            :data-placeholder="'Commander'"
+            @focus="onArrayFocus('items', planIndex, 'ctaText')"
+            @blur="onArrayBlur($event, 'items', planIndex, 'ctaText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            @click="!isEditMode && $emit('cta-click', planIndex)"
+          >{{ plan.ctaText || 'Commander' }}</button>
         </div>
       </div>
   </section>
@@ -127,6 +169,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 // Types
 type ButtonStyle = 'filled' | 'outlined'
@@ -161,6 +204,7 @@ interface PricingPlan {
 }
 
 interface Props {
+  blockId?: string
   templateId?: string
   // Contenu
   title?: string
@@ -219,6 +263,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'pricing-minimal-centered',
   title: '',
   subtitle: '',
@@ -266,6 +311,69 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineEmits(['cta-click'])
+
+// Édition inline
+const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+const isFieldActive = (field: string) => activeEditField.value === field
+
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none', 'cursor-text', 'transition-all', 'duration-150', 'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers pour les champs simples (title, subtitle)
+const onFocus = (field: string) => {
+  if (props.blockId) startEditing(props.blockId, field)
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+// Handlers pour les champs dans items[]
+const onArrayFocus = (arrayKey: string, index: number, propKey: string) => {
+  if (props.blockId) startEditing(props.blockId, `${arrayKey}[${index}].${propKey}`)
+}
+
+const onArrayBlur = (e: FocusEvent, arrayKey: string, index: number, propKey: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitArrayPropUpdate(props.blockId, arrayKey, index, propKey, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
+
+const handleCtaClick = (plan: PricingPlan, _planIndex: number) => {
+  if (!isEditMode.value && plan.ctaUrl) {
+    window.open(plan.ctaUrl, plan.ctaTarget || '_self')
+  }
+}
 
 // Créer les plans (soit depuis items, soit depuis les props legacy)
 const plans = computed<PricingPlan[]>(() => {

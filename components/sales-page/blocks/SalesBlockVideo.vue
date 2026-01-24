@@ -4,14 +4,18 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Titre (au-dessus) -->
+      <!-- Titre (au-dessus, éditable inline) -->
       <h3 
-        v-if="props.title && props.titlePosition === 'top'"
-        :class="template.styles.title"
+        v-if="(props.title && props.titlePosition === 'top') || (isEditMode && props.titlePosition === 'top')"
+        :class="[template.styles.title, editableClasses('title')]"
         :style="titleStyles"
-      >
-        {{ props.title }}
-      </h3>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Titre de la vidéo'"
+        @focus="onFocus('title')"
+        @blur="onBlur($event, 'title')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.title }}</h3>
       
       <!-- Player vidéo -->
       <div 
@@ -69,14 +73,18 @@
         </div>
       </div>
       
-      <!-- Titre (en-dessous) -->
+      <!-- Titre (en-dessous, éditable inline) -->
       <h3 
-        v-if="props.title && props.titlePosition === 'bottom'"
-        :class="template.styles.title"
+        v-if="(props.title && props.titlePosition === 'bottom') || (isEditMode && props.titlePosition === 'bottom')"
+        :class="[template.styles.title, editableClasses('title')]"
         :style="titleStyles"
-      >
-        {{ props.title }}
-      </h3>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Titre de la vidéo'"
+        @focus="onFocus('title')"
+        @blur="onBlur($event, 'title')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+      >{{ props.title }}</h3>
     </div>
   </section>
 </template>
@@ -84,8 +92,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
 
 interface Props {
+  blockId?: string
   templateId?: string
   type?: 'youtube' | 'vimeo' | 'url'
   url?: string
@@ -116,6 +126,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'video-minimal-centered',
   type: 'youtube',
   url: '',
@@ -137,6 +148,49 @@ const props = withDefaults(defineProps<Props>(), {
   paddingY: 'large',
   animation: 'none',
 })
+
+// Édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+const isFieldActive = (field: string) => activeEditField.value === field
+
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none', 'cursor-text', 'transition-all', 'duration-150', 'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+const onFocus = (field: string) => {
+  if (props.blockId) startEditing(props.blockId, field)
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Template actif
 const template = computed(() => {

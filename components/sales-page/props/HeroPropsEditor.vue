@@ -633,6 +633,81 @@
       </div>
     </div>
     
+    <!-- ===== SECTION POSITIONNEMENT (Option 1 + 2) ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.positioning = !sections.positioning" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Positionnement</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.positioning ? 'rotate-180' : '']"/>
+      </button>
+      
+      <div v-show="sections.positioning" class="mt-3 space-y-4">
+        <!-- Réordonnement des éléments -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-2">Ordre des éléments (glisser pour réorganiser)</label>
+          <div class="space-y-1">
+            <div
+              v-for="(element, index) in localProps.elementsOrder"
+              :key="element"
+              class="flex items-center gap-2 p-2 bg-gray-50 rounded border border-gray-200 cursor-move hover:bg-gray-100 transition-colors"
+              draggable="true"
+              @dragstart="onDragStart($event, index)"
+              @dragover.prevent
+              @drop="onDrop($event, index)"
+            >
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+              </svg>
+              <span class="text-xs font-medium text-gray-700">{{ getElementLabel(element) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Offsets individuels -->
+        <div class="space-y-3">
+          <p class="text-xs text-gray-500">Décalage vertical (px)</p>
+          
+          <div v-if="showBadge">
+            <label class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Badge</span>
+              <span class="font-mono">{{ localProps.badgeOffsetY }}px</span>
+            </label>
+            <input type="range" min="-100" max="100" v-model.number="localProps.badgeOffsetY" @input="updateProp('badgeOffsetY', localProps.badgeOffsetY)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"/>
+          </div>
+          
+          <div>
+            <label class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Titre</span>
+              <span class="font-mono">{{ localProps.titleOffsetY }}px</span>
+            </label>
+            <input type="range" min="-100" max="100" v-model.number="localProps.titleOffsetY" @input="updateProp('titleOffsetY', localProps.titleOffsetY)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"/>
+          </div>
+          
+          <div>
+            <label class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Sous-titre</span>
+              <span class="font-mono">{{ localProps.subtitleOffsetY }}px</span>
+            </label>
+            <input type="range" min="-100" max="100" v-model.number="localProps.subtitleOffsetY" @input="updateProp('subtitleOffsetY', localProps.subtitleOffsetY)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"/>
+          </div>
+          
+          <div>
+            <label class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Boutons</span>
+              <span class="font-mono">{{ localProps.buttonsOffsetY }}px</span>
+            </label>
+            <input type="range" min="-100" max="100" v-model.number="localProps.buttonsOffsetY" @input="updateProp('buttonsOffsetY', localProps.buttonsOffsetY)" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"/>
+          </div>
+          
+          <button 
+            @click="resetPositioning" 
+            class="w-full py-1.5 text-xs text-gray-600 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          >
+            Réinitialiser les positions
+          </button>
+        </div>
+      </div>
+    </div>
+    
     <!-- ===== SECTION AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -704,6 +779,7 @@ const sections = reactive({
   typography: false,
   badge: false,
   animation: false,
+  positioning: false, // Nouvelle section positionnement
   advanced: false,
 })
 
@@ -786,6 +862,12 @@ const localProps = reactive({
   verticalAlignment: props.props.verticalAlignment || 'center',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement (Option 1 + 2)
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'buttons'] as ('badge' | 'title' | 'subtitle' | 'buttons')[],
+  badgeOffsetY: props.props.badgeOffsetY || 0,
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
+  buttonsOffsetY: props.props.buttonsOffsetY || 0,
 })
 
 // Sync avec props parent
@@ -815,6 +897,60 @@ function removeSlide(index: number) {
   localProps.slides.splice(index, 1)
   updateSlides()
 }
+
+// ============ FONCTIONS POSITIONNEMENT (Option 1 + 2) ============
+
+// Labels pour l'affichage
+const elementLabels: Record<string, string> = {
+  badge: 'Étiquette (Badge)',
+  title: 'Titre',
+  subtitle: 'Sous-titre',
+  buttons: 'Boutons'
+}
+
+function getElementLabel(element: string): string {
+  return elementLabels[element] || element
+}
+
+// Drag & drop pour réordonner
+let draggedIndex: number | null = null
+
+function onDragStart(event: DragEvent, index: number) {
+  draggedIndex = index
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+  }
+}
+
+function onDrop(event: DragEvent, targetIndex: number) {
+  if (draggedIndex === null || draggedIndex === targetIndex) return
+  
+  const newOrder = [...localProps.elementsOrder]
+  const [removed] = newOrder.splice(draggedIndex, 1)
+  newOrder.splice(targetIndex, 0, removed)
+  
+  localProps.elementsOrder = newOrder
+  emit('update', { elementsOrder: newOrder })
+  draggedIndex = null
+}
+
+function resetPositioning() {
+  localProps.elementsOrder = ['badge', 'title', 'subtitle', 'buttons']
+  localProps.badgeOffsetY = 0
+  localProps.titleOffsetY = 0
+  localProps.subtitleOffsetY = 0
+  localProps.buttonsOffsetY = 0
+  
+  emit('update', {
+    elementsOrder: localProps.elementsOrder,
+    badgeOffsetY: 0,
+    titleOffsetY: 0,
+    subtitleOffsetY: 0,
+    buttonsOffsetY: 0
+  })
+}
+
+// ============ FIN FONCTIONS POSITIONNEMENT ============
 
 // Config template
 const templateConfig = computed(() => {

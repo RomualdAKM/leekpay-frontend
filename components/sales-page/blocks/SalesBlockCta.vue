@@ -5,29 +5,40 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container" :style="containerStyles">
-      <!-- Titre -->
+      <!-- Titre (Editable Inline) -->
       <h2 
-        v-if="props.title"
+        v-if="props.title || isEditMode"
         class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4"
+        :class="editableClasses('title')"
         :style="{ color: props.textColor }"
-      >
-        {{ props.title }}
-      </h2>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Titre (optionnel)'"
+        @focus="onFocus('title')"
+        @blur="onBlur($event, 'title')"
+        @keydown="onKeydown($event, true)"
+        @paste="onPaste"
+        ref="titleRef"
+      >{{ props.title }}</h2>
       
-      <!-- Texte -->
+      <!-- Texte (Editable Inline) -->
       <p 
-        v-if="props.text"
-        :class="template.styles.text"
+        v-if="props.text || isEditMode"
+        :class="[template.styles.text, editableClasses('text')]"
         :style="{ color: props.textColor, opacity: props.title ? 0.85 : 1 }"
-      >
-        {{ props.text }}
-      </p>
+        :contenteditable="isEditMode"
+        :data-placeholder="'Texte de votre CTA...'"
+        @focus="onFocus('text')"
+        @blur="onBlur($event, 'text')"
+        @keydown="onKeydown($event, false)"
+        @paste="onPaste"
+        ref="textRef"
+      >{{ props.text }}</p>
       
       <!-- Boutons -->
       <div :class="buttonsContainerClass">
         <!-- Bouton Principal -->
         <a
-          v-if="props.buttonText && props.buttonUrl"
+          v-if="props.buttonText && props.buttonUrl && !isEditMode"
           :href="props.buttonUrl"
           :target="props.buttonTarget"
           :class="[
@@ -39,53 +50,89 @@
         >
           <span class="flex items-center gap-2">
             {{ props.buttonText }}
-            <svg v-if="props.buttonIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            <svg v-if="props.buttonIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <svg v-if="props.buttonIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <svg v-if="props.buttonIcon === 'play'" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg v-if="props.buttonIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <ButtonIcon :icon="props.buttonIcon" />
           </span>
         </a>
         <button
-          v-else-if="props.buttonText"
+          v-else-if="props.buttonText || isEditMode"
           :class="[
             template.styles.button,
             props.buttonStyle === 'outlined' ? 'bg-transparent border-2' : '',
-            buttonHoverClass
+            buttonHoverClass,
+            isEditMode && 'cursor-text'
           ]"
           :style="primaryButtonStyles"
-          @click="$emit('cta-click')"
+          @click="!isEditMode && $emit('cta-click')"
         >
-          <span class="flex items-center gap-2">
-            {{ props.buttonText }}
-            <svg v-if="props.buttonIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            <svg v-if="props.buttonIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <svg v-if="props.buttonIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <svg v-if="props.buttonIcon === 'play'" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg v-if="props.buttonIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span 
+            class="flex items-center gap-2"
+            :class="editableClasses('buttonText')"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            ref="buttonTextRef"
+          >
+            {{ props.buttonText || 'Commencer' }}
           </span>
+          <ButtonIcon v-if="!isEditMode" :icon="props.buttonIcon" />
         </button>
         
         <!-- Bouton Secondaire -->
         <a
-          v-if="props.showSecondaryButton && props.secondaryButtonText"
-          :href="props.secondaryButtonUrl || '#'"
+          v-if="props.showSecondaryButton && (props.secondaryButtonText || isEditMode)"
+          :href="!isEditMode ? (props.secondaryButtonUrl || '#') : undefined"
           :target="props.buttonTarget"
           class="px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200 hover:opacity-80"
+          :class="editableClasses('secondaryButtonText')"
           :style="secondaryButtonStyles"
-        >
-          {{ props.secondaryButtonText }}
-        </a>
+          :contenteditable="isEditMode"
+          :data-placeholder="'Texte secondaire'"
+          @focus="onFocus('secondaryButtonText')"
+          @blur="onBlur($event, 'secondaryButtonText')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+          @click.prevent="isEditMode ? null : undefined"
+          ref="secondaryButtonTextRef"
+        >{{ props.secondaryButtonText }}</a>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted, watch, h, type FunctionalComponent } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
+import { useInlineEdit } from '~/composables/useInlineEdit'
+
+// Composant fonctionnel pour les icônes du bouton
+const ButtonIcon: FunctionalComponent<{ icon?: string }> = (props) => {
+  if (!props.icon) return null
+  const icons: Record<string, any> = {
+    'arrow-right': h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M17 8l4 4m0 0l-4 4m4-4H3' })
+    ]),
+    'cart': h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z' })
+    ]),
+    'download': h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' })
+    ]),
+    'play': h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { d: 'M8 5v14l11-7z' })
+    ]),
+    'check': h('svg', { class: 'w-4 h-4', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24' }, [
+      h('path', { 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2', d: 'M5 13l4 4L19 7' })
+    ]),
+  }
+  return icons[props.icon] || null
+}
+ButtonIcon.props = ['icon']
 
 interface Props {
+  blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   title?: string
   text?: string
@@ -113,6 +160,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'cta-minimal-1',
   title: '',
   text: 'Profitez de cette offre exclusive maintenant !',
@@ -140,6 +188,68 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineEmits(['cta-click'])
+
+// Références DOM pour les éléments éditables
+const titleRef = ref<HTMLElement | null>(null)
+const textRef = ref<HTMLElement | null>(null)
+const buttonTextRef = ref<HTMLElement | null>(null)
+const secondaryButtonTextRef = ref<HTMLElement | null>(null)
+
+// Contexte d'édition inline
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+// Champ en cours d'édition
+const isFieldActive = (field: string) => activeEditField.value === field
+
+// Classes pour les éléments éditables
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none',
+    'cursor-text',
+    'transition-all',
+    'duration-150',
+    'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+// Handlers d'édition
+const onFocus = (field: string) => {
+  if (props.blockId) {
+    startEditing(props.blockId, field)
+  }
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  // Empêcher Enter en mode single line
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  // Escape pour annuler
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Template actif
 const template = computed(() => {
@@ -227,3 +337,16 @@ const secondaryButtonStyles = computed(() => ({
   borderBottom: `1px solid ${props.textColor}40`,
 }))
 </script>
+
+<style scoped>
+[contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  pointer-events: none;
+}
+
+[contenteditable="true"]:focus:empty::before {
+  content: '';
+}
+</style>
