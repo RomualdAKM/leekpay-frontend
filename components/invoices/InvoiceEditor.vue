@@ -56,7 +56,6 @@
             :sending="sending"
             :pdf-loading="pdfLoading"
             :auto-save="settings.autoSave"
-            :is-premium="isPremium"
             @save="saveInvoice"
             @send="openSendModal"
             @preview-pdf="previewPdf"
@@ -213,11 +212,14 @@ const settings = reactive({
   layout: []
 })
 
+const FREE_TEMPLATE_ID = 'leekpay-modern'
+
 const premiumTemplates = [
   {
     id: 'leekpay-modern',
     name: 'LeekPay Modern',
     label: 'SaaS clean',
+    isFree: true,
     primaryColor: '#0A1F44',
     secondaryColor: '#2ECC71',
     backgroundColor: '#FFFFFF',
@@ -439,8 +441,18 @@ const premiumTemplates = [
 const normalizeColor = (value) => String(value || '').trim().toLowerCase()
 const normalizeFont = (value) => String(value || '').split(',')[0].trim().toLowerCase()
 
-// Temporary: premium access is always enabled; backend gating will be added later.
-const isPremium = computed(() => true)
+const isPremium = computed(() => user.value?.is_premium === true)
+
+const appliedTemplateId = ref(FREE_TEMPLATE_ID)
+
+const currentTemplateIsFree = computed(() => {
+  const currentId = appliedTemplateId.value
+  if (!currentId || currentId === FREE_TEMPLATE_ID) return true
+  const template = premiumTemplates.find(t => t.id === currentId)
+  return template?.isFree === true
+})
+
+const canUseCurrentTemplate = computed(() => isPremium.value || currentTemplateIsFree.value)
 
 const selectedTemplateId = computed(() => {
   const match = premiumTemplates.find((template) => (
@@ -461,9 +473,11 @@ const appliedTemplateSlug = computed(() => appliedTemplate.value?.id || 'personn
 
 const applyTemplate = (template) => {
   if (!template) return
-  if (!isPremium.value) {
-    showToast('Option reservee aux abonnements premium.', 'error')
-    return
+  
+  appliedTemplateId.value = template.id
+  
+  if (!isPremium.value && !template.isFree) {
+    showToast('Ce template est reserve aux abonnes Premium. Vous pouvez le previsualiser mais pas l\'utiliser pour envoyer ou telecharger.', 'error')
   }
   settings.primaryColor = template.primaryColor
   settings.secondaryColor = template.secondaryColor
@@ -827,6 +841,11 @@ const loadInvoice = async () => {
     settings.currency = currencyCode
     settings.currencyId = data.currency_id || data.currency?.id || settings.currencyId || user.value?.currency?.id || null
     const theme = data.theme || {}
+    
+    if (theme.templateId || theme.template_id) {
+      appliedTemplateId.value = theme.templateId || theme.template_id
+    }
+    
     settings.primaryColor = theme.primaryColor || theme.primary_color || settings.primaryColor
     settings.secondaryColor = theme.secondaryColor || theme.secondary_color || settings.secondaryColor
     settings.fontFamily = theme.fontFamily || theme.font_family || settings.fontFamily
@@ -1032,6 +1051,7 @@ const buildPayload = () => {
     terms: invoice.footerNote || '',
     layout,
     theme: {
+      templateId: appliedTemplateId.value,
       primaryColor: settings.primaryColor,
       secondaryColor: settings.secondaryColor,
       backgroundColor: settings.backgroundColor,
@@ -1121,16 +1141,12 @@ const saveInvoice = async (options = {}) => {
 }
 
 const previewPdf = () => {
-  if (!isPremium.value) {
-    showToast('Apercu instantane reserve au plan Premium.', 'error')
-    return
-  }
   previewModal.value = true
 }
 
 const downloadPdf = async () => {
-  if (!isPremium.value) {
-    showToast('Le telechargement PDF est reserve au plan Premium.', 'error')
+  if (!canUseCurrentTemplate.value) {
+    showToast('Ce template est reserve aux abonnes Premium. Utilisez le template gratuit ou passez Premium.', 'error')
     return
   }
   if (!invoiceId.value) {
@@ -1201,8 +1217,8 @@ const uploadLogo = async (file) => {
 }
 
 const openSendModal = () => {
-  if (!isPremium.value) {
-    showToast('L\'envoi de facture est reserve au plan Premium.', 'error')
+  if (!canUseCurrentTemplate.value) {
+    showToast('Ce template est reserve aux abonnes Premium. Utilisez le template gratuit ou passez Premium.', 'error')
     return
   }
   if (!invoiceId.value) {

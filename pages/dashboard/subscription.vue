@@ -85,13 +85,23 @@
             <p class="text-sm text-gray-400">Accès direct à notre équipe via WhatsApp pour une assistance rapide</p>
           </div>
         </div>
+        
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 bg-gray-800 flex items-center justify-center flex-shrink-0">
+            <Check class="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p class="font-medium">Thèmes de factures premium</p>
+            <p class="text-sm text-gray-400">Accédez à 9 thèmes professionnels exclusifs pour personnaliser vos factures</p>
+          </div>
+        </div>
       </div>
 
       <!-- Prix et action -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-800">
         <div>
           <p class="text-3xl font-semibold">
-            4 700 <span class="text-lg font-normal text-gray-400">FCFA/mois</span>
+            9 700 <span class="text-lg font-normal text-gray-400">FCFA/mois</span>
           </p>
         </div>
         

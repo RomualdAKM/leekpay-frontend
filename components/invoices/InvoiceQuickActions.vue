@@ -22,13 +22,11 @@
         {{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}
       </button>
       <button
-        class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700"
+        class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="!invoiceId || sending"
         @click="emit('send')"
       >
-        <span>{{ sending ? 'Envoi...' : 'Envoyer' }}</span>
-        <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">PRO</span>
-        <Lock v-if="!isPremium" class="ml-2 h-3.5 w-3.5 text-amber-600" />
+        <span>{{ sending ? 'Envoi...' : (invoiceId ? 'Envoyer' : 'Sauvegardez d\'abord') }}</span>
       </button>
       <button
         class="w-full border border-gray-300 rounded-md py-2 text-xs font-semibold text-gray-700 sm:col-span-2 flex items-center justify-center"
@@ -36,15 +34,12 @@
         @click="emit('preview-pdf')"
       >
         <span>{{ pdfLoading ? 'Apercu...' : 'Apercu instantane' }}</span>
-        <span class="ml-2 inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-semibold">PRO</span>
-        <Lock v-if="!isPremium" class="ml-2 h-3.5 w-3.5 text-amber-600" />
       </button>
     </div>
   </Card>
 </template>
 
 <script setup>
-import { Lock } from 'lucide-vue-next'
 import Card from '~/components/ui/Card.vue'
 
 const props = defineProps({
@@ -55,11 +50,7 @@ const props = defineProps({
   saving: Boolean,
   sending: Boolean,
   pdfLoading: Boolean,
-  autoSave: Boolean,
-  isPremium: {
-    type: Boolean,
-    default: false
-  }
+  autoSave: Boolean
 })
 
 const emit = defineEmits(['save', 'send', 'preview-pdf'])
