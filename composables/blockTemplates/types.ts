@@ -55,12 +55,24 @@ export interface TemplateConfig {
   [key: string]: string | boolean | number | undefined
 }
 
+// Configuration pour les previews visuelles dans le TemplatePicker
+export interface PreviewConfig {
+  bgType: 'light' | 'dark' | 'gradient' | 'accent'
+  bgValue?: string // couleur ou gradient CSS
+  layoutType: 'centered' | 'split-left' | 'split-right' | 'cards' | 'grid' | 'list' | 'slider' | 'single'
+  icon?: 'quote' | 'star' | 'card' | 'grid' | 'slider' | 'list' | 'split'
+  columns?: number
+  accentColor?: string
+  badge?: string // texte du badge optionnel
+}
+
 export interface BlockTemplate {
   id: string
   name: string
   category: 'minimal' | 'modern' | 'bold'
   description?: string
   config?: TemplateConfig
+  preview?: PreviewConfig
   styles: TemplateStyles
 }
 

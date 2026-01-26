@@ -312,6 +312,113 @@ export const featuresTemplates: BlockTemplateGroup = {
       cardText: 'text-base md:text-lg opacity-70 leading-relaxed',
     }
   },
+
+  // ===== NOUVEAUX STYLES AVANCÉS =====
+  'features-steps-process': {
+    id: 'features-steps-process',
+    name: 'Steps Process',
+    category: 'modern',
+    description: 'Étapes numérotées verticales',
+    config: { layout: 'steps', iconStyle: 'number', showDescription: true },
+    preview: { bgType: 'light', layoutType: 'list', icon: 'list' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-3xl mx-auto',
+      header: 'text-center mb-12 md:mb-16',
+      title: 'text-3xl md:text-4xl font-bold tracking-tight text-gray-900',
+      subtitle: 'text-base text-gray-500 mt-4',
+      grid: 'space-y-8',
+      card: 'flex items-start gap-6',
+      iconWrapper: 'w-14 h-14 rounded-full bg-gray-900 text-white flex items-center justify-center flex-shrink-0 text-xl font-bold',
+      icon: 'hidden',
+      cardTitle: 'text-xl font-semibold text-gray-900 mb-1',
+      cardText: 'text-gray-500',
+    }
+  },
+  'features-services-grid': {
+    id: 'features-services-grid',
+    name: 'Services Grid',
+    category: 'modern',
+    description: 'Grille services avec icônes',
+    config: { layout: 'grid', columns: 4, iconStyle: 'outlined', showDescription: true },
+    preview: { bgType: 'light', bgValue: '#f3f4f6', layoutType: 'grid', icon: 'grid' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-gray-100',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-12 md:mb-16',
+      title: 'text-3xl md:text-4xl font-bold tracking-tight text-gray-900',
+      subtitle: 'text-base text-gray-500 mt-4',
+      grid: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4',
+      card: 'bg-gray-200/60 rounded-xl p-6 text-left',
+      iconWrapper: 'w-12 h-12 rounded-lg bg-gray-300/60 flex items-center justify-center mb-4',
+      icon: 'w-6 h-6 text-gray-600',
+      cardTitle: 'text-lg font-semibold text-gray-900 mb-2',
+      cardText: 'text-sm text-gray-500',
+    }
+  },
+  'features-showcase-alternating': {
+    id: 'features-showcase-alternating',
+    name: 'Feature Showcase',
+    category: 'modern',
+    description: 'Sections avec images alternées',
+    config: { layout: 'showcase', iconStyle: 'none', showDescription: true, showImage: true, showLink: true },
+    preview: { bgType: 'light', layoutType: 'list', icon: 'list' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-6xl mx-auto',
+      header: 'hidden',
+      title: 'hidden',
+      subtitle: 'hidden',
+      grid: 'space-y-16 md:space-y-24',
+      card: 'grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center',
+      iconWrapper: 'hidden',
+      icon: 'hidden',
+      cardTitle: 'text-2xl md:text-3xl font-bold text-gray-900 mb-4',
+      cardText: 'text-gray-600 leading-relaxed mb-6',
+    }
+  },
+  'features-checklist-grid': {
+    id: 'features-checklist-grid',
+    name: 'Checklist Grid',
+    category: 'modern',
+    description: 'Liste à coches en grille',
+    config: { layout: 'checklist', iconStyle: 'check', showDescription: false, showBadge: true },
+    preview: { bgType: 'light', layoutType: 'grid', icon: 'grid' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-4xl mx-auto',
+      header: 'text-center mb-12 md:mb-16',
+      title: 'text-3xl md:text-4xl font-bold tracking-tight text-gray-900',
+      subtitle: 'text-base text-gray-500 mt-4',
+      grid: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+      card: 'flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg',
+      iconWrapper: 'w-6 h-6 flex-shrink-0',
+      icon: 'w-6 h-6 text-emerald-500',
+      cardTitle: 'text-base font-medium text-gray-900',
+      cardText: 'hidden',
+    }
+  },
+  'features-tabs-showcase': {
+    id: 'features-tabs-showcase',
+    name: 'Tabs Showcase',
+    category: 'modern',
+    description: 'Fonctionnalités avec onglets',
+    config: { layout: 'tabs', iconStyle: 'check', showDescription: true, showImage: true, showTabs: true },
+    preview: { bgType: 'light', layoutType: 'grid', icon: 'grid' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-10',
+      title: 'text-3xl md:text-4xl font-bold tracking-tight text-gray-900',
+      subtitle: 'text-base text-gray-500 mt-4',
+      grid: 'grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center',
+      card: '',
+      iconWrapper: 'w-5 h-5 flex-shrink-0 text-emerald-500',
+      icon: 'w-5 h-5',
+      cardTitle: 'text-2xl font-bold text-gray-900 mb-4',
+      cardText: 'text-gray-600 mb-6',
+    }
+  },
 }
 
 export default featuresTemplates

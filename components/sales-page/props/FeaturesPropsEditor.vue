@@ -386,6 +386,68 @@
       </div>
     </div>
     
+    <!-- ===== BADGE (Checklist/Tabs uniquement) ===== -->
+    <div v-if="localProps.templateId?.includes('checklist') || localProps.templateId?.includes('tabs')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.badge = !sections.badge" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Badge</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.badge ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.badge" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2">
+          <input v-model="localProps.showBadge" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+          <span class="text-xs text-gray-600">Afficher le badge</span>
+        </label>
+        <div v-if="localProps.showBadge">
+          <label class="block text-xs text-gray-500 mb-1">Texte du badge</label>
+          <input v-model="localProps.badge" @input="emitUpdate" type="text" placeholder="CARACTÉRISTIQUES" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== ONGLETS (Tabs uniquement) ===== -->
+    <div v-if="localProps.templateId?.includes('tabs')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.tabs = !sections.tabs" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Onglets ({{ localProps.tabs?.length || 0 }})</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.tabs ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.tabs" class="mt-3 space-y-3">
+        <div class="flex justify-end">
+          <button @click="addTab" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium">+ Ajouter un onglet</button>
+        </div>
+        <div v-for="(tab, index) in localProps.tabs" :key="index" class="border border-gray-200 rounded-lg p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-gray-600">Onglet {{ index + 1 }}</span>
+            <button v-if="localProps.tabs.length > 1" @click="removeTab(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+          </div>
+          <div class="space-y-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Label (bouton)</label>
+              <input v-model="tab.label" @input="emitUpdate" type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Titre</label>
+              <input v-model="tab.title" @input="emitUpdate" type="text" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Description</label>
+              <textarea v-model="tab.description" @input="emitUpdate" rows="2" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Fonctionnalités (une par ligne)</label>
+              <textarea v-model="tabFeaturesText[index]" @input="updateTabFeatures(index, $event)" rows="3" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none" placeholder="CDN global&#10;Cache intelligent&#10;Compression"></textarea>
+            </div>
+            <div>
+              <UiImageUploader
+                v-model="tab.image"
+                label="Image"
+                @update:model-value="emitUpdate"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- ===== AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -423,6 +485,8 @@ const sections = reactive({
   typography: false,
   appearance: false,
   animation: false,
+  badge: true,
+  tabs: true,
   advanced: false,
 })
 
@@ -469,9 +533,48 @@ const localProps = reactive({
   animation: props.props.animation || 'none',
   animationDuration: props.props.animationDuration || 500,
   animationDelay: props.props.animationDelay || 0,
+  showBadge: props.props.showBadge || false,
+  badge: props.props.badge || 'Caractéristiques',
+  tabs: props.props.tabs || [
+    { label: 'Performance', title: 'Vitesse incomparable', description: 'Notre infrastructure est optimisée.', features: ['CDN global', 'Cache intelligent'], image: '' },
+    { label: 'Sécurité', title: 'Protection maximale', description: 'Vos données sont protégées.', features: ['SSL', 'Sauvegarde'], image: '' },
+  ],
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
 })
+
+// Texte des features par onglet (pour édition ligne par ligne)
+const tabFeaturesText = reactive<string[]>([])
+
+// Init tabFeaturesText
+if (localProps.tabs) {
+  localProps.tabs.forEach((tab: any, idx: number) => {
+    tabFeaturesText[idx] = (tab.features || []).join('\n')
+  })
+}
+
+const updateTabFeatures = (index: number, event: Event) => {
+  const value = (event.target as HTMLTextAreaElement).value
+  tabFeaturesText[index] = value
+  if (localProps.tabs && localProps.tabs[index]) {
+    localProps.tabs[index].features = value.split('\n').filter(f => f.trim())
+  }
+  emitUpdate()
+}
+
+function addTab() {
+  if (!localProps.tabs) localProps.tabs = []
+  const newTab = { label: 'Nouvel onglet', title: 'Titre', description: 'Description', features: ['Fonctionnalité 1'], image: '' }
+  localProps.tabs.push(newTab)
+  tabFeaturesText.push('Fonctionnalité 1')
+  emitUpdate()
+}
+
+function removeTab(index: number) {
+  localProps.tabs.splice(index, 1)
+  tabFeaturesText.splice(index, 1)
+  emitUpdate()
+}
 
 watch(() => props.props, (newVal) => {
   Object.keys(newVal).forEach(key => {

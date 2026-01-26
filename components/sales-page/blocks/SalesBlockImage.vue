@@ -11,25 +11,16 @@
           :style="imageWrapperStyles"
         >
           <img 
-            v-if="props.src"
-            :src="props.src"
-            :alt="props.alt"
+            :src="imageSrc"
+            :alt="props.alt || 'Image'"
             :class="template.styles.image"
             :style="imageStyles"
             loading="lazy"
           />
-          <div 
-            v-else 
-            class="w-full aspect-video bg-gray-100 flex items-center justify-center"
-          >
-            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
           
           <!-- Overlay -->
           <div 
-            v-if="props.overlayEnabled && props.src"
+            v-if="props.overlayEnabled"
             class="absolute inset-0"
             :style="overlayStyles"
           />
@@ -51,6 +42,11 @@
     </div>
   </section>
 </template>
+
+<script lang="ts">
+// Image par défaut libre de droit (Unsplash)
+export const DEFAULT_IMAGE_SRC = 'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1200&auto=format&fit=crop&q=80'
+</script>
 
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -93,7 +89,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   blockId: '',
   templateId: 'image-minimal-centered',
-  src: null,
+  src: DEFAULT_IMAGE_SRC,
   alt: '',
   caption: '',
   backgroundColor: '#ffffff',
@@ -157,6 +153,11 @@ const onPaste = (e: ClipboardEvent) => {
   const text = e.clipboardData?.getData('text/plain') || ''
   document.execCommand('insertText', false, text)
 }
+
+// Image avec fallback par défaut
+const imageSrc = computed(() => {
+  return props.src || DEFAULT_IMAGE_SRC
+})
 
 // Template actif
 const template = computed(() => {

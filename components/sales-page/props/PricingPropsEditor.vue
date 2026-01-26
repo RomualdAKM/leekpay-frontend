@@ -28,8 +28,8 @@
       </div>
     </div>
     
-    <!-- ===== PLANS ===== -->
-    <div class="border-b border-gray-200 pb-4">
+    <!-- ===== PLANS (masqué pour enterprise-split) ===== -->
+    <div v-if="!localProps.templateId?.includes('enterprise-split')" class="border-b border-gray-200 pb-4">
       <button @click="sections.plans = !sections.plans" class="flex items-center justify-between w-full text-left">
         <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Plans ({{ localProps.items?.length || 0 }})</h4>
         <ChevronDown :class="['w-4 h-4 transition-transform', sections.plans ? 'rotate-180' : '']"/>
@@ -138,6 +138,95 @@
               <option value="outlined">Contour</option>
             </select>
           </div>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Effet hover carte</label>
+          <select v-model="localProps.cardHoverEffect" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+            <option value="none">Aucun</option>
+            <option value="lift">Lévitation</option>
+            <option value="scale">Agrandissement</option>
+            <option value="glow">Halo</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== TOGGLE MENSUEL/ANNUEL (Flexible Toggle) ===== -->
+    <div v-if="localProps.templateId?.includes('flexible-toggle')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.toggle = !sections.toggle" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Toggle Période</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.toggle ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.toggle" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Badge réduction annuelle</label>
+          <input v-model="localProps.yearlyDiscount" @input="emitUpdate" type="text" placeholder="-20%" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== ENTERPRISE (Enterprise Split) ===== -->
+    <div v-if="localProps.templateId?.includes('enterprise-split')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.enterprise = !sections.enterprise" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Entreprise</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.enterprise ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.enterprise" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Badge</label>
+          <input v-model="localProps.enterpriseBadge" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Titre contact</label>
+          <input v-model="localProps.contactTitle" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Description contact</label>
+          <input v-model="localProps.contactDescription" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
+          <input v-model="localProps.contactCtaText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">URL bouton</label>
+          <input v-model="localProps.contactCtaUrl" @input="emitUpdate" type="url" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Téléphone</label>
+          <input v-model="localProps.contactPhone" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1">
+            <label class="text-xs text-gray-500">Caractéristiques Entreprise</label>
+            <button @click="addEnterpriseFeature" class="text-xs text-emerald-600">+ Ajouter</button>
+          </div>
+          <div v-for="(f, fi) in localProps.enterpriseFeatures" :key="fi" class="flex items-center gap-1 mb-1">
+            <input v-model="localProps.enterpriseFeatures[fi]" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-sm"/>
+            <button v-if="localProps.enterpriseFeatures.length > 1" @click="removeEnterpriseFeature(fi)" class="text-red-500 text-xs">×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== LIFETIME DEAL ===== -->
+    <div v-if="localProps.templateId?.includes('lifetime-deal')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.lifetime = !sections.lifetime" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Offre Lifetime</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.lifetime ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.lifetime" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Badge réduction</label>
+          <input v-model="localProps.discountBadge" @input="emitUpdate" type="text" placeholder="-70%" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <label class="flex items-center gap-2">
+          <input v-model="localProps.showUrgency" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+          <span class="text-xs text-gray-600">Afficher message urgence</span>
+        </label>
+        <div v-if="localProps.showUrgency">
+          <label class="block text-xs text-gray-500 mb-1">Message urgence</label>
+          <input v-model="localProps.urgencyText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
         </div>
       </div>
     </div>
@@ -268,8 +357,11 @@ const emit = defineEmits(['update'])
 
 const sections = reactive({
   content: true,
-  plans: false,
+  plans: true,
   style: false,
+  toggle: true,
+  enterprise: true,
+  lifetime: true,
   card: false,
   appearance: false,
   advanced: false,
@@ -298,12 +390,27 @@ const localProps = reactive({
   cardBorderWidth: props.props.cardBorderWidth || 'thin',
   cardBorderRadius: props.props.cardBorderRadius || 'medium',
   cardShadow: props.props.cardShadow || 'none',
+  cardHoverEffect: props.props.cardHoverEffect || 'none',
   backgroundType: props.props.backgroundType || 'solid',
   backgroundColor: props.props.backgroundColor || '#ffffff',
   gradientStart: props.props.gradientStart || '#f8fafc',
   gradientEnd: props.props.gradientEnd || '#ffffff',
   accentColor: props.props.accentColor || '#10b981',
   paddingY: props.props.paddingY || 'large',
+  // Toggle Mensuel/Annuel
+  yearlyDiscount: props.props.yearlyDiscount || '-20%',
+  // Enterprise Split
+  enterpriseBadge: props.props.enterpriseBadge || 'ENTREPRISE',
+  enterpriseFeatures: props.props.enterpriseFeatures || ['Déploiement dédié', 'SLA garanti 99.99%', 'Support dédié 24/7', 'Intégrations personnalisées'],
+  contactTitle: props.props.contactTitle || 'Parlons de vos besoins',
+  contactDescription: props.props.contactDescription || 'Notre équipe vous accompagne',
+  contactCtaText: props.props.contactCtaText || 'Demander un devis',
+  contactCtaUrl: props.props.contactCtaUrl || '',
+  contactPhone: props.props.contactPhone || '+33 1 23 45 67 89',
+  // Lifetime Deal
+  showUrgency: props.props.showUrgency ?? false,
+  urgencyText: props.props.urgencyText || 'Plus que 47 places disponibles !',
+  discountBadge: props.props.discountBadge || '-70%',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
 })
@@ -345,6 +452,17 @@ function addFeature(idx: number) {
 
 function removeFeature(planIdx: number, fIdx: number) {
   localProps.items[planIdx].features.splice(fIdx, 1)
+  emitUpdate()
+}
+
+function addEnterpriseFeature() {
+  if (!localProps.enterpriseFeatures) localProps.enterpriseFeatures = []
+  localProps.enterpriseFeatures.push('Nouvelle caractéristique')
+  emitUpdate()
+}
+
+function removeEnterpriseFeature(idx: number) {
+  localProps.enterpriseFeatures.splice(idx, 1)
   emitUpdate()
 }
 </script>

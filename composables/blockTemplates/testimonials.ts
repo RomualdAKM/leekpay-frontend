@@ -12,6 +12,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Témoignages épurés centrés',
     config: { layout: 'list', showAvatar: true, showRole: true, showRating: false },
+    preview: { bgType: 'light', layoutType: 'centered', icon: 'quote' },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-4xl mx-auto',
@@ -38,6 +39,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Grille de témoignages simple',
     config: { layout: 'grid', columns: 2, showAvatar: true, showRole: true, showRating: false },
+    preview: { bgType: 'light', layoutType: 'grid', icon: 'grid', columns: 2 },
     styles: {
       section: 'py-14 md:py-20 px-6',
       container: 'max-w-5xl mx-auto',
@@ -64,6 +66,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Un seul témoignage mis en avant',
     config: { layout: 'single', showAvatar: true, showRole: true, showRating: false },
+    preview: { bgType: 'light', layoutType: 'single', icon: 'quote' },
     styles: {
       section: 'py-12 md:py-16 px-6',
       container: 'max-w-2xl mx-auto text-center',
@@ -92,6 +95,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Cartes modernes avec bordure',
     config: { layout: 'grid', columns: 3, showAvatar: true, showRole: true, showRating: true, showCompany: true },
+    preview: { bgType: 'light', bgValue: '#f8fafc', layoutType: 'cards', icon: 'card', columns: 3 },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-6xl mx-auto',
@@ -118,6 +122,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Avec accent coloré à gauche',
     config: { layout: 'list', showAvatar: true, showRole: true, showRating: false, showCompany: true },
+    preview: { bgType: 'light', layoutType: 'list', icon: 'list', accentColor: '#10b981' },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-5xl mx-auto',
@@ -144,6 +149,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Style carrousel horizontal',
     config: { layout: 'carousel', showAvatar: true, showRole: true, showRating: true },
+    preview: { bgType: 'light', layoutType: 'slider', icon: 'slider' },
     styles: {
       section: 'py-16 md:py-24 px-6 overflow-hidden',
       container: 'max-w-6xl mx-auto',
@@ -170,6 +176,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Layout Masonry dynamique',
     config: { layout: 'masonry', columns: 3, showAvatar: true, showRole: true, showRating: true },
+    preview: { bgType: 'light', layoutType: 'grid', icon: 'grid', columns: 3 },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-6xl mx-auto',
@@ -196,6 +203,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Un témoignage mis en avant avec grille',
     config: { layout: 'grid', columns: 2, showAvatar: true, showRole: true, showRating: true, showCompany: true },
+    preview: { bgType: 'light', layoutType: 'split-left', icon: 'split' },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-5xl mx-auto',
@@ -224,6 +232,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Grande citation mise en avant',
     config: { layout: 'single', showAvatar: true, showRole: true, showRating: false },
+    preview: { bgType: 'dark', bgValue: '#1f2937', layoutType: 'centered', icon: 'quote' },
     styles: {
       section: 'py-20 md:py-32 px-6',
       container: 'max-w-5xl mx-auto text-center',
@@ -250,6 +259,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Layout divisé audacieux',
     config: { layout: 'grid', columns: 2, showAvatar: true, showRole: true, showRating: true },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', layoutType: 'split-left', icon: 'split' },
     styles: {
       section: 'py-20 md:py-28 px-6',
       container: 'max-w-6xl mx-auto',
@@ -276,6 +286,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Témoignages pleine largeur',
     config: { layout: 'list', showAvatar: true, showRole: true, showRating: false, showCompany: true },
+    preview: { bgType: 'dark', bgValue: '#0f172a', layoutType: 'list', icon: 'list' },
     styles: {
       section: 'py-20 md:py-28 px-6',
       container: 'max-w-7xl mx-auto',
@@ -304,6 +315,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Style élégant raffiné',
     config: { layout: 'single', showAvatar: true, showRole: true, showRating: false, showCompany: true },
+    preview: { bgType: 'light', bgValue: '#fafafa', layoutType: 'single', icon: 'quote' },
     styles: {
       section: 'py-20 md:py-32 px-6',
       container: 'max-w-3xl mx-auto text-center',
@@ -330,6 +342,7 @@ export const testimonialsTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Présentation premium',
     config: { layout: 'grid', columns: 3, showAvatar: true, showRole: true, showRating: true, showCompany: true },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(to bottom, #f8fafc, #e2e8f0)', layoutType: 'cards', icon: 'star', columns: 3 },
     styles: {
       section: 'py-20 md:py-32 px-6',
       container: 'max-w-6xl mx-auto',
@@ -348,6 +361,153 @@ export const testimonialsTemplates: BlockTemplateGroup = {
       author: 'text-sm font-semibold',
       role: 'text-xs opacity-60 mt-1',
       company: 'text-xs opacity-40 mt-1',
+    }
+  },
+
+  // ===== NOUVEAUX STYLES AVANCÉS =====
+  
+  // Style 1: Dark Slider - Fond sombre avec carrousel
+  'testimonials-dark-slider': {
+    id: 'testimonials-dark-slider',
+    name: 'Dark Slider',
+    category: 'bold',
+    description: 'Carrousel élégant sur fond sombre',
+    config: { layout: 'carousel', showAvatar: true, showRole: true, showRating: true, showCompany: true },
+    preview: { bgType: 'dark', bgValue: '#1e293b', layoutType: 'slider', icon: 'slider' },
+    styles: {
+      section: 'py-20 md:py-28 px-6 bg-slate-800',
+      container: 'max-w-4xl mx-auto text-center',
+      header: 'mb-12',
+      title: 'text-3xl md:text-4xl font-bold tracking-tight text-white',
+      subtitle: 'text-base text-slate-400 mt-4',
+      grid: 'relative',
+      card: 'px-8 py-6',
+      quoteIcon: 'hidden',
+      quote: 'text-xl md:text-2xl font-light leading-relaxed italic text-slate-200',
+      rating: 'flex justify-center gap-1 mb-6',
+      star: 'w-5 h-5 text-amber-400',
+      authorWrapper: 'flex items-center justify-center mt-8 gap-4',
+      avatar: 'w-12 h-12 rounded-full bg-slate-600 flex items-center justify-center text-white font-semibold',
+      authorInfo: 'text-left',
+      author: 'text-base font-semibold text-white',
+      role: 'text-sm text-slate-400',
+      company: 'text-sm text-slate-500',
+    }
+  },
+
+  // Style 2: Quote Large - Grande citation avec icône
+  'testimonials-quote-large': {
+    id: 'testimonials-quote-large',
+    name: 'Quote Large',
+    category: 'modern',
+    description: 'Grande citation avec icône distinctive',
+    config: { layout: 'single', showAvatar: true, showRole: true, showRating: false, showCompany: true },
+    preview: { bgType: 'light', layoutType: 'centered', icon: 'quote' },
+    styles: {
+      section: 'py-20 md:py-28 px-6 bg-white',
+      container: 'max-w-4xl mx-auto text-center',
+      header: 'hidden',
+      title: 'hidden',
+      subtitle: 'hidden',
+      grid: '',
+      card: '',
+      quoteIcon: 'w-20 h-20 mx-auto mb-8 text-gray-200',
+      quote: 'text-2xl md:text-3xl font-light leading-relaxed italic text-gray-700',
+      rating: 'hidden',
+      star: 'w-4 h-4',
+      authorWrapper: 'flex items-center justify-center mt-10 gap-4',
+      avatar: 'w-14 h-14 rounded-full ring-4 ring-gray-100',
+      authorInfo: 'text-left',
+      author: 'text-lg font-semibold text-gray-900',
+      role: 'text-sm text-gray-500',
+      company: 'text-sm text-gray-400',
+    }
+  },
+
+  // Style 3: Grid Compact - Grille compacte pour avis courts
+  'testimonials-grid-compact': {
+    id: 'testimonials-grid-compact',
+    name: 'Grid Compact',
+    category: 'modern',
+    description: 'Grille compacte style avis produit',
+    config: { layout: 'grid', columns: 3, showAvatar: false, showRole: false, showRating: true, showCompany: false },
+    preview: { bgType: 'light', bgValue: '#fafafa', layoutType: 'grid', icon: 'grid', columns: 3 },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-gray-50',
+      container: 'max-w-6xl mx-auto',
+      header: 'text-center mb-12',
+      title: 'text-2xl md:text-3xl font-bold tracking-tight text-gray-900',
+      subtitle: 'text-base text-gray-600 mt-3',
+      grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
+      card: 'bg-white p-6 rounded-xl border border-gray-200',
+      quoteIcon: 'hidden',
+      quote: 'text-sm leading-relaxed text-gray-700 mt-3',
+      rating: 'flex gap-0.5',
+      star: 'w-4 h-4 text-amber-400',
+      authorWrapper: 'mt-4',
+      avatar: 'hidden',
+      authorInfo: '',
+      author: 'text-sm font-medium text-gray-900',
+      role: 'hidden',
+      company: 'hidden',
+    }
+  },
+
+  // Style 4: Split Image - Image grande + témoignage
+  'testimonials-split-image': {
+    id: 'testimonials-split-image',
+    name: 'Split Image',
+    category: 'bold',
+    description: 'Grande image avec témoignage et statistiques',
+    config: { layout: 'single', showAvatar: false, showRole: true, showRating: false, showCompany: true },
+    preview: { bgType: 'light', layoutType: 'split-left', icon: 'split' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-6xl mx-auto',
+      header: 'hidden',
+      title: 'hidden',
+      subtitle: 'hidden',
+      grid: 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center',
+      card: '',
+      quoteIcon: 'w-12 h-12 text-gray-300 mb-6',
+      quote: 'text-xl md:text-2xl font-normal leading-relaxed text-gray-700',
+      rating: 'hidden',
+      star: 'w-4 h-4',
+      authorWrapper: 'mt-8',
+      avatar: 'hidden',
+      authorInfo: '',
+      author: 'text-lg font-bold text-gray-900',
+      role: 'text-sm text-gray-500',
+      company: 'text-sm text-gray-400',
+    }
+  },
+
+  // Style 5: Reviews List - Style avis vérifiés avec dates
+  'testimonials-reviews-list': {
+    id: 'testimonials-reviews-list',
+    name: 'Reviews List',
+    category: 'modern',
+    description: 'Style avis vérifiés avec note moyenne',
+    config: { layout: 'list', showAvatar: false, showRole: false, showRating: true, showCompany: false },
+    preview: { bgType: 'light', layoutType: 'list', icon: 'star' },
+    styles: {
+      section: 'py-16 md:py-24 px-6 bg-white',
+      container: 'max-w-3xl mx-auto',
+      header: 'text-center mb-10',
+      title: 'text-2xl md:text-3xl font-bold tracking-tight text-gray-900',
+      subtitle: 'flex items-center justify-center gap-2 mt-3 text-lg',
+      grid: 'space-y-4',
+      card: 'bg-white p-6 rounded-xl border border-gray-200 relative',
+      quoteIcon: 'hidden',
+      quote: 'text-base leading-relaxed text-gray-700 mt-2',
+      rating: 'flex gap-0.5',
+      star: 'w-4 h-4 text-amber-400',
+      authorWrapper: 'mt-3',
+      avatar: 'hidden',
+      authorInfo: '',
+      author: 'text-sm font-medium text-gray-600',
+      role: 'hidden',
+      company: 'hidden',
     }
   },
 }

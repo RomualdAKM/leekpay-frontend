@@ -1,5 +1,212 @@
 <template>
+  <!-- LAYOUT: STEPS PROCESS -->
   <section 
+    v-if="layoutType === 'steps'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-3xl mx-auto">
+      <div :style="headerStyles" class="mb-12 md:mb-16">
+        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+      </div>
+      <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col">
+        <div v-for="(item, index) in props.items" :key="index" class="flex items-start gap-6">
+          <div 
+            class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: props.iconColor || '#ffffff' }"
+          >
+            {{ index + 1 }}
+          </div>
+          <div class="pt-2">
+            <h3 :style="{ color: props.titleColor || textColor }" class="text-xl font-semibold mb-1">{{ item.title }}</h3>
+            <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="opacity-70">{{ item.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: SERVICES GRID -->
+  <section 
+    v-else-if="layoutType === 'services'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto">
+      <div :style="headerStyles" class="mb-12 md:mb-16">
+        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
+        <div 
+          v-for="(item, index) in props.items" 
+          :key="index" 
+          :style="cardStyles"
+          :class="['rounded-xl p-6 text-left', cardHoverClass]"
+        >
+          <div 
+            v-if="props.showIcon"
+            class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+            :style="iconWrapperStyles"
+          >
+            <svg class="w-6 h-6" :style="{ color: iconTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon || 'check')" />
+            </svg>
+          </div>
+          <h3 :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold mb-2">{{ item.title }}</h3>
+          <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="text-sm opacity-70">{{ item.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: FEATURE SHOWCASE (alterné avec images) -->
+  <section 
+    v-else-if="layoutType === 'showcase'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <div v-if="props.title || props.subtitle" :style="headerStyles" class="mb-12 md:mb-16">
+        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+      </div>
+      <div :style="{ gap: itemGapMap[props.itemGap || 'xlarge'] || '3rem' }" class="flex flex-col">
+        <div 
+          v-for="(item, index) in displayShowcaseItems" 
+          :key="index" 
+          :class="['grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center']"
+        >
+          <div :class="index % 2 === 1 ? 'md:order-2' : ''">
+            <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl md:text-3xl font-bold mb-4">{{ item.title }}</h3>
+            <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="leading-relaxed mb-6 opacity-80">{{ item.description }}</p>
+            <a v-if="item.link" :href="item.link" :style="{ color: props.titleColor || textColor }" class="inline-flex items-center gap-2 font-medium hover:underline">
+              {{ item.linkText || 'En savoir plus' }}
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
+          <div :class="index % 2 === 1 ? 'md:order-1' : ''">
+            <img 
+              :src="item.image || DEFAULT_SHOWCASE_IMAGES[index % DEFAULT_SHOWCASE_IMAGES.length]" 
+              :alt="item.title"
+              :style="{ borderRadius: cardBorderRadiusValue }"
+              class="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: CHECKLIST GRID -->
+  <section 
+    v-else-if="layoutType === 'checklist'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-4xl mx-auto">
+      <!-- Badge -->
+      <div v-if="props.showBadge" class="flex justify-start mb-6">
+        <span 
+          class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+          :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+        >
+          {{ props.badge || 'Caractéristiques' }}
+        </span>
+      </div>
+      <div :style="headerStyles" class="mb-12 md:mb-16">
+        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
+        <div 
+          v-for="(item, index) in props.items" 
+          :key="index" 
+          :style="cardStyles"
+          :class="['flex items-center gap-4 p-4 rounded-lg', cardHoverClass]"
+        >
+          <svg :style="{ color: props.accentColor || '#10B981' }" class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span :style="{ color: props.titleColor || textColor }" class="text-base font-medium">{{ item.title }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: TABS SHOWCASE -->
+  <section 
+    v-else-if="layoutType === 'tabs'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto">
+      <!-- Badge -->
+      <div v-if="props.showBadge" class="flex justify-start mb-6">
+        <span 
+          class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+          :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+        >
+          {{ props.badge || 'Caractéristiques' }}
+        </span>
+      </div>
+      <div :style="headerStyles" class="mb-10">
+        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+      </div>
+      
+      <!-- Onglets -->
+      <div class="flex flex-wrap justify-center gap-2 mb-10">
+        <button 
+          v-for="(tab, index) in displayTabs" 
+          :key="index"
+          @click="activeTab = index"
+          :style="activeTab === index 
+            ? { backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' } 
+            : { backgroundColor: 'rgba(0,0,0,0.05)', color: textColor }"
+          class="px-6 py-2.5 rounded-full text-sm font-medium transition-colors hover:opacity-80"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+      
+      <!-- Contenu de l'onglet actif -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+        <div>
+          <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl font-bold mb-4">{{ displayTabs[activeTab]?.title }}</h3>
+          <p :style="{ color: textColor }" class="mb-6 opacity-80">{{ displayTabs[activeTab]?.description }}</p>
+          <ul class="space-y-3">
+            <li v-for="(feature, idx) in displayTabs[activeTab]?.features" :key="idx" class="flex items-center gap-3">
+              <svg :style="{ color: props.accentColor || '#10B981' }" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span :style="{ color: textColor }">{{ feature }}</span>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <img 
+            :src="displayTabs[activeTab]?.image || DEFAULT_TAB_IMAGE" 
+            :alt="displayTabs[activeTab]?.title"
+            :style="{ borderRadius: cardBorderRadiusValue }"
+            class="w-full h-auto object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: DÉFAUT -->
+  <section 
+    v-else
     :id="props.cssId || undefined"
     :class="[template.styles.section, props.customClasses, animationClass]"
     :style="sectionStyles"
@@ -100,8 +307,41 @@
   </section>
 </template>
 
+<script lang="ts">
+// Images par défaut pour le showcase
+export const DEFAULT_SHOWCASE_IMAGES = [
+  'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop&q=80',
+]
+export const DEFAULT_TAB_IMAGE = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop&q=80'
+
+export const DEFAULT_TABS = [
+  {
+    label: 'Performance',
+    title: 'Vitesse incomparable',
+    description: 'Notre infrastructure est optimisée pour offrir les meilleures performances du marché.',
+    features: ['CDN global', 'Cache intelligent', 'Compression automatique'],
+    image: DEFAULT_SHOWCASE_IMAGES[0],
+  },
+  {
+    label: 'Sécurité',
+    title: 'Protection maximale',
+    description: 'Vos données sont protégées par les meilleurs standards de sécurité.',
+    features: ['Chiffrement SSL', 'Sauvegarde quotidienne', 'Conformité RGPD'],
+    image: DEFAULT_SHOWCASE_IMAGES[1],
+  },
+  {
+    label: 'Intégrations',
+    title: 'Connecté à vos outils',
+    description: 'Intégrez facilement vos applications préférées.',
+    features: ['API REST', 'Webhooks', '50+ intégrations'],
+    image: DEFAULT_SHOWCASE_IMAGES[0],
+  },
+]
+</script>
+
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
 import { useInlineEdit } from '~/composables/useInlineEdit'
 
@@ -113,6 +353,20 @@ interface FeatureItem {
   icon?: string
   title: string
   description?: string
+}
+
+interface ShowcaseItem extends FeatureItem {
+  image?: string
+  link?: string
+  linkText?: string
+}
+
+interface TabItem {
+  label: string
+  title: string
+  description: string
+  features: string[]
+  image?: string
 }
 
 interface Props {
@@ -163,6 +417,10 @@ interface Props {
   // Avancé
   cssId?: string
   customClasses?: string
+  // Nouveaux layouts
+  showBadge?: boolean
+  badge?: string
+  tabs?: TabItem[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -209,7 +467,48 @@ const props = withDefaults(defineProps<Props>(), {
   animationDelay: 0,
   cssId: '',
   customClasses: '',
+  showBadge: false,
+  badge: 'Caractéristiques',
+  tabs: () => DEFAULT_TABS,
 })
+
+// Onglet actif pour le layout tabs
+const activeTab = ref(0)
+
+// Détecte le type de layout à partir du templateId
+const layoutType = computed(() => {
+  const id = props.templateId || ''
+  if (id.includes('steps-process')) return 'steps'
+  if (id.includes('services-grid')) return 'services'
+  if (id.includes('showcase-alternating')) return 'showcase'
+  if (id.includes('checklist-grid')) return 'checklist'
+  if (id.includes('tabs-showcase')) return 'tabs'
+  return 'default'
+})
+
+// Items pour le showcase avec images par défaut
+const displayShowcaseItems = computed(() => {
+  return (props.items || []).map((item, index) => ({
+    ...item,
+    image: (item as ShowcaseItem).image || DEFAULT_SHOWCASE_IMAGES[index % DEFAULT_SHOWCASE_IMAGES.length],
+    link: (item as ShowcaseItem).link || '#',
+    linkText: (item as ShowcaseItem).linkText || 'En savoir plus',
+  }))
+})
+
+// Onglets avec données par défaut
+const displayTabs = computed(() => {
+  return props.tabs && props.tabs.length > 0 ? props.tabs : DEFAULT_TABS
+})
+
+// Rayon de bordure pour les images
+const cardBorderRadiusMap: Record<string, string> = {
+  none: '0',
+  small: '0.375rem',
+  medium: '0.75rem',
+  large: '1.5rem',
+}
+const cardBorderRadiusValue = computed(() => cardBorderRadiusMap[props.cardBorderRadius || 'medium'] || '0.75rem')
 
 // Contexte d'édition inline
 const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()

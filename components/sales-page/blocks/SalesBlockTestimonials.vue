@@ -1,5 +1,227 @@
 <template>
+  <!-- LAYOUT: SPLIT IMAGE -->
   <section 
+    v-if="layoutType === 'split-image'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <!-- Grande image -->
+        <div class="relative">
+          <img 
+            :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
+            :alt="displayItems[0]?.name"
+            :style="{ borderRadius: cardBorderRadiusValue }"
+            class="w-full h-auto object-cover aspect-[4/5]"
+          />
+        </div>
+        <!-- Témoignage -->
+        <div>
+          <!-- Quote icon -->
+          <svg v-if="props.showQuoteIcon" class="w-12 h-12 mb-6" :style="{ color: textColor, opacity: 0.3 }" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+          </svg>
+          <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-normal leading-relaxed mb-8">
+            {{ displayItems[0]?.text }}
+          </blockquote>
+          <div class="mb-8">
+            <p :style="{ color: props.titleColor || textColor }" class="text-lg font-bold">{{ displayItems[0]?.name }}</p>
+            <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
+          </div>
+          <!-- Stats -->
+          <div class="flex gap-8">
+            <div>
+              <p class="text-3xl font-bold" :style="{ color: props.accentColor || '#10B981' }">{{ props.stat1Value }}</p>
+              <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat1Label }}</p>
+            </div>
+            <div>
+              <p class="text-3xl font-bold" :style="{ color: props.titleColor || textColor }">{{ props.stat2Value }}</p>
+              <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat2Label }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: DARK SLIDER -->
+  <section 
+    v-else-if="layoutType === 'dark-slider'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 v-if="props.title" :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-12">{{ props.title }}</h2>
+      
+      <!-- Slider Container -->
+      <div class="relative">
+        <!-- Flèches -->
+        <button 
+          @click="prevSlide"
+          :style="{ backgroundColor: sliderButtonBg, color: textColor }"
+          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button 
+          @click="nextSlide"
+          :style="{ backgroundColor: sliderButtonBg, color: textColor }"
+          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        
+        <!-- Slide -->
+        <div class="px-8">
+          <!-- Étoiles -->
+          <div v-if="props.showRating" class="flex justify-center gap-1 mb-6">
+            <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+          <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-light leading-relaxed italic mb-8">
+            "{{ displayItems[currentSlide]?.text }}"
+          </blockquote>
+          <div class="flex items-center justify-center gap-4">
+            <div 
+              v-if="props.showAvatar"
+              :style="{ ...avatarStyles, backgroundColor: sliderButtonBg }"
+              class="flex items-center justify-center font-semibold"
+            >
+              <span :style="{ color: textColor }">{{ getInitials(displayItems[currentSlide]?.name || 'C') }}</span>
+            </div>
+            <div class="text-left">
+              <p :style="{ color: props.titleColor || textColor }" class="text-base font-semibold">{{ displayItems[currentSlide]?.name }}</p>
+              <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[currentSlide]?.role }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dots -->
+        <div class="flex justify-center gap-2 mt-8">
+          <button 
+            v-for="(_, idx) in displayItems" 
+            :key="idx"
+            @click="currentSlide = idx"
+            :style="{ backgroundColor: currentSlide === idx ? (props.accentColor || textColor) : sliderButtonBg }"
+            class="w-2 h-2 rounded-full transition-colors"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: QUOTE LARGE -->
+  <section 
+    v-else-if="layoutType === 'quote-large'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <!-- Grande icône quote -->
+      <svg v-if="props.showQuoteIcon" class="w-20 h-20 mx-auto mb-8" :style="{ color: textColor, opacity: 0.2 }" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+      </svg>
+      <blockquote :style="quoteStyles" class="text-2xl md:text-3xl font-light leading-relaxed italic mb-10">
+        "{{ displayItems[0]?.text }}"
+      </blockquote>
+      <div class="flex items-center justify-center gap-4">
+        <img 
+          v-if="props.showAvatar"
+          :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
+          :alt="displayItems[0]?.name"
+          :style="avatarStyles"
+          class="ring-4"
+        />
+        <div class="text-left">
+          <p :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold">{{ displayItems[0]?.name }}</p>
+          <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: GRID COMPACT -->
+  <section 
+    v-else-if="layoutType === 'grid-compact'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 v-if="props.title" :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight text-center mb-12">{{ props.title }}</h2>
+      <div :class="gridClasses">
+        <div 
+          v-for="(item, index) in displayItems" 
+          :key="index"
+          :style="cardStyles"
+          :class="['p-6', cardHoverClass]"
+        >
+          <!-- Étoiles -->
+          <div v-if="props.showRating" class="flex gap-0.5 mb-3">
+            <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+          <p :style="{ color: textColor }" class="text-sm leading-relaxed mb-4">{{ item.text }}</p>
+          <p :style="{ color: props.titleColor || textColor }" class="text-sm font-medium">{{ item.name }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: REVIEWS LIST -->
+  <section 
+    v-else-if="layoutType === 'reviews-list'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-3xl mx-auto px-6">
+      <!-- Header avec note moyenne -->
+      <div class="text-center mb-10">
+        <h2 v-if="props.title" :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div class="flex items-center justify-center gap-2 mt-3">
+          <div class="flex gap-0.5">
+            <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          </div>
+          <span :style="{ color: props.titleColor || textColor }" class="text-xl font-bold">{{ props.averageRating }}</span>
+          <span :style="{ color: textColor, opacity: 0.6 }">({{ props.totalReviews }} avis)</span>
+        </div>
+      </div>
+      
+      <!-- Liste des avis -->
+      <div class="space-y-4">
+        <div 
+          v-for="(item, index) in displayItems" 
+          :key="index"
+          :style="cardStyles"
+          :class="['p-6 relative', cardHoverClass]"
+        >
+          <div class="flex items-start justify-between mb-2">
+            <div v-if="props.showRating" class="flex gap-0.5">
+              <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <span :style="{ color: textColor, opacity: 0.5 }" class="text-sm">{{ getReviewDate(index) }}</span>
+          </div>
+          <p :style="{ color: textColor }" class="text-base leading-relaxed mb-3">{{ item.text }}</p>
+          <p :style="{ color: textColor, opacity: 0.7 }" class="text-sm font-medium">{{ item.name }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: DÉFAUT (Grille standard) -->
+  <section 
+    v-else
     :id="props.cssId || undefined"
     :class="[template.styles.section, props.customClasses, animationClass]"
     :style="sectionStyles"
@@ -34,7 +256,7 @@
       <!-- Grille -->
       <div :class="gridClasses">
         <div 
-          v-for="(item, index) in props.items"
+          v-for="(item, index) in displayItems"
           :key="index"
           :class="[template.styles.card, cardHoverClass]"
           :style="cardStyles"
@@ -50,19 +272,7 @@
             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
           </svg>
           
-          <!-- Texte du témoignage -->
-          <blockquote 
-            :class="[template.styles.quote, editableClasses(`items[${index}].text`)]"
-            :style="quoteStyles"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Témoignage...'"
-            @focus="onArrayFocus('items', index, 'text')"
-            @blur="onArrayBlur($event, 'items', index, 'text')"
-            @keydown="onKeydown($event, false)"
-            @paste="onPaste"
-          >"{{ item.text }}"</blockquote>
-          
-          <!-- Étoiles -->
+          <!-- Étoiles en haut pour certains styles -->
           <div v-if="props.showRating && item.rating" :class="template.styles.rating">
             <svg 
               v-for="star in 5" 
@@ -76,24 +286,28 @@
             </svg>
           </div>
           
+          <!-- Texte du témoignage -->
+          <blockquote 
+            :class="[template.styles.quote, editableClasses(`items[${index}].text`)]"
+            :style="quoteStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Témoignage...'"
+            @focus="onArrayFocus('items', index, 'text')"
+            @blur="onArrayBlur($event, 'items', index, 'text')"
+            @keydown="onKeydown($event, false)"
+            @paste="onPaste"
+          >"{{ item.text }}"</blockquote>
+          
           <!-- Auteur -->
           <div :class="template.styles.authorWrapper">
             <!-- Avatar -->
             <img 
-              v-if="props.showAvatar && item.avatar"
-              :src="item.avatar"
+              v-if="props.showAvatar"
+              :src="item.avatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length]"
               :alt="item.name"
               :class="template.styles.avatar"
               :style="avatarStyles"
             />
-            <div 
-              v-else-if="props.showAvatar"
-              :class="template.styles.avatar"
-              :style="{ ...avatarStyles, backgroundColor: props.accentColor }"
-              class="flex items-center justify-center text-white font-medium"
-            >
-              {{ getInitials(item.name) }}
-            </div>
             
             <!-- Nom et rôle -->
             <div :class="template.styles.authorInfo">
@@ -133,8 +347,44 @@
   </section>
 </template>
 
+<script lang="ts">
+// Avatars par défaut libres de droit (Unsplash - faces professionnelles)
+export const DEFAULT_AVATARS = [
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop&crop=face',
+  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+]
+
+export const DEFAULT_TESTIMONIAL_ITEMS = [
+  { 
+    name: 'Marc Dupont', 
+    role: 'CEO, TechStart', 
+    company: 'TechStart',
+    text: 'Un service exceptionnel qui a transformé mon business. Les résultats ont dépassé toutes mes attentes.', 
+    avatar: DEFAULT_AVATARS[0], 
+    rating: 5 
+  },
+  { 
+    name: 'Sophie Martin', 
+    role: 'Directrice Marketing', 
+    company: 'MarketPro',
+    text: 'Une solution complète et intuitive. Je recommande vivement à tous les entrepreneurs.', 
+    avatar: DEFAULT_AVATARS[1], 
+    rating: 5 
+  },
+  { 
+    name: 'Thomas Bernard', 
+    role: 'Fondateur, InnoLab', 
+    company: 'InnoLab',
+    text: 'Le meilleur investissement que j\'ai fait pour mon entreprise. Support client au top !', 
+    avatar: DEFAULT_AVATARS[2], 
+    rating: 5 
+  },
+]
+</script>
+
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
 import { useInlineEdit } from '~/composables/useInlineEdit'
 
@@ -192,6 +442,14 @@ interface Props {
   cardHoverEffect?: 'none' | 'lift' | 'scale' | 'glow'
   // Animation
   animation?: 'none' | 'fade' | 'slide-up' | 'scale'
+  // Stats (Split Image)
+  stat1Value?: string
+  stat1Label?: string
+  stat2Value?: string
+  stat2Label?: string
+  // Stats (Reviews List)
+  averageRating?: string
+  totalReviews?: string
   // Avancé
   cssId?: string
   customClasses?: string
@@ -202,9 +460,7 @@ const props = withDefaults(defineProps<Props>(), {
   templateId: 'testimonials-minimal-centered',
   title: "Ce qu'ils en disent",
   subtitle: '',
-  items: () => [
-    { name: 'Client 1', role: 'Entrepreneur', text: 'Un service exceptionnel qui a transformé mon business.', avatar: null, rating: 5 },
-  ],
+  items: () => DEFAULT_TESTIMONIAL_ITEMS,
   headerAlignment: 'center',
   layout: 'grid',
   columns: 3,
@@ -232,6 +488,12 @@ const props = withDefaults(defineProps<Props>(), {
   cardShadow: 'none',
   cardHoverEffect: 'none',
   animation: 'none',
+  stat1Value: '+45%',
+  stat1Label: 'Satisfaction',
+  stat2Value: '2x',
+  stat2Label: 'Conversions',
+  averageRating: '4.9',
+  totalReviews: '1894',
   cssId: '',
   customClasses: '',
 })
@@ -307,6 +569,34 @@ const onPaste = (e: ClipboardEvent) => {
   document.execCommand('insertText', false, text)
 }
 
+// Slide actuel pour le carrousel
+const currentSlide = ref(0)
+
+const prevSlide = () => {
+  currentSlide.value = currentSlide.value === 0 ? displayItems.value.length - 1 : currentSlide.value - 1
+}
+
+const nextSlide = () => {
+  currentSlide.value = currentSlide.value === displayItems.value.length - 1 ? 0 : currentSlide.value + 1
+}
+
+// Génère une date fictive pour les avis
+const getReviewDate = (index: number) => {
+  const dates = ['Il y a 2 jours', 'Il y a 1 semaine', 'Il y a 2 semaines', 'Il y a 3 semaines', 'Il y a 1 mois']
+  return dates[index % dates.length]
+}
+
+// Détecte le type de layout à partir du templateId
+const layoutType = computed(() => {
+  const id = props.templateId || ''
+  if (id.includes('split-image')) return 'split-image'
+  if (id.includes('dark-slider')) return 'dark-slider'
+  if (id.includes('quote-large')) return 'quote-large'
+  if (id.includes('grid-compact')) return 'grid-compact'
+  if (id.includes('reviews-list')) return 'reviews-list'
+  return 'default'
+})
+
 // Template actif
 const template = computed(() => {
   return getTemplate('testimonials', props.templateId) || {
@@ -333,6 +623,20 @@ const template = computed(() => {
       company: 'text-xs opacity-40',
     }
   }
+})
+
+// Items avec fallback aux données par défaut
+const displayItems = computed(() => {
+  const items = props.items && props.items.length > 0 ? props.items : DEFAULT_TESTIMONIAL_ITEMS
+  return items.map((item, index) => ({
+    ...item,
+    avatar: item.avatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length],
+    text: item.text || 'Témoignage...',
+    name: item.name || 'Client',
+    role: item.role || 'Entrepreneur',
+    company: item.company || '',
+    rating: item.rating ?? 5,
+  }))
 })
 
 // Couleur du texte auto
@@ -499,4 +803,24 @@ function getInitials(name: string): string {
     .toUpperCase()
     .slice(0, 2)
 }
+
+// Rayon de bordure pour images
+const cardBorderRadiusMap: Record<string, string> = {
+  none: '0',
+  small: '0.375rem',
+  medium: '0.75rem',
+  large: '1.5rem',
+}
+const cardBorderRadiusValue = computed(() => cardBorderRadiusMap[props.cardBorderRadius || 'medium'] || '0.75rem')
+
+// Couleur de fond pour boutons slider (contraste avec le bg)
+const sliderButtonBg = computed(() => {
+  const bg = props.backgroundColor || '#ffffff'
+  const hex = bg.replace('#', '')
+  const r = parseInt(hex.substr(0, 2), 16)
+  const g = parseInt(hex.substr(2, 2), 16)
+  const b = parseInt(hex.substr(4, 2), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)'
+})
 </script>

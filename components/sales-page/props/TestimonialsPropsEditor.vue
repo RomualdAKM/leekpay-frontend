@@ -327,6 +327,56 @@
       </div>
     </div>
     
+    <!-- ===== STATISTIQUES (Split Image uniquement) ===== -->
+    <div v-if="localProps.templateId?.includes('split-image')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.stats = !sections.stats" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Statistiques</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.stats ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.stats" class="mt-3 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Stat 1 - Valeur</label>
+            <input v-model="localProps.stat1Value" @input="emitUpdate" type="text" placeholder="+45%" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Stat 1 - Label</label>
+            <input v-model="localProps.stat1Label" @input="emitUpdate" type="text" placeholder="Satisfaction" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Stat 2 - Valeur</label>
+            <input v-model="localProps.stat2Value" @input="emitUpdate" type="text" placeholder="2x" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Stat 2 - Label</label>
+            <input v-model="localProps.stat2Label" @input="emitUpdate" type="text" placeholder="Conversions" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== NOTE GLOBALE (Reviews List uniquement) ===== -->
+    <div v-if="localProps.templateId?.includes('reviews-list')" class="border-b border-gray-200 pb-4">
+      <button @click="sections.reviewStats = !sections.reviewStats" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Note globale</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.reviewStats ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.reviewStats" class="mt-3 space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Note moyenne</label>
+            <input v-model="localProps.averageRating" @input="emitUpdate" type="text" placeholder="4.9" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Nombre d'avis</label>
+            <input v-model="localProps.totalReviews" @input="emitUpdate" type="text" placeholder="1894" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- ===== AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -364,6 +414,8 @@ const sections = reactive({
   card: false,
   appearance: false,
   animation: false,
+  stats: true,
+  reviewStats: true,
   advanced: false,
 })
 
@@ -402,6 +454,12 @@ const localProps = reactive({
   titleColor: props.props.titleColor || '',
   paddingY: props.props.paddingY || 'large',
   animation: props.props.animation || 'none',
+  stat1Value: props.props.stat1Value || '+45%',
+  stat1Label: props.props.stat1Label || 'Satisfaction',
+  stat2Value: props.props.stat2Value || '2x',
+  stat2Label: props.props.stat2Label || 'Conversions',
+  averageRating: props.props.averageRating || '4.9',
+  totalReviews: props.props.totalReviews || '1894',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
 })

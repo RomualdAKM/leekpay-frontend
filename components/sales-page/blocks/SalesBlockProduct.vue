@@ -14,19 +14,10 @@
           <!-- Image -->
           <div :class="template.styles.imageWrapper">
             <img 
-              v-if="product.image"
-              :src="product.image"
+              :src="product.image || DEFAULT_PRODUCT_IMAGES[index % DEFAULT_PRODUCT_IMAGES.length]"
               :alt="product.name"
               :class="template.styles.image"
             />
-            <div 
-              v-else
-              :class="[template.styles.image, 'bg-gray-100 flex items-center justify-center']"
-            >
-              <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
           </div>
           
           <!-- Contenu -->
@@ -106,6 +97,38 @@
     </div>
   </section>
 </template>
+
+<script lang="ts">
+// Images produits par défaut libres de droit (Unsplash)
+export const DEFAULT_PRODUCT_IMAGES = [
+  'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=600&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=600&fit=crop&q=80',
+]
+
+export const DEFAULT_PRODUCTS = [
+  {
+    id: '1',
+    image: DEFAULT_PRODUCT_IMAGES[0],
+    name: 'Produit Premium',
+    description: 'Un produit de qualité supérieure pour répondre à vos besoins.',
+    price: '29900',
+    originalPrice: '39900',
+    buttonText: 'Acheter',
+    buttonUrl: '',
+  },
+  {
+    id: '2',
+    image: DEFAULT_PRODUCT_IMAGES[1],
+    name: 'Produit Standard',
+    description: 'Le choix idéal pour commencer.',
+    price: '19900',
+    originalText: '',
+    buttonText: 'Acheter',
+    buttonUrl: '',
+  }
+]
+</script>
 
 <script setup lang="ts">
 import { computed } from 'vue'
@@ -198,21 +221,13 @@ const handleClick = (product: Product) => {
   }
 }
 
-// Liste des produits avec fallback
+// Liste des produits avec fallback et images par défaut
 const productsList = computed(() => {
-  if (props.products && props.products.length > 0) {
-    return props.products
-  }
-  return [{
-    id: '1',
-    image: null,
-    name: 'Nom du produit',
-    description: 'Description du produit.',
-    price: '29900',
-    originalPrice: '',
-    buttonText: 'Acheter',
-    buttonUrl: '',
-  }]
+  const products = props.products && props.products.length > 0 ? props.products : DEFAULT_PRODUCTS
+  return products.map((product, index) => ({
+    ...product,
+    image: product.image || DEFAULT_PRODUCT_IMAGES[index % DEFAULT_PRODUCT_IMAGES.length],
+  }))
 })
 
 // Template actif

@@ -480,6 +480,28 @@
   </section>
 </template>
 
+<script lang="ts">
+// Images par défaut libres de droit (Unsplash) - déclarées au niveau module
+export const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&auto=format&fit=crop&q=80'
+export const DEFAULT_SLIDES = [
+  {
+    image: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=1600&auto=format&fit=crop&q=80',
+    title: 'Innovation & Excellence',
+    subtitle: 'Découvrez notre approche unique'
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&auto=format&fit=crop&q=80',
+    title: 'Une Équipe Passionnée',
+    subtitle: 'Des experts à votre service'
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&auto=format&fit=crop&q=80',
+    title: 'Résultats Concrets',
+    subtitle: 'Votre succès est notre priorité'
+  }
+]
+</script>
+
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
@@ -592,7 +614,7 @@ const props = withDefaults(defineProps<Props>(), {
   badge: '',
   contentAlignment: 'center',
   contentMaxWidth: 'large',
-  mediaUrl: null,
+  mediaUrl: DEFAULT_HERO_IMAGE,
   videoUrl: null,
   imageRadius: 'none',
   backgroundType: 'solid',
@@ -647,7 +669,7 @@ const props = withDefaults(defineProps<Props>(), {
   animateOnScroll: false,
   imagePosition: 'center',
   imageFilter: 'none',
-  slides: () => [],
+  slides: () => DEFAULT_SLIDES,
   autoplay: true,
   autoplayInterval: 5000,
   cssId: '',

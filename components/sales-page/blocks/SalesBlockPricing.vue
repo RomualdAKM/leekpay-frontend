@@ -1,173 +1,306 @@
 <template>
+  <!-- LAYOUT: CLASSIC CARDS (3 colonnes avec coches/croix) -->
   <section 
+    v-if="layoutType === 'classic-cards'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto px-6">
+      <div v-if="props.title || props.subtitle" :style="headerStyles" class="text-center mb-12">
+        <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-4">{{ props.subtitle }}</p>
+      </div>
+      <div :class="gridClasses">
+        <div 
+          v-for="(plan, idx) in plans" 
+          :key="idx"
+          :style="getCardStyles(plan)"
+          :class="['p-8 relative', plan.highlighted ? 'ring-2 ring-offset-2 scale-105 z-10' : '', cardHoverClass]"
+        >
+          <span 
+            v-if="plan.showBadge && plan.badgeText"
+            :style="getBadgeStyles(plan)"
+            class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide rounded-full"
+          >{{ plan.badgeText }}</span>
+          <h3 :style="{ color: getTextColor(plan) }" class="text-xl font-semibold mb-1">{{ plan.name }}</h3>
+          <p v-if="plan.description" :style="{ color: getTextColor(plan), opacity: 0.6 }" class="text-sm mb-4">{{ plan.description }}</p>
+          <div class="mb-6">
+            <div class="flex items-baseline">
+              <span :style="getPriceStyles(plan)" class="text-5xl font-bold">{{ formatPrice(plan.price) }}</span>
+              <span :style="{ color: getTextColor(plan), opacity: 0.6 }" class="text-sm ml-1">{{ plan.period }}</span>
+            </div>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li v-for="(f, fi) in plan.features" :key="fi" class="flex items-start gap-3">
+              <svg 
+                class="w-5 h-5 flex-shrink-0 mt-0.5" 
+                :style="{ color: isFeatureIncluded(f) ? (plan.accentColor || accentColorFinal) : (getTextColor(plan) + '40') }" 
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path v-if="isFeatureIncluded(f)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span :style="{ color: getTextColor(plan), opacity: isFeatureIncluded(f) ? 1 : 0.4 }">{{ getFeatureText(f) }}</span>
+            </li>
+          </ul>
+          <button :style="getButtonStyles(plan)" class="w-full py-3 text-sm font-medium tracking-wide rounded-lg transition-colors">{{ plan.ctaText || 'Commander' }}</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: SIMPLE PYRAMID (2+1 layout minimaliste) -->
+  <section 
+    v-else-if="layoutType === 'simple-pyramid'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-4xl mx-auto px-6">
+      <div v-if="props.title" :style="headerStyles" class="text-center mb-12">
+        <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+      </div>
+      <!-- Ligne 1 : 2 cartes -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+        <div 
+          v-for="(plan, idx) in plans.slice(0, 2)" 
+          :key="idx"
+          :style="getCardStyles(plan)"
+          :class="['p-8 text-center', plan.highlighted ? 'ring-2 ring-offset-2' : '', cardHoverClass]"
+        >
+          <h3 :style="{ color: getTextColor(plan) }" class="text-xl font-semibold mb-1">{{ plan.name }}</h3>
+          <p v-if="plan.description" :style="{ color: getTextColor(plan), opacity: 0.6 }" class="text-sm mb-4">{{ plan.description }}</p>
+          <div class="flex items-baseline justify-center mb-4">
+            <span :style="getPriceStyles(plan)" class="text-5xl font-bold">{{ formatPrice(plan.price) }}</span>
+            <span :style="{ color: getTextColor(plan), opacity: 0.6 }" class="text-sm ml-1">{{ plan.period }}</span>
+          </div>
+          <button :style="getButtonStyles(plan)" class="w-full py-3 text-sm font-medium tracking-wide rounded-full transition-colors">{{ plan.ctaText || 'Choisir' }}</button>
+        </div>
+      </div>
+      <!-- Ligne 2 : 1 carte centrée -->
+      <div v-if="plans.length > 2" class="max-w-md mx-auto">
+        <div 
+          :style="getCardStyles(thirdPlan)"
+          :class="['p-8 text-center', thirdPlan.highlighted ? 'ring-2 ring-offset-2' : '', cardHoverClass]"
+        >
+          <h3 :style="{ color: getTextColor(thirdPlan) }" class="text-xl font-semibold mb-1">{{ thirdPlan.name }}</h3>
+          <p v-if="thirdPlan.description" :style="{ color: getTextColor(thirdPlan), opacity: 0.6 }" class="text-sm mb-4">{{ thirdPlan.description }}</p>
+          <div class="flex items-baseline justify-center mb-4">
+            <span :style="getPriceStyles(thirdPlan)" class="text-5xl font-bold">{{ formatPrice(thirdPlan.price) }}</span>
+            <span :style="{ color: getTextColor(thirdPlan), opacity: 0.6 }" class="text-sm ml-1">{{ thirdPlan.period }}</span>
+          </div>
+          <button :style="getButtonStyles(thirdPlan)" class="w-full py-3 text-sm font-medium tracking-wide rounded-full transition-colors">{{ thirdPlan.ctaText || 'Choisir' }}</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: FLEXIBLE TOGGLE (Mensuel/Annuel) -->
+  <section 
+    v-else-if="layoutType === 'flexible-toggle'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-6xl mx-auto px-6">
+      <div v-if="props.title || props.subtitle" :style="headerStyles" class="text-center mb-6">
+        <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-4">{{ props.subtitle }}</p>
+      </div>
+      <!-- Toggle Mensuel/Annuel -->
+      <div class="flex justify-center mb-10">
+        <div :style="{ backgroundColor: textColor + '10' }" class="inline-flex items-center p-1 rounded-full">
+          <button 
+            @click="billingCycle = 'monthly'"
+            :style="billingCycle === 'monthly' ? { backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' } : { color: textColor }"
+            class="px-6 py-2 text-sm font-medium rounded-full transition-colors"
+          >Mensuel</button>
+          <button 
+            @click="billingCycle = 'yearly'"
+            :style="billingCycle === 'yearly' ? { backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' } : { color: textColor }"
+            class="px-6 py-2 text-sm font-medium rounded-full transition-colors flex items-center gap-2"
+          >
+            Annuel
+            <span v-if="props.yearlyDiscount" :style="{ backgroundColor: accentColorFinal, color: '#ffffff' }" class="px-2 py-0.5 text-xs font-bold rounded-full">{{ props.yearlyDiscount }}</span>
+          </button>
+        </div>
+      </div>
+      <div :class="gridClasses">
+        <div 
+          v-for="(plan, idx) in plans" 
+          :key="idx"
+          :style="getCardStyles(plan)"
+          :class="['p-8 relative', plan.highlighted ? 'ring-2 ring-offset-2 scale-105 z-10' : '', cardHoverClass]"
+        >
+          <span 
+            v-if="plan.showBadge && plan.badgeText"
+            :style="getBadgeStyles(plan)"
+            class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide rounded-full"
+          >{{ plan.badgeText }}</span>
+          <h3 :style="{ color: getTextColor(plan) }" class="text-xl font-semibold mb-1">{{ plan.name }}</h3>
+          <div class="mb-6">
+            <div class="flex items-baseline">
+              <span :style="getPriceStyles(plan)" class="text-5xl font-bold">{{ formatPrice(billingCycle === 'yearly' && plan.yearlyPrice ? plan.yearlyPrice : plan.price) }}</span>
+              <span :style="{ color: getTextColor(plan), opacity: 0.6 }" class="text-sm ml-1">{{ plan.period }}</span>
+            </div>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li v-for="(f, fi) in plan.features" :key="fi" class="flex items-start gap-3" :style="{ color: getTextColor(plan) }">
+              <svg class="w-5 h-5 flex-shrink-0 mt-0.5" :style="{ color: plan.accentColor || accentColorFinal }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{{ typeof f === 'string' ? f : f.text }}</span>
+            </li>
+          </ul>
+          <button :style="getButtonStyles(plan)" class="w-full py-3 text-sm font-medium tracking-wide rounded-lg transition-colors">{{ plan.ctaText || 'Choisir' }}</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: ENTERPRISE SPLIT (features + contact) -->
+  <section 
+    v-else-if="layoutType === 'enterprise-split'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <!-- Gauche : Features -->
+        <div>
+          <span 
+            v-if="props.enterpriseBadge"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+            class="inline-block px-3 py-1 text-xs font-semibold uppercase tracking-wide rounded mb-6"
+          >{{ props.enterpriseBadge }}</span>
+          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-4">{{ props.title }}</h2>
+          <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.7 }" class="text-lg mb-8">{{ props.subtitle }}</p>
+          <ul class="space-y-4">
+            <li v-for="(f, fi) in enterpriseFeatures" :key="fi" class="flex items-start gap-3" :style="{ color: textColor }">
+              <svg class="w-5 h-5 flex-shrink-0 mt-1" :style="{ color: accentColorFinal }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span class="text-base">{{ f }}</span>
+            </li>
+          </ul>
+        </div>
+        <!-- Droite : Carte contact -->
+        <div :style="contactCardStyles" class="p-8 rounded-xl">
+          <h3 :style="{ color: contactTextColor }" class="text-xl font-bold mb-2">{{ props.contactTitle || 'Parlons de vos besoins' }}</h3>
+          <p :style="{ color: contactTextColor, opacity: 0.7 }" class="text-sm mb-6">{{ props.contactDescription || 'Notre équipe vous accompagne dans la mise en place' }}</p>
+          <a 
+            v-if="props.contactCtaUrl" 
+            :href="props.contactCtaUrl" 
+            target="_blank"
+            :style="{ backgroundColor: accentColorFinal, color: '#ffffff' }" 
+            class="block w-full py-4 text-base font-semibold rounded-lg transition-colors mb-4 text-center"
+          >{{ props.contactCtaText || 'Demander un devis' }}</a>
+          <button 
+            v-else
+            :style="{ backgroundColor: accentColorFinal, color: '#ffffff' }" 
+            class="w-full py-4 text-base font-semibold rounded-lg transition-colors mb-4"
+          >{{ props.contactCtaText || 'Demander un devis' }}</button>
+          <p v-if="props.contactPhone" :style="{ color: contactTextColor }" class="text-center text-sm">
+            ou appelez-nous : <a :href="'tel:' + props.contactPhone" :style="{ color: accentColorFinal }" class="font-medium">{{ props.contactPhone }}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUT: LIFETIME DEAL (offre unique avec urgence) -->
+  <section 
+    v-else-if="layoutType === 'lifetime-deal'"
+    :id="props.cssId || undefined"
+    :class="props.customClasses"
+    :style="sectionStyles"
+  >
+    <div class="max-w-lg mx-auto px-6 text-center">
+      <span 
+        v-if="firstPlan.showBadge && firstPlan.badgeText"
+        :style="getBadgeStyles(firstPlan)"
+        class="inline-block px-5 py-2 text-sm font-bold uppercase tracking-wide rounded-full mb-6"
+      >{{ firstPlan.badgeText }}</span>
+      <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-4">{{ props.title }}</h2>
+      <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.7 }" class="text-lg mb-8">{{ props.subtitle }}</p>
+      <!-- Prix -->
+      <div class="mb-8">
+        <span v-if="firstPlan.showOriginalPrice && firstPlan.originalPrice" :style="{ color: textColor, opacity: 0.5 }" class="text-xl line-through mr-3">{{ formatPrice(firstPlan.originalPrice) }}{{ firstPlan.currency || props.currency }}</span>
+        <span :style="getPriceStyles(firstPlan)" class="text-6xl md:text-7xl font-black">{{ formatPrice(firstPlan.price) }}</span>
+        <span :style="{ color: textColor }" class="text-2xl font-bold">{{ firstPlan.currency || props.currency }}</span>
+        <span v-if="props.discountBadge" :style="{ backgroundColor: '#ef4444', color: '#ffffff' }" class="ml-3 px-3 py-1 text-sm font-bold rounded-full">{{ props.discountBadge }}</span>
+      </div>
+      <!-- Features -->
+      <ul class="space-y-3 text-left max-w-sm mx-auto mb-8">
+        <li v-for="(f, fi) in firstPlan.features" :key="fi" class="flex items-start gap-3" :style="{ color: textColor }">
+          <svg class="w-5 h-5 flex-shrink-0 mt-1" :style="{ color: accentColorFinal }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{{ getFeatureText(f) }}</span>
+        </li>
+      </ul>
+      <!-- CTA -->
+      <button :style="getButtonStyles(firstPlan)" class="w-full py-5 text-base font-bold rounded-xl transition-colors mb-4">{{ firstPlan.ctaText || 'Obtenir l\'accès' }}</button>
+      <!-- Urgence -->
+      <p v-if="props.showUrgency && props.urgencyText" :style="{ color: '#ef4444' }" class="text-sm font-medium mb-2">{{ props.urgencyText }}</p>
+      <!-- Garantie -->
+      <p v-if="firstPlan.showGuarantee && firstPlan.guaranteeText" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ firstPlan.guaranteeText }}</p>
+    </div>
+  </section>
+
+  <!-- LAYOUT: DÉFAUT -->
+  <section 
+    v-else
     :id="props.cssId || undefined"
     :class="[template.styles.section, props.customClasses]"
     :style="sectionStyles"
   >
-    <!-- Header avec container du template -->
-    <div v-if="props.title || props.subtitle || isEditMode" :class="[template.styles.container, template.styles.header]" :style="headerStyles">
-      <h2 
-        v-if="props.title || isEditMode"
-        :class="[template.styles.title, editableClasses('title')]"
-        :style="titleStyles"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Titre de la section'"
-        @focus="onFocus('title')"
-        @blur="onBlur($event, 'title')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.title }}</h2>
-      <p 
-        v-if="props.subtitle || isEditMode"
-        :class="[template.styles.subtitle, editableClasses('subtitle')]"
-        :style="{ color: textColor }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Sous-titre de la section'"
-        @focus="onFocus('subtitle')"
-        @blur="onBlur($event, 'subtitle')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.subtitle }}</p>
+    <div v-if="props.title || props.subtitle" :class="[template.styles.container, template.styles.header]" :style="headerStyles">
+      <h2 v-if="props.title" :class="template.styles.title" :style="titleStyles">{{ props.title }}</h2>
+      <p v-if="props.subtitle" :class="template.styles.subtitle" :style="{ color: textColor }">{{ props.subtitle }}</p>
     </div>
-    
-    <!-- Grille de cartes - hors container pour être responsive -->
     <div :class="gridClasses">
-        <!-- Carte de prix -->
-        <div 
-          v-for="(plan, planIndex) in plans" 
-          :key="planIndex"
-          :class="[template.styles.card, plan.highlighted ? 'ring-2 ring-offset-2 scale-105 z-10' : '']" 
-          :style="getCardStyles(plan)"
-        >
-          <!-- Badge (éditable inline) -->
-          <span 
-            v-if="(plan.showBadge && plan.badgeText) || (isEditMode && plan.showBadge)"
-            :class="[template.styles.badge, editableClasses(`items[${planIndex}].badgeText`)]"
-            :style="getBadgeStyles(plan)"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Badge'"
-            @focus="onArrayFocus('items', planIndex, 'badgeText')"
-            @blur="onArrayBlur($event, 'items', planIndex, 'badgeText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-          >{{ plan.badgeText }}</span>
-          
-          <!-- Nom du plan (éditable inline) -->
-          <h3 
-            v-if="plan.name || isEditMode" 
-            :class="['text-lg font-semibold mb-2', editableClasses(`items[${planIndex}].name`)]"
-            :style="{ color: getTextColor(plan) }"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Nom du plan'"
-            @focus="onArrayFocus('items', planIndex, 'name')"
-            @blur="onArrayBlur($event, 'items', planIndex, 'name')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-          >{{ plan.name }}</h3>
-          
-          <!-- Prix -->
-          <div :class="template.styles.priceWrapper">
-            <!-- Prix barré -->
-            <p 
-              v-if="plan.showOriginalPrice && plan.originalPrice"
-              :class="template.styles.originalPrice"
-              :style="{ color: getTextColor(plan) }"
-            >
-              {{ formatPrice(plan.originalPrice) }} {{ plan.currency || props.currency }}
-            </p>
-            
-            <!-- Prix actuel -->
-            <div :class="template.styles.priceRow">
-              <span :class="template.styles.currency" :style="{ color: plan.priceColor || getTextColor(plan) }">
-                {{ plan.currency || props.currency }}
-              </span>
-              <span :class="template.styles.price" :style="getPriceStyles(plan)">
-                {{ formatPrice(plan.price) }}
-              </span>
-            </div>
-            
-            <!-- Période (éditable inline) -->
-            <p 
-              v-if="(plan.showPeriod && plan.period) || isEditMode" 
-              :class="[template.styles.period, editableClasses(`items[${planIndex}].period`)]"
-              :style="{ color: getTextColor(plan) }"
-              :contenteditable="isEditMode"
-              :data-placeholder="'/mois'"
-              @focus="onArrayFocus('items', planIndex, 'period')"
-              @blur="onArrayBlur($event, 'items', planIndex, 'period')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-            >{{ plan.period }}</p>
+      <div 
+        v-for="(plan, planIndex) in plans" 
+        :key="planIndex"
+        :class="[template.styles.card, plan.highlighted ? 'ring-2 ring-offset-2 scale-105 z-10' : '', cardHoverClass]" 
+        :style="getCardStyles(plan)"
+      >
+        <span 
+          v-if="plan.showBadge && plan.badgeText"
+          :class="template.styles.badge"
+          :style="getBadgeStyles(plan)"
+        >{{ plan.badgeText }}</span>
+        <h3 v-if="plan.name" class="text-lg font-semibold mb-2" :style="{ color: getTextColor(plan) }">{{ plan.name }}</h3>
+        <div :class="template.styles.priceWrapper">
+          <p v-if="plan.showOriginalPrice && plan.originalPrice" :class="template.styles.originalPrice" :style="{ color: getTextColor(plan) }">
+            {{ formatPrice(plan.originalPrice) }} {{ plan.currency || props.currency }}
+          </p>
+          <div :class="template.styles.priceRow">
+            <span :class="template.styles.currency" :style="{ color: plan.priceColor || getTextColor(plan) }">{{ plan.currency || props.currency }}</span>
+            <span :class="template.styles.price" :style="getPriceStyles(plan)">{{ formatPrice(plan.price) }}</span>
           </div>
-          
-          <!-- Liste des features -->
-          <ul v-if="plan.showFeatures !== false && plan.features?.length" :class="template.styles.features">
-            <li 
-              v-for="(feature, index) in plan.features"
-              :key="index"
-              :class="template.styles.featureItem"
-              :style="{ color: getTextColor(plan) }"
-            >
-              <svg 
-                :class="template.styles.featureIcon"
-                :style="{ color: plan.accentColor || props.accentColor }" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span :class="template.styles.featureText">{{ feature }}</span>
-            </li>
-          </ul>
-          
-          <!-- Garantie (éditable inline) -->
-          <p 
-            v-if="(plan.showGuarantee && plan.guaranteeText) || (isEditMode && plan.showGuarantee)"
-            :class="[template.styles.guarantee, editableClasses(`items[${planIndex}].guaranteeText`)]"
-            :style="{ color: getTextColor(plan) }"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Garantie satisfait ou remboursé'"
-            @focus="onArrayFocus('items', planIndex, 'guaranteeText')"
-            @blur="onArrayBlur($event, 'items', planIndex, 'guaranteeText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-          >{{ plan.guaranteeText }}</p>
-          
-          <!-- Bouton CTA (éditable inline pour le texte) -->
-          <a
-            v-if="plan.ctaUrl"
-            :href="isEditMode ? undefined : plan.ctaUrl"
-            :target="plan.ctaTarget || '_self'"
-            :class="[template.styles.button, editableClasses(`items[${planIndex}].ctaText`)]"
-            :style="getButtonStyles(plan)"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Commander'"
-            @focus="onArrayFocus('items', planIndex, 'ctaText')"
-            @blur="onArrayBlur($event, 'items', planIndex, 'ctaText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-            @click.prevent="handleCtaClick(plan, planIndex)"
-          >{{ plan.ctaText || 'Commander' }}</a>
-          <button
-            v-else
-            :class="[template.styles.button, editableClasses(`items[${planIndex}].ctaText`)]"
-            :style="getButtonStyles(plan)"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Commander'"
-            @focus="onArrayFocus('items', planIndex, 'ctaText')"
-            @blur="onArrayBlur($event, 'items', planIndex, 'ctaText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-            @click="!isEditMode && $emit('cta-click', planIndex)"
-          >{{ plan.ctaText || 'Commander' }}</button>
+          <p v-if="plan.showPeriod && plan.period" :class="template.styles.period" :style="{ color: getTextColor(plan) }">{{ plan.period }}</p>
         </div>
+        <ul v-if="plan.showFeatures !== false && plan.features?.length" :class="template.styles.features">
+          <li v-for="(feature, index) in plan.features" :key="index" :class="template.styles.featureItem" :style="{ color: getTextColor(plan) }">
+            <svg :class="template.styles.featureIcon" :style="{ color: plan.accentColor || props.accentColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span :class="template.styles.featureText">{{ typeof feature === 'string' ? feature : feature.text }}</span>
+          </li>
+        </ul>
+        <p v-if="plan.showGuarantee && plan.guaranteeText" :class="template.styles.guarantee" :style="{ color: getTextColor(plan) }">{{ plan.guaranteeText }}</p>
+        <button :class="template.styles.button" :style="getButtonStyles(plan)">{{ plan.ctaText || 'Commander' }}</button>
       </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { getTemplate } from '~/composables/blockTemplates'
 import { useInlineEdit } from '~/composables/useInlineEdit'
 
@@ -177,11 +310,13 @@ type PriceSize = 'small' | 'medium' | 'large' | 'xlarge'
 
 interface PricingPlan {
   name?: string
+  description?: string
   price?: string | number
+  yearlyPrice?: string | number
   originalPrice?: string | number | null
   currency?: string
   period?: string
-  features?: string[]
+  features?: (string | { text: string; included?: boolean })[]
   showBadge?: boolean
   badgeText?: string
   badgeColor?: string
@@ -257,6 +392,22 @@ interface Props {
   cardShadow?: 'none' | 'small' | 'medium' | 'large'
   // Layout
   columns?: number
+  cardHoverEffect?: 'none' | 'lift' | 'scale' | 'glow'
+  // Toggle Mensuel/Annuel
+  showBillingToggle?: boolean
+  yearlyDiscount?: string
+  // Enterprise Split
+  enterpriseBadge?: string
+  enterpriseFeatures?: string[]
+  contactTitle?: string
+  contactDescription?: string
+  contactCtaText?: string
+  contactPhone?: string
+  contactCtaUrl?: string
+  // Lifetime Deal
+  showUrgency?: boolean
+  urgencyText?: string
+  discountBadge?: string
   // Avancé
   cssId?: string
   customClasses?: string
@@ -306,6 +457,19 @@ const props = withDefaults(defineProps<Props>(), {
   cardPadding: 'large',
   cardShadow: 'none',
   columns: 1,
+  cardHoverEffect: 'none',
+  showBillingToggle: false,
+  yearlyDiscount: '-20%',
+  enterpriseBadge: 'ENTREPRISE',
+  enterpriseFeatures: () => ['Déploiement dédié', 'SLA garanti 99.99%', 'Support dédié 24/7', 'Intégrations personnalisées'],
+  contactTitle: 'Parlons de vos besoins',
+  contactDescription: 'Notre équipe vous accompagne dans la mise en place',
+  contactCtaText: 'Demander un devis',
+  contactPhone: '+33 1 23 45 67 89',
+  contactCtaUrl: '',
+  showUrgency: false,
+  urgencyText: 'Plus que 47 places disponibles !',
+  discountBadge: '-70%',
   cssId: '',
   customClasses: '',
 })
@@ -462,6 +626,108 @@ function getTextColor(plan: PricingPlan): string {
 
 const textColor = computed(() => getTextColor({}))
 const accentColorFinal = computed(() => props.accentColor || '#10B981')
+
+// Détecte le type de layout à partir du templateId
+const layoutType = computed(() => {
+  const id = props.templateId || ''
+  if (id.includes('classic-cards')) return 'classic-cards'
+  if (id.includes('simple-pyramid')) return 'simple-pyramid'
+  if (id.includes('flexible-toggle')) return 'flexible-toggle'
+  if (id.includes('enterprise-split')) return 'enterprise-split'
+  if (id.includes('lifetime-deal')) return 'lifetime-deal'
+  return 'default'
+})
+
+// Toggle Mensuel/Annuel
+const billingCycle = ref<'monthly' | 'yearly'>('monthly')
+
+// Features Enterprise avec fallback
+const enterpriseFeatures = computed(() => {
+  return props.enterpriseFeatures && props.enterpriseFeatures.length > 0 
+    ? props.enterpriseFeatures 
+    : ['Déploiement dédié', 'SLA garanti 99.99%', 'Support dédié 24/7', 'Intégrations personnalisées']
+})
+
+// Effet hover carte
+const cardHoverClass = computed(() => {
+  const effectMap: Record<string, string> = {
+    none: '',
+    lift: 'transition-all duration-300 hover:-translate-y-1 hover:shadow-lg',
+    scale: 'transition-transform duration-300 hover:scale-105',
+    glow: 'transition-shadow duration-300 hover:shadow-xl hover:shadow-emerald-500/20',
+  }
+  return effectMap[props.cardHoverEffect || 'none'] || ''
+})
+
+// Styles carte contact (Enterprise) - utilise les mêmes props que les cartes normales
+const contactCardBgColor = computed(() => props.cardBgColor || '#f8fafc')
+
+const contactCardStyles = computed(() => {
+  const styles: Record<string, string> = {
+    backgroundColor: contactCardBgColor.value,
+  }
+  
+  // Border radius
+  if (props.cardBorderRadius && props.cardBorderRadius !== 'none') {
+    const radiusMap: Record<string, string> = {
+      small: '0.5rem',
+      medium: '1rem',
+      large: '1.5rem',
+    }
+    styles.borderRadius = radiusMap[props.cardBorderRadius] || '0.75rem'
+  } else {
+    styles.borderRadius = '0.75rem'
+  }
+  
+  // Border
+  if (props.cardBorderWidth && props.cardBorderWidth !== 'none') {
+    const borderWidthMap: Record<string, string> = {
+      thin: '1px',
+      medium: '2px',
+      thick: '4px',
+    }
+    styles.borderWidth = borderWidthMap[props.cardBorderWidth] || '1px'
+    styles.borderStyle = 'solid'
+    styles.borderColor = props.cardBorderColor || accentColorFinal.value
+  }
+  
+  // Shadow
+  if (props.cardShadow && props.cardShadow !== 'none') {
+    const shadowMap: Record<string, string> = {
+      small: '0 1px 3px rgba(0,0,0,0.1)',
+      medium: '0 4px 6px rgba(0,0,0,0.1)',
+      large: '0 10px 25px rgba(0,0,0,0.15)',
+    }
+    styles.boxShadow = shadowMap[props.cardShadow] || ''
+  }
+  
+  return styles
+})
+
+// Couleur texte pour carte contact (basée sur son propre fond)
+const contactTextColor = computed(() => {
+  const bg = contactCardBgColor.value
+  const hex = bg.replace('#', '')
+  const r = parseInt(hex.substr(0, 2), 16)
+  const g = parseInt(hex.substr(2, 2), 16)
+  const b = parseInt(hex.substr(4, 2), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#1f2937' : '#ffffff'
+})
+
+// Plans avec accès sécurisé
+const firstPlan = computed(() => plans.value[0] || {} as PricingPlan)
+const thirdPlan = computed(() => plans.value[2] || {} as PricingPlan)
+
+// Helper pour vérifier si feature est incluse
+function isFeatureIncluded(f: string | { text: string; included?: boolean }): boolean {
+  if (typeof f === 'string') return true
+  return f.included !== false
+}
+
+function getFeatureText(f: string | { text: string; included?: boolean }): string {
+  return typeof f === 'string' ? f : f.text
+}
 
 // Styles section
 const sectionStyles = computed(() => {

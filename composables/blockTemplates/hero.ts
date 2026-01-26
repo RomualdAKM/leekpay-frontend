@@ -23,6 +23,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Texte centré sur fond uni, design minimaliste',
     config: { layout: 'centered', contentPosition: 'center', textAlign: 'center', showBadge: false, showSecondaryButton: false, imageRatio: '', overlayEnabled: false },
+    preview: { bgType: 'light', layoutType: 'centered', icon: 'list' },
     styles: {
       section: 'py-20 md:py-32 lg:py-40 px-6',
       container: 'max-w-4xl mx-auto text-center',
@@ -40,6 +41,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Grand titre centré avec fort impact visuel',
     config: { layout: 'centered', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '', overlayEnabled: false },
+    preview: { bgType: 'dark', bgValue: '#1f2937', layoutType: 'centered', icon: 'list' },
     styles: {
       section: 'py-24 md:py-36 lg:py-48 px-6',
       container: 'max-w-5xl mx-auto text-center',
@@ -57,6 +59,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Design élégant avec typographie raffinée',
     config: { layout: 'centered', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: false, imageRatio: '', overlayEnabled: false },
+    preview: { bgType: 'light', bgValue: '#fafafa', layoutType: 'centered', icon: 'list', accentColor: '#6366f1' },
     styles: {
       section: 'py-20 md:py-28 lg:py-36 px-6',
       container: 'max-w-3xl mx-auto text-center',
@@ -76,6 +79,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Texte à gauche, image à droite - style moderne',
     config: { layout: 'split-right', contentPosition: 'center', textAlign: 'left', showBadge: true, showSecondaryButton: true, imageRatio: '4/3', overlayEnabled: false },
+    preview: { bgType: 'light', layoutType: 'split-right', icon: 'split' },
     styles: {
       section: 'py-12 md:py-0 px-6 md:px-0',
       container: 'max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-0 items-center',
@@ -96,6 +100,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Layout split épuré avec image à droite',
     config: { layout: 'split-right', contentPosition: 'center', textAlign: 'left', showBadge: false, showSecondaryButton: false, imageRatio: '1/1', overlayEnabled: false },
+    preview: { bgType: 'light', layoutType: 'split-right', icon: 'split' },
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-6xl mx-auto grid md:grid-cols-2 gap-12 lg:gap-20 items-center',
@@ -116,6 +121,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Layout split audacieux avec grande image',
     config: { layout: 'split-right', contentPosition: 'center', textAlign: 'left', showBadge: true, showSecondaryButton: true, imageRatio: '3/4', overlayEnabled: false },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', layoutType: 'split-right', icon: 'split' },
     styles: {
       section: 'py-0',
       container: 'grid lg:grid-cols-2 min-h-screen',
@@ -138,6 +144,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Image à gauche, texte à droite - style moderne',
     config: { layout: 'split-left', contentPosition: 'center', textAlign: 'left', showBadge: true, showSecondaryButton: true, imageRatio: '4/3', overlayEnabled: false },
+    preview: { bgType: 'light', bgValue: '#f8fafc', layoutType: 'split-left', icon: 'split' },
     styles: {
       section: 'py-12 md:py-0 px-6 md:px-0',
       container: 'max-w-7xl mx-auto grid md:grid-cols-2 gap-8 md:gap-0 items-center',
@@ -158,6 +165,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Design élégant avec image à gauche',
     config: { layout: 'split-left', contentPosition: 'center', textAlign: 'left', showBadge: false, showSecondaryButton: false, imageRatio: '3/4', overlayEnabled: false },
+    preview: { bgType: 'light', layoutType: 'split-left', icon: 'split' },
     styles: {
       section: 'py-16 md:py-0',
       container: 'max-w-7xl mx-auto grid md:grid-cols-5 gap-8 items-center',
@@ -180,6 +188,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Image plein écran avec texte centré et overlay',
     config: { layout: 'fullscreen', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '', overlayEnabled: true },
+    preview: { bgType: 'dark', bgValue: '#0f172a', layoutType: 'centered', icon: 'grid' },
     styles: {
       section: 'relative min-h-screen flex items-center justify-center px-6',
       overlay: 'absolute inset-0 bg-black',
@@ -200,6 +209,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Plein écran avec contenu en bas',
     config: { layout: 'fullscreen', contentPosition: 'bottom', textAlign: 'left', showBadge: true, showSecondaryButton: true, imageRatio: '', overlayEnabled: true },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)', layoutType: 'list', icon: 'list' },
     styles: {
       section: 'relative min-h-screen flex items-end px-6 pb-16 md:pb-24',
       overlay: 'absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent',
@@ -220,6 +230,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'minimal',
     description: 'Plein écran épuré avec overlay subtil',
     config: { layout: 'fullscreen', contentPosition: 'center', textAlign: 'center', showBadge: false, showSecondaryButton: false, imageRatio: '', overlayEnabled: true },
+    preview: { bgType: 'dark', bgValue: '#374151', layoutType: 'centered', icon: 'list' },
     styles: {
       section: 'relative min-h-[80vh] flex items-center justify-center px-6',
       overlay: 'absolute inset-0 bg-black/30',
@@ -242,6 +253,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Carrousel plein écran avec navigation',
     config: { layout: 'slider', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '', overlayEnabled: true },
+    preview: { bgType: 'dark', bgValue: '#1e293b', layoutType: 'slider', icon: 'slider' },
     styles: {
       section: 'relative min-h-screen',
       overlay: 'absolute inset-0 bg-black/40',
@@ -267,6 +279,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Carrousel compact avec contenu à gauche',
     config: { layout: 'slider', contentPosition: 'center', textAlign: 'left', showBadge: true, showSecondaryButton: false, imageRatio: '16/9', overlayEnabled: true },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(to right, rgba(0,0,0,0.7), transparent)', layoutType: 'slider', icon: 'slider' },
     styles: {
       section: 'relative py-16 md:py-0 md:min-h-[600px]',
       overlay: 'absolute inset-0 bg-gradient-to-r from-black/70 to-transparent',
@@ -294,6 +307,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'modern',
     description: 'Image en haut, contenu en bas',
     config: { layout: 'stacked', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '21/9', overlayEnabled: false },
+    preview: { bgType: 'light', layoutType: 'grid', icon: 'card', columns: 1 },
     styles: {
       section: '',
       container: '',
@@ -314,6 +328,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Contenu qui chevauche l\'image',
     config: { layout: 'stacked', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '16/9', overlayEnabled: false },
+    preview: { bgType: 'gradient', bgValue: 'linear-gradient(to bottom, #e5e7eb 60%, white 60%)', layoutType: 'single', icon: 'card' },
     styles: {
       section: 'pb-16 md:pb-24',
       container: '',
@@ -336,6 +351,7 @@ export const heroTemplates: BlockTemplateGroup = {
     category: 'bold',
     description: 'Vidéo en fond avec texte centré',
     config: { layout: 'video', contentPosition: 'center', textAlign: 'center', showBadge: true, showSecondaryButton: true, imageRatio: '', overlayEnabled: true },
+    preview: { bgType: 'dark', bgValue: '#0c0a09', layoutType: 'centered', icon: 'slider', badge: 'VIDEO' },
     styles: {
       section: 'relative min-h-screen flex items-center justify-center px-6',
       overlay: 'absolute inset-0 bg-black/50',
