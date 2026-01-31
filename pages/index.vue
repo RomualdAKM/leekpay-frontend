@@ -530,7 +530,6 @@
         </a>
       </div>
 
-      <!-- Copyright -->
       <div class="text-white text-sm md:text-base">
         © 2026 LeekPay. Tous droits réservés
       </div>
