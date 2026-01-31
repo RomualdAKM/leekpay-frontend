@@ -7,19 +7,35 @@
       <p class="text-gray-500">Erreur de chargement</p>
     </div>
     <div v-else>
-      <SalesBlockRenderer
-        v-for="block in sortedBlocks"
-        :key="block.id"
-        :block="block"
-        :checkout-url="checkoutUrl"
-      />
+      <!-- Rendu des sections (Phase 3) -->
+      <template v-if="pageData?.sections && pageData.sections.length > 0">
+        <SalesPageSalesSection
+          v-for="section in pageData.sections"
+          :key="section.id"
+          :section="section"
+          :is-edit-mode="false"
+          :preview-mode="true"
+          :is-selected="false"
+          :selected-column-id="null"
+          :checkout-url="checkoutUrl"
+        />
+      </template>
+
+      <!-- Rendu des blocs (Legacy) -->
+      <template v-else>
+        <SalesPageSalesBlockRenderer
+          v-for="block in sortedBlocks"
+          :key="block.id"
+          :block="block"
+          :checkout-url="checkoutUrl"
+        />
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import SalesBlockRenderer from '~/components/sales-page/SalesBlockRenderer.vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: false })
