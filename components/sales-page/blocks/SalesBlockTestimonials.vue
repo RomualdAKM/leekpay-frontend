@@ -791,6 +791,16 @@ const cardStyles = computed(() => {
     styles.padding = paddingMap[props.cardPadding] || '1.5rem'
   }
   
+  // Shadow
+  if (props.cardShadow && props.cardShadow !== 'none') {
+    const shadowMap: Record<string, string> = {
+      small: '0 1px 3px rgba(0,0,0,0.1)',
+      medium: '0 4px 6px rgba(0,0,0,0.1)',
+      large: '0 10px 25px rgba(0,0,0,0.15)',
+    }
+    styles.boxShadow = shadowMap[props.cardShadow] || ''
+  }
+  
   return styles
 })
 

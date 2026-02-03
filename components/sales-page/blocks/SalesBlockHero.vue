@@ -25,7 +25,7 @@
       </div>
       
       <!-- Content -->
-      <div :class="[template.styles.container, contentAlignmentClass]" class="min-h-screen">
+      <div :class="[template.styles.container, contentAlignmentClass, verticalAlignmentClass]" :style="containerDynamicStyles" class="min-h-screen">
         <div :class="template.styles.content">
           <span 
             v-if="props.badge && template.config?.showBadge !== false"
@@ -186,7 +186,7 @@
     v-else-if="layout === 'fullscreen'"
     :id="sectionId"
     :class="[template.styles.section, sectionClasses, animationClass]"
-    :style="animationStyles"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
     <!-- Background Image -->
     <div :class="template.styles.imageWrapper">
@@ -202,53 +202,56 @@
     <!-- Overlay -->
     <div :class="template.styles.overlay" :style="overlayStyles"></div>
     
-    <!-- Content -->
-    <div :class="[template.styles.container, contentAlignmentClass]">
-      <span 
-        v-if="props.badge && template.config?.showBadge !== false"
-        :class="template.styles.badge"
-        :style="badgeStyles"
-      >{{ props.badge }}</span>
-      
-      <h1 
-        :class="template.styles.title"
-        :style="titleStylesFullscreen"
-      >{{ props.title }}</h1>
-      
-      <p 
-        v-if="props.subtitle"
-        :class="template.styles.subtitle"
-        :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
-      >{{ props.subtitle }}</p>
-      
-      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
-        <component
-          :is="props.ctaUrl ? 'a' : 'button'"
-          v-if="props.ctaText"
-          :href="props.ctaUrl || undefined"
-          :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="[template.styles.button, buttonHoverClass]"
-          :style="buttonStyles"
-          @click="!props.ctaUrl && $emit('cta-click')"
-        >
-          <span class="flex items-center gap-2">
-            {{ props.ctaText }}
-            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          </span>
-        </component>
+    <!-- Content Container -->
+    <div :class="[contentAlignmentClass, verticalAlignmentClass]" class="relative z-10 w-full h-full flex items-center justify-center px-6">
+      <!-- Inner Content with maxWidth -->
+      <div :style="contentWrapperStyles" :class="contentAlignmentClass">
+        <span 
+          v-if="props.badge && template.config?.showBadge !== false"
+          :class="template.styles.badge"
+          :style="badgeStyles"
+        >{{ props.badge }}</span>
         
-        <component
-          :is="props.secondaryButtonUrl ? 'a' : 'button'"
-          v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
-          :href="props.secondaryButtonUrl || undefined"
-          :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="[template.styles.buttonSecondary, buttonHoverClass]"
-          :style="secondaryButtonStyles"
-        >{{ props.secondaryButtonText }}</component>
+        <h1 
+          :class="template.styles.title"
+          :style="titleStylesFullscreen"
+        >{{ props.title }}</h1>
+      
+        <p 
+          v-if="props.subtitle"
+          :class="template.styles.subtitle"
+          :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
+        >{{ props.subtitle }}</p>
+        
+        <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+          <component
+            :is="props.ctaUrl ? 'a' : 'button'"
+            v-if="props.ctaText"
+            :href="props.ctaUrl || undefined"
+            :target="props.ctaUrl ? props.ctaTarget : undefined"
+            :class="[template.styles.button, buttonHoverClass]"
+            :style="buttonStyles"
+            @click="!props.ctaUrl && $emit('cta-click')"
+          >
+            <span class="flex items-center gap-2">
+              {{ props.ctaText }}
+              <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </span>
+          </component>
+          
+          <component
+            :is="props.secondaryButtonUrl ? 'a' : 'button'"
+            v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
+            :href="props.secondaryButtonUrl || undefined"
+            :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
+            :class="[template.styles.buttonSecondary, buttonHoverClass]"
+            :style="secondaryButtonStyles"
+          >{{ props.secondaryButtonText }}</component>
+        </div>
       </div>
     </div>
   </section>
@@ -258,7 +261,7 @@
     v-else-if="layout === 'video'"
     :id="sectionId"
     :class="[template.styles.section, sectionClasses, animationClass]"
-    :style="animationStyles"
+    :style="{ ...sectionStyles, ...animationStyles }"
   >
     <!-- Background Video -->
     <div :class="template.styles.videoWrapper">
@@ -277,7 +280,7 @@
     <div :class="template.styles.overlay" :style="overlayStyles"></div>
     
     <!-- Content -->
-    <div :class="[template.styles.container, contentAlignmentClass]">
+    <div :class="[template.styles.container, contentAlignmentClass, verticalAlignmentClass]" :style="containerDynamicStyles">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -348,7 +351,7 @@
     </div>
     
     <!-- Content -->
-    <div :class="[template.styles.content, contentAlignmentClass]">
+    <div :class="[template.styles.content, contentAlignmentClass, verticalAlignmentClass]" :style="containerDynamicStyles">
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
@@ -405,76 +408,77 @@
     :class="[template.styles.section, sectionClasses, animationClass]"
     :style="{ ...sectionStyles, ...animationStyles }"
   >
-    <div 
-      :class="[template.styles.container, contentAlignmentClass]" 
-      :style="{ ...containerDynamicStyles, display: 'flex', flexDirection: 'column' }"
-    >
-      <span 
-        v-if="(props.badge || isEditMode) && template.config?.showBadge !== false"
-        :class="[template.styles.badge, editableClasses('badge')]"
-        :style="{ ...badgeStyles, ...badgePositionStyles }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Badge'"
-        @focus="onFocus('badge')"
-        @blur="onBlur($event, 'badge')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.badge }}</span>
-      
-      <h1 
-        :class="[template.styles.title, editableClasses('title')]"
-        :style="{ ...titleStyles, ...titlePositionStyles }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Titre principal'"
-        @focus="onFocus('title')"
-        @blur="onBlur($event, 'title')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.title }}</h1>
-      
-      <p 
-        v-if="props.subtitle || isEditMode"
-        :class="[template.styles.subtitle, editableClasses('subtitle')]"
-        :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Sous-titre'"
-        @focus="onFocus('subtitle')"
-        @blur="onBlur($event, 'subtitle')"
-        @keydown="onKeydown($event, false)"
-        @paste="onPaste"
-      >{{ props.subtitle }}</p>
-      
-      <div 
-        :class="[template.styles.buttonGroup, buttonAlignmentClass]" 
-        :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }"
-      >
-        <component
-          :is="props.ctaUrl ? 'a' : 'button'"
-          v-if="props.ctaText"
-          :href="props.ctaUrl || undefined"
-          :target="props.ctaUrl ? props.ctaTarget : undefined"
-          :class="[template.styles.button, buttonHoverClass]"
-          :style="buttonStyles"
-          @click="!props.ctaUrl && $emit('cta-click')"
-        >
-          <span class="flex items-center gap-2">
-            {{ props.ctaText }}
-            <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          </span>
-        </component>
+    <!-- Conteneur externe pour le centrage -->
+    <div class="w-full h-full flex items-center justify-center" :class="verticalAlignmentClass">
+      <!-- Wrapper contenu avec maxWidth -->
+      <div :style="contentWrapperStyles" :class="contentAlignmentClass">
+        <span 
+          v-if="(props.badge || isEditMode) && template.config?.showBadge !== false"
+          :class="[template.styles.badge, editableClasses('badge')]"
+          :style="{ ...badgeStyles, ...badgePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Badge'"
+          @focus="onFocus('badge')"
+          @blur="onBlur($event, 'badge')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.badge }}</span>
         
-        <component
-          :is="props.secondaryButtonUrl ? 'a' : 'button'"
-          v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
-          :href="props.secondaryButtonUrl || undefined"
-          :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
-          :class="[template.styles.buttonSecondary, buttonHoverClass]"
-          :style="secondaryButtonStyles"
-        >{{ props.secondaryButtonText }}</component>
+        <h1 
+          :class="[template.styles.title, editableClasses('title')]"
+          :style="{ ...titleStyles, ...titlePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre principal'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h1>
+        
+        <p 
+          v-if="props.subtitle || isEditMode"
+          :class="[template.styles.subtitle, editableClasses('subtitle')]"
+          :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
+        
+        <div 
+          :class="[template.styles.buttonGroup, buttonAlignmentClass]" 
+          :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }"
+        >
+          <component
+            :is="props.ctaUrl ? 'a' : 'button'"
+            v-if="props.ctaText"
+            :href="props.ctaUrl || undefined"
+            :target="props.ctaUrl ? props.ctaTarget : undefined"
+            :class="[template.styles.button, buttonHoverClass]"
+            :style="buttonStyles"
+            @click="!props.ctaUrl && $emit('cta-click')"
+          >
+            <span class="flex items-center gap-2">
+              {{ props.ctaText }}
+              <svg v-if="props.ctaIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              <svg v-else-if="props.ctaIcon === 'cart'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'download'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <svg v-else-if="props.ctaIcon === 'play'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <svg v-else-if="props.ctaIcon === 'check'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </span>
+          </component>
+          
+          <component
+            :is="props.secondaryButtonUrl ? 'a' : 'button'"
+            v-if="props.secondaryButtonText && template.config?.showSecondaryButton !== false"
+            :href="props.secondaryButtonUrl || undefined"
+            :target="props.secondaryButtonUrl ? props.secondaryButtonTarget : undefined"
+            :class="[template.styles.buttonSecondary, buttonHoverClass]"
+            :style="secondaryButtonStyles"
+          >{{ props.secondaryButtonText }}</component>
+        </div>
       </div>
     </div>
   </section>
@@ -1109,10 +1113,24 @@ const containerDynamicStyles = computed(() => {
   // Gap entre éléments
   styles.gap = contentGapMap[props.contentGap || 'medium'] || '1.5rem'
   
-  // Max width
+  // Max width - force la largeur pour que le maxWidth soit visible
+  styles.width = '100%'
   styles.maxWidth = contentMaxWidthMap[props.contentMaxWidth || 'large'] || '1024px'
+  styles.marginLeft = 'auto'
+  styles.marginRight = 'auto'
   
   return styles
+})
+
+// Styles wrapper contenu - utilisé pour les layouts fullscreen/video
+const contentWrapperStyles = computed(() => {
+  return {
+    width: '100%',
+    maxWidth: contentMaxWidthMap[props.contentMaxWidth || 'large'] || '1024px',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: contentGapMap[props.contentGap || 'medium'] || '1.5rem'
+  }
 })
 
 // Classe dynamique pour l'alignement (override les classes Tailwind)

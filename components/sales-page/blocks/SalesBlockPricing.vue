@@ -834,6 +834,16 @@ function getCardStyles(plan: PricingPlan) {
     styles.padding = paddingMap[props.cardPadding] || '2.5rem'
   }
   
+  // Shadow
+  if (props.cardShadow && props.cardShadow !== 'none') {
+    const shadowMap: Record<string, string> = {
+      small: '0 1px 3px rgba(0,0,0,0.1)',
+      medium: '0 4px 6px rgba(0,0,0,0.1)',
+      large: '0 10px 25px rgba(0,0,0,0.15)',
+    }
+    styles.boxShadow = shadowMap[props.cardShadow] || ''
+  }
+  
   // Highlight ring color
   if (plan.highlighted) {
     styles.ringColor = plan.accentColor || accentColorFinal.value

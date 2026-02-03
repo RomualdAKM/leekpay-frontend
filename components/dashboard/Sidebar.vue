@@ -27,7 +27,7 @@
         @click="onSectionChange('dashboard')"
         class="w-full flex items-center gap-3 px-3 py-2.5 mb-4 text-sm transition"
         :class="[
-          isActive('dashboard') && !isActive('dashboard/') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+          isActive('dashboard') && !isActive('dashboard/') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
           collapsed ? 'justify-center' : ''
         ]"
         title="Tableau de bord"
@@ -38,7 +38,7 @@
 
       <!-- LIENS DE PAIEMENT -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center justify-between px-3 py-2.5 mb-1 bg-green-50" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Liens de paiement</p>
           <button 
             @click="onSectionChange('dashboard/create-link')"
@@ -52,7 +52,7 @@
           @click="onSectionChange('dashboard/links')"
           class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
           :class="[
-            isActive('dashboard/links') || isActive('dashboard/create-link') || isActive('dashboard/edit-link') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+            isActive('dashboard/links') || isActive('dashboard/create-link') || isActive('dashboard/edit-link') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
             collapsed ? 'justify-center' : ''
           ]"
           title="Mes liens"
@@ -63,7 +63,7 @@
       </div>
    <!-- PAGES DE VENTE -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center justify-between px-3 py-2.5 mb-1 bg-green-50" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pages de vente</p>
           <button 
             @click="onSectionChange('dashboard/sales-pages/create')"
@@ -77,7 +77,7 @@
           @click="onSectionChange('dashboard/sales-pages')"
           class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
           :class="[
-            isActive('dashboard/sales-pages') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+            isActive('dashboard/sales-pages') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
             collapsed ? 'justify-center' : ''
           ]"
           title="Mes pages"
@@ -88,7 +88,7 @@
       </div>
       <!-- FACTURES -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center justify-between px-3 py-2.5 mb-1 bg-green-50" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Factures</p>
           <button 
             @click="onSectionChange('dashboard/invoices/create')"
@@ -102,7 +102,7 @@
           @click="onSectionChange('dashboard/invoices')"
           class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
           :class="[
-            isActive('dashboard/invoices') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+            isActive('dashboard/invoices') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
             collapsed ? 'justify-center' : ''
           ]"
           title="Mes factures"
@@ -122,7 +122,7 @@
         <button 
           v-if="!collapsed"
           @click="toggleSection('finances')"
-          class="w-full flex items-center justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
+          class="w-full flex items-center justify-between px-3 py-2.5 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition bg-green-50"
         >
           <span>Finances</span>
           <ChevronDown class="w-3 h-3 transition-transform" :class="openSections.finances ? 'rotate-180' : ''" />
@@ -132,7 +132,7 @@
             @click="onSectionChange('dashboard/transactions')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/transactions') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/transactions') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Transactions"
@@ -144,7 +144,7 @@
             @click="onSectionChange('dashboard/withdrawals')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/withdrawals') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/withdrawals') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Retraits"
@@ -160,7 +160,7 @@
         <button 
           v-if="!collapsed"
           @click="toggleSection('compte')"
-          class="w-full flex items-center justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
+          class="w-full flex items-center justify-between px-3 py-2.5 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition bg-green-50"
         >
           <span>Compte</span>
           <ChevronDown class="w-3 h-3 transition-transform" :class="openSections.compte ? 'rotate-180' : ''" />
@@ -171,7 +171,7 @@
             @click="onSectionChange('dashboard/kyc')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/kyc') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/kyc') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Vérification KYC"
@@ -183,7 +183,7 @@
             @click="onSectionChange('dashboard/api-keys')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/api-keys') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/api-keys') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Clés API"
@@ -195,7 +195,7 @@
             @click="onSectionChange('dashboard/settings')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/settings') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/settings') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Paramètres"
@@ -207,7 +207,7 @@
             @click="onSectionChange('dashboard/subscription')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/subscription') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/subscription') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Abonnement"
@@ -220,7 +220,7 @@
             @click="onSectionChange('dashboard/affiliation')"
             class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
             :class="[
-              isActive('dashboard/affiliation') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive('dashboard/affiliation') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             title="Affiliation"
@@ -241,7 +241,7 @@
             @click="onSectionChange(item.id)"
             class="w-full flex items-center gap-3 px-3 py-2 text-sm transition"
             :class="[
-              isActive(item.id) ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              isActive(item.id) ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
               collapsed ? 'justify-center' : ''
             ]"
             :title="item.label"
@@ -257,7 +257,7 @@
         @click="onSectionChange('dashboard/support')"
         class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
         :class="[
-          isActive('dashboard/support') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+          isActive('dashboard/support') ? 'bg-gray-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
           collapsed ? 'justify-center' : ''
         ]"
         title="Support"
