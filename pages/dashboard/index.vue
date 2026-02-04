@@ -3,19 +3,18 @@
     <!-- Carrousel Bannières -->
     <div v-if="banners.length > 0" class="relative overflow-hidden">
       <div class="relative">
-        <a 
+        <!-- Sur mobile : clic ouvre le popup, sur desktop : lien direct -->
+        <div 
           v-if="banners[currentBannerIndex]"
-          :href="banners[currentBannerIndex].url || '#'"
-          :target="banners[currentBannerIndex].url ? '_blank' : '_self'"
-          rel="noopener noreferrer"
-          class="block"
+          @click="isMobile ? showBannerModal = true : null"
+          class="block cursor-pointer sm:cursor-default"
         >
           <img 
             :src="banners[currentBannerIndex].image_url" 
             :alt="banners[currentBannerIndex].title"
-            class="w-full h-56 sm:h-40 md:h-48 object-contain object-center transition-opacity duration-500 bg-gray-50"
+            class="w-full h-36 sm:h-40 md:h-48 object-cover object-center transition-opacity duration-500"
           />
-        </a>
+        </div>
         
         <!-- Indicateurs -->
         <div v-if="banners.length > 1" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
@@ -51,6 +50,57 @@
         </template>
       </div>
     </div>
+
+    <!-- Modal Bannière (Mobile uniquement) -->
+    <Transition name="modal">
+      <div 
+        v-if="showBannerModal && banners[currentBannerIndex]"
+        @click="showBannerModal = false"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:hidden"
+      >
+        <div 
+          @click.stop
+          class="relative max-w-lg w-full"
+        >
+          <!-- Boutons d'action (en haut à droite, flottants) -->
+          <div class="absolute -top-12 right-0 flex items-center gap-2 z-10">
+            <!-- Bouton En savoir plus (si URL) -->
+            <a 
+              v-if="banners[currentBannerIndex].url"
+              :href="banners[currentBannerIndex].url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="w-9 h-9 bg-[#2ECC71] hover:bg-[#27AE60] text-white rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-110"
+              title="En savoir plus"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </a>
+            
+            <!-- Bouton Fermer -->
+            <button 
+              @click="showBannerModal = false"
+              class="w-9 h-9 bg-white hover:bg-gray-100 text-gray-800 rounded-full flex items-center justify-center transition-all shadow-lg hover:scale-110"
+              title="Fermer"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Image complète avec coins arrondis -->
+          <div class="bg-white rounded-xl overflow-hidden shadow-2xl">
+            <img 
+              :src="banners[currentBannerIndex].image_url" 
+              :alt="banners[currentBannerIndex].title"
+              class="w-full h-auto"
+            />
+          </div>
+        </div>
+      </div>
+    </Transition>
 
     <!-- Header + Actions rapides -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -282,6 +332,8 @@ const selectedPeriod = ref('')
 // Bannières
 const banners = ref([])
 const currentBannerIndex = ref(0)
+const showBannerModal = ref(false)
+const isMobile = ref(false)
 let bannerInterval = null
 
 const fetchBanners = async () => {
@@ -302,7 +354,7 @@ const fetchBanners = async () => {
 const startBannerAutoplay = () => {
   bannerInterval = setInterval(() => {
     currentBannerIndex.value = (currentBannerIndex.value + 1) % banners.value.length
-  }, 5000)
+  }, 8000) // 8 secondes au lieu de 5
 }
 
 const prevBanner = () => {
@@ -384,6 +436,12 @@ const getStatusLabel = (status) => {
 }
 
 onMounted(() => {
+  // Détection mobile
+  isMobile.value = window.innerWidth < 640
+  window.addEventListener('resize', () => {
+    isMobile.value = window.innerWidth < 640
+  })
+  
   fetchBanners()
   fetchDashboard()
 })
@@ -394,3 +452,29 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+/* Animation modal */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-active .relative,
+.modal-leave-active .relative {
+  transition: transform 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .relative {
+  transform: scale(0.9);
+}
+
+.modal-leave-to .relative {
+  transform: scale(0.9);
+}
+</style>
