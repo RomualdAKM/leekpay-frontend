@@ -69,9 +69,19 @@ const route = useRoute()
 const mobileBreakpoint = 1024 // lg
 const isMobile = ref(false)
 
+// Réinitialiser le viewport responsive pour le dashboard
+useHead({
+  meta: [
+    {
+      name: 'viewport',
+      content: 'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes'
+    }
+  ]
+})
+
 // État sidebar
 const sidebarOpen = ref(false)
-const sidebarCollapsed = ref(false)
+const sidebarCollapsed = ref(true) // Par défaut fermé sur desktop
 
 // Calcul de la section active
 const currentPage = computed(() => {
@@ -138,13 +148,15 @@ const checkScreenSize = () => {
 }
 
 onMounted(() => {
-  if (process.client) {
-    const saved = localStorage.getItem('leekpay_sidebar_collapsed')
-    // Par défaut, sidebar réduit sur grand écran (sauf si utilisateur a changé)
-    sidebarCollapsed.value = saved !== null ? saved === '1' : true
-  }
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
+  
+  // Charger la préférence utilisateur APRÈS checkScreenSize
+  if (process.client) {
+    const saved = localStorage.getItem('leekpay_sidebar_collapsed')
+    // Forcer fermé par défaut : si pas de valeur sauvegardée, utiliser true (fermé)
+    sidebarCollapsed.value = saved === '0' ? false : true
+  }
 })
 
 onBeforeUnmount(() => {
