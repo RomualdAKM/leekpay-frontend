@@ -38,7 +38,7 @@
 
       <!-- LIENS DE PAIEMENT -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center bg-gray-100 justify-between px-3 py-2.5 mb-1" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Liens de paiement</p>
           <button 
             @click="onSectionChange('dashboard/create-link')"
@@ -63,7 +63,7 @@
       </div>
    <!-- PAGES DE VENTE -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center bg-gray-100 py-2.5 justify-between px-3 mb-1" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Pages de vente</p>
           <button 
             @click="onSectionChange('dashboard/sales-pages/create')"
@@ -88,7 +88,7 @@
       </div>
       <!-- FACTURES -->
       <div class="mb-4">
-        <div class="flex items-center justify-between px-3 mb-1" v-if="!collapsed">
+        <div class="flex items-center bg-gray-100 py-2.5 justify-between px-3 mb-1" v-if="!collapsed">
           <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Factures</p>
           <button 
             @click="onSectionChange('dashboard/invoices/create')"
@@ -122,7 +122,7 @@
         <button 
           v-if="!collapsed"
           @click="toggleSection('finances')"
-          class="w-full flex items-center justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
+          class="w-full flex items-center bg-gray-100 py-2.5 justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
         >
           <span>Finances</span>
           <ChevronDown class="w-3 h-3 transition-transform" :class="openSections.finances ? 'rotate-180' : ''" />
@@ -160,7 +160,7 @@
         <button 
           v-if="!collapsed"
           @click="toggleSection('compte')"
-          class="w-full flex items-center justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
+          class="w-full flex items-center bg-gray-100 py-2.5 justify-between px-3 mb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider hover:text-gray-600 transition"
         >
           <span>Compte</span>
           <ChevronDown class="w-3 h-3 transition-transform" :class="openSections.compte ? 'rotate-180' : ''" />
