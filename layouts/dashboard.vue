@@ -140,7 +140,8 @@ const checkScreenSize = () => {
 onMounted(() => {
   if (process.client) {
     const saved = localStorage.getItem('leekpay_sidebar_collapsed')
-    sidebarCollapsed.value = saved === '1'
+    // Par défaut, sidebar réduit sur grand écran (sauf si utilisateur a changé)
+    sidebarCollapsed.value = saved !== null ? saved === '1' : true
   }
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)

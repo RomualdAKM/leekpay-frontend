@@ -226,4 +226,14 @@ onMounted(() => {
 })
 
 definePageMeta({ layout: 'editor' })
+
+// Forcer le viewport desktop pour la création de pages de vente
+useHead({
+  meta: [
+    {
+      name: 'viewport',
+      content: 'width=1024, initial-scale=0.5, maximum-scale=2.0, user-scalable=yes'
+    }
+  ]
+})
 </script>
