@@ -131,7 +131,7 @@
 
       <!-- Collecte -->
       <div 
-        class="relative bg-[#2ECC7142] rounded-xl p-8 pt-12"
+        class="relative bg-[#2ECC7142] rounded-xl p-8 pt-12 pr-20 md:pr-8"
         v-motion="{
           initial: { opacity: 0, y: 40 },
           visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 300 } }
@@ -147,8 +147,8 @@
             <br/> dons ou abonnements en toute simplicité.
           </p>
         </div>
-        <div class="absolute -right-8 top-1/2 -translate-y-1/2 w-24 h-24 bg-white rounded-2xl shadow-lg flex items-center justify-center transform rotate-6">
-          <img src="~/assets/ressource_new_landing_page/Frame_2.png" alt="" class="w-12 h-12" />
+        <div class="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 w-20 h-20 md:w-24 md:h-24 bg-white rounded-2xl shadow-lg flex items-center justify-center transform rotate-6">
+          <img src="~/assets/ressource_new_landing_page/Frame_2.png" alt="" class="w-10 h-10 md:w-12 md:h-12" />
         </div>
       </div>
     </div>
@@ -164,10 +164,10 @@
         <p class="text-gray-900 text-base md:text-2xl font-bold mb-4">flexibles via plusieurs réseaux</p>
 
         <div class="overflow-hidden py-2 md:py-6 bg-gray-200">
-          <div class="flex animate-marquee whitespace-nowrap ">
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-6 md:mx-8" />
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-6 md:mx-8" />
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-6 md:mx-8" />
+          <div class="flex animate-marquee whitespace-nowrap">
+            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
+            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
+            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
           </div>
         </div>
       </div>
@@ -243,8 +243,11 @@
             <img
               src="~/assets/ressource_new_landing_page/Liens-de-paiement 2.png"
               alt="Liens de paiement"
-              class="w-full h-auto rounded-lg"
+              class="w-full h-auto rounded-lg mb-4"
             />
+            <button class="w-full bg-[#2ECC71] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#27AE60] transition-colors">
+              Voir les détails
+            </button>
           </div>
 
           <!-- Pages de vente -->
@@ -259,8 +262,11 @@
             <img
               src="~/assets/ressource_new_landing_page/Pages-de-vente 3.png"
               alt="Pages de vente"
-              class="w-full h-auto rounded-lg"
+              class="w-full h-auto rounded-lg mb-4"
             />
+            <button class="w-full bg-[#F39C12] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#E67E22] transition-colors">
+              Voir les détails
+            </button>
           </div>
         </div>
 
@@ -277,8 +283,11 @@
             <img
               src="~/assets/ressource_new_landing_page/Factures-numériques 3.png"
               alt="Factures numériques"
-              class="w-full h-auto rounded-lg"
+              class="w-full h-auto rounded-lg mb-4"
             />
+            <button class="w-full bg-[#CD7F32] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#B8701F] transition-colors">
+              Voir les détails
+            </button>
           </div>
 
           <!-- API LeekPay -->
@@ -293,8 +302,11 @@
             <img
               src="~/assets/ressource_new_landing_page/API-LeekPay 2.png"
               alt="API LeekPay"
-              class="w-full h-auto rounded-lg"
+              class="w-full h-auto rounded-lg mb-4"
             />
+            <button class="w-full bg-[#0EA5E9] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#0284C7] transition-colors">
+              Voir les détails
+            </button>
           </div>
         </div>
 
@@ -468,6 +480,49 @@
         </div>
     </div>
     </section>
+
+<!-- CTA SECTION -->
+<section class="py-16 px-6 md:px-12">
+  <div class="container mx-auto max-w-6xl">
+    <div 
+      class="relative bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-3xl overflow-hidden p-8 md:p-12 lg:p-16"
+      v-motion
+      :initial="{ opacity: 0, y: 50 }"
+      :visibleOnce="{ opacity: 1, y: 0, transition: { duration: 600 } }"
+    >
+      <div class="grid md:grid-cols-2 gap-8 items-center relative z-10">
+        <!-- Left: World Map -->
+        <div class="flex items-center justify-center">
+          <img 
+            src="~/assets/ressource_new_landing_page/WorldMap.png" 
+            alt="World Map"
+            class="w-full max-w-md mx-auto"
+          />
+        </div>
+
+        <!-- Right: Content - TOUJOURS CENTRÉ -->
+        <div class="text-white text-center">
+          <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 italic">
+            Prêt à commencer<br>
+            l'aventure avec LeekPay ?
+          </h2>
+          <p class="text-base md:text-lg mb-8 opacity-95 leading-relaxed">
+            Crée des liens de paiement,<br>
+            des pages de vente et<br>
+            des factures numériques<br>
+            en toute simplicité.
+          </p>
+          <NuxtLink 
+            to="/auth/register"
+            class="inline-block bg-white text-[#2ECC71] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-all duration-200 shadow-md hover:shadow-xl hover:scale-105"
+          >
+            Créer mon compte
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- FOOTER -->
 <footer class="py-8 px-6 md:px-12 bg-[#0A1F44]">
