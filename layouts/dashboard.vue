@@ -1,5 +1,8 @@
 <template>
-  <div class="flex h-screen font-sans overflow-x-hidden">
+  <div :class="[
+    'flex font-sans overflow-x-hidden',
+    forceDesktopMode ? 'min-h-screen' : 'h-screen'
+  ]">
     <!-- Overlay (mobile only) -->
     <div
         v-if="sidebarOpen && isMobile"
@@ -26,7 +29,10 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden ml-0">
+    <div :class="[
+      'flex-1 flex flex-col ml-0',
+      forceDesktopMode ? 'overflow-y-auto' : 'overflow-hidden'
+    ]">
       <!-- Header -->
       <header class="bg-white shadow-sm px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-30">
         <!-- Hamburger button (mobile) -->
@@ -47,7 +53,10 @@
       </header>
 
       <!-- Page Content -->
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+      <main :class="[
+        'flex-1 p-4 sm:p-6',
+        forceDesktopMode ? '' : 'overflow-y-auto'
+      ]">
         <slot />
       </main>
     </div>
