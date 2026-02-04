@@ -225,5 +225,11 @@ onMounted(() => {
   fetchTemplates()
 })
 
-definePageMeta({ layout: 'editor' })
+definePageMeta({ 
+  layout: 'editor',
+  pageTransition: false
+})
+
+// Indiquer au layout editor qu'on force le mode desktop
+provide('forceDesktopMode', true)
 </script>

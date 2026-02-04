@@ -69,6 +69,9 @@ const route = useRoute()
 const mobileBreakpoint = 1024 // lg
 const isMobile = ref(false)
 
+// Détecter si la page force le mode desktop
+const forceDesktopMode = inject('forceDesktopMode', false)
+
 // Réinitialiser le viewport responsive pour le dashboard
 useHead({
   meta: [
@@ -141,7 +144,8 @@ const pageTitle = computed(() => {
 const checkScreenSize = () => {
   isMobile.value = window.innerWidth < mobileBreakpoint
   if (!isMobile.value) {
-    sidebarOpen.value = true // Toujours ouverte sur desktop
+    // Si mode desktop forcé (création facture), fermer la sidebar
+    sidebarOpen.value = forceDesktopMode ? false : true
   } else {
     sidebarOpen.value = false // Fermée par défaut sur mobile
   }

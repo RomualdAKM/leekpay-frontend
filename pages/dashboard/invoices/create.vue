@@ -5,7 +5,10 @@
 <script setup>
 import InvoiceEditor from '~/components/invoices/InvoiceEditor.vue'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ 
+  layout: 'dashboard',
+  pageTransition: false // Désactiver transition pour éviter conflits viewport
+})
 
 // Forcer le viewport desktop pour la création de factures
 useHead({
@@ -16,4 +19,7 @@ useHead({
     }
   ]
 })
+
+// Indiquer au layout qu'on est en mode desktop forcé
+provide('forceDesktopMode', true)
 </script>
