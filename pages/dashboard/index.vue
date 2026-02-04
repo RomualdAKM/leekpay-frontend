@@ -13,7 +13,7 @@
           <img 
             :src="banners[currentBannerIndex].image_url" 
             :alt="banners[currentBannerIndex].title"
-            class="w-full h-32 sm:h-40 md:h-48 object-cover transition-opacity duration-500"
+            class="w-full h-56 sm:h-40 md:h-48 object-contain object-center transition-opacity duration-500 bg-gray-50"
           />
         </a>
         
