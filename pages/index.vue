@@ -245,9 +245,9 @@
               alt="Liens de paiement"
               class="w-full h-auto rounded-lg mb-4"
             />
-            <button class="w-full bg-[#2ECC71] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#27AE60] transition-colors">
+            <NuxtLink to="/a-propos" class="w-full bg-[#2ECC71] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#27AE60] transition-colors inline-flex items-center justify-center">
               Voir les détails
-            </button>
+            </NuxtLink>
           </div>
 
           <!-- Pages de vente -->
@@ -264,9 +264,9 @@
               alt="Pages de vente"
               class="w-full h-auto rounded-lg mb-4"
             />
-            <button class="w-full bg-[#F39C12] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#E67E22] transition-colors">
+            <NuxtLink to="/sales-pages" class="w-full bg-[#F39C12] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#E67E22] transition-colors inline-flex items-center justify-center">
               Voir les détails
-            </button>
+            </NuxtLink>
           </div>
         </div>
 
@@ -285,9 +285,9 @@
               alt="Factures numériques"
               class="w-full h-auto rounded-lg mb-4"
             />
-            <button class="w-full bg-[#CD7F32] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#B8701F] transition-colors">
+            <NuxtLink to="/invoices" class="w-full bg-[#CD7F32] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#B8701F] transition-colors inline-flex items-center justify-center">
               Voir les détails
-            </button>
+            </NuxtLink>
           </div>
 
           <!-- API LeekPay -->
@@ -304,9 +304,9 @@
               alt="API LeekPay"
               class="w-full h-auto rounded-lg mb-4"
             />
-            <button class="w-full bg-[#0EA5E9] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#0284C7] transition-colors">
+            <NuxtLink to="/api" class="w-full bg-[#0EA5E9] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#0284C7] transition-colors inline-flex items-center justify-center">
               Voir les détails
-            </button>
+            </NuxtLink>
           </div>
         </div>
 
@@ -482,7 +482,7 @@
     </section>
 
 <!-- CTA SECTION -->
-<section class="py-16 px-6 md:px-12">
+<section id="contact" class="py-16 px-6 md:px-12">
   <div class="container mx-auto max-w-6xl">
     <div 
       class="relative bg-gradient-to-r from-[#2ECC71] to-[#27AE60] rounded-3xl overflow-hidden p-8 md:p-12 lg:p-16"

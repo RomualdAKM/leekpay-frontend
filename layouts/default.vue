@@ -21,9 +21,10 @@ const toggleMobileMenu = () => {
         </NuxtLink>
 
         <nav class="hidden md:flex items-center space-x-10">
-          <a href="#fonctionnalites" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Fonctionnalités</a>
-          <a href="#tarifs" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Tarifs</a>
-          <a href="#support" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Support</a>
+          <NuxtLink to="/#fonctionnalites" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Fonctionnalités</NuxtLink>
+          <NuxtLink to="/#tarifs" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Tarifs</NuxtLink>
+          <NuxtLink to="/a-propos" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">À Propos</NuxtLink>
+          <NuxtLink to="/#contact" class="text-gray-900 hover:text-[#2ECC71] font-medium transition">Contact</NuxtLink>
 
           <NuxtLink to="/register" class="bg-[#2ECC71] text-white px-5 py-2 rounded-md font-medium hover:bg-[#27AE60] transition">
             Démarrer
@@ -51,9 +52,10 @@ const toggleMobileMenu = () => {
 
       <transition name="fade">
         <div v-if="mobileMenuOpen" class="md:hidden bg-white border-t border-gray-100 mt-4 py-4 space-y-4">
-          <a href="#fonctionnalites" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Fonctionnalités</a>
-          <a href="#tarifs" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Tarifs</a>
-          <a href="#support" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Support</a>
+          <NuxtLink to="/#fonctionnalites" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Fonctionnalités</NuxtLink>
+          <NuxtLink to="/#tarifs" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Tarifs</NuxtLink>
+          <NuxtLink to="/a-propos" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">À Propos</NuxtLink>
+          <NuxtLink to="/#contact" @click="toggleMobileMenu" class="block text-gray-900 hover:text-[#2ECC71] font-medium transition">Contact</NuxtLink>
 
           <NuxtLink to="/register" class="block bg-[#2ECC71] text-white text-center px-6 py-2.5 rounded-md font-medium hover:bg-[#27AE60] transition">
             Démarrer
