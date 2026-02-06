@@ -123,7 +123,10 @@
             <p class="text-[10px] uppercase tracking-wide text-gray-400">Client</p>
             <p v-if="!preview" class="text-[11px] text-emerald-600">Infos client pre-remplies via LeekPay</p>
           </div>
-          <div class="mt-3 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-4">
+          <div
+            class="mt-3 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-4"
+            :class="preview ? 'preview-two-cols' : ''"
+          >
             <div class="space-y-2">
               <template v-if="preview">
                 <div class="font-semibold text-gray-900">{{ invoice.client.name || '' }}</div>
@@ -378,8 +381,13 @@ const watermarkText = computed(() => props.settings.watermarkText || 'LeekPay Pr
 
 const headerLayoutClass = computed(() => {
   const base = 'sheet-header grid gap-6'
-  if (props.settings.headerStyle === 'stacked') return `${base} grid-cols-1`
-  if (props.settings.headerStyle === 'compact') return `${base} grid-cols-1 xl:grid-cols-[minmax(0,1fr)_220px]`
+  const isStacked = props.settings.headerStyle === 'stacked'
+  const isCompact = props.settings.headerStyle === 'compact'
+  if (isStacked) return `${base} grid-cols-1`
+  if (props.preview) {
+    return `${base} grid-cols-[minmax(0,1fr)_${isCompact ? '220px' : '260px'}]`
+  }
+  if (isCompact) return `${base} grid-cols-1 xl:grid-cols-[minmax(0,1fr)_220px]`
   return `${base} grid-cols-1 xl:grid-cols-[minmax(0,1fr)_260px]`
 })
 
@@ -459,7 +467,12 @@ const metaValuePlaceholder = (label) => {
 }
 
 const sheetStyle = computed(() => ({
-  ...(props.preview ? { aspectRatio: '210 / 297' } : {}),
+  ...(props.preview
+    ? {
+        width: '210mm',
+        minHeight: '297mm'
+      }
+    : {}),
   fontFamily: props.settings.fontFamily || 'Poppins, sans-serif',
   '--accent-color': props.settings.primaryColor || '#2ECC71',
   '--secondary-color': props.settings.secondaryColor || '#0A1F44',
@@ -599,6 +612,14 @@ const onDragEnd = () => {
 
 .invoice-sheet.is-editor {
   overflow: visible;
+}
+
+.invoice-sheet.is-preview .sheet-header {
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
+.invoice-sheet.is-preview .preview-two-cols {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .pattern-dots {

@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="min-h-screen bg-[#f2f2f2] p-6" :data-ready="ready ? 'true' : 'false'">
+  <div class="print-root" :data-ready="ready ? 'true' : 'false'">
     <div v-if="error" class="max-w-3xl mx-auto text-red-600 text-sm bg-white p-4 rounded-lg">
       {{ error }}
     </div>
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 import InvoiceCanvas from '~/components/invoices/InvoiceCanvas.vue'
 
 definePageMeta({
@@ -214,6 +214,11 @@ const loadInvoice = async () => {
     invoice.notes = data.notes || ''
     invoice.footerNote = data.terms || ''
 
+    await nextTick()
+    if (document?.fonts?.ready) {
+      await document.fonts.ready
+    }
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
     ready.value = true
   } catch (err) {
     error.value = 'Impossible de generer l\'aperçu.'
@@ -224,3 +229,30 @@ const loadInvoice = async () => {
 
 onMounted(loadInvoice)
 </script>
+
+<style>
+@page {
+  size: A4;
+  margin: 0;
+}
+
+html,
+body,
+#__nuxt {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+}
+
+.print-root {
+  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+</style>
