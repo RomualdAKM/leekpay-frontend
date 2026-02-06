@@ -535,6 +535,20 @@ export const useSalesPageBuilder = () => {
   
   const selectBlock = (blockId: string | null) => {
     selectedBlockId.value = blockId
+    
+    // Si un bloc est sélectionné, trouver et sélectionner sa section/colonne parent
+    if (blockId && page.value.sections) {
+      for (const section of page.value.sections) {
+        for (const column of section.columns) {
+          const block = column.blocks.find(b => b.id === blockId)
+          if (block) {
+            selectedSectionId.value = section.id
+            selectedColumnId.value = column.id
+            return
+          }
+        }
+      }
+    }
   }
   
   const reorderBlocks = (newOrder: Block[]) => {
@@ -626,7 +640,18 @@ export const useSalesPageBuilder = () => {
         page.value.sections = []
       }
       
-      // Créer une nouvelle section avec le bloc
+      // Si une colonne est sélectionnée, ajouter le bloc dedans
+      if (selectedColumnId.value && selectedSection.value) {
+        const column = selectedSection.value.columns.find(c => c.id === selectedColumnId.value)
+        if (column) {
+          newBlock.order = column.blocks.length
+          column.blocks.push(newBlock)
+          selectedBlockId.value = newBlock.id
+          return
+        }
+      }
+      
+      // Sinon, créer une nouvelle section avec le bloc
       const newSection: Section = {
         id: generateSectionId(),
         order: page.value.sections.length,
@@ -681,7 +706,7 @@ export const useSalesPageBuilder = () => {
       width,
       settings: {
         verticalAlign: 'top',
-        padding: 'medium',
+        padding: 'none',
       },
       blocks: [],
     }))
@@ -690,8 +715,8 @@ export const useSalesPageBuilder = () => {
       id: generateSectionId(),
       order: page.value.sections.length,
       settings: {
-        paddingTop: 'large',
-        paddingBottom: 'large',
+        paddingTop: 'none',
+        paddingBottom: 'none',
         maxWidth: '7xl',
       },
       columns,
@@ -699,6 +724,10 @@ export const useSalesPageBuilder = () => {
     
     page.value.sections.push(newSection)
     selectedSectionId.value = newSection.id
+    // Sélectionner automatiquement la première colonne
+    if (columns[0]) {
+      selectedColumnId.value = columns[0].id
+    }
   }
   
   // Supprimer une section
@@ -911,8 +940,17 @@ export const useSalesPageBuilder = () => {
   
   const selectColumn = (columnId: string | null) => {
     selectedColumnId.value = columnId
-    if (!columnId) {
-      selectedBlockId.value = null
+    // Désélectionner le bloc pour afficher les paramètres de la section
+    selectedBlockId.value = null
+    
+    // Trouver et sélectionner la section parent de cette colonne
+    if (columnId && page.value.sections) {
+      const parentSection = page.value.sections.find(section => 
+        section.columns.some(col => col.id === columnId)
+      )
+      if (parentSection) {
+        selectedSectionId.value = parentSection.id
+      }
     }
   }
   
@@ -954,7 +992,7 @@ export const useSalesPageBuilder = () => {
     isLoading.value = true
     error.value = null
     try {
-      const response = await $fetch<{ success: boolean; data: { blocks: Block[]; theme: Theme; settings: Settings } }>(
+      const response = await $fetch<{ success: boolean; data: { blocks: Block[]; sections: Section[]; theme: Theme; settings: Settings } }>(
         `/sales-page-templates/${templateId}/data`,
         { 
           baseURL: config.public.apiBaseURL,
@@ -962,14 +1000,37 @@ export const useSalesPageBuilder = () => {
         }
       )
       if (response.success && response.data) {
-        // Générer de nouveaux IDs pour les blocs
-        const newBlocks = (response.data.blocks || []).map((block: Block, index: number) => ({
-          ...block,
-          id: generateBlockId(),
-          order: index
-        }))
-        
-        page.value.blocks = newBlocks
+        // Gérer les sections (nouveau système)
+        if (response.data.sections && response.data.sections.length > 0) {
+          // Générer de nouveaux IDs pour les sections, colonnes et blocs
+          const newSections = response.data.sections.map((section: Section, sectionIndex: number) => ({
+            ...section,
+            id: generateSectionId(),
+            order: sectionIndex,
+            columns: section.columns.map((column: Column) => ({
+              ...column,
+              id: generateColumnId(),
+              blocks: column.blocks.map((block: Block, blockIndex: number) => ({
+                ...block,
+                id: generateBlockId(),
+                order: blockIndex
+              }))
+            }))
+          }))
+          
+          page.value.sections = newSections
+          page.value.blocks = [] // Vider les blocs legacy
+        } else {
+          // Gérer les blocs legacy (ancien système)
+          const newBlocks = (response.data.blocks || []).map((block: Block, index: number) => ({
+            ...block,
+            id: generateBlockId(),
+            order: index
+          }))
+          
+          page.value.blocks = newBlocks
+          page.value.sections = [] // Vider les sections
+        }
         
         if (response.data.theme) {
           page.value.theme = { ...page.value.theme, ...response.data.theme }

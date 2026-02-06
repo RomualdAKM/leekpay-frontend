@@ -4,30 +4,9 @@
     :style="columnStyles"
     @click.stop="handleClick"
   >
-    <!-- Zone de drop pour les blocs -->
-    <div v-if="isEditMode && !previewMode && column.blocks.length === 0" class="min-h-[100px]">
-      <!-- Placeholder vide -->
-      <div 
-        class="h-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-4 transition-colors"
-        :class="{ 'border-emerald-400 bg-emerald-50': isSelected }"
-      >
-        <svg class="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        <p class="text-sm text-gray-400">Glissez un bloc ici</p>
-        
-        <!-- Boutons rapides pour ajouter des blocs -->
-        <div class="flex flex-wrap gap-1 mt-3 justify-center">
-          <button 
-            v-for="type in quickBlockTypes" 
-            :key="type.value"
-            @click.stop="$emit('add-block', type.value)"
-            class="px-2 py-1 text-xs bg-white border border-gray-200 rounded hover:border-emerald-300 hover:text-emerald-600 transition-colors"
-          >
-            {{ type.label }}
-          </button>
-        </div>
-      </div>
+    <!-- Zone vide invisible pour permettre le clic sur la colonne -->
+    <div v-if="isEditMode && !previewMode && column.blocks.length === 0" class="min-h-[100px] flex items-center justify-center">
+      <p class="text-sm text-gray-400">Cliquez sur un bloc dans la sidebar pour l'ajouter</p>
     </div>
     
     <!-- Blocs de la colonne -->
@@ -44,8 +23,9 @@
     >
       <template #item="{ element: block }">
         <div 
-          class="relative group/block"
+          class="relative group/block cursor-pointer"
           :class="{ 'ring-2 ring-emerald-400 ring-inset rounded': selectedBlockId === block.id }"
+          @click.stop="$emit('select-block', block.id)"
         >
           <!-- Actions du bloc -->
           <div 
@@ -90,38 +70,7 @@
       />
     </div>
     
-    <!-- Bouton ajouter bloc (mode édition) -->
-    <button
-      v-if="isEditMode && !previewMode && column.blocks.length > 0"
-      @click.stop="showAddMenu = !showAddMenu"
-      class="w-full mt-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-400 hover:border-emerald-400 hover:text-emerald-500 transition-colors flex items-center justify-center"
-    >
-      <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-      Ajouter un bloc
-    </button>
-    
-    <!-- Menu d'ajout de bloc -->
-    <div 
-      v-if="showAddMenu && isEditMode"
-      class="absolute left-1/2 -translate-x-1/2 mt-2 bg-white rounded-lg shadow-lg border p-3 z-30 min-w-[250px]"
-      @click.stop
-    >
-      <div class="grid grid-cols-3 gap-2">
-        <button 
-          v-for="type in allBlockTypes" 
-          :key="type.value"
-          @click="addBlock(type.value)"
-          class="p-2 hover:bg-gray-100 rounded flex flex-col items-center text-center"
-        >
-          <div class="w-8 h-8 rounded bg-gray-100 flex items-center justify-center mb-1">
-            <span class="text-gray-500 text-xs">{{ type.value.charAt(0).toUpperCase() }}</span>
-          </div>
-          <span class="text-xs text-gray-600">{{ type.label }}</span>
-        </button>
-      </div>
-    </div>
+    <!-- Bouton ajouter bloc supprimé - utiliser la sidebar gauche à la place -->
   </div>
 </template>
 
@@ -150,6 +99,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'select', columnId: string): void
+  (e: 'select-block', blockId: string): void
   (e: 'add-block', blockType: string): void
   (e: 'remove-block', blockId: string): void
   (e: 'update-block', payload: { blockId: string; props: any }): void
@@ -235,7 +185,7 @@ const columnClasses = computed(() => {
   const classes = ['relative', 'transition-all', 'duration-150']
   
   if (props.isEditMode && !props.previewMode) {
-    classes.push('cursor-pointer')
+    classes.push('cursor-pointer', 'p-2') // Padding pour zone cliquable
     if (props.isSelected) {
       classes.push('ring-2', 'ring-emerald-300', 'ring-offset-2', 'rounded-lg')
     }

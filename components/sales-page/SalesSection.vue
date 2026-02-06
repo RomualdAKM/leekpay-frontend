@@ -94,8 +94,10 @@
           :is-edit-mode="isEditMode"
           :preview-mode="previewMode"
           :is-selected="selectedColumnId === column.id"
+          :selected-block-id="selectedBlockId"
           :checkout-url="checkoutUrl"
           @select="$emit('select-column', $event)"
+          @select-block="$emit('select-block', $event)"
           @add-block="$emit('add-block', section.id, column.id, $event)"
           @remove-block="$emit('remove-block', section.id, column.id, $event)"
           @update-block="$emit('update-block', section.id, column.id, $event)"
@@ -120,6 +122,7 @@ interface Props {
   previewMode: boolean
   isSelected: boolean
   selectedColumnId: string | null
+  selectedBlockId: string | null
   checkoutUrl?: string
 }
 
@@ -128,6 +131,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (e: 'select', sectionId: string): void
   (e: 'select-column', columnId: string): void
+  (e: 'select-block', blockId: string): void
   (e: 'remove', sectionId: string): void
   (e: 'duplicate', sectionId: string): void
   (e: 'change-layout', sectionId: string, layout: string): void
@@ -192,11 +196,7 @@ const sectionClasses = computed(() => {
   
   if (props.isEditMode && !props.previewMode) {
     classes.push('cursor-pointer')
-    if (props.isSelected) {
-      classes.push('ring-2', 'ring-emerald-400', 'ring-inset')
-    } else {
-      classes.push('hover:ring-1', 'hover:ring-emerald-300', 'hover:ring-inset')
-    }
+    // Cadre de section masqué - seules les colonnes ont un cadre
   }
   
   return classes.join(' ')

@@ -75,9 +75,9 @@
               <span class="text-xs font-medium text-gray-600">Lien {{ index + 1 }}</span>
               <button @click="removeNavItem(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
             </div>
-            <input :value="item.text" @input="updateNavItem(index, 'text', ($event.target as HTMLInputElement).value)" 
+            <input :value="item.text" @input="updateNavItemField(index, 'text', $event)" 
               type="text" placeholder="Texte" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs" />
-            <input :value="item.url" @input="updateNavItem(index, 'url', ($event.target as HTMLInputElement).value)" 
+            <input :value="item.url" @input="updateNavItemField(index, 'url', $event)" 
               type="text" placeholder="URL (#section ou https://...)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs" />
           </div>
         </div>
@@ -549,8 +549,8 @@ const emit = defineEmits(['update'])
 // Sections collapsibles
 const sections = reactive({
   logo: true,
-  navigation: false,
-  cta: false,
+  navigation: true,
+  cta: true,
   appearance: false,
   border: false,
   typography: false,
@@ -567,12 +567,15 @@ const localProps = reactive({
   logoHeight: 40,
   logoLink: '/',
   // Navigation
-  showNavigation: false,
-  navItems: [] as { text: string; url: string }[],
+  showNavigation: true,
+  navItems: [
+    { text: 'Accueil', url: '#' },
+    { text: 'À propos', url: '#' },
+  ],
   navPosition: 'right',
   navGap: 'medium',
   // CTA
-  showCta: false,
+  showCta: true,
   ctaText: 'Acheter',
   ctaUrl: '#',
   ctaBgColor: '#10b981',
@@ -596,10 +599,10 @@ const localProps = reactive({
   scrollEffect: 'none',
   scrollBgColor: '#ffffff',
   // Bordure
-  showBorder: false,
+  showBorder: true,
   borderWidth: '1',
   borderColor: '#e5e7eb',
-  shadow: 'none',
+  shadow: 'small',
   // Typographie
   textColor: '#1f2937',
   fontFamily: '',
@@ -642,5 +645,15 @@ function updateNavItem(index: number, field: string, value: string) {
     i === index ? { ...item, [field]: value } : item
   )
   emitUpdate()
+}
+
+function handleNavItemInput(index: number, field: string, event: Event) {
+  const target = event.target as HTMLInputElement
+  updateNavItem(index, field, target.value)
+}
+
+function updateNavItemField(index: number, field: string, event: Event) {
+  const target = event.target as HTMLInputElement
+  updateNavItem(index, field, target.value)
 }
 </script>

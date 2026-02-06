@@ -642,9 +642,11 @@
                   :preview-mode="previewMode"
                   :is-selected="selectedSectionId === section.id"
                   :selected-column-id="selectedColumnId"
+                  :selected-block-id="selectedBlockId"
                   :checkout-url="checkoutUrl"
                   @select="selectSection"
                   @select-column="selectColumn"
+                  @select-block="selectBlock"
                   @remove="handleRemoveSection"
                   @duplicate="duplicateSection"
                   @change-layout="changeSectionLayout"
@@ -741,12 +743,24 @@
         class="w-72 lg:w-80 bg-white border-l border-gray-200 flex flex-col overflow-hidden flex-shrink-0"
       >
         <!-- Header bloc sélectionné -->
-        <div v-if="selectedBlock" class="p-4 border-b border-gray-200 flex items-center justify-between">
-          <h3 class="font-semibold text-gray-900">Propriétés du bloc</h3>
-          <button @click="selectBlock(null)" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <div v-if="selectedBlock" class="p-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900">Propriétés du bloc</h3>
+            <button @click="selectBlock(null)" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <!-- Lien vers paramètres section -->
+          <button 
+            @click="selectBlock(null)" 
+            class="mt-2 text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
+            Paramètres de la section
           </button>
         </div>
         

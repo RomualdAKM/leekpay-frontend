@@ -15,9 +15,10 @@
               :alt="props.logoText || 'Logo'"
               :style="logoStyles"
               class="object-contain"
+              @error="handleImageError"
             />
             <span 
-              v-else-if="props.logoText || isEditMode"
+              v-if="props.logoText || isEditMode"
               :class="['font-bold text-xl', editableClasses('logoText')]"
               :style="{ color: props.textColor || '#1f2937' }"
               :contenteditable="isEditMode"
@@ -27,7 +28,7 @@
               @keydown="onKeydown($event, true)"
               @paste="onPaste"
             >{{ props.logoText }}</span>
-            <div v-else class="h-10 w-28 bg-gray-100 flex items-center justify-center text-gray-400 text-xs rounded">
+            <div v-if="!props.logoUrl && !props.logoText" class="h-10 w-28 bg-gray-100 flex items-center justify-center text-gray-400 text-xs rounded">
               Logo
             </div>
           </a>
@@ -58,7 +59,7 @@
         </nav>
         
         <!-- CTA Button (éditable inline) -->
-        <div v-if="props.showCta" :class="{ 'order-3': props.layout === 'logo-right' }" class="hidden md:block">
+        <div v-if="props.showCta" :class="{ 'order-3': props.layout === 'logo-right' }" class="hidden md:block ml-6">
           <a 
             :href="isEditMode ? undefined : (props.ctaUrl || '#')"
             :class="[ctaClasses, editableClasses('ctaText')]"
@@ -125,9 +126,10 @@
               :alt="props.logoText || 'Logo'"
               :style="logoStyles"
               class="object-contain"
+              @error="handleImageError"
             />
             <span 
-              v-else-if="props.logoText || isEditMode"
+              v-if="props.logoText || isEditMode"
               :class="['font-bold text-xl', editableClasses('logoText')]"
               :style="{ color: props.textColor || '#1f2937' }"
               :contenteditable="isEditMode"
@@ -137,6 +139,9 @@
               @keydown="onKeydown($event, true)"
               @paste="onPaste"
             >{{ props.logoText }}</span>
+            <div v-if="!props.logoUrl && !props.logoText" class="h-10 w-28 bg-gray-100 flex items-center justify-center text-gray-400 text-xs rounded">
+              Logo
+            </div>
           </a>
         </div>
         
@@ -309,11 +314,14 @@ const props = withDefaults(defineProps<Props>(), {
   logoWidth: 120,
   logoHeight: 40,
   logoLink: '/',
-  showNavigation: false,
-  navItems: () => [],
+  showNavigation: true,
+  navItems: () => [
+    { text: 'Accueil', url: '#' },
+    { text: 'À propos', url: '#' },
+  ],
   navPosition: 'right',
   navGap: 'medium',
-  showCta: false,
+  showCta: true,
   ctaText: 'Acheter',
   ctaUrl: '#',
   ctaBgColor: '#10b981',
@@ -335,10 +343,10 @@ const props = withDefaults(defineProps<Props>(), {
   sticky: false,
   scrollEffect: 'none',
   scrollBgColor: '#ffffff',
-  showBorder: false,
+  showBorder: true,
   borderWidth: '1',
   borderColor: '#e5e7eb',
-  shadow: 'none',
+  shadow: 'small',
   textColor: '#1f2937',
   fontFamily: '',
   fontSize: 'sm',
@@ -354,6 +362,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const mobileMenuOpen = ref(false)
+
+// Gérer les erreurs de chargement d'image
+const handleImageError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  img.style.display = 'none'
+}
 
 // Édition inline
 const { isEditMode, emitPropUpdate, emitArrayPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
