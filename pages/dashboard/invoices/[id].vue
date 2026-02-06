@@ -5,7 +5,12 @@
 <script setup>
 import InvoiceEditor from '~/components/invoices/InvoiceEditor.vue'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ 
+  layout: 'editor',
+  pageTransition: false
+})
+
+provide('forceDesktopMode', true)
 
 const route = useRoute()
 </script>

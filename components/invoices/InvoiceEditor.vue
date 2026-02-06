@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f2f2f2] pb-8">
+  <div class="h-screen overflow-y-auto bg-[#f2f2f2] pb-8">
     <Transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0 translate-y-2"

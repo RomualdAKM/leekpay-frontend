@@ -2,7 +2,7 @@
   <div class="rounded-2xl border border-gray-200 bg-[#f4f5f7] p-5">
     <div
       class="mx-auto w-full max-w-[920px] bg-white shadow-[0_10px_30px_rgba(15,23,42,0.08)] invoice-sheet"
-      :class="[templateClass, densityClass, cornerClass, patternClass]"
+      :class="[templateClass, densityClass, cornerClass, patternClass, preview ? 'is-preview' : 'is-editor']"
       :style="sheetStyle"
     >
       <div v-if="accentVisible" class="accent-layer" :class="accentClass"></div>
@@ -459,7 +459,7 @@ const metaValuePlaceholder = (label) => {
 }
 
 const sheetStyle = computed(() => ({
-  aspectRatio: '210 / 297',
+  ...(props.preview ? { aspectRatio: '210 / 297' } : {}),
   fontFamily: props.settings.fontFamily || 'Poppins, sans-serif',
   '--accent-color': props.settings.primaryColor || '#2ECC71',
   '--secondary-color': props.settings.secondaryColor || '#0A1F44',
@@ -595,6 +595,10 @@ const onDragEnd = () => {
   background: var(--sheet-bg, #ffffff);
   position: relative;
   overflow: hidden;
+}
+
+.invoice-sheet.is-editor {
+  overflow: visible;
 }
 
 .pattern-dots {
