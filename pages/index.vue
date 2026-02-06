@@ -245,7 +245,7 @@
               alt="Liens de paiement"
               class="w-full h-auto rounded-lg mb-4"
             />
-            <NuxtLink to="/a-propos" class="w-full bg-[#2ECC71] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#27AE60] transition-colors inline-flex items-center justify-center">
+            <NuxtLink to="/payment-links" class="w-full bg-[#2ECC71] text-white py-4 rounded-lg font-semibold text-lg hover:bg-[#27AE60] transition-colors inline-flex items-center justify-center">
               Voir les détails
             </NuxtLink>
           </div>

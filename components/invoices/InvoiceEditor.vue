@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-full bg-[#f2f2f2] pb-8">
+  <div class="h-screen overflow-y-auto bg-[#f2f2f2] pb-8">
     <Transition
       enter-active-class="transition ease-out duration-300"
       enter-from-class="opacity-0 translate-y-2"
@@ -20,6 +20,15 @@
     </Transition>
 
     <div class="max-w-6xl mx-auto px-4 py-6 space-y-4">
+      <NuxtLink
+        to="/dashboard/invoices"
+        class="inline-flex items-center text-sm text-gray-500 hover:text-gray-900"
+      >
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Retour aux factures
+      </NuxtLink>
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <p class="text-sm text-gray-600">Creez, personnalisez et envoyez vos factures en toute simplicite.</p>
@@ -67,6 +76,7 @@
             :templates="premiumTemplates"
             :selected-template-id="selectedTemplateId"
             :is-premium="isPremium"
+            :pdf-loading="pdfLoading"
             @download="downloadPdf"
             @apply-template="applyTemplate"
             @upgrade="() => showToast('Passez au plan Premium pour debloquer cette fonctionnalite.', 'error')"

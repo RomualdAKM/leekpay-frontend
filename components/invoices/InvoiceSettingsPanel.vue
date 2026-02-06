@@ -224,11 +224,16 @@
     </div>
     <div v-if="variant === 'full'" class="p-4 space-y-3">
       <button
-        class="w-full bg-[#2ECC71] text-white font-semibold rounded-md py-2.5 text-sm flex items-center justify-center gap-2"
+        class="w-full bg-[#2ECC71] text-white font-semibold rounded-md py-2.5 text-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        :disabled="pdfLoading"
         @click="emit('download')"
       >
         <Download class="w-4 h-4" />
-        <span>Telecharger ma facture</span>
+        <span>{{ pdfLoading ? 'Telechargement en cours...' : 'Telecharger ma facture' }}</span>
+        <span
+          v-if="pdfLoading"
+          class="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+        ></span>
       </button>
     </div>
   </Card>
@@ -265,6 +270,10 @@ defineProps({
     default: () => []
   },
   currenciesLoading: {
+    type: Boolean,
+    default: false
+  },
+  pdfLoading: {
     type: Boolean,
     default: false
   }
