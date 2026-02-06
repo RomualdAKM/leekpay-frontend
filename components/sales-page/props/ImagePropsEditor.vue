@@ -2,6 +2,63 @@
   <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <TemplatePicker block-type="image" :model-value="localProps.templateId" @select="updateProp('templateId', $event)"/>
     
+    <!-- TITRE OPTIONNEL -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.title = !sections.title" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Titre</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.title ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.title" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" v-model="localProps.showTitle" @change="emitUpdate" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
+          <span class="text-sm text-gray-700">Afficher un titre</span>
+        </label>
+        <div v-if="localProps.showTitle" class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Titre</label>
+            <input v-model="localProps.title" @input="emitUpdate" type="text" placeholder="Votre titre..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Taille</label>
+              <select v-model="localProps.titleSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="small">Petit</option>
+                <option value="medium">Moyen</option>
+                <option value="large">Grand</option>
+                <option value="xlarge">Très grand</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+              <select v-model="localProps.titleAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="left">Gauche</option>
+                <option value="center">Centre</option>
+                <option value="right">Droite</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- DESCRIPTION OPTIONNELLE -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.description = !sections.description" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.description ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.description" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" v-model="localProps.showDescription" @change="emitUpdate" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
+          <span class="text-sm text-gray-700">Afficher une description</span>
+        </label>
+        <div v-if="localProps.showDescription">
+          <label class="block text-xs text-gray-500 mb-1">Description</label>
+          <textarea v-model="localProps.description" @input="emitUpdate" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Description de l'image..."/>
+        </div>
+      </div>
+    </div>
+    
     <!-- IMAGE -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.image = !sections.image" class="flex items-center justify-between w-full text-left">
@@ -23,6 +80,57 @@
         <div>
           <label class="block text-xs text-gray-500 mb-1">Légende</label>
           <input v-model="localProps.caption" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+      </div>
+    </div>
+    
+    <!-- BOUTON OPTIONNEL -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.button = !sections.button" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Bouton</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.button ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.button" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" v-model="localProps.showButton" @change="emitUpdate" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
+          <span class="text-sm text-gray-700">Afficher un bouton</span>
+        </label>
+        <div v-if="localProps.showButton" class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
+            <input v-model="localProps.buttonText" @input="emitUpdate" type="text" placeholder="Cliquez ici" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Lien (URL)</label>
+            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Ouvrir dans</label>
+              <select v-model="localProps.buttonTarget" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="_self">Même fenêtre</option>
+                <option value="_blank">Nouvel onglet</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Icône</label>
+              <select v-model="localProps.buttonIcon" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="arrow-right">Flèche droite</option>
+                <option value="external">Lien externe</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Fond bouton</label>
+              <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
+              <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -221,6 +329,21 @@
       </div>
     </div>
     
+    <!-- POSITIONNEMENT -->
+    <PositioningSection
+      :elements="['title', 'description', 'image', 'button']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="{
+        titleOffsetY: localProps.titleOffsetY,
+        descriptionOffsetY: localProps.descriptionOffsetY,
+        imageOffsetY: localProps.imageOffsetY,
+        buttonOffsetY: localProps.buttonOffsetY
+      }"
+      :labels="elementLabels"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+    
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -245,25 +368,52 @@
 import { reactive, watch } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
 
 const sections = reactive({
+  title: false,
+  description: false,
   image: true,
+  button: false,
   display: false,
   effects: false,
   border: false,
   overlay: false,
   appearance: false,
+  positioning: false,
   advanced: false,
 })
 
 const localProps = reactive({
   templateId: props.props.templateId || 'image-minimal-centered',
+  // Titre
+  showTitle: props.props.showTitle || false,
+  title: props.props.title || '',
+  titleSize: props.props.titleSize || 'large',
+  titleWeight: props.props.titleWeight || 'bold',
+  titleColor: props.props.titleColor || '',
+  titleAlign: props.props.titleAlign || 'center',
+  // Description
+  showDescription: props.props.showDescription || false,
+  description: props.props.description || '',
+  descriptionColor: props.props.descriptionColor || '',
+  // Image
   src: props.props.src || null,
   alt: props.props.alt || '',
   caption: props.props.caption || '',
+  // Bouton
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || '',
+  buttonUrl: props.props.buttonUrl || '',
+  buttonTarget: props.props.buttonTarget || '_self',
+  buttonIcon: props.props.buttonIcon || 'none',
+  buttonBgColor: props.props.buttonBgColor || '#10b981',
+  buttonTextColor: props.props.buttonTextColor || '#ffffff',
+  buttonAlign: props.props.buttonAlign || 'center',
+  // Affichage
   aspectRatio: props.props.aspectRatio || 'auto',
   maxHeight: props.props.maxHeight || 'auto',
   objectFit: props.props.objectFit || 'cover',
@@ -284,6 +434,12 @@ const localProps = reactive({
   animation: props.props.animation || 'none',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['title', 'description', 'image', 'button'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  descriptionOffsetY: props.props.descriptionOffsetY || 0,
+  imageOffsetY: props.props.imageOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -291,6 +447,19 @@ watch(() => props.props, (newVal) => {
     if (key in localProps) (localProps as any)[key] = newVal[key]
   })
 }, { deep: true })
+
+// Labels pour le positionnement
+const elementLabels: Record<string, string> = {
+  title: 'Titre',
+  description: 'Description',
+  image: 'Image',
+  button: 'Bouton'
+}
+
+function updateOffsets(offsets: Record<string, number>) {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }

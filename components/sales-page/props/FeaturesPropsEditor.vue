@@ -40,8 +40,8 @@
         </div>
         <div v-for="(item, index) in localProps.items" :key="index" class="border border-gray-200 rounded-lg p-3">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-gray-600">#{{ index + 1 }}</span>
-            <button v-if="localProps.items.length > 1" @click="removeItem(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+            <span class="text-xs font-medium text-gray-600">#{{ (index as any) + 1 }}</span>
+            <button v-if="localProps.items.length > 1" @click="removeItem(index as any)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
           </div>
           <div class="space-y-2">
             <div>
@@ -416,8 +416,8 @@
         </div>
         <div v-for="(tab, index) in localProps.tabs" :key="index" class="border border-gray-200 rounded-lg p-3">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-gray-600">Onglet {{ index + 1 }}</span>
-            <button v-if="localProps.tabs.length > 1" @click="removeTab(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+            <span class="text-xs font-medium text-gray-600">Onglet {{ (index as any) + 1 }}</span>
+            <button v-if="localProps.tabs.length > 1" @click="removeTab(index as any)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
           </div>
           <div class="space-y-2">
             <div>
@@ -434,7 +434,7 @@
             </div>
             <div>
               <label class="block text-xs text-gray-500 mb-1">Fonctionnalités (une par ligne)</label>
-              <textarea v-model="tabFeaturesText[index]" @input="updateTabFeatures(index, $event)" rows="3" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none" placeholder="CDN global&#10;Cache intelligent&#10;Compression"></textarea>
+              <textarea v-model="tabFeaturesText[index as any]" @input="updateTabFeatures(index as any, $event)" rows="3" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm resize-none" placeholder="CDN global&#10;Cache intelligent&#10;Compression"></textarea>
             </div>
             <div>
               <UiImageUploader
@@ -448,6 +448,21 @@
       </div>
     </div>
     
+    <!-- ===== POSITIONNEMENT ===== -->
+    <PositioningSection
+      :elements="['badge', 'title', 'subtitle', 'grid']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="{ 
+        badgeOffsetY: localProps.badgeOffsetY, 
+        titleOffsetY: localProps.titleOffsetY, 
+        subtitleOffsetY: localProps.subtitleOffsetY, 
+        gridOffsetY: localProps.gridOffsetY 
+      }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', grid: 'Grille/Liste' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- ===== AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -472,6 +487,7 @@
 import { reactive, watch } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -487,6 +503,7 @@ const sections = reactive({
   animation: false,
   badge: true,
   tabs: true,
+  positioning: false,
   advanced: false,
 })
 
@@ -541,6 +558,12 @@ const localProps = reactive({
   ],
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'grid'],
+  badgeOffsetY: props.props.badgeOffsetY || 0,
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
+  gridOffsetY: props.props.gridOffsetY || 0,
 })
 
 // Texte des features par onglet (pour édition ligne par ligne)
@@ -586,6 +609,11 @@ watch(() => props.props, (newVal) => {
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => {
   (localProps as any)[key] = value
+  emitUpdate()
+}
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
   emitUpdate()
 }
 

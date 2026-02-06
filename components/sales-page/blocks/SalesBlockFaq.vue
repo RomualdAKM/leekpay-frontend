@@ -5,12 +5,17 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Header -->
-      <div v-if="props.title || props.subtitle || isEditMode" class="mb-12 md:mb-16" :style="headerStyles">
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ 
+        gap: '1.5rem',
+        alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start'),
+        textAlign: props.headerAlignment || 'center'
+      }">
+        <!-- Titre -->
         <h2 
           v-if="props.title || isEditMode"
           :class="[template.styles.title, editableClasses('title')]"
-          :style="{ color: textColor }"
+          :style="{ color: textColor, ...titlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Titre de la FAQ'"
           @focus="onFocus('title')"
@@ -18,11 +23,13 @@
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
         >{{ props.title }}</h2>
+
+        <!-- Sous-titre -->
         <p 
           v-if="props.subtitle || isEditMode"
-          class="mt-4 text-base md:text-lg font-light max-w-2xl"
+          class="text-base md:text-lg font-light max-w-2xl"
           :class="editableClasses('subtitle')"
-          :style="{ color: textColor, opacity: 0.7, margin: props.headerAlignment === 'center' ? '1rem auto 0' : '1rem 0 0' }"
+          :style="{ color: textColor, opacity: 0.7, ...subtitlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Sous-titre (optionnel)'"
           @focus="onFocus('subtitle')"
@@ -30,71 +37,71 @@
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
         >{{ props.subtitle }}</p>
-      </div>
-      
-      <!-- Liste des FAQ -->
-      <div :class="template.styles.grid">
-        <div 
-          v-for="(item, index) in faqItems"
-          :key="index"
-          :class="[
-            template.styles.card,
-            { 'border-current/20': !template.styles.card?.includes('border-') }
-          ]"
-          :style="cardStyles"
-        >
-          <!-- Question -->
-          <button 
-            class="w-full flex items-center justify-between text-left group"
-            :class="template.styles.question"
-            :style="{ color: textColor }"
-            @click="!isEditMode && toggleItem(index)"
-          >
-            <span 
-              class="pr-4"
-              :class="editableClasses(`items[${index}].question`)"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Question'"
-              @focus="onArrayFocus('items', index, 'question')"
-              @blur="onArrayBlur($event, 'items', index, 'question')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-              @click.stop
-            >{{ item.question }}</span>
-            <div 
-              class="flex-shrink-0 transition-all duration-300"
-              :class="[
-                template.styles.icon,
-                { 'rotate-180': openItems.includes(index) }
-              ]"
-              :style="iconStyles"
-            >
-              <svg 
-                class="w-full h-full"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
-          
-          <!-- Réponse -->
+        
+        <!-- Liste des FAQ -->
+        <div :class="template.styles.grid" :style="itemsPositionStyles" class="w-full">
           <div 
-            class="overflow-hidden transition-all duration-300 ease-in-out"
-            :style="{ maxHeight: openItems.includes(index) || isEditMode ? '500px' : '0px' }"
+            v-for="(item, index) in faqItems"
+            :key="index"
+            :class="[
+              template.styles.card,
+              { 'border-current/20': !template.styles.card?.includes('border-') }
+            ]"
+            :style="cardStyles"
           >
-            <p 
-              :class="[template.styles.answer, editableClasses(`items[${index}].answer`)]"
+            <!-- Question -->
+            <button 
+              class="w-full flex items-center justify-between text-left group"
+              :class="template.styles.question"
               :style="{ color: textColor }"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Réponse'"
-              @focus="onArrayFocus('items', index, 'answer')"
-              @blur="onArrayBlur($event, 'items', index, 'answer')"
-              @keydown="onKeydown($event, false)"
-              @paste="onPaste"
-            >{{ item.answer }}</p>
+              @click="!isEditMode && toggleItem(index)"
+            >
+              <span 
+                class="pr-4"
+                :class="editableClasses(`items[${index}].question`)"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Question'"
+                @focus="onArrayFocus('items', index, 'question')"
+                @blur="onArrayBlur($event, 'items', index, 'question')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+                @click.stop
+              >{{ item.question }}</span>
+              <div 
+                class="flex-shrink-0 transition-all duration-300"
+                :class="[
+                  template.styles.icon,
+                  { 'rotate-180': openItems.includes(index) }
+                ]"
+                :style="iconStyles"
+              >
+                <svg 
+                  class="w-full h-full"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </button>
+            
+            <!-- Réponse -->
+            <div 
+              class="overflow-hidden transition-all duration-300 ease-in-out"
+              :style="{ maxHeight: openItems.includes(index) || isEditMode ? '500px' : '0px' }"
+            >
+              <p 
+                :class="[template.styles.answer, editableClasses(`items[${index}].answer`)]"
+                :style="{ color: textColor }"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Réponse'"
+                @focus="onArrayFocus('items', index, 'answer')"
+                @blur="onArrayBlur($event, 'items', index, 'answer')"
+                @keydown="onKeydown($event, false)"
+                @paste="onPaste"
+              >{{ item.answer }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -129,6 +136,11 @@ interface Props {
   expandFirstByDefault?: boolean
   cssId?: string
   customClasses?: string
+  // Positionnement
+  elementsOrder?: string[]
+  titleOffsetY?: number
+  subtitleOffsetY?: number
+  itemsOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -152,6 +164,11 @@ const props = withDefaults(defineProps<Props>(), {
   expandFirstByDefault: true,
   cssId: '',
   customClasses: '',
+  // Positionnement
+  elementsOrder: () => ['title', 'subtitle', 'items'],
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
+  itemsOffsetY: 0,
 })
 
 // Contexte d'édition inline
@@ -257,7 +274,7 @@ const template = computed(() => {
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-2xl mx-auto',
-      title: 'text-2xl md:text-3xl font-light tracking-tight text-center mb-12',
+      title: 'text-2xl md:text-3xl font-light tracking-tight mb-2',
       grid: 'space-y-0',
       card: 'border-b py-6',
       question: 'text-base font-medium cursor-pointer',
@@ -320,5 +337,28 @@ const cardStyles = computed(() => {
 
 const iconStyles = computed(() => ({
   color: props.accentColor || textColor.value,
+}))
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  return (props.elementsOrder || ['title', 'subtitle', 'items']).indexOf(element)
+}
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+}))
+
+const subtitlePositionStyles = computed(() => ({
+  order: getElementOrder('subtitle'),
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0'
+}))
+
+const itemsPositionStyles = computed(() => ({
+  order: getElementOrder('items'),
+  transform: props.itemsOffsetY ? `translateY(${props.itemsOffsetY}px)` : undefined,
+  marginTop: getElementOrder('items') > 0 ? '2rem' : '0'
 }))
 </script>

@@ -5,98 +5,101 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container" :style="containerStyles">
-      <!-- Titre (Editable Inline) -->
-      <h2 
-        v-if="props.title || isEditMode"
-        class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4"
-        :class="editableClasses('title')"
-        :style="{ color: props.textColor }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Titre (optionnel)'"
-        @focus="onFocus('title')"
-        @blur="onBlur($event, 'title')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-        ref="titleRef"
-      >{{ props.title }}</h2>
-      
-      <!-- Texte (Editable Inline) -->
-      <p 
-        v-if="props.text || isEditMode"
-        :class="[template.styles.text, editableClasses('text')]"
-        :style="{ color: props.textColor, opacity: props.title ? 0.85 : 1 }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Texte de votre CTA...'"
-        @focus="onFocus('text')"
-        @blur="onBlur($event, 'text')"
-        @keydown="onKeydown($event, false)"
-        @paste="onPaste"
-        ref="textRef"
-      >{{ props.text }}</p>
-      
-      <!-- Boutons -->
-      <div :class="buttonsContainerClass">
-        <!-- Bouton Principal -->
-        <a
-          v-if="props.buttonText && props.buttonUrl && !isEditMode"
-          :href="props.buttonUrl"
-          :target="props.buttonTarget"
-          :class="[
-            template.styles.button,
-            props.buttonStyle === 'outlined' ? 'bg-transparent border-2' : '',
-            buttonHoverClass
-          ]"
-          :style="primaryButtonStyles"
-        >
-          <span class="flex items-center gap-2">
-            {{ props.buttonText }}
-            <ButtonIcon :icon="props.buttonIcon" />
-          </span>
-        </a>
-        <button
-          v-else-if="props.buttonText || isEditMode"
-          :class="[
-            template.styles.button,
-            props.buttonStyle === 'outlined' ? 'bg-transparent border-2' : '',
-            buttonHoverClass,
-            isEditMode && 'cursor-text'
-          ]"
-          :style="primaryButtonStyles"
-          @click="!isEditMode && $emit('cta-click')"
-        >
-          <span 
-            class="flex items-center gap-2"
-            :class="editableClasses('buttonText')"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Texte du bouton'"
-            @focus="onFocus('buttonText')"
-            @blur="onBlur($event, 'buttonText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-            ref="buttonTextRef"
-          >
-            {{ props.buttonText || 'Commencer' }}
-          </span>
-          <ButtonIcon v-if="!isEditMode" :icon="props.buttonIcon" />
-        </button>
-        
-        <!-- Bouton Secondaire -->
-        <a
-          v-if="props.showSecondaryButton && (props.secondaryButtonText || isEditMode)"
-          :href="!isEditMode ? (props.secondaryButtonUrl || '#') : undefined"
-          :target="props.buttonTarget"
-          class="px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200 hover:opacity-80"
-          :class="editableClasses('secondaryButtonText')"
-          :style="secondaryButtonStyles"
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: props.title ? '1.5rem' : '1rem' }">
+        <!-- Titre (Editable Inline) -->
+        <h2 
+          v-if="props.title || isEditMode"
+          class="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight"
+          :class="editableClasses('title')"
+          :style="{ color: props.textColor, ...titlePositionStyles }"
           :contenteditable="isEditMode"
-          :data-placeholder="'Texte secondaire'"
-          @focus="onFocus('secondaryButtonText')"
-          @blur="onBlur($event, 'secondaryButtonText')"
+          :data-placeholder="'Titre (optionnel)'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
-          @click.prevent="isEditMode ? null : undefined"
-          ref="secondaryButtonTextRef"
-        >{{ props.secondaryButtonText }}</a>
+          ref="titleRef"
+        >{{ props.title }}</h2>
+        
+        <!-- Texte (Editable Inline) -->
+        <p 
+          v-if="props.text || isEditMode"
+          :class="[template.styles.text, editableClasses('text')]"
+          :style="{ color: props.textColor, opacity: props.title ? 0.85 : 1, ...textPositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Texte de votre CTA...'"
+          @focus="onFocus('text')"
+          @blur="onBlur($event, 'text')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+          ref="textRef"
+        >{{ props.text }}</p>
+        
+        <!-- Boutons -->
+        <div :class="buttonsContainerClass" :style="buttonsContainerPositionStyles">
+          <!-- Bouton Principal -->
+          <a
+            v-if="props.buttonText && props.buttonUrl && !isEditMode"
+            :href="props.buttonUrl"
+            :target="props.buttonTarget"
+            :class="[
+              template.styles.button,
+              props.buttonStyle === 'outlined' ? 'bg-transparent border-2' : '',
+              buttonHoverClass
+            ]"
+            :style="primaryButtonStyles"
+          >
+            <span class="flex items-center gap-2">
+              {{ props.buttonText }}
+              <ButtonIcon :icon="props.buttonIcon" />
+            </span>
+          </a>
+          <button
+            v-else-if="props.buttonText || isEditMode"
+            :class="[
+              template.styles.button,
+              props.buttonStyle === 'outlined' ? 'bg-transparent border-2' : '',
+              buttonHoverClass,
+              isEditMode && 'cursor-text'
+            ]"
+            :style="primaryButtonStyles"
+            @click="!isEditMode && $emit('cta-click')"
+          >
+            <span 
+              class="flex items-center gap-2"
+              :class="editableClasses('buttonText')"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Texte du bouton'"
+              @focus="onFocus('buttonText')"
+              @blur="onBlur($event, 'buttonText')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+              ref="buttonTextRef"
+            >
+              {{ props.buttonText || 'Commencer' }}
+            </span>
+            <ButtonIcon v-if="!isEditMode" :icon="props.buttonIcon" />
+          </button>
+          
+          <!-- Bouton Secondaire -->
+          <a
+            v-if="props.showSecondaryButton && (props.secondaryButtonText || isEditMode)"
+            :href="!isEditMode ? (props.secondaryButtonUrl || '#') : undefined"
+            :target="props.buttonTarget"
+            class="px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200 hover:opacity-80"
+            :class="editableClasses('secondaryButtonText')"
+            :style="secondaryButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte secondaire'"
+            @focus="onFocus('secondaryButtonText')"
+            @blur="onBlur($event, 'secondaryButtonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+            @click.prevent="isEditMode ? null : undefined"
+            ref="secondaryButtonTextRef"
+          >{{ props.secondaryButtonText }}</a>
+        </div>
       </div>
     </div>
   </section>
@@ -157,6 +160,11 @@ interface Props {
   animation?: 'none' | 'fade' | 'slide-up' | 'scale' | 'bounce'
   cssId?: string
   customClasses?: string
+  // Positionnement
+  elementsOrder?: string[]
+  titleOffsetY?: number
+  textOffsetY?: number
+  buttonsOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -185,6 +193,11 @@ const props = withDefaults(defineProps<Props>(), {
   animation: 'none',
   cssId: '',
   customClasses: '',
+  // Positionnement
+  elementsOrder: () => ['title', 'text', 'buttons'],
+  titleOffsetY: 0,
+  textOffsetY: 0,
+  buttonsOffsetY: 0,
 })
 
 defineEmits(['cta-click'])
@@ -293,7 +306,7 @@ const containerStyles = computed(() => ({
 }))
 
 const buttonsContainerClass = computed(() => {
-  const base = 'flex flex-col sm:flex-row gap-4 mt-8'
+  const base = 'flex flex-col sm:flex-row gap-4'
   const alignMap: Record<string, string> = {
     left: 'items-start justify-start',
     center: 'items-center justify-center',
@@ -335,6 +348,28 @@ const primaryButtonStyles = computed(() => {
 const secondaryButtonStyles = computed(() => ({
   color: props.textColor,
   borderBottom: `1px solid ${props.textColor}40`,
+}))
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  return (props.elementsOrder || ['title', 'text', 'buttons']).indexOf(element)
+}
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+}))
+
+const textPositionStyles = computed(() => ({
+  order: getElementOrder('text'),
+  transform: props.textOffsetY ? `translateY(${props.textOffsetY}px)` : undefined
+}))
+
+const buttonsContainerPositionStyles = computed(() => ({
+  order: getElementOrder('buttons'),
+  transform: props.buttonsOffsetY ? `translateY(${props.buttonsOffsetY}px)` : undefined,
+  marginTop: getElementOrder('buttons') > 0 ? '1rem' : '0' // Ajustement dynamique du margin si pas en haut
 }))
 </script>
 

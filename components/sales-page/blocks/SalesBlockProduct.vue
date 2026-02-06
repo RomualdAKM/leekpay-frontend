@@ -4,93 +4,99 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Grille de produits -->
-      <div :class="template.styles.grid">
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Grille de produits -->
         <div 
-          v-for="(product, index) in productsList" 
-          :key="product.id"
-          :class="template.styles.card"
+          :class="template.styles.grid"
+          :style="productsPositionStyles"
         >
-          <!-- Image -->
-          <div :class="template.styles.imageWrapper">
-            <img 
-              :src="product.image || DEFAULT_PRODUCT_IMAGES[index % DEFAULT_PRODUCT_IMAGES.length]"
-              :alt="product.name"
-              :class="template.styles.image"
-            />
-          </div>
-          
-          <!-- Contenu -->
-          <div :class="template.styles.content">
-            <!-- Nom du produit (éditable inline) -->
-            <h3 
-              :class="[template.styles.name, editableClasses(`products[${index}].name`)]"
-              :style="{ color: textColor }"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Nom du produit'"
-              @focus="onArrayFocus('products', index, 'name')"
-              @blur="onArrayBlur($event, 'products', index, 'name')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-            >{{ product.name }}</h3>
-            
-            <!-- Description du produit (éditable inline) -->
-            <p 
-              v-if="product.description || isEditMode"
-              :class="[template.styles.description !== 'hidden' ? template.styles.description : '', editableClasses(`products[${index}].description`)]"
-              :style="{ color: textColor }"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Description du produit'"
-              @focus="onArrayFocus('products', index, 'description')"
-              @blur="onArrayBlur($event, 'products', index, 'description')"
-              @keydown="onKeydown($event, false)"
-              @paste="onPaste"
-            >{{ product.description }}</p>
-            
-            <!-- Prix -->
-            <div :class="template.styles.priceWrapper">
-              <span 
-                v-if="props.showOriginalPrice && product.originalPrice"
-                :class="template.styles.originalPrice"
-                :style="{ color: textColor }"
-              >
-                {{ formatPrice(product.originalPrice) }} {{ props.currency }}
-              </span>
-              <span 
-                :class="template.styles.price"
-                :style="{ color: props.accentColor || textColor }"
-              >
-                {{ formatPrice(product.price) }} {{ props.currency }}
-              </span>
+          <div 
+            v-for="(product, index) in productsList" 
+            :key="product.id"
+            :class="template.styles.card"
+          >
+            <!-- Image -->
+            <div :class="template.styles.imageWrapper">
+              <img 
+                :src="product.image || DEFAULT_PRODUCT_IMAGES[index % DEFAULT_PRODUCT_IMAGES.length]"
+                :alt="product.name"
+                :class="template.styles.image"
+              />
             </div>
             
-            <!-- Bouton (éditable inline pour le texte) -->
-            <a
-              v-if="product.buttonText && product.buttonUrl"
-              :href="isEditMode ? undefined : product.buttonUrl"
-              :target="props.buttonTarget"
-              :class="[template.styles.button, editableClasses(`products[${index}].buttonText`)]"
-              :style="buttonStyles"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Texte du bouton'"
-              @focus="onArrayFocus('products', index, 'buttonText')"
-              @blur="onArrayBlur($event, 'products', index, 'buttonText')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-              @click.prevent="handleClick(product)"
-            >{{ product.buttonText }}</a>
-            <button
-              v-else-if="product.buttonText || isEditMode"
-              :class="[template.styles.button, editableClasses(`products[${index}].buttonText`)]"
-              :style="buttonStyles"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Texte du bouton'"
-              @focus="onArrayFocus('products', index, 'buttonText')"
-              @blur="onArrayBlur($event, 'products', index, 'buttonText')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-              @click="!isEditMode && $emit('product-click', product)"
-            >{{ product.buttonText || 'Acheter' }}</button>
+            <!-- Contenu -->
+            <div :class="template.styles.content">
+              <!-- Nom du produit (éditable inline) -->
+              <h3 
+                :class="[template.styles.name, editableClasses(`products[${index}].name`)]"
+                :style="{ color: textColor }"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Nom du produit'"
+                @focus="onArrayFocus('products', index, 'name')"
+                @blur="onArrayBlur($event, 'products', index, 'name')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+              >{{ product.name }}</h3>
+              
+              <!-- Description du produit (éditable inline) -->
+              <p 
+                v-if="product.description || isEditMode"
+                :class="[template.styles.description !== 'hidden' ? template.styles.description : '', editableClasses(`products[${index}].description`)]"
+                :style="{ color: textColor }"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Description du produit'"
+                @focus="onArrayFocus('products', index, 'description')"
+                @blur="onArrayBlur($event, 'products', index, 'description')"
+                @keydown="onKeydown($event, false)"
+                @paste="onPaste"
+              >{{ product.description }}</p>
+              
+              <!-- Prix -->
+              <div :class="template.styles.priceWrapper">
+                <span 
+                  v-if="props.showOriginalPrice && product.originalPrice"
+                  :class="template.styles.originalPrice"
+                  :style="{ color: textColor }"
+                >
+                  {{ formatPrice(product.originalPrice) }} {{ props.currency }}
+                </span>
+                <span 
+                  :class="template.styles.price"
+                  :style="{ color: props.accentColor || textColor }"
+                >
+                  {{ formatPrice(product.price) }} {{ props.currency }}
+                </span>
+              </div>
+              
+              <!-- Bouton (éditable inline pour le texte) -->
+              <a
+                v-if="product.buttonText && product.buttonUrl"
+                :href="isEditMode ? undefined : product.buttonUrl"
+                :target="props.buttonTarget"
+                :class="[template.styles.button, editableClasses(`products[${index}].buttonText`)]"
+                :style="buttonStyles"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Texte du bouton'"
+                @focus="onArrayFocus('products', index, 'buttonText')"
+                @blur="onArrayBlur($event, 'products', index, 'buttonText')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+                @click.prevent="handleClick(product)"
+              >{{ product.buttonText }}</a>
+              <button
+                v-else-if="product.buttonText || isEditMode"
+                :class="[template.styles.button, editableClasses(`products[${index}].buttonText`)]"
+                :style="buttonStyles"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Texte du bouton'"
+                @focus="onArrayFocus('products', index, 'buttonText')"
+                @blur="onArrayBlur($event, 'products', index, 'buttonText')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+                @click="!isEditMode && $emit('product-click', product)"
+              >{{ product.buttonText || 'Acheter' }}</button>
+            </div>
           </div>
         </div>
       </div>
@@ -156,6 +162,9 @@ interface Props {
   buttonTarget?: '_self' | '_blank'
   backgroundColor?: string
   accentColor?: string
+  // Positionnement
+  elementsOrder?: string[]
+  productsOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -168,6 +177,9 @@ const props = withDefaults(defineProps<Props>(), {
   buttonTarget: '_self',
   backgroundColor: '#ffffff',
   accentColor: '#10b981',
+  // Positionnement
+  elementsOrder: () => ['products'],
+  productsOffsetY: 0,
 })
 
 defineEmits(['product-click'])
@@ -280,4 +292,15 @@ const formatPrice = (price: string | number): string => {
   if (isNaN(num)) return String(price)
   return num.toLocaleString('fr-FR')
 }
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  return (props.elementsOrder || ['products']).indexOf(element)
+}
+
+const productsPositionStyles = computed(() => ({
+  order: getElementOrder('products'),
+  transform: props.productsOffsetY ? `translateY(${props.productsOffsetY}px)` : undefined
+}))
 </script>

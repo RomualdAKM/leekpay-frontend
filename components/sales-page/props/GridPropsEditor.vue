@@ -118,6 +118,17 @@
       </div>
     </div>
     
+    <!-- POSITIONNEMENT -->
+    <PositioningSection
+      v-show="sections.positioning"
+      :elements="['grid']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="localProps"
+      :labels="{ grid: 'Grille' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -142,6 +153,7 @@
 import { reactive, watch, ref, inject } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 interface GridItem { id: string; type: 'text' | 'image' | 'video'; content: string | null; alt?: string; span?: number }
 
@@ -149,7 +161,7 @@ const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
 const uploadImage = inject<(file: File) => Promise<string | null>>('uploadImage')
 
-const sections = reactive({ options: true, items: true, appearance: false, advanced: false })
+const sections = reactive({ options: true, items: true, appearance: false, positioning: false, advanced: false })
 const expandedItem = ref<string | null>(null)
 
 const localProps = reactive({
@@ -164,6 +176,9 @@ const localProps = reactive({
   paddingY: props.props.paddingY || 'medium',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['grid'],
+  gridOffsetY: props.props.gridOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -174,6 +189,11 @@ watch(() => props.props, (newVal) => {
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 
 const toggleItem = (id: string) => { expandedItem.value = expandedItem.value === id ? null : id }
 const getItemLabel = (type: string) => ({ text: 'Texte', image: 'Image', video: 'Vidéo' }[type] || type)

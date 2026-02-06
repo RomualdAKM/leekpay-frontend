@@ -145,6 +145,17 @@
       </div>
     </div>
     
+    <!-- ===== POSITIONNEMENT ===== -->
+    <PositioningSection
+      v-show="sections.positioning"
+      :elements="['title', 'subtitle', 'timer', 'message']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="localProps"
+      :labels="{ title: 'Titre', subtitle: 'Sous-titre', timer: 'Compteur', message: 'Message expiré' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -169,6 +180,7 @@
 import { reactive, watch } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -179,6 +191,7 @@ const sections = reactive({
   display: false,
   style: false,
   appearance: false,
+  positioning: false,
   advanced: false,
 })
 
@@ -205,6 +218,12 @@ const localProps = reactive({
   paddingY: props.props.paddingY || 'medium',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'timer', 'message'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
+  timerOffsetY: props.props.timerOffsetY || 0,
+  messageOffsetY: props.props.messageOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -215,4 +234,9 @@ watch(() => props.props, (newVal) => {
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 </script>

@@ -4,75 +4,81 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <div :class="[template.styles.grid, gapClass, alignClass]">
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
         <div 
-          v-for="(item, index) in itemsList" 
-          :key="item.id"
-          :class="getItemClass(index)"
+          :class="[template.styles.grid, gapClass, alignClass]"
+          :style="gridPositionStyles"
         >
-          <!-- TYPE: TEXTE -->
           <div 
-            v-if="item.type === 'text'" 
-            class="prose prose-sm md:prose-base max-w-none"
-            :style="{ color: textColor }"
-            v-html="item.content"
-          />
-          
-          <!-- TYPE: IMAGE -->
-          <div v-else-if="item.type === 'image'" class="w-full">
-            <img 
-              v-if="item.content"
-              :src="item.content"
-              :alt="item.alt || ''"
-              class="w-full h-auto object-cover rounded-lg"
+            v-for="(item, index) in itemsList" 
+            :key="item.id"
+            :class="getItemClass(index)"
+          >
+            <!-- TYPE: TEXTE -->
+            <div 
+              v-if="item.type === 'text'" 
+              class="prose prose-sm md:prose-base max-w-none"
+              :style="{ color: textColor }"
+              v-html="item.content"
             />
-            <div 
-              v-else
-              class="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center"
-            >
-              <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          </div>
-          
-          <!-- TYPE: VIDEO -->
-          <div v-else-if="item.type === 'video'" class="w-full">
-            <div v-if="item.content" class="relative w-full aspect-video rounded-lg overflow-hidden">
-              <!-- YouTube -->
-              <iframe
-                v-if="getVideoType(item.content) === 'youtube'"
-                :src="getYoutubeEmbedUrl(item.content)"
-                class="absolute inset-0 w-full h-full"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              />
-              <!-- Vimeo -->
-              <iframe
-                v-else-if="getVideoType(item.content) === 'vimeo'"
-                :src="getVimeoEmbedUrl(item.content)"
-                class="absolute inset-0 w-full h-full"
-                frameborder="0"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowfullscreen
-              />
-              <!-- Direct URL -->
-              <video
-                v-else
+            
+            <!-- TYPE: IMAGE -->
+            <div v-else-if="item.type === 'image'" class="w-full">
+              <img 
+                v-if="item.content"
                 :src="item.content"
-                class="absolute inset-0 w-full h-full object-cover"
-                controls
+                :alt="item.alt || ''"
+                class="w-full h-auto object-cover rounded-lg"
               />
+              <div 
+                v-else
+                class="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center"
+              >
+                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
             </div>
-            <div 
-              v-else
-              class="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center"
-            >
-              <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            
+            <!-- TYPE: VIDEO -->
+            <div v-else-if="item.type === 'video'" class="w-full">
+              <div v-if="item.content" class="relative w-full aspect-video rounded-lg overflow-hidden">
+                <!-- YouTube -->
+                <iframe
+                  v-if="getVideoType(item.content) === 'youtube'"
+                  :src="getYoutubeEmbedUrl(item.content)"
+                  class="absolute inset-0 w-full h-full"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                />
+                <!-- Vimeo -->
+                <iframe
+                  v-else-if="getVideoType(item.content) === 'vimeo'"
+                  :src="getVimeoEmbedUrl(item.content)"
+                  class="absolute inset-0 w-full h-full"
+                  frameborder="0"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowfullscreen
+                />
+                <!-- Direct URL -->
+                <video
+                  v-else
+                  :src="item.content"
+                  class="absolute inset-0 w-full h-full object-cover"
+                  controls
+                />
+              </div>
+              <div 
+                v-else
+                class="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center"
+              >
+                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +106,9 @@ interface Props {
   verticalAlign?: 'top' | 'center' | 'bottom' | 'stretch'
   items?: GridItem[]
   backgroundColor?: string
+  // Positionnement
+  elementsOrder?: string[]
+  gridOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -109,6 +118,9 @@ const props = withDefaults(defineProps<Props>(), {
   verticalAlign: 'center',
   items: () => [],
   backgroundColor: '#ffffff',
+  // Positionnement
+  elementsOrder: () => ['grid'],
+  gridOffsetY: 0,
 })
 
 // Liste des items avec fallback
@@ -213,6 +225,17 @@ const getVimeoEmbedUrl = (url: string): string => {
   const videoId = match ? match[1] : null
   return videoId ? `https://player.vimeo.com/video/${videoId}` : ''
 }
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  return (props.elementsOrder || ['grid']).indexOf(element)
+}
+
+const gridPositionStyles = computed(() => ({
+  order: getElementOrder('grid'),
+  transform: props.gridOffsetY ? `translateY(${props.gridOffsetY}px)` : undefined
+}))
 </script>
 
 <style scoped>

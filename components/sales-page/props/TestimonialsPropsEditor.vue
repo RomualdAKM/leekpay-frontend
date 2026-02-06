@@ -40,8 +40,8 @@
         </div>
         <div v-for="(item, index) in localProps.items" :key="index" class="border border-gray-200 rounded-lg p-3">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-xs font-medium text-gray-600">#{{ index + 1 }}</span>
-            <button v-if="localProps.items.length > 1" @click="removeItem(index)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
+            <span class="text-xs font-medium text-gray-600">#{{ (index as number) + 1 }}</span>
+            <button v-if="localProps.items.length > 1" @click="removeItem(index as number)" class="text-xs text-red-500 hover:text-red-600">Supprimer</button>
           </div>
           <div class="space-y-2">
             <div class="grid grid-cols-2 gap-2">
@@ -377,6 +377,20 @@
       </div>
     </div>
     
+    <!-- ===== POSITIONNEMENT ===== -->
+    <PositioningSection
+      :elements="['title', 'subtitle', 'items']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="{ 
+        titleOffsetY: localProps.titleOffsetY, 
+        subtitleOffsetY: localProps.subtitleOffsetY, 
+        itemsOffsetY: localProps.itemsOffsetY 
+      }"
+      :labels="{ title: 'Titre', subtitle: 'Sous-titre', items: 'Grille des témoignages' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- ===== AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -401,6 +415,7 @@
 import { reactive, watch } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -416,6 +431,7 @@ const sections = reactive({
   animation: false,
   stats: true,
   reviewStats: true,
+  positioning: false,
   advanced: false,
 })
 
@@ -462,6 +478,11 @@ const localProps = reactive({
   totalReviews: props.props.totalReviews || '1894',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'items'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
+  itemsOffsetY: props.props.itemsOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -474,6 +495,11 @@ watch(() => props.props, (newVal) => {
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => {
   (localProps as any)[key] = value
+  emitUpdate()
+}
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
   emitUpdate()
 }
 

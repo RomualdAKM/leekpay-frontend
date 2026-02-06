@@ -4,87 +4,109 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Titre (au-dessus, éditable inline) -->
-      <h3 
-        v-if="(props.title && props.titlePosition === 'top') || (isEditMode && props.titlePosition === 'top')"
-        :class="[template.styles.title, editableClasses('title')]"
-        :style="titleStyles"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Titre de la vidéo'"
-        @focus="onFocus('title')"
-        @blur="onBlur($event, 'title')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.title }}</h3>
-      
-      <!-- Player vidéo -->
-      <div 
-        :class="template.styles.videoWrapper"
-        :style="videoWrapperStyles"
-      >
-        <div :class="template.styles.video" class="relative bg-black">
-          <!-- YouTube -->
-          <iframe
-            v-if="props.type === 'youtube' && youtubeId"
-            :src="`https://www.youtube.com/embed/${youtubeId}${youtubeParams}`"
-            class="absolute inset-0 w-full h-full"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-          />
-          
-          <!-- Vimeo -->
-          <iframe
-            v-else-if="props.type === 'vimeo' && vimeoId"
-            :src="`https://player.vimeo.com/video/${vimeoId}${vimeoParams}`"
-            class="absolute inset-0 w-full h-full"
-            frameborder="0"
-            allow="autoplay; fullscreen; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-          />
-          
-          <!-- URL directe -->
-          <video
-            v-else-if="props.type === 'url' && props.url"
-            :src="props.url"
-            :autoplay="props.autoplay"
-            :loop="props.loop"
-            :muted="props.muted"
-            :controls="props.showControls"
-            class="absolute inset-0 w-full h-full object-cover"
-            playsinline
-          />
-          
-          <!-- Placeholder -->
-          <div 
-            v-else 
-            class="absolute inset-0 flex items-center justify-center bg-gray-900"
-          >
-            <div class="text-center text-white">
-              <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p class="text-sm opacity-75">Ajoutez une URL vidéo</p>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col" :style="{ gap: '1.5rem' }">
+        <!-- Titre (éditable inline) -->
+        <h3 
+          v-if="props.title || isEditMode"
+          :class="[template.styles.title, editableClasses('title')]"
+          :style="{ ...titleStyles, ...titlePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre de la vidéo'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h3>
+        
+        <!-- Player vidéo -->
+        <div 
+          :class="template.styles.videoWrapper"
+          :style="{ ...videoWrapperStyles, ...videoPositionStyles }"
+        >
+          <div :class="template.styles.video" class="relative bg-black">
+            <!-- YouTube -->
+            <iframe
+              v-if="props.type === 'youtube' && youtubeId"
+              :src="`https://www.youtube.com/embed/${youtubeId}${youtubeParams}`"
+              class="absolute inset-0 w-full h-full"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            />
+            
+            <!-- Vimeo -->
+            <iframe
+              v-else-if="props.type === 'vimeo' && vimeoId"
+              :src="`https://player.vimeo.com/video/${vimeoId}${vimeoParams}`"
+              class="absolute inset-0 w-full h-full"
+              frameborder="0"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            />
+            
+            <!-- URL directe -->
+            <video
+              v-else-if="props.type === 'url' && props.url"
+              :src="props.url"
+              :autoplay="props.autoplay"
+              :loop="props.loop"
+              :muted="props.muted"
+              :controls="props.showControls"
+              class="absolute inset-0 w-full h-full object-cover"
+              playsinline
+            />
+            
+            <!-- Placeholder -->
+            <div 
+              v-else 
+              class="absolute inset-0 flex items-center justify-center bg-gray-900"
+            >
+              <div class="text-center text-white">
+                <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-sm opacity-75">Ajoutez une URL vidéo</p>
+              </div>
             </div>
           </div>
         </div>
+        
+        <!-- Description optionnelle -->
+        <p 
+          v-if="props.showDescription && (props.description || isEditMode)"
+          :class="editableClasses('description')"
+          :style="{ ...descriptionStyles, ...descriptionPositionStyles }"
+          :contenteditable="isEditMode"
+          data-placeholder="Description de la vidéo"
+          @focus="onFocus('description')"
+          @blur="onBlur($event, 'description')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.description }}</p>
+        
+        <!-- Bouton optionnel -->
+        <div v-if="props.showButton && (props.buttonText || isEditMode)" :style="{ ...buttonContainerStyles, ...buttonPositionStyles }">
+          <component
+            :is="props.buttonUrl ? 'a' : 'button'"
+            :href="props.buttonUrl || undefined"
+            :target="props.buttonUrl ? props.buttonTarget : undefined"
+            class="inline-flex items-center gap-2"
+            :style="buttonStyles"
+          >
+            {{ props.buttonText || 'Bouton' }}
+            <svg v-if="props.buttonIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+            <svg v-else-if="props.buttonIcon === 'external'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </component>
+        </div>
       </div>
-      
-      <!-- Titre (en-dessous, éditable inline) -->
-      <h3 
-        v-if="(props.title && props.titlePosition === 'bottom') || (isEditMode && props.titlePosition === 'bottom')"
-        :class="[template.styles.title, editableClasses('title')]"
-        :style="titleStyles"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Titre de la vidéo'"
-        @focus="onFocus('title')"
-        @blur="onBlur($event, 'title')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.title }}</h3>
     </div>
   </section>
 </template>
@@ -100,6 +122,19 @@ interface Props {
   type?: 'youtube' | 'vimeo' | 'url'
   url?: string
   title?: string
+  // Description optionnelle
+  showDescription?: boolean
+  description?: string
+  descriptionColor?: string
+  // Bouton optionnel
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
+  buttonTarget?: '_self' | '_blank'
+  buttonIcon?: 'none' | 'arrow-right' | 'external'
+  buttonBgColor?: string
+  buttonTextColor?: string
+  buttonAlign?: 'left' | 'center' | 'right'
   // Lecture
   autoplay?: boolean
   loop?: boolean
@@ -123,6 +158,12 @@ interface Props {
   paddingY?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
   // Animation
   animation?: 'none' | 'fade' | 'slide-up' | 'zoom'
+  // Positionnement des éléments
+  elementsOrder?: ('title' | 'video' | 'description' | 'button')[]
+  titleOffsetY?: number
+  videoOffsetY?: number
+  descriptionOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -131,6 +172,20 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'youtube',
   url: '',
   title: '',
+  // Description
+  showDescription: false,
+  description: '',
+  descriptionColor: '',
+  // Bouton
+  showButton: false,
+  buttonText: '',
+  buttonUrl: '',
+  buttonTarget: '_self',
+  buttonIcon: 'none',
+  buttonBgColor: '#10b981',
+  buttonTextColor: '#ffffff',
+  buttonAlign: 'center',
+  // Lecture
   autoplay: false,
   loop: false,
   muted: false,
@@ -147,6 +202,12 @@ const props = withDefaults(defineProps<Props>(), {
   titleWeight: 'medium',
   paddingY: 'large',
   animation: 'none',
+  // Positionnement
+  elementsOrder: () => ['title', 'video', 'description', 'button'] as ('title' | 'video' | 'description' | 'button')[],
+  titleOffsetY: 0,
+  videoOffsetY: 0,
+  descriptionOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Édition inline
@@ -313,6 +374,88 @@ const animationClass = computed(() => {
   const anim = props.animation || 'none'
   if (anim === 'none') return ''
   return `animate-${anim}`
+})
+
+// Styles de la description
+const descriptionStyles = computed(() => {
+  return {
+    color: props.descriptionColor || '#6b7280',
+    fontSize: '1rem',
+    textAlign: props.titleAlign || 'center',
+    marginTop: '1rem',
+    maxWidth: maxWidthMap[props.maxWidth || 'large'] || '64rem',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }
+})
+
+// Styles du conteneur du bouton
+const buttonContainerStyles = computed(() => {
+  const alignMap: Record<string, string> = {
+    'left': 'flex-start',
+    'center': 'center',
+    'right': 'flex-end'
+  }
+  return {
+    display: 'flex',
+    justifyContent: alignMap[props.buttonAlign || 'center'] || 'center'
+  }
+})
+
+// Styles du bouton
+const buttonStyles = computed(() => {
+  return {
+    backgroundColor: props.buttonBgColor || '#10b981',
+    color: props.buttonTextColor || '#ffffff',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    fontWeight: '600',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    border: 'none'
+  }
+})
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  const defaultOrder = ['title', 'video', 'description', 'button']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element as any)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
+}
+
+const titlePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.titleOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('title'))
+  return styles
+})
+
+const videoPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.videoOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('video'))
+  return styles
+})
+
+const descriptionPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.descriptionOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('description'))
+  return styles
+})
+
+const buttonPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.buttonOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('button'))
+  return styles
 })
 
 // YouTube params

@@ -7,38 +7,41 @@
     :style="sectionStyles"
   >
     <div class="max-w-6xl mx-auto px-6">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <!-- Grande image -->
-        <div class="relative">
-          <img 
-            :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
-            :alt="displayItems[0]?.name"
-            :style="{ borderRadius: cardBorderRadiusValue }"
-            class="w-full h-auto object-cover aspect-[4/5]"
-          />
-        </div>
-        <!-- Témoignage -->
-        <div>
-          <!-- Quote icon -->
-          <svg v-if="props.showQuoteIcon" class="w-12 h-12 mb-6" :style="{ color: textColor, opacity: 0.3 }" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-          </svg>
-          <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-normal leading-relaxed mb-8">
-            {{ displayItems[0]?.text }}
-          </blockquote>
-          <div class="mb-8">
-            <p :style="{ color: props.titleColor || textColor }" class="text-lg font-bold">{{ displayItems[0]?.name }}</p>
-            <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center" :style="itemsPositionStyles">
+          <!-- Grande image -->
+          <div class="relative">
+            <img 
+              :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
+              :alt="displayItems[0]?.name"
+              :style="{ borderRadius: cardBorderRadiusValue }"
+              class="w-full h-auto object-cover aspect-[4/5]"
+            />
           </div>
-          <!-- Stats -->
-          <div class="flex gap-8">
-            <div>
-              <p class="text-3xl font-bold" :style="{ color: props.accentColor || '#10B981' }">{{ props.stat1Value }}</p>
-              <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat1Label }}</p>
+          <!-- Témoignage -->
+          <div>
+            <!-- Quote icon -->
+            <svg v-if="props.showQuoteIcon" class="w-12 h-12 mb-6" :style="{ color: textColor, opacity: 0.3 }" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+            </svg>
+            <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-normal leading-relaxed mb-8">
+              {{ displayItems[0]?.text }}
+            </blockquote>
+            <div class="mb-8">
+              <p :style="{ color: props.titleColor || textColor }" class="text-lg font-bold">{{ displayItems[0]?.name }}</p>
+              <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
             </div>
-            <div>
-              <p class="text-3xl font-bold" :style="{ color: props.titleColor || textColor }">{{ props.stat2Value }}</p>
-              <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat2Label }}</p>
+            <!-- Stats -->
+            <div class="flex gap-8">
+              <div>
+                <p class="text-3xl font-bold" :style="{ color: props.accentColor || '#10B981' }">{{ props.stat1Value }}</p>
+                <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat1Label }}</p>
+              </div>
+              <div>
+                <p class="text-3xl font-bold" :style="{ color: props.titleColor || textColor }">{{ props.stat2Value }}</p>
+                <p :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ props.stat2Label }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -54,61 +57,66 @@
     :style="sectionStyles"
   >
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 v-if="props.title" :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-12">{{ props.title }}</h2>
-      
-      <!-- Slider Container -->
-      <div class="relative">
-        <!-- Flèches -->
-        <button 
-          @click="prevSlide"
-          :style="{ backgroundColor: sliderButtonBg, color: textColor }"
-          class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </button>
-        <button 
-          @click="nextSlide"
-          :style="{ backgroundColor: sliderButtonBg, color: textColor }"
-          class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </button>
-        
-        <!-- Slide -->
-        <div class="px-8">
-          <!-- Étoiles -->
-          <div v-if="props.showRating" class="flex justify-center gap-1 mb-6">
-            <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-light leading-relaxed italic mb-8">
-            "{{ displayItems[currentSlide]?.text }}"
-          </blockquote>
-          <div class="flex items-center justify-center gap-4">
-            <div 
-              v-if="props.showAvatar"
-              :style="{ ...avatarStyles, backgroundColor: sliderButtonBg }"
-              class="flex items-center justify-center font-semibold"
-            >
-              <span :style="{ color: textColor }">{{ getInitials(displayItems[currentSlide]?.name || 'C') }}</span>
-            </div>
-            <div class="text-left">
-              <p :style="{ color: props.titleColor || textColor }" class="text-base font-semibold">{{ displayItems[currentSlide]?.name }}</p>
-              <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[currentSlide]?.role }}</p>
-            </div>
-          </div>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-12">{{ props.title }}</h2>
         </div>
         
-        <!-- Dots -->
-        <div class="flex justify-center gap-2 mt-8">
+        <!-- Slider Container -->
+        <div class="relative" :style="itemsPositionStyles">
+          <!-- Flèches -->
           <button 
-            v-for="(_, idx) in displayItems" 
-            :key="idx"
-            @click="currentSlide = idx"
-            :style="{ backgroundColor: currentSlide === idx ? (props.accentColor || textColor) : sliderButtonBg }"
-            class="w-2 h-2 rounded-full transition-colors"
-          />
+            @click="prevSlide"
+            :style="{ backgroundColor: sliderButtonBg, color: textColor }"
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button 
+            @click="nextSlide"
+            :style="{ backgroundColor: sliderButtonBg, color: textColor }"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity z-10"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+          
+          <!-- Slide -->
+          <div class="px-8">
+            <!-- Étoiles -->
+            <div v-if="props.showRating" class="flex justify-center gap-1 mb-6">
+              <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <blockquote :style="quoteStyles" class="text-xl md:text-2xl font-light leading-relaxed italic mb-8">
+              "{{ displayItems[currentSlide]?.text }}"
+            </blockquote>
+            <div class="flex items-center justify-center gap-4">
+              <div 
+                v-if="props.showAvatar"
+                :style="{ ...avatarStyles, backgroundColor: sliderButtonBg }"
+                class="flex items-center justify-center font-semibold"
+              >
+                <span :style="{ color: textColor }">{{ getInitials(displayItems[currentSlide]?.name || 'C') }}</span>
+              </div>
+              <div class="text-left">
+                <p :style="{ color: props.titleColor || textColor }" class="text-base font-semibold">{{ displayItems[currentSlide]?.name }}</p>
+                <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[currentSlide]?.role }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Dots -->
+          <div class="flex justify-center gap-2 mt-8">
+            <button 
+              v-for="(_, idx) in displayItems" 
+              :key="idx"
+              @click="currentSlide = idx"
+              :style="{ backgroundColor: currentSlide === idx ? (props.accentColor || textColor) : sliderButtonBg }"
+              class="w-2 h-2 rounded-full transition-colors"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -122,24 +130,29 @@
     :style="sectionStyles"
   >
     <div class="max-w-4xl mx-auto px-6 text-center">
-      <!-- Grande icône quote -->
-      <svg v-if="props.showQuoteIcon" class="w-20 h-20 mx-auto mb-8" :style="{ color: textColor, opacity: 0.2 }" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-      </svg>
-      <blockquote :style="quoteStyles" class="text-2xl md:text-3xl font-light leading-relaxed italic mb-10">
-        "{{ displayItems[0]?.text }}"
-      </blockquote>
-      <div class="flex items-center justify-center gap-4">
-        <img 
-          v-if="props.showAvatar"
-          :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
-          :alt="displayItems[0]?.name"
-          :style="avatarStyles"
-          class="ring-4"
-        />
-        <div class="text-left">
-          <p :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold">{{ displayItems[0]?.name }}</p>
-          <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <div :style="itemsPositionStyles">
+          <!-- Grande icône quote -->
+          <svg v-if="props.showQuoteIcon" class="w-20 h-20 mx-auto mb-8" :style="{ color: textColor, opacity: 0.2 }" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+          </svg>
+          <blockquote :style="quoteStyles" class="text-2xl md:text-3xl font-light leading-relaxed italic mb-10">
+            "{{ displayItems[0]?.text }}"
+          </blockquote>
+          <div class="flex items-center justify-center gap-4">
+            <img 
+              v-if="props.showAvatar"
+              :src="displayItems[0]?.avatar || DEFAULT_AVATARS[0]" 
+              :alt="displayItems[0]?.name"
+              :style="avatarStyles"
+              class="ring-4"
+            />
+            <div class="text-left">
+              <p :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold">{{ displayItems[0]?.name }}</p>
+              <p v-if="props.showRole" :style="{ color: textColor, opacity: 0.6 }" class="text-sm">{{ displayItems[0]?.role }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -153,22 +166,30 @@
     :style="sectionStyles"
   >
     <div class="max-w-6xl mx-auto px-6">
-      <h2 v-if="props.title" :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight text-center mb-12">{{ props.title }}</h2>
-      <div :class="gridClasses">
-        <div 
-          v-for="(item, index) in displayItems" 
-          :key="index"
-          :style="cardStyles"
-          :class="['p-6', cardHoverClass]"
-        >
-          <!-- Étoiles -->
-          <div v-if="props.showRating" class="flex gap-0.5 mb-3">
-            <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight text-center">{{ props.title }}</h2>
+        </div>
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base text-center mt-2 mb-12">{{ props.subtitle }}</p>
+        </div>
+        <div :class="gridClasses" :style="itemsPositionStyles">
+          <div 
+            v-for="(item, index) in displayItems" 
+            :key="index"
+            :style="cardStyles"
+            :class="['p-6', cardHoverClass]"
+          >
+            <!-- Étoiles -->
+            <div v-if="props.showRating" class="flex gap-0.5 mb-3">
+              <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            <p :style="{ color: textColor }" class="text-sm leading-relaxed mb-4">{{ item.text }}</p>
+            <p :style="{ color: props.titleColor || textColor }" class="text-sm font-medium">{{ item.name }}</p>
           </div>
-          <p :style="{ color: textColor }" class="text-sm leading-relaxed mb-4">{{ item.text }}</p>
-          <p :style="{ color: props.titleColor || textColor }" class="text-sm font-medium">{{ item.name }}</p>
         </div>
       </div>
     </div>
@@ -182,44 +203,51 @@
     :style="sectionStyles"
   >
     <div class="max-w-3xl mx-auto px-6">
-      <!-- Header avec note moyenne -->
-      <div class="text-center mb-10">
-        <h2 v-if="props.title" :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight">{{ props.title }}</h2>
-        <div class="flex items-center justify-center gap-2 mt-3">
-          <div class="flex gap-0.5">
-            <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          <span :style="{ color: props.titleColor || textColor }" class="text-xl font-bold">{{ props.averageRating }}</span>
-          <span :style="{ color: textColor, opacity: 0.6 }">({{ props.totalReviews }} avis)</span>
-        </div>
-      </div>
-      
-      <!-- Liste des avis -->
-      <div class="space-y-4">
-        <div 
-          v-for="(item, index) in displayItems" 
-          :key="index"
-          :style="cardStyles"
-          :class="['p-6 relative', cardHoverClass]"
-        >
-          <div class="flex items-start justify-between mb-2">
-            <div v-if="props.showRating" class="flex gap-0.5">
-              <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Header avec note moyenne -->
+        <div class="mb-10" :style="titlePositionStyles">
+          <div class="text-center">
+            <h2 v-if="props.title || isEditMode" :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight">{{ props.title }}</h2>
+            <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+              <p :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-2">{{ props.subtitle }}</p>
             </div>
-            <span :style="{ color: textColor, opacity: 0.5 }" class="text-sm">{{ getReviewDate(index) }}</span>
+            <div class="flex items-center justify-center gap-2 mt-3">
+              <div class="flex gap-0.5">
+                <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <span :style="{ color: props.titleColor || textColor }" class="text-xl font-bold">{{ props.averageRating }}</span>
+              <span :style="{ color: textColor, opacity: 0.6 }">({{ props.totalReviews }} avis)</span>
+            </div>
           </div>
-          <p :style="{ color: textColor }" class="text-base leading-relaxed mb-3">{{ item.text }}</p>
-          <p :style="{ color: textColor, opacity: 0.7 }" class="text-sm font-medium">{{ item.name }}</p>
+        </div>
+        
+        <!-- Liste des avis -->
+        <div class="space-y-4" :style="itemsPositionStyles">
+          <div 
+            v-for="(item, index) in displayItems" 
+            :key="index"
+            :style="cardStyles"
+            :class="['p-6 relative', cardHoverClass]"
+          >
+            <div class="flex items-start justify-between mb-2">
+              <div v-if="props.showRating" class="flex gap-0.5">
+                <svg v-for="star in 5" :key="star" class="w-4 h-4" :style="{ color: star <= (item.rating || 5) ? (props.accentColor || '#fbbf24') : (textColor + '40') }" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <span :style="{ color: textColor, opacity: 0.5 }" class="text-sm">{{ getReviewDate(index) }}</span>
+            </div>
+            <p :style="{ color: textColor }" class="text-base leading-relaxed mb-3">{{ item.text }}</p>
+            <p :style="{ color: textColor, opacity: 0.7 }" class="text-sm font-medium">{{ item.name }}</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- LAYOUT: DÉFAUT (Grille standard) -->
   <section 
     v-else
     :id="props.cssId || undefined"
@@ -227,118 +255,121 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Header -->
-      <div v-if="props.title || props.subtitle || isEditMode" :class="template.styles.header" :style="headerStyles">
-        <h2 
-          v-if="props.title || isEditMode"
-          :class="[template.styles.title, editableClasses('title')]"
-          :style="titleStyles"
-          :contenteditable="isEditMode"
-          :data-placeholder="'Titre de la section'"
-          @focus="onFocus('title')"
-          @blur="onBlur($event, 'title')"
-          @keydown="onKeydown($event, true)"
-          @paste="onPaste"
-        >{{ props.title }}</h2>
-        <p 
-          v-if="props.subtitle || isEditMode"
-          :class="[template.styles.subtitle, editableClasses('subtitle')]"
-          :style="{ color: textColor }"
-          :contenteditable="isEditMode"
-          :data-placeholder="'Sous-titre (optionnel)'"
-          @focus="onFocus('subtitle')"
-          @blur="onBlur($event, 'subtitle')"
-          @keydown="onKeydown($event, false)"
-          @paste="onPaste"
-        >{{ props.subtitle }}</p>
-      </div>
-      
-      <!-- Grille -->
-      <div :class="gridClasses">
-        <div 
-          v-for="(item, index) in displayItems"
-          :key="index"
-          :class="[template.styles.card, cardHoverClass]"
-          :style="cardStyles"
-        >
-          <!-- Icône citation -->
-          <svg 
-            v-if="props.showQuoteIcon"
-            :class="template.styles.quoteIcon"
-            :style="{ color: props.accentColor }"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-          </svg>
-          
-          <!-- Étoiles en haut pour certains styles -->
-          <div v-if="props.showRating && item.rating" :class="template.styles.rating">
-            <svg 
-              v-for="star in 5" 
-              :key="star"
-              :class="template.styles.star"
-              :style="{ color: star <= item.rating ? props.accentColor : textColor, opacity: star <= item.rating ? 1 : 0.2 }"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          </div>
-          
-          <!-- Texte du témoignage -->
-          <blockquote 
-            :class="[template.styles.quote, editableClasses(`items[${index}].text`)]"
-            :style="quoteStyles"
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Header -->
+        <div v-if="props.title || props.subtitle || isEditMode" :class="template.styles.header" :style="{ ...headerStyles, ...titlePositionStyles }">
+          <h2 
+            v-if="props.title || isEditMode"
+            :class="[template.styles.title, editableClasses('title')]"
+            :style="titleStyles"
             :contenteditable="isEditMode"
-            :data-placeholder="'Témoignage...'"
-            @focus="onArrayFocus('items', index, 'text')"
-            @blur="onArrayBlur($event, 'items', index, 'text')"
+            :data-placeholder="'Titre de la section'"
+            @focus="onFocus('title')"
+            @blur="onBlur($event, 'title')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.title }}</h2>
+          <p 
+            v-if="props.subtitle || isEditMode"
+            :class="[template.styles.subtitle, editableClasses('subtitle')]"
+            :style="{ color: textColor, ...subtitlePositionStyles }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Sous-titre (optionnel)'"
+            @focus="onFocus('subtitle')"
+            @blur="onBlur($event, 'subtitle')"
             @keydown="onKeydown($event, false)"
             @paste="onPaste"
-          >"{{ item.text }}"</blockquote>
-          
-          <!-- Auteur -->
-          <div :class="template.styles.authorWrapper">
-            <!-- Avatar -->
-            <img 
-              v-if="props.showAvatar"
-              :src="item.avatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length]"
-              :alt="item.name"
-              :class="template.styles.avatar"
-              :style="avatarStyles"
-            />
+          >{{ props.subtitle }}</p>
+        </div>
+        
+        <!-- Grille -->
+        <div :class="gridClasses" :style="itemsPositionStyles" class="mt-8">
+          <div 
+            v-for="(item, index) in displayItems"
+            :key="index"
+            :class="[template.styles.card, cardHoverClass]"
+            :style="cardStyles"
+          >
+            <!-- Icône citation -->
+            <svg 
+              v-if="props.showQuoteIcon"
+              :class="template.styles.quoteIcon"
+              :style="{ color: props.accentColor }"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+            </svg>
             
-            <!-- Nom et rôle -->
-            <div :class="template.styles.authorInfo">
-              <p 
-                :class="[template.styles.author, editableClasses(`items[${index}].name`)]"
-                :style="{ color: textColor }"
-                :contenteditable="isEditMode"
-                :data-placeholder="'Nom'"
-                @focus="onArrayFocus('items', index, 'name')"
-                @blur="onArrayBlur($event, 'items', index, 'name')"
-                @keydown="onKeydown($event, true)"
-                @paste="onPaste"
-              >{{ item.name }}</p>
-              <p 
-                v-if="props.showRole && (item.role || isEditMode)" 
-                :class="[template.styles.role, editableClasses(`items[${index}].role`)]" 
-                :style="{ color: textColor }"
-                :contenteditable="isEditMode"
-                :data-placeholder="'Rôle'"
-                @focus="onArrayFocus('items', index, 'role')"
-                @blur="onArrayBlur($event, 'items', index, 'role')"
-                @keydown="onKeydown($event, true)"
-                @paste="onPaste"
-              >{{ item.role }}</p>
-              <p 
-                v-if="props.showCompany && item.company" 
-                :class="template.styles.company" 
-                :style="{ color: textColor }"
+            <!-- Étoiles en haut pour certains styles -->
+            <div v-if="props.showRating && item.rating" :class="template.styles.rating">
+              <svg 
+                v-for="star in 5" 
+                :key="star"
+                :class="template.styles.star"
+                :style="{ color: star <= item.rating ? props.accentColor : textColor, opacity: star <= item.rating ? 1 : 0.2 }"
+                fill="currentColor"
+                viewBox="0 0 20 20"
               >
-                {{ item.company }}
-              </p>
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </div>
+            
+            <!-- Texte du témoignage -->
+            <blockquote 
+              :class="[template.styles.quote, editableClasses(`items[${index}].text`)]"
+              :style="quoteStyles"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Témoignage...'"
+              @focus="onArrayFocus('items', index, 'text')"
+              @blur="onArrayBlur($event, 'items', index, 'text')"
+              @keydown="onKeydown($event, false)"
+              @paste="onPaste"
+            >"{{ item.text }}"</blockquote>
+            
+            <!-- Auteur -->
+            <div :class="template.styles.authorWrapper">
+              <!-- Avatar -->
+              <img 
+                v-if="props.showAvatar"
+                :src="item.avatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length]"
+                :alt="item.name"
+                :class="template.styles.avatar"
+                :style="avatarStyles"
+              />
+              
+              <!-- Nom et rôle -->
+              <div :class="template.styles.authorInfo">
+                <p 
+                  :class="[template.styles.author, editableClasses(`items[${index}].name`)]"
+                  :style="{ color: textColor }"
+                  :contenteditable="isEditMode"
+                  :data-placeholder="'Nom'"
+                  @focus="onArrayFocus('items', index, 'name')"
+                  @blur="onArrayBlur($event, 'items', index, 'name')"
+                  @keydown="onKeydown($event, true)"
+                  @paste="onPaste"
+                >{{ item.name }}</p>
+                <p 
+                  v-if="props.showRole && (item.role || isEditMode)" 
+                  :class="[template.styles.role, editableClasses(`items[${index}].role`)]" 
+                  :style="{ color: textColor }"
+                  :contenteditable="isEditMode"
+                  :data-placeholder="'Rôle'"
+                  @focus="onArrayFocus('items', index, 'role')"
+                  @blur="onArrayBlur($event, 'items', index, 'role')"
+                  @keydown="onKeydown($event, true)"
+                  @paste="onPaste"
+                >{{ item.role }}</p>
+                <p 
+                  v-if="props.showCompany && item.company" 
+                  :class="template.styles.company" 
+                  :style="{ color: textColor }"
+                >
+                  {{ item.company }}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -453,6 +484,11 @@ interface Props {
   // Avancé
   cssId?: string
   customClasses?: string
+  // Positionnement
+  elementsOrder?: string[]
+  titleOffsetY?: number
+  subtitleOffsetY?: number
+  itemsOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -496,6 +532,11 @@ const props = withDefaults(defineProps<Props>(), {
   totalReviews: '1894',
   cssId: '',
   customClasses: '',
+  // Positionnement
+  elementsOrder: () => ['title', 'subtitle', 'items'],
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
+  itemsOffsetY: 0,
 })
 
 // Contexte d'édition inline
@@ -833,4 +874,28 @@ const sliderButtonBg = computed(() => {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
   return luminance > 0.5 ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.15)'
 })
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  const defaultOrder = ['title', 'subtitle', 'items']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
+}
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+}))
+
+const subtitlePositionStyles = computed(() => ({
+  order: getElementOrder('subtitle'),
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined
+}))
+
+const itemsPositionStyles = computed(() => ({
+  order: getElementOrder('items'),
+  transform: props.itemsOffsetY ? `translateY(${props.itemsOffsetY}px)` : undefined
+}))
 </script>

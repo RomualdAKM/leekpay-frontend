@@ -327,6 +327,20 @@
       </div>
     </div>
     
+    <!-- ===== POSITIONNEMENT ===== -->
+    <PositioningSection
+      :elements="['title', 'subtitle', 'plans']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="{ 
+        titleOffsetY: localProps.titleOffsetY, 
+        subtitleOffsetY: localProps.subtitleOffsetY, 
+        plansOffsetY: localProps.plansOffsetY 
+      }"
+      :labels="{ title: 'Titre', subtitle: 'Sous-titre', plans: 'Grille des plans' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- ===== AVANCÉ ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -351,6 +365,7 @@
 import { reactive, watch, ref } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -364,6 +379,7 @@ const sections = reactive({
   lifetime: true,
   card: false,
   appearance: false,
+  positioning: false,
   advanced: false,
 })
 
@@ -413,6 +429,11 @@ const localProps = reactive({
   discountBadge: props.props.discountBadge || '-70%',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'plans'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
+  plansOffsetY: props.props.plansOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -424,6 +445,11 @@ watch(() => props.props, (newVal) => {
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 
 function togglePlan(idx: number) {
   const i = expandedPlans.value.indexOf(idx)

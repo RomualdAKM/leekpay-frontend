@@ -4,12 +4,13 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Header -->
-      <div v-if="props.title || props.subtitle || isEditMode" class="text-center" :class="{ 'mb-8 md:mb-12': props.title || isEditMode }">
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col items-center w-full" :style="{ gap: '1.5rem' }">
+        <!-- Titre -->
         <h3 
           v-if="props.title || isEditMode"
           :class="[template.styles.title, editableClasses('title')]"
-          :style="{ color: props.textColor }"
+          :style="{ color: props.textColor, ...titlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Titre du countdown'"
           @focus="onFocus('title')"
@@ -17,11 +18,13 @@
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
         >{{ props.title }}</h3>
+
+        <!-- Sous-titre -->
         <p 
           v-if="props.subtitle || isEditMode"
-          class="mt-2 text-sm md:text-base opacity-70"
+          class="text-sm md:text-base opacity-70"
           :class="editableClasses('subtitle')"
-          :style="{ color: props.textColor }"
+          :style="{ color: props.textColor, ...subtitlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Sous-titre (optionnel)'"
           @focus="onFocus('subtitle')"
@@ -29,110 +32,110 @@
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
         >{{ props.subtitle }}</p>
+        
+        <!-- Timer -->
+        <div :class="template.styles.timer" :style="timerPositionStyles">
+          <!-- Jours -->
+          <div v-if="props.showDays" class="flex flex-col items-center">
+            <div 
+              :class="[template.styles.digit, getDigitClass]"
+              :style="digitStyles"
+            >
+              {{ timeLeft.days }}
+            </div>
+            <span 
+              v-if="props.showLabels"
+              :class="template.styles.label"
+              :style="{ color: props.textColor }"
+            >
+              {{ props.dayLabel || 'Jours' }}
+            </span>
+          </div>
+          
+          <span 
+            v-if="props.showDays && props.showHours && props.showSeparators" 
+            :class="template.styles.separator" 
+            :style="{ color: props.textColor }"
+          >:</span>
+          
+          <!-- Heures -->
+          <div v-if="props.showHours" class="flex flex-col items-center">
+            <div 
+              :class="[template.styles.digit, getDigitClass]"
+              :style="digitStyles"
+            >
+              {{ timeLeft.hours }}
+            </div>
+            <span 
+              v-if="props.showLabels"
+              :class="template.styles.label"
+              :style="{ color: props.textColor }"
+            >
+              {{ props.hourLabel || 'Heures' }}
+            </span>
+          </div>
+          
+          <span 
+            v-if="props.showHours && props.showMinutes && props.showSeparators" 
+            :class="template.styles.separator" 
+            :style="{ color: props.textColor }"
+          >:</span>
+          
+          <!-- Minutes -->
+          <div v-if="props.showMinutes" class="flex flex-col items-center">
+            <div 
+              :class="[template.styles.digit, getDigitClass]"
+              :style="digitStyles"
+            >
+              {{ timeLeft.minutes }}
+            </div>
+            <span 
+              v-if="props.showLabels"
+              :class="template.styles.label"
+              :style="{ color: props.textColor }"
+            >
+              {{ props.minuteLabel || 'Minutes' }}
+            </span>
+          </div>
+          
+          <span 
+            v-if="props.showMinutes && props.showSeconds && props.showSeparators" 
+            :class="template.styles.separator" 
+            :style="{ color: props.textColor }"
+          >:</span>
+          
+          <!-- Secondes -->
+          <div v-if="props.showSeconds" class="flex flex-col items-center">
+            <div 
+              :class="[template.styles.digit, getDigitClass]"
+              :style="digitStyles"
+            >
+              {{ timeLeft.seconds }}
+            </div>
+            <span 
+              v-if="props.showLabels"
+              :class="template.styles.label"
+              :style="{ color: props.textColor }"
+            >
+              {{ props.secondLabel || 'Secondes' }}
+            </span>
+          </div>
+        </div>
+        
+        <!-- Message expiré -->
+        <p 
+          v-if="isExpired || isEditMode"
+          class="text-base font-medium text-center"
+          :class="editableClasses('expiredMessage')"
+          :style="{ color: props.textColor, opacity: isExpired ? 1 : 0.5, ...messagePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Message quand expiré'"
+          @focus="onFocus('expiredMessage')"
+          @blur="onBlur($event, 'expiredMessage')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.expiredMessage || 'Cette offre a expiré' }}</p>
       </div>
-      
-      <!-- Timer -->
-      <div :class="template.styles.timer">
-        <!-- Jours -->
-        <div v-if="props.showDays" class="flex flex-col items-center">
-          <div 
-            :class="[template.styles.digit, getDigitClass]"
-            :style="digitStyles"
-          >
-            {{ timeLeft.days }}
-          </div>
-          <span 
-            v-if="props.showLabels"
-            :class="template.styles.label"
-            :style="{ color: props.textColor }"
-          >
-            {{ props.dayLabel || 'Jours' }}
-          </span>
-        </div>
-        
-        <span 
-          v-if="props.showDays && props.showHours && props.showSeparators" 
-          :class="template.styles.separator" 
-          :style="{ color: props.textColor }"
-        >:</span>
-        
-        <!-- Heures -->
-        <div v-if="props.showHours" class="flex flex-col items-center">
-          <div 
-            :class="[template.styles.digit, getDigitClass]"
-            :style="digitStyles"
-          >
-            {{ timeLeft.hours }}
-          </div>
-          <span 
-            v-if="props.showLabels"
-            :class="template.styles.label"
-            :style="{ color: props.textColor }"
-          >
-            {{ props.hourLabel || 'Heures' }}
-          </span>
-        </div>
-        
-        <span 
-          v-if="props.showHours && props.showMinutes && props.showSeparators" 
-          :class="template.styles.separator" 
-          :style="{ color: props.textColor }"
-        >:</span>
-        
-        <!-- Minutes -->
-        <div v-if="props.showMinutes" class="flex flex-col items-center">
-          <div 
-            :class="[template.styles.digit, getDigitClass]"
-            :style="digitStyles"
-          >
-            {{ timeLeft.minutes }}
-          </div>
-          <span 
-            v-if="props.showLabels"
-            :class="template.styles.label"
-            :style="{ color: props.textColor }"
-          >
-            {{ props.minuteLabel || 'Minutes' }}
-          </span>
-        </div>
-        
-        <span 
-          v-if="props.showMinutes && props.showSeconds && props.showSeparators" 
-          :class="template.styles.separator" 
-          :style="{ color: props.textColor }"
-        >:</span>
-        
-        <!-- Secondes -->
-        <div v-if="props.showSeconds" class="flex flex-col items-center">
-          <div 
-            :class="[template.styles.digit, getDigitClass]"
-            :style="digitStyles"
-          >
-            {{ timeLeft.seconds }}
-          </div>
-          <span 
-            v-if="props.showLabels"
-            :class="template.styles.label"
-            :style="{ color: props.textColor }"
-          >
-            {{ props.secondLabel || 'Secondes' }}
-          </span>
-        </div>
-      </div>
-      
-      <!-- Message expiré -->
-      <p 
-        v-if="isExpired || isEditMode"
-        class="mt-6 text-base font-medium text-center"
-        :class="editableClasses('expiredMessage')"
-        :style="{ color: props.textColor, opacity: isExpired ? 1 : 0.5 }"
-        :contenteditable="isEditMode"
-        :data-placeholder="'Message quand expiré'"
-        @focus="onFocus('expiredMessage')"
-        @blur="onBlur($event, 'expiredMessage')"
-        @keydown="onKeydown($event, true)"
-        @paste="onPaste"
-      >{{ props.expiredMessage || 'Cette offre a expiré' }}</p>
     </div>
   </section>
 </template>
@@ -163,6 +166,12 @@ interface Props {
   backgroundColor?: string
   textColor?: string
   accentColor?: string
+  // Positionnement
+  elementsOrder?: string[]
+  titleOffsetY?: number
+  subtitleOffsetY?: number
+  timerOffsetY?: number
+  messageOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -186,6 +195,12 @@ const props = withDefaults(defineProps<Props>(), {
   backgroundColor: '#fef3c7',
   textColor: '#92400e',
   accentColor: '',
+  // Positionnement
+  elementsOrder: () => ['title', 'subtitle', 'timer', 'message'],
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
+  timerOffsetY: 0,
+  messageOffsetY: 0,
 })
 
 // Contexte d'édition inline
@@ -247,7 +262,7 @@ const template = computed(() => {
     styles: {
       section: 'py-10 md:py-14 px-6',
       container: 'max-w-2xl mx-auto text-center',
-      title: 'text-lg font-light mb-6 opacity-80',
+      title: 'text-lg font-light opacity-80',
       timer: 'flex justify-center gap-6',
       digit: 'text-4xl md:text-5xl font-light tracking-tight',
       label: 'text-xs uppercase tracking-wider opacity-50 mt-2',
@@ -352,4 +367,32 @@ onMounted(() => {
 onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  return (props.elementsOrder || ['title', 'subtitle', 'timer', 'message']).indexOf(element)
+}
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined,
+  marginBottom: getElementOrder('title') < getElementOrder('timer') ? '0' : '0' // On laisse le gap du parent gérer
+}))
+
+const subtitlePositionStyles = computed(() => ({
+  order: getElementOrder('subtitle'),
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  marginTop: '-0.5rem' // Rapprochement du titre si juste en dessous
+}))
+
+const timerPositionStyles = computed(() => ({
+  order: getElementOrder('timer'),
+  transform: props.timerOffsetY ? `translateY(${props.timerOffsetY}px)` : undefined
+}))
+
+const messagePositionStyles = computed(() => ({
+  order: getElementOrder('message'),
+  transform: props.messageOffsetY ? `translateY(${props.messageOffsetY}px)` : undefined
+}))
 </script>

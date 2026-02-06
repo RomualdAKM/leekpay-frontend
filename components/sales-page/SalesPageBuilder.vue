@@ -1212,6 +1212,7 @@ const loadTemplateForEdit = async (templateId: number) => {
     if (response.success && response.data) {
       templateData.value = { name: response.data.name, category: response.data.category }
       page.value.blocks = response.data.blocks || []
+      page.value.sections = response.data.sections || []
       page.value.theme = response.data.theme || page.value.theme
       page.value.settings = {
         ...page.value.settings,
@@ -1238,6 +1239,7 @@ const saveTemplateChanges = async () => {
         name: templateData.value.name,
         category: templateData.value.category,
         blocks: page.value.blocks,
+        sections: page.value.sections,
         theme: page.value.theme,
         settings: {
           showBranding: page.value.settings.showBranding,

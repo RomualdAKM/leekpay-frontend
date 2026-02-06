@@ -149,6 +149,17 @@
       </div>
     </div>
     
+    <!-- POSITIONNEMENT -->
+    <PositioningSection
+      v-show="sections.positioning"
+      :elements="['products']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="localProps"
+      :labels="{ products: 'Grille de produits' }"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -173,6 +184,7 @@
 import { reactive, watch, ref, inject } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 interface Product { id: string; image: string | null; name: string; description: string; price: string; originalPrice: string; buttonText: string; buttonUrl: string }
 
@@ -180,7 +192,7 @@ const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
 const uploadImage = inject<(file: File) => Promise<string | null>>('uploadImage')
 
-const sections = reactive({ products: true, options: false, appearance: false, advanced: false })
+const sections = reactive({ products: true, options: false, appearance: false, positioning: false, advanced: false })
 const expandedProduct = ref<string | null>(null)
 
 const localProps = reactive({
@@ -197,6 +209,9 @@ const localProps = reactive({
   paddingY: props.props.paddingY || 'large',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['products'],
+  productsOffsetY: props.props.productsOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -207,6 +222,11 @@ watch(() => props.props, (newVal) => {
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
+
+const updateOffsets = (offsets: Record<string, number>) => {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 
 const toggleProduct = (id: string) => { expandedProduct.value = expandedProduct.value === id ? null : id }
 

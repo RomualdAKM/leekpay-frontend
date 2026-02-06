@@ -4,25 +4,60 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container" :style="containerStyles">
-      <div 
-        v-if="!isEditMode"
-        :class="template.styles.text"
-        :style="textStyles"
-        v-html="props.content"
-      />
-      <!-- Mode édition: contenteditable avec HTML -->
-      <div 
-        v-else
-        :class="[template.styles.text, editableClasses('content')]"
-        :style="textStyles"
-        contenteditable="true"
-        data-placeholder="Écrivez votre contenu ici..."
-        @focus="onFocus('content')"
-        @blur="onBlur($event, 'content')"
-        @keydown="onKeydown"
-        ref="contentRef"
-        v-html="props.content"
-      />
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col" :style="{ gap: '1rem' }">
+        <!-- Titre optionnel -->
+        <h2 
+          v-if="props.showTitle && (props.title || isEditMode)"
+          :class="[template.styles.title, editableClasses('title')]"
+          :style="{ ...titleStyles, ...titlePositionStyles }"
+          :contenteditable="isEditMode"
+          data-placeholder="Titre de la section"
+          @focus="onFocus('title')"
+          @blur="onBlurText($event, 'title')"
+          @keydown="onKeydown"
+        >{{ props.title }}</h2>
+        
+        <!-- Contenu / Description -->
+        <div 
+          v-if="!isEditMode"
+          :class="template.styles.text"
+          :style="{ ...textStyles, ...contentPositionStyles }"
+          v-html="props.content"
+        />
+        <!-- Mode édition: contenteditable avec HTML -->
+        <div 
+          v-else
+          :class="[template.styles.text, editableClasses('content')]"
+          :style="{ ...textStyles, ...contentPositionStyles }"
+          contenteditable="true"
+          data-placeholder="Écrivez votre contenu ici..."
+          @focus="onFocus('content')"
+          @blur="onBlur($event, 'content')"
+          @keydown="onKeydown"
+          ref="contentRef"
+          v-html="props.content"
+        />
+        
+        <!-- Bouton optionnel -->
+        <div v-if="props.showButton && (props.buttonText || isEditMode)" :style="{ ...buttonContainerStyles, ...buttonPositionStyles }">
+          <component
+            :is="props.buttonUrl ? 'a' : 'button'"
+            :href="props.buttonUrl || undefined"
+            :target="props.buttonUrl ? props.buttonTarget : undefined"
+            :class="[template.styles.button, 'inline-flex items-center gap-2']"
+            :style="buttonStyles"
+          >
+            {{ props.buttonText || 'Bouton' }}
+            <svg v-if="props.buttonIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+            <svg v-else-if="props.buttonIcon === 'external'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </component>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -36,6 +71,21 @@ interface Props {
   blockId?: string  // ID du bloc pour l'édition inline
   templateId?: string
   content?: string
+  // Titre optionnel
+  showTitle?: boolean
+  title?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  titleColor?: string
+  // Bouton optionnel
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
+  buttonTarget?: '_self' | '_blank'
+  buttonIcon?: 'none' | 'arrow-right' | 'external'
+  buttonBgColor?: string
+  buttonTextColor?: string
+  buttonAlign?: 'left' | 'center' | 'right'
   // Couleurs
   backgroundColor?: string
   textColor?: string
@@ -59,12 +109,33 @@ interface Props {
   borderRadius?: 'none' | 'small' | 'medium' | 'large'
   // Animation
   animation?: 'none' | 'fade' | 'slide-up' | 'slide-left'
+  // Positionnement des éléments
+  elementsOrder?: ('title' | 'content' | 'button')[]
+  titleOffsetY?: number
+  contentOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   blockId: '',
   templateId: 'text-minimal-centered',
   content: '<p>Votre contenu ici...</p>',
+  // Titre
+  showTitle: false,
+  title: '',
+  titleSize: 'large',
+  titleWeight: 'bold',
+  titleColor: '',
+  // Bouton
+  showButton: false,
+  buttonText: '',
+  buttonUrl: '',
+  buttonTarget: '_self',
+  buttonIcon: 'none',
+  buttonBgColor: '#10b981',
+  buttonTextColor: '#ffffff',
+  buttonAlign: 'left',
+  // Couleurs
   backgroundColor: '#ffffff',
   textColor: '',
   accentColor: '#3b82f6',
@@ -83,6 +154,11 @@ const props = withDefaults(defineProps<Props>(), {
   borderColor: '',
   borderRadius: 'none',
   animation: 'none',
+  // Positionnement
+  elementsOrder: () => ['title', 'content', 'button'] as ('title' | 'content' | 'button')[],
+  titleOffsetY: 0,
+  contentOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Référence DOM
@@ -120,6 +196,17 @@ const onBlur = (e: FocusEvent, field: string) => {
   const target = e.target as HTMLElement
   // Pour le rich text, on garde le HTML
   const newValue = target.innerHTML || ''
+  
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+// Handler pour le titre (texte simple, pas HTML)
+const onBlurText = (e: FocusEvent, field: string) => {
+  const target = e.target as HTMLElement
+  const newValue = target.innerText || ''
   
   if (props.blockId) {
     emitPropUpdate(props.blockId, field, newValue)
@@ -298,5 +385,96 @@ const animationClass = computed(() => {
   const anim = props.animation || 'none'
   if (anim === 'none') return ''
   return `animate-${anim}`
+})
+
+// Taille du titre
+const titleSizeMap: Record<string, string> = {
+  'small': '1.25rem',
+  'medium': '1.5rem',
+  'large': '2rem',
+  'xlarge': '2.5rem'
+}
+
+// Styles du titre
+const titleStyles = computed(() => {
+  const styles: Record<string, string> = {
+    color: props.titleColor || props.textColor || autoTextColor.value,
+    fontSize: titleSizeMap[props.titleSize || 'large'] || '2rem',
+    fontWeight: fontWeightMap[props.titleWeight || 'bold'] || '700',
+    marginBottom: '1rem',
+    textAlign: props.textAlign || 'left'
+  }
+  return styles
+})
+
+// Styles du conteneur du bouton (pour l'alignement)
+const buttonContainerStyles = computed(() => {
+  const alignMap: Record<string, string> = {
+    'left': 'flex-start',
+    'center': 'center',
+    'right': 'flex-end'
+  }
+  return {
+    display: 'flex',
+    justifyContent: alignMap[props.buttonAlign || props.textAlign || 'left'] || 'flex-start'
+  }
+})
+
+// Styles du bouton
+const buttonStyles = computed(() => {
+  return {
+    backgroundColor: props.buttonBgColor || '#10b981',
+    color: props.buttonTextColor || '#ffffff',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    fontWeight: '600',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    border: 'none'
+  }
+})
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+// Calcul de l'ordre CSS pour chaque élément
+const getElementOrder = (element: string): number => {
+  const defaultOrder = ['title', 'content', 'button']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element as any)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
+}
+
+// Styles de positionnement pour le titre
+const titlePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.titleOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('title'))
+  return styles
+})
+
+// Styles de positionnement pour le contenu
+const contentPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.contentOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('content'))
+  return styles
+})
+
+// Styles de positionnement pour le bouton
+const buttonPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.buttonOffsetY || 0
+  if (offset !== 0) {
+    styles.transform = `translateY(${offset}px)`
+  }
+  styles.order = String(getElementOrder('button'))
+  return styles
 })
 </script>

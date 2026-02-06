@@ -4,41 +4,89 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <figure>
-        <!-- Image Wrapper -->
-        <div 
-          :class="template.styles.imageWrapper"
-          :style="imageWrapperStyles"
-        >
-          <img 
-            :src="imageSrc"
-            :alt="props.alt || 'Image'"
-            :class="template.styles.image"
-            :style="imageStyles"
-            loading="lazy"
-          />
-          
-          <!-- Overlay -->
-          <div 
-            v-if="props.overlayEnabled"
-            class="absolute inset-0"
-            :style="overlayStyles"
-          />
-        </div>
-        
-        <!-- Caption (éditable inline) -->
-        <figcaption 
-          v-if="props.caption || isEditMode"
-          :class="[template.styles.caption, editableClasses('caption')]"
-          :style="captionStyles"
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col" :style="{ gap: '1rem' }">
+        <!-- Titre optionnel -->
+        <h2 
+          v-if="props.showTitle && (props.title || isEditMode)"
+          :class="editableClasses('title')"
+          :style="{ ...titleStyles, ...titlePositionStyles }"
           :contenteditable="isEditMode"
-          :data-placeholder="'Légende de l\'image'"
-          @focus="onFocus('caption')"
-          @blur="onBlur($event, 'caption')"
+          data-placeholder="Titre de la section"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
-        >{{ props.caption }}</figcaption>
-      </figure>
+        >{{ props.title }}</h2>
+        
+        <!-- Description optionnelle -->
+        <p 
+          v-if="props.showDescription && (props.description || isEditMode)"
+          :class="editableClasses('description')"
+          :style="{ ...descriptionStyles, ...descriptionPositionStyles }"
+          :contenteditable="isEditMode"
+          data-placeholder="Description de l'image"
+          @focus="onFocus('description')"
+          @blur="onBlur($event, 'description')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.description }}</p>
+        
+        <figure :style="imagePositionStyles">
+          <!-- Image Wrapper -->
+          <div 
+            :class="template.styles.imageWrapper"
+            :style="imageWrapperStyles"
+          >
+            <img 
+              :src="imageSrc"
+              :alt="props.alt || 'Image'"
+              :class="template.styles.image"
+              :style="imageStyles"
+              loading="lazy"
+            />
+            
+            <!-- Overlay -->
+            <div 
+              v-if="props.overlayEnabled"
+              class="absolute inset-0"
+              :style="overlayStyles"
+            />
+          </div>
+          
+          <!-- Caption (éditable inline) -->
+          <figcaption 
+            v-if="props.caption || isEditMode"
+            :class="[template.styles.caption, editableClasses('caption')]"
+            :style="captionStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Légende de l\'image'"
+            @focus="onFocus('caption')"
+            @blur="onBlur($event, 'caption')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.caption }}</figcaption>
+        </figure>
+        
+        <!-- Bouton optionnel -->
+        <div v-if="props.showButton && (props.buttonText || isEditMode)" :style="{ ...buttonContainerStyles, ...buttonPositionStyles }">
+          <component
+            :is="props.buttonUrl ? 'a' : 'button'"
+            :href="props.buttonUrl || undefined"
+            :target="props.buttonUrl ? props.buttonTarget : undefined"
+            class="inline-flex items-center gap-2"
+            :style="buttonStyles"
+          >
+            {{ props.buttonText || 'Bouton' }}
+            <svg v-if="props.buttonIcon === 'arrow-right'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+            <svg v-else-if="props.buttonIcon === 'external'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </component>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -59,6 +107,26 @@ interface Props {
   src?: string | null
   alt?: string
   caption?: string
+  // Titre optionnel
+  showTitle?: boolean
+  title?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  titleColor?: string
+  titleAlign?: 'left' | 'center' | 'right'
+  // Description optionnelle
+  showDescription?: boolean
+  description?: string
+  descriptionColor?: string
+  // Bouton optionnel
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
+  buttonTarget?: '_self' | '_blank'
+  buttonIcon?: 'none' | 'arrow-right' | 'external'
+  buttonBgColor?: string
+  buttonTextColor?: string
+  buttonAlign?: 'left' | 'center' | 'right'
   // Couleurs
   backgroundColor?: string
   // Image
@@ -84,6 +152,12 @@ interface Props {
   captionSize?: 'small' | 'medium' | 'large'
   // Animation
   animation?: 'none' | 'fade' | 'slide-up' | 'zoom'
+  // Positionnement des éléments
+  elementsOrder?: ('title' | 'description' | 'image' | 'button')[]
+  titleOffsetY?: number
+  descriptionOffsetY?: number
+  imageOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -92,6 +166,27 @@ const props = withDefaults(defineProps<Props>(), {
   src: DEFAULT_IMAGE_SRC,
   alt: '',
   caption: '',
+  // Titre
+  showTitle: false,
+  title: '',
+  titleSize: 'large',
+  titleWeight: 'bold',
+  titleColor: '',
+  titleAlign: 'center',
+  // Description
+  showDescription: false,
+  description: '',
+  descriptionColor: '',
+  // Bouton
+  showButton: false,
+  buttonText: '',
+  buttonUrl: '',
+  buttonTarget: '_self',
+  buttonIcon: 'none',
+  buttonBgColor: '#10b981',
+  buttonTextColor: '#ffffff',
+  buttonAlign: 'center',
+  // Autres
   backgroundColor: '#ffffff',
   objectFit: 'cover',
   objectPosition: 'center',
@@ -109,6 +204,12 @@ const props = withDefaults(defineProps<Props>(), {
   captionAlign: 'center',
   captionSize: 'small',
   animation: 'none',
+  // Positionnement
+  elementsOrder: () => ['title', 'description', 'image', 'button'] as ('title' | 'description' | 'image' | 'button')[],
+  titleOffsetY: 0,
+  descriptionOffsetY: 0,
+  imageOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Édition inline
@@ -311,5 +412,112 @@ const animationClass = computed(() => {
   const anim = props.animation || 'none'
   if (anim === 'none') return ''
   return `animate-${anim}`
+})
+
+// Styles du titre
+const titleSizeMap: Record<string, string> = {
+  'small': '1.25rem',
+  'medium': '1.5rem',
+  'large': '2rem',
+  'xlarge': '2.5rem'
+}
+
+const fontWeightMap: Record<string, string> = {
+  'normal': '400',
+  'medium': '500',
+  'semibold': '600',
+  'bold': '700'
+}
+
+const titleStyles = computed(() => {
+  return {
+    color: props.titleColor || '#1f2937',
+    fontSize: titleSizeMap[props.titleSize || 'large'] || '2rem',
+    fontWeight: fontWeightMap[props.titleWeight || 'bold'] || '700',
+    textAlign: props.titleAlign || 'center',
+    marginBottom: '1rem'
+  }
+})
+
+// Styles de la description
+const descriptionStyles = computed(() => {
+  return {
+    color: props.descriptionColor || '#6b7280',
+    fontSize: '1rem',
+    textAlign: props.titleAlign || 'center',
+    marginBottom: '1.5rem',
+    maxWidth: '48rem',
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }
+})
+
+// Styles du conteneur du bouton
+const buttonContainerStyles = computed(() => {
+  const alignMap: Record<string, string> = {
+    'left': 'flex-start',
+    'center': 'center',
+    'right': 'flex-end'
+  }
+  return {
+    display: 'flex',
+    justifyContent: alignMap[props.buttonAlign || 'center'] || 'center'
+  }
+})
+
+// Styles du bouton
+const buttonStyles = computed(() => {
+  return {
+    backgroundColor: props.buttonBgColor || '#10b981',
+    color: props.buttonTextColor || '#ffffff',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    fontWeight: '600',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    border: 'none'
+  }
+})
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  const defaultOrder = ['title', 'description', 'image', 'button']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element as any)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
+}
+
+const titlePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.titleOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('title'))
+  return styles
+})
+
+const descriptionPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.descriptionOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('description'))
+  return styles
+})
+
+const imagePositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.imageOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('image'))
+  return styles
+})
+
+const buttonPositionStyles = computed(() => {
+  const styles: Record<string, string> = {}
+  const offset = props.buttonOffsetY || 0
+  if (offset !== 0) styles.transform = `translateY(${offset}px)`
+  styles.order = String(getElementOrder('button'))
+  return styles
 })
 </script>

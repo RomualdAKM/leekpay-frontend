@@ -26,25 +26,25 @@
       
       <!-- Content -->
       <div :class="[template.styles.container, contentAlignmentClass, verticalAlignmentClass]" :style="containerDynamicStyles" class="min-h-screen">
-        <div :class="template.styles.content">
+        <div :class="template.styles.content" :style="contentWrapperStyles">
           <span 
             v-if="props.badge && template.config?.showBadge !== false"
             :class="template.styles.badge"
-            :style="badgeStyles"
+            :style="{ ...badgeStyles, ...badgePositionStyles }"
           >{{ props.badge }}</span>
           
           <h1 
             :class="template.styles.title"
-            :style="titleStylesFullscreen"
+            :style="{ ...titleStylesFullscreen, ...titlePositionStyles }"
           >{{ currentSlideData?.title || props.title }}</h1>
           
           <p 
             v-if="currentSlideData?.subtitle || props.subtitle"
             :class="template.styles.subtitle"
-            :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
+            :style="{ opacity: (props.subtitleOpacity ?? 70) / 100, ...subtitlePositionStyles }"
           >{{ currentSlideData?.subtitle || props.subtitle }}</p>
           
-          <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+          <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }">
             <component
               :is="props.ctaUrl ? 'a' : 'button'"
               v-if="props.ctaText"
@@ -117,25 +117,25 @@
   >
     <div :class="template.styles.container">
       <!-- Content -->
-      <div :class="[template.styles.content, contentAlignmentClass]">
+      <div :class="[template.styles.content, contentAlignmentClass, verticalAlignmentClass]" :style="containerDynamicStyles">
         <span 
           v-if="props.badge && template.config?.showBadge !== false"
           :class="template.styles.badge"
-          :style="badgeStyles"
+          :style="{ ...badgeStyles, ...badgePositionStyles }"
         >{{ props.badge }}</span>
         
         <h1 
           :class="template.styles.title"
-          :style="titleStyles"
+          :style="{ ...titleStyles, ...titlePositionStyles }"
         >{{ props.title }}</h1>
         
         <p 
           v-if="props.subtitle"
           :class="template.styles.subtitle"
-          :style="subtitleStyles"
+          :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
         >{{ props.subtitle }}</p>
         
-        <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+        <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }">
           <component
             :is="props.ctaUrl ? 'a' : 'button'"
             v-if="props.ctaText"
@@ -170,6 +170,7 @@
       <div 
         v-if="props.mediaUrl"
         :class="template.styles.imageWrapper"
+        :style="imagePositionStyles"
       >
         <img 
           :src="props.mediaUrl"
@@ -209,21 +210,21 @@
         <span 
           v-if="props.badge && template.config?.showBadge !== false"
           :class="template.styles.badge"
-          :style="badgeStyles"
+          :style="{ ...badgeStyles, ...badgePositionStyles }"
         >{{ props.badge }}</span>
         
         <h1 
           :class="template.styles.title"
-          :style="titleStylesFullscreen"
+          :style="{ ...titleStylesFullscreen, ...titlePositionStyles }"
         >{{ props.title }}</h1>
       
         <p 
           v-if="props.subtitle"
           :class="template.styles.subtitle"
-          :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
+          :style="{ opacity: (props.subtitleOpacity ?? 70) / 100, ...subtitlePositionStyles }"
         >{{ props.subtitle }}</p>
         
-        <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+        <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }">
           <component
             :is="props.ctaUrl ? 'a' : 'button'"
             v-if="props.ctaText"
@@ -284,21 +285,21 @@
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
-        :style="badgeStyles"
+        :style="{ ...badgeStyles, ...badgePositionStyles }"
       >{{ props.badge }}</span>
       
       <h1 
         :class="template.styles.title"
-        :style="titleStylesFullscreen"
+        :style="{ ...titleStylesFullscreen, ...titlePositionStyles }"
       >{{ props.title }}</h1>
       
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
-        :style="{ opacity: (props.subtitleOpacity ?? 70) / 100 }"
+        :style="{ opacity: (props.subtitleOpacity ?? 70) / 100, ...subtitlePositionStyles }"
       >{{ props.subtitle }}</p>
       
-      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }">
         <component
           :is="props.ctaUrl ? 'a' : 'button'"
           v-if="props.ctaText"
@@ -355,21 +356,21 @@
       <span 
         v-if="props.badge && template.config?.showBadge !== false"
         :class="template.styles.badge"
-        :style="badgeStyles"
+        :style="{ ...badgeStyles, ...badgePositionStyles }"
       >{{ props.badge }}</span>
       
       <h1 
         :class="template.styles.title"
-        :style="titleStyles"
+        :style="{ ...titleStyles, ...titlePositionStyles }"
       >{{ props.title }}</h1>
       
       <p 
         v-if="props.subtitle"
         :class="template.styles.subtitle"
-        :style="subtitleStyles"
+        :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
       >{{ props.subtitle }}</p>
       
-      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="buttonGroupStyles">
+      <div :class="[template.styles.buttonGroup, buttonAlignmentClass]" :style="{ ...buttonGroupStyles, ...buttonsPositionStyles }">
         <component
           :is="props.ctaUrl ? 'a' : 'button'"
           v-if="props.ctaText"
@@ -1110,6 +1111,10 @@ const sectionDynamicStyles = computed(() => {
 const containerDynamicStyles = computed(() => {
   const styles: Record<string, string> = {}
   
+  // Flex container pour permettre le réordonnancement avec CSS order
+  styles.display = 'flex'
+  styles.flexDirection = 'column'
+  
   // Gap entre éléments
   styles.gap = contentGapMap[props.contentGap || 'medium'] || '1.5rem'
   
@@ -1189,8 +1194,10 @@ const sectionClasses = computed(() => props.customClasses || '')
 
 // Calcul de l'ordre CSS pour chaque élément
 const getElementOrder = (element: string): number => {
-  const order = props.elementsOrder || ['badge', 'title', 'subtitle', 'buttons']
-  return order.indexOf(element as any)
+  const defaultOrder = ['badge', 'title', 'subtitle', 'buttons']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element as any)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
 }
 
 // Styles avec offset pour le badge

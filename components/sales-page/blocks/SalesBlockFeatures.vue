@@ -7,21 +7,30 @@
     :style="sectionStyles"
   >
     <div class="max-w-3xl mx-auto">
-      <div :style="headerStyles" class="mb-12 md:mb-16">
-        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
-        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
-      </div>
-      <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col">
-        <div v-for="(item, index) in props.items" :key="index" class="flex items-start gap-6">
-          <div 
-            class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold"
-            :style="{ backgroundColor: props.accentColor || '#1f2937', color: props.iconColor || '#ffffff' }"
-          >
-            {{ index + 1 }}
-          </div>
-          <div class="pt-2">
-            <h3 :style="{ color: props.titleColor || textColor }" class="text-xl font-semibold mb-1">{{ item.title }}</h3>
-            <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="opacity-70">{{ item.description }}</p>
+      <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Titre -->
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        </div>
+        <!-- Sous-titre -->
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+        </div>
+        <!-- Grille/Liste -->
+        <div :style="gridPositionStyles" class="mt-8 w-full">
+          <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col">
+            <div v-for="(item, index) in props.items" :key="index" class="flex items-start gap-6">
+              <div 
+                class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold"
+                :style="{ backgroundColor: props.accentColor || '#1f2937', color: props.iconColor || '#ffffff' }"
+              >
+                {{ index + 1 }}
+              </div>
+              <div class="pt-2">
+                <h3 :style="{ color: props.titleColor || textColor }" class="text-xl font-semibold mb-1">{{ item.title }}</h3>
+                <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="opacity-70">{{ item.description }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -36,28 +45,37 @@
     :style="sectionStyles"
   >
     <div class="max-w-6xl mx-auto">
-      <div :style="headerStyles" class="mb-12 md:mb-16">
-        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
-        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
-        <div 
-          v-for="(item, index) in props.items" 
-          :key="index" 
-          :style="cardStyles"
-          :class="['rounded-xl p-6 text-left', cardHoverClass]"
-        >
-          <div 
-            v-if="props.showIcon"
-            class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-            :style="iconWrapperStyles"
-          >
-            <svg class="w-6 h-6" :style="{ color: iconTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon || 'check')" />
-            </svg>
+      <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Titre -->
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        </div>
+        <!-- Sous-titre -->
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+        </div>
+        <!-- Grille/Liste -->
+        <div :style="gridPositionStyles" class="mt-8 w-full">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
+            <div 
+              v-for="(item, index) in props.items" 
+              :key="index" 
+              :style="cardStyles"
+              :class="['rounded-xl p-6 text-left', cardHoverClass]"
+            >
+              <div 
+                v-if="props.showIcon"
+                class="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
+                :style="iconWrapperStyles"
+              >
+                <svg class="w-6 h-6" :style="{ color: iconTextColor }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" :d="getIconPath(item.icon || 'check')" />
+                </svg>
+              </div>
+              <h3 :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold mb-2">{{ item.title }}</h3>
+              <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="text-sm opacity-70">{{ item.description }}</p>
+            </div>
           </div>
-          <h3 :style="{ color: props.titleColor || textColor }" class="text-lg font-semibold mb-2">{{ item.title }}</h3>
-          <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="text-sm opacity-70">{{ item.description }}</p>
         </div>
       </div>
     </div>
@@ -71,34 +89,42 @@
     :style="sectionStyles"
   >
     <div class="max-w-6xl mx-auto">
-      <!-- Header -->
-      <div v-if="props.title || props.subtitle" :style="headerStyles" class="mb-12 md:mb-16">
-        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
-        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
-      </div>
-      <div :style="{ gap: itemGapMap[props.itemGap || 'xlarge'] || '3rem' }" class="flex flex-col">
-        <div 
-          v-for="(item, index) in displayShowcaseItems" 
-          :key="index" 
-          :class="['grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center']"
-        >
-          <div :class="index % 2 === 1 ? 'md:order-2' : ''">
-            <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl md:text-3xl font-bold mb-4">{{ item.title }}</h3>
-            <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="leading-relaxed mb-6 opacity-80">{{ item.description }}</p>
-            <a v-if="item.link" :href="item.link" :style="{ color: props.titleColor || textColor }" class="inline-flex items-center gap-2 font-medium hover:underline">
-              {{ item.linkText || 'En savoir plus' }}
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-          </div>
-          <div :class="index % 2 === 1 ? 'md:order-1' : ''">
-            <img 
-              :src="item.image || DEFAULT_SHOWCASE_IMAGES[index % DEFAULT_SHOWCASE_IMAGES.length]" 
-              :alt="item.title"
-              :style="{ borderRadius: cardBorderRadiusValue }"
-              class="w-full h-auto object-cover"
-            />
+      <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Titre -->
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        </div>
+        <!-- Sous-titre -->
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+        </div>
+        <!-- Grille/Liste -->
+        <div :style="gridPositionStyles" class="mt-8 w-full">
+          <div :style="{ gap: itemGapMap[props.itemGap || 'xlarge'] || '3rem' }" class="flex flex-col">
+            <div 
+              v-for="(item, index) in displayShowcaseItems" 
+              :key="index" 
+              :class="['grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center']"
+            >
+              <div :class="index % 2 === 1 ? 'md:order-2' : ''">
+                <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl md:text-3xl font-bold mb-4">{{ item.title }}</h3>
+                <p v-if="item.description && props.showDescription" :style="{ color: textColor }" class="leading-relaxed mb-6 opacity-80">{{ item.description }}</p>
+                <a v-if="item.link" :href="item.link" :style="{ color: props.titleColor || textColor }" class="inline-flex items-center gap-2 font-medium hover:underline">
+                  {{ item.linkText || 'En savoir plus' }}
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+              </div>
+              <div :class="index % 2 === 1 ? 'md:order-1' : ''">
+                <img 
+                  :src="item.image || DEFAULT_SHOWCASE_IMAGES[index % DEFAULT_SHOWCASE_IMAGES.length]" 
+                  :alt="item.title"
+                  :style="{ borderRadius: cardBorderRadiusValue }"
+                  class="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -113,30 +139,39 @@
     :style="sectionStyles"
   >
     <div class="max-w-4xl mx-auto">
-      <!-- Badge -->
-      <div v-if="props.showBadge" class="flex justify-start mb-6">
-        <span 
-          class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
-          :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
-        >
-          {{ props.badge || 'Caractéristiques' }}
-        </span>
-      </div>
-      <div :style="headerStyles" class="mb-12 md:mb-16">
-        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
-        <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
-        <div 
-          v-for="(item, index) in props.items" 
-          :key="index" 
-          :style="cardStyles"
-          :class="['flex items-center gap-4 p-4 rounded-lg', cardHoverClass]"
-        >
-          <svg :style="{ color: props.accentColor || '#10B981' }" class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-          </svg>
-          <span :style="{ color: props.titleColor || textColor }" class="text-base font-medium">{{ item.title }}</span>
+      <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
+        </div>
+        <!-- Titre -->
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        </div>
+        <!-- Sous-titre -->
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+        </div>
+        <!-- Grille/Liste -->
+        <div :style="gridPositionStyles" class="mt-8 w-full">
+          <div class="grid grid-cols-1 md:grid-cols-2" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
+            <div 
+              v-for="(item, index) in props.items" 
+              :key="index" 
+              :style="cardStyles"
+              :class="['flex items-center gap-4 p-4 rounded-lg', cardHoverClass]"
+            >
+              <svg :style="{ color: props.accentColor || '#10B981' }" class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span :style="{ color: props.titleColor || textColor }" class="text-base font-medium">{{ item.title }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -150,55 +185,64 @@
     :style="sectionStyles"
   >
     <div class="max-w-6xl mx-auto">
-      <!-- Badge -->
-      <div v-if="props.showBadge" class="flex justify-start mb-6">
-        <span 
-          class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
-          :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
-        >
-          {{ props.badge || 'Caractéristiques' }}
-        </span>
-      </div>
-      <div :style="headerStyles" class="mb-10">
-        <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
-      </div>
-      
-      <!-- Onglets -->
-      <div class="flex flex-wrap justify-center gap-2 mb-10">
-        <button 
-          v-for="(tab, index) in displayTabs" 
-          :key="index"
-          @click="activeTab = index"
-          :style="activeTab === index 
-            ? { backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' } 
-            : { backgroundColor: 'rgba(0,0,0,0.05)', color: textColor }"
-          class="px-6 py-2.5 rounded-full text-sm font-medium transition-colors hover:opacity-80"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
-      
-      <!-- Contenu de l'onglet actif -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-        <div>
-          <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl font-bold mb-4">{{ displayTabs[activeTab]?.title }}</h3>
-          <p :style="{ color: textColor }" class="mb-6 opacity-80">{{ displayTabs[activeTab]?.description }}</p>
-          <ul class="space-y-3">
-            <li v-for="(feature, idx) in displayTabs[activeTab]?.features" :key="idx" class="flex items-center gap-3">
-              <svg :style="{ color: props.accentColor || '#10B981' }" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
-              <span :style="{ color: textColor }">{{ feature }}</span>
-            </li>
-          </ul>
+      <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
         </div>
-        <div>
-          <img 
-            :src="displayTabs[activeTab]?.image || DEFAULT_TAB_IMAGE" 
-            :alt="displayTabs[activeTab]?.title"
-            :style="{ borderRadius: cardBorderRadiusValue }"
-            class="w-full h-auto object-cover"
-          />
+        <!-- Titre -->
+        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
+          <h2 :style="sectionTitleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        </div>
+        <!-- Sous-titre -->
+        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
+        </div>
+        <!-- Grille/Liste -->
+        <div :style="gridPositionStyles" class="mt-4 w-full">
+          <!-- Onglets -->
+          <div class="flex flex-wrap justify-center gap-2 mb-10">
+            <button 
+              v-for="(tab, index) in displayTabs" 
+              :key="index"
+              @click="activeTab = index"
+              :style="activeTab === index 
+                ? { backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' } 
+                : { backgroundColor: 'rgba(0,0,0,0.05)', color: textColor }"
+              class="px-6 py-2.5 rounded-full text-sm font-medium transition-colors hover:opacity-80"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
+          
+          <!-- Contenu de l'onglet actif -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div>
+              <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl font-bold mb-4">{{ displayTabs[activeTab]?.title }}</h3>
+              <p :style="{ color: textColor }" class="mb-6 opacity-80">{{ displayTabs[activeTab]?.description }}</p>
+              <ul class="space-y-3">
+                <li v-for="(feature, idx) in displayTabs[activeTab]?.features" :key="idx" class="flex items-center gap-3">
+                  <svg :style="{ color: props.accentColor || '#10B981' }" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span :style="{ color: textColor }">{{ feature }}</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <img 
+                :src="displayTabs[activeTab]?.image || DEFAULT_TAB_IMAGE" 
+                :alt="displayTabs[activeTab]?.title"
+                :style="{ borderRadius: cardBorderRadiusValue }"
+                class="w-full h-auto object-cover"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -212,12 +256,27 @@
     :style="sectionStyles"
   >
     <div :class="template.styles.container">
-      <!-- Header -->
-      <div v-if="props.title || props.subtitle || isEditMode" :class="template.styles.header" :style="headerStyles">
+      <!-- Conteneur flex pour le positionnement -->
+      <div class="flex flex-col w-full" :style="{ 
+        gap: '1.5rem',
+        alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start'),
+        textAlign: props.headerAlignment || 'center'
+      }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
+        </div>
+
+        <!-- Titre -->
         <h2 
           v-if="props.title || isEditMode"
           :class="[template.styles.title, editableClasses('title')]"
-          :style="sectionTitleStyles"
+          :style="{ ...sectionTitleStyles, ...titlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Titre de la section'"
           @focus="onFocus('title')"
@@ -225,10 +284,12 @@
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
         >{{ props.title }}</h2>
+
+        <!-- Sous-titre -->
         <p 
           v-if="props.subtitle || isEditMode"
           :class="[template.styles.subtitle, editableClasses('subtitle')]"
-          :style="{ color: textColor }"
+          :style="{ color: textColor, ...subtitlePositionStyles }"
           :contenteditable="isEditMode"
           :data-placeholder="'Sous-titre (optionnel)'"
           @focus="onFocus('subtitle')"
@@ -236,70 +297,70 @@
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
         >{{ props.subtitle }}</p>
-      </div>
       
-      <!-- Grille de features -->
-      <div :class="gridClasses" :style="gridStyles">
-        <div 
-          v-for="(item, index) in props.items"
-          :key="index"
-          :class="[template.styles.card, cardHoverClass]"
-          :style="cardStyles"
-        >
-          <!-- Icône -->
+        <!-- Grille de features -->
+        <div :class="gridClasses" :style="gridPositionStyles" class="w-full">
           <div 
-            v-if="props.showIcon"
-            :class="template.styles.iconWrapper"
-            :style="iconWrapperStyles"
+            v-for="(item, index) in props.items"
+            :key="index"
+            :class="[template.styles.card, cardHoverClass]"
+            :style="cardStyles"
           >
-            <!-- Numérotation -->
-            <span v-if="props.iconStyle === 'number'" :style="{ color: iconTextColor }">
-              {{ String(index + 1).padStart(2, '0') }}
-            </span>
-            <!-- Icône SVG -->
-            <svg 
-              v-else
-              :class="template.styles.icon"
-              :style="{ color: iconTextColor }"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+            <!-- Icône -->
+            <div 
+              v-if="props.showIcon"
+              :class="template.styles.iconWrapper"
+              :style="iconWrapperStyles"
             >
-              <path 
-                stroke-linecap="round" 
-                stroke-linejoin="round" 
-                :stroke-width="props.iconStyle === 'outlined' ? 1.5 : 2" 
-                :d="getIconPath(item.icon || 'check')" 
-              />
-            </svg>
-          </div>
-          
-          <!-- Contenu -->
-          <div :class="props.layout === 'list' || props.layout === 'alternating' ? 'flex-1' : ''">
-            <!-- Titre -->
-            <h3 
-              :class="[template.styles.cardTitle, editableClasses(`items[${index}].title`)]"
-              :style="cardTitleStyles"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Titre'"
-              @focus="onArrayFocus('items', index, 'title')"
-              @blur="onArrayBlur($event, 'items', index, 'title')"
-              @keydown="onKeydown($event, true)"
-              @paste="onPaste"
-            >{{ item.title }}</h3>
+              <!-- Numérotation -->
+              <span v-if="props.iconStyle === 'number'" :style="{ color: iconTextColor }">
+                {{ String(index + 1).padStart(2, '0') }}
+              </span>
+              <!-- Icône SVG -->
+              <svg 
+                v-else
+                :class="template.styles.icon"
+                :style="{ color: iconTextColor }"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  :stroke-width="props.iconStyle === 'outlined' ? 1.5 : 2" 
+                  :d="getIconPath(item.icon || 'check')" 
+                />
+              </svg>
+            </div>
             
-            <!-- Description -->
-            <p 
-              v-if="props.showDescription && (item.description || isEditMode)"
-              :class="[template.styles.cardText, editableClasses(`items[${index}].description`)]"
-              :style="{ color: textColor }"
-              :contenteditable="isEditMode"
-              :data-placeholder="'Description'"
-              @focus="onArrayFocus('items', index, 'description')"
-              @blur="onArrayBlur($event, 'items', index, 'description')"
-              @keydown="onKeydown($event, false)"
-              @paste="onPaste"
-            >{{ item.description }}</p>
+            <!-- Contenu -->
+            <div :class="props.layout === 'list' || props.layout === 'alternating' ? 'flex-1' : ''">
+              <!-- Titre -->
+              <h3 
+                :class="[template.styles.cardTitle, editableClasses(`items[${index}].title`)]"
+                :style="cardTitleStyles"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Titre'"
+                @focus="onArrayFocus('items', index, 'title')"
+                @blur="onArrayBlur($event, 'items', index, 'title')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+              >{{ item.title }}</h3>
+              
+              <!-- Description -->
+              <p 
+                v-if="props.showDescription && (item.description || isEditMode)"
+                :class="[template.styles.cardText, editableClasses(`items[${index}].description`)]"
+                :style="{ color: textColor }"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Description'"
+                @focus="onArrayFocus('items', index, 'description')"
+                @blur="onArrayBlur($event, 'items', index, 'description')"
+                @keydown="onKeydown($event, false)"
+                @paste="onPaste"
+              >{{ item.description }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -421,6 +482,12 @@ interface Props {
   showBadge?: boolean
   badge?: string
   tabs?: TabItem[]
+  // Positionnement
+  elementsOrder?: string[]
+  badgeOffsetY?: number
+  titleOffsetY?: number
+  subtitleOffsetY?: number
+  gridOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -470,6 +537,12 @@ const props = withDefaults(defineProps<Props>(), {
   showBadge: false,
   badge: 'Caractéristiques',
   tabs: () => DEFAULT_TABS,
+  // Positionnement
+  elementsOrder: () => ['badge', 'title', 'subtitle', 'grid'],
+  badgeOffsetY: 0,
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
+  gridOffsetY: 0,
 })
 
 // Onglet actif pour le layout tabs
@@ -590,9 +663,9 @@ const template = computed(() => {
     styles: {
       section: 'py-16 md:py-24 px-6',
       container: 'max-w-5xl mx-auto',
-      header: 'text-center mb-12 md:mb-16',
+      header: 'text-center mb-8',
       title: 'text-2xl md:text-3xl font-light tracking-tight',
-      subtitle: 'text-base opacity-60 mt-4 max-w-2xl mx-auto',
+      subtitle: 'text-base opacity-60 mt-2 max-w-2xl mx-auto',
       grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12',
       card: 'text-center',
       iconWrapper: 'w-12 h-12 mx-auto mb-4 flex items-center justify-center',
@@ -830,6 +903,39 @@ const animationClass = computed(() => {
 // Styles titre carte
 const cardTitleStyles = computed(() => ({
   color: props.titleColor || textColor.value,
+}))
+
+// ============ POSITIONNEMENT DES ÉLÉMENTS ============
+
+const getElementOrder = (element: string): number => {
+  const defaultOrder = ['badge', 'title', 'subtitle', 'grid']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
+}
+
+const badgePositionStyles = computed(() => ({
+  order: getElementOrder('badge'),
+  transform: props.badgeOffsetY ? `translateY(${props.badgeOffsetY}px)` : undefined,
+  marginBottom: '0.5rem'
+}))
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+}))
+
+const subtitlePositionStyles = computed(() => ({
+  order: getElementOrder('subtitle'),
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0'
+}))
+
+const gridPositionStyles = computed(() => ({
+  ...gridStyles.value,
+  order: getElementOrder('grid'),
+  transform: props.gridOffsetY ? `translateY(${props.gridOffsetY}px)` : undefined,
+  marginTop: getElementOrder('grid') > 0 ? '2rem' : '0'
 }))
 
 // Icônes SVG paths

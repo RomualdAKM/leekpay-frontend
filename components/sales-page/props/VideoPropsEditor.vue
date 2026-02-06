@@ -42,6 +42,75 @@
       </div>
     </div>
     
+    <!-- DESCRIPTION OPTIONNELLE -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.description = !sections.description" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.description ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.description" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" v-model="localProps.showDescription" @change="emitUpdate" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
+          <span class="text-sm text-gray-700">Afficher une description</span>
+        </label>
+        <div v-if="localProps.showDescription">
+          <label class="block text-xs text-gray-500 mb-1">Description</label>
+          <textarea v-model="localProps.description" @input="emitUpdate" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Description de la vidéo..."/>
+        </div>
+      </div>
+    </div>
+    
+    <!-- BOUTON OPTIONNEL -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.button = !sections.button" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Bouton</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.button ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.button" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" v-model="localProps.showButton" @change="emitUpdate" class="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"/>
+          <span class="text-sm text-gray-700">Afficher un bouton</span>
+        </label>
+        <div v-if="localProps.showButton" class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
+            <input v-model="localProps.buttonText" @input="emitUpdate" type="text" placeholder="Cliquez ici" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Lien (URL)</label>
+            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Ouvrir dans</label>
+              <select v-model="localProps.buttonTarget" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="_self">Même fenêtre</option>
+                <option value="_blank">Nouvel onglet</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Icône</label>
+              <select v-model="localProps.buttonIcon" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="arrow-right">Flèche droite</option>
+                <option value="external">Lien externe</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Fond bouton</label>
+              <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
+              <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- AFFICHAGE -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.display = !sections.display" class="flex items-center justify-between w-full text-left">
@@ -143,6 +212,21 @@
       </div>
     </div>
     
+    <!-- POSITIONNEMENT -->
+    <PositioningSection
+      :elements="['title', 'video', 'description', 'button']"
+      :elements-order="localProps.elementsOrder"
+      :offsets="{
+        titleOffsetY: localProps.titleOffsetY,
+        videoOffsetY: localProps.videoOffsetY,
+        descriptionOffsetY: localProps.descriptionOffsetY,
+        buttonOffsetY: localProps.buttonOffsetY
+      }"
+      :labels="elementLabels"
+      @update:elements-order="updateProp('elementsOrder', $event)"
+      @update:offsets="updateOffsets"
+    />
+    
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.advanced = !sections.advanced" class="flex items-center justify-between w-full text-left">
@@ -167,6 +251,7 @@
 import { reactive, watch, computed } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
+import PositioningSection from './PositioningSection.vue'
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -174,8 +259,11 @@ const emit = defineEmits(['update'])
 const sections = reactive({
   source: true,
   playback: false,
+  description: false,
+  button: false,
   display: false,
   appearance: false,
+  positioning: false,
   advanced: false,
 })
 
@@ -184,10 +272,25 @@ const localProps = reactive({
   type: props.props.type || 'youtube',
   url: props.props.url || '',
   title: props.props.title || '',
+  // Description
+  showDescription: props.props.showDescription || false,
+  description: props.props.description || '',
+  descriptionColor: props.props.descriptionColor || '',
+  // Bouton
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || '',
+  buttonUrl: props.props.buttonUrl || '',
+  buttonTarget: props.props.buttonTarget || '_self',
+  buttonIcon: props.props.buttonIcon || 'none',
+  buttonBgColor: props.props.buttonBgColor || '#10b981',
+  buttonTextColor: props.props.buttonTextColor || '#ffffff',
+  buttonAlign: props.props.buttonAlign || 'center',
+  // Lecture
   autoplay: props.props.autoplay || false,
   loop: props.props.loop || false,
   muted: props.props.muted || false,
   showControls: props.props.showControls ?? true,
+  // Affichage
   aspectRatio: props.props.aspectRatio || 'video',
   maxWidth: props.props.maxWidth || 'large',
   borderRadius: props.props.borderRadius || 'none',
@@ -201,6 +304,12 @@ const localProps = reactive({
   animation: props.props.animation || 'none',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Positionnement
+  elementsOrder: props.props.elementsOrder || ['title', 'video', 'description', 'button'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  videoOffsetY: props.props.videoOffsetY || 0,
+  descriptionOffsetY: props.props.descriptionOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
 })
 
 watch(() => props.props, (newVal) => {
@@ -208,6 +317,19 @@ watch(() => props.props, (newVal) => {
     if (key in localProps) (localProps as any)[key] = newVal[key]
   })
 }, { deep: true })
+
+// Labels pour le positionnement
+const elementLabels: Record<string, string> = {
+  title: 'Titre',
+  video: 'Vidéo',
+  description: 'Description',
+  button: 'Bouton'
+}
+
+function updateOffsets(offsets: Record<string, number>) {
+  Object.assign(localProps, offsets)
+  emitUpdate()
+}
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
