@@ -20,7 +20,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-3 mb-4',
       price: 'text-xl font-semibold',
       originalPrice: 'text-base line-through opacity-40',
-      button: 'px-6 py-2.5 text-sm font-medium tracking-wide transition-all duration-200',
+      button: 'inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium tracking-wide transition-all duration-200',
     }
   },
 
@@ -43,7 +43,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-3 mb-4',
       price: 'text-xl font-semibold',
       originalPrice: 'text-base line-through opacity-40',
-      button: 'w-full px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200',
+      button: 'w-full flex items-center justify-center px-6 py-3 text-sm font-medium tracking-wide transition-all duration-200',
     }
   },
 
@@ -66,7 +66,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-2 mb-4',
       price: 'text-lg font-semibold',
       originalPrice: 'text-sm line-through opacity-40',
-      button: 'w-full px-5 py-2.5 text-sm font-medium tracking-wide transition-all duration-200',
+      button: 'w-full flex items-center justify-center px-5 py-2.5 text-sm font-medium tracking-wide transition-all duration-200',
     }
   },
 
@@ -89,7 +89,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-2 mb-3',
       price: 'text-base font-semibold',
       originalPrice: 'text-xs line-through opacity-40',
-      button: 'w-full px-4 py-2 text-xs font-medium tracking-wide transition-all duration-200',
+      button: 'w-full flex items-center justify-center px-4 py-2 text-xs font-medium tracking-wide transition-all duration-200',
     }
   },
 
@@ -112,7 +112,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-2 mb-4',
       price: 'text-lg font-bold',
       originalPrice: 'text-sm line-through opacity-40',
-      button: 'w-full px-5 py-3 text-sm font-semibold tracking-wide rounded-lg transition-all duration-200',
+      button: 'w-full flex items-center justify-center px-5 py-3 text-sm font-semibold tracking-wide rounded-lg transition-all duration-200',
     }
   },
 
@@ -135,7 +135,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-2',
       price: 'text-base font-semibold',
       originalPrice: 'text-sm line-through opacity-40',
-      button: 'flex-shrink-0 px-4 py-2 text-xs font-medium tracking-wide transition-all duration-200',
+      button: 'flex-shrink-0 inline-flex items-center justify-center px-4 py-2 text-xs font-medium tracking-wide transition-all duration-200',
     }
   },
 
@@ -158,7 +158,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center gap-3 mb-5',
       price: 'text-2xl font-bold',
       originalPrice: 'text-lg line-through opacity-40',
-      button: 'px-8 py-3 text-sm font-semibold tracking-wide transition-all duration-200',
+      button: 'inline-flex items-center justify-center px-8 py-3 text-sm font-semibold tracking-wide transition-all duration-200',
     }
   },
 
@@ -181,7 +181,7 @@ export const productTemplates: BlockTemplateGroup = {
       priceWrapper: 'flex items-center justify-center gap-3 mb-6',
       price: 'text-2xl font-light tracking-wide',
       originalPrice: 'text-lg line-through opacity-40',
-      button: 'mx-auto px-10 py-3 text-sm font-medium tracking-[0.1em] uppercase border transition-all duration-200',
+      button: 'mx-auto flex items-center justify-center px-10 py-3 text-sm font-medium tracking-[0.1em] uppercase border transition-all duration-200',
     }
   },
 }

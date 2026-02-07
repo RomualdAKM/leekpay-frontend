@@ -11,6 +11,16 @@
         alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start'),
         textAlign: props.headerAlignment || 'center'
       }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'FAQ' }}
+          </span>
+        </div>
+
         <!-- Titre -->
         <h2 
           v-if="props.title || isEditMode"
@@ -37,6 +47,28 @@
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
         >{{ props.subtitle }}</p>
+
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="{ 
+              backgroundColor: props.accentColor || '#1f2937', 
+              color: '#ffffff',
+              opacity: props.showButton ? 1 : 0.5 
+            }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
+        </div>
         
         <!-- Liste des FAQ -->
         <div :class="template.styles.grid" :style="itemsPositionStyles" class="w-full">
@@ -136,11 +168,19 @@ interface Props {
   expandFirstByDefault?: boolean
   cssId?: string
   customClasses?: string
+  // Nouveaux éléments
+  showBadge?: boolean
+  badge?: string
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
   // Positionnement
   elementsOrder?: string[]
+  badgeOffsetY?: number
   titleOffsetY?: number
   subtitleOffsetY?: number
   itemsOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -164,11 +204,18 @@ const props = withDefaults(defineProps<Props>(), {
   expandFirstByDefault: true,
   cssId: '',
   customClasses: '',
+  showBadge: false,
+  badge: 'FAQ',
+  showButton: false,
+  buttonText: 'Démarrer maintenant',
+  buttonUrl: '',
   // Positionnement
-  elementsOrder: () => ['title', 'subtitle', 'items'],
+  elementsOrder: () => ['badge', 'title', 'subtitle', 'items', 'button'],
+  badgeOffsetY: 0,
   titleOffsetY: 0,
   subtitleOffsetY: 0,
   itemsOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Contexte d'édition inline
@@ -342,8 +389,16 @@ const iconStyles = computed(() => ({
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============
 
 const getElementOrder = (element: string): number => {
-  return (props.elementsOrder || ['title', 'subtitle', 'items']).indexOf(element)
+  const defaultOrder = ['badge', 'title', 'subtitle', 'items', 'button']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
 }
+
+const badgePositionStyles = computed(() => ({
+  order: getElementOrder('badge'),
+  transform: props.badgeOffsetY ? `translateY(${props.badgeOffsetY}px)` : undefined
+}))
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
@@ -359,6 +414,13 @@ const subtitlePositionStyles = computed(() => ({
 const itemsPositionStyles = computed(() => ({
   order: getElementOrder('items'),
   transform: props.itemsOffsetY ? `translateY(${props.itemsOffsetY}px)` : undefined,
-  marginTop: getElementOrder('items') > 0 ? '2rem' : '0'
+  marginTop: getElementOrder('items') > 0 ? '2rem' : '0',
+  width: '100%'
+}))
+
+const buttonPositionStyles = computed(() => ({
+  order: getElementOrder('button'),
+  transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined,
+  marginTop: '1rem'
 }))
 </script>

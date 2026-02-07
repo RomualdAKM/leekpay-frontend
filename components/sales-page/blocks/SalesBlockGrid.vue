@@ -5,7 +5,59 @@
   >
     <div :class="template.styles.container">
       <!-- Conteneur flex pour le positionnement -->
-      <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+      <div class="flex flex-col w-full" :style="{ 
+        gap: '2.5rem',
+        alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start'),
+        textAlign: props.headerAlignment || 'center'
+      }">
+        <!-- Titre -->
+        <h2 
+          v-if="props.title || isEditMode"
+          :class="['text-3xl md:text-4xl font-bold tracking-tight', editableClasses('title')]"
+          :style="{ color: textColor, ...titlePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Titre de la section'"
+          @focus="onFocus('title')"
+          @blur="onBlur($event, 'title')"
+          @keydown="onKeydown($event, true)"
+          @paste="onPaste"
+        >{{ props.title }}</h2>
+
+        <!-- Sous-titre -->
+        <p 
+          v-if="props.subtitle || isEditMode"
+          :class="['text-lg opacity-70 max-w-2xl', editableClasses('subtitle')]"
+          :style="{ color: textColor, ...subtitlePositionStyles }"
+          :contenteditable="isEditMode"
+          :data-placeholder="'Sous-titre (optionnel)'"
+          @focus="onFocus('subtitle')"
+          @blur="onBlur($event, 'subtitle')"
+          @keydown="onKeydown($event, false)"
+          @paste="onPaste"
+        >{{ props.subtitle }}</p>
+
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
+            :class="[editableClasses('buttonTextGlobal')]"
+            :style="{ 
+              backgroundColor: props.accentColor || '#10B981', 
+              color: '#ffffff',
+              opacity: props.showButton ? 1 : 0.5 
+            }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonTextGlobal')"
+            @blur="onBlur($event, 'buttonTextGlobal')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'En savoir plus' }}
+          </a>
+        </div>
+      
         <div 
           :class="[template.styles.grid, gapClass, alignClass]"
           :style="gridPositionStyles"
@@ -100,28 +152,95 @@ interface GridItem {
 }
 
 interface Props {
+  blockId?: string
   templateId?: string
   columns?: number
   gap?: 'none' | 'small' | 'medium' | 'large'
   verticalAlign?: 'top' | 'center' | 'bottom' | 'stretch'
   items?: GridItem[]
   backgroundColor?: string
+  accentColor?: string
+  // Nouveaux éléments globaux
+  title?: string
+  subtitle?: string
+  headerAlignment?: 'left' | 'center' | 'right'
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
   // Positionnement
   elementsOrder?: string[]
+  titleOffsetY?: number
+  subtitleOffsetY?: number
   gridOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  blockId: '',
   templateId: 'grid-2-cols',
   columns: 2,
   gap: 'medium',
   verticalAlign: 'center',
   items: () => [],
   backgroundColor: '#ffffff',
+  accentColor: '#10b981',
+  title: '',
+  subtitle: '',
+  headerAlignment: 'center',
+  showButton: false,
+  buttonText: 'En savoir plus',
+  buttonUrl: '',
   // Positionnement
-  elementsOrder: () => ['grid'],
+  elementsOrder: () => ['title', 'subtitle', 'grid', 'button'],
+  titleOffsetY: 0,
+  subtitleOffsetY: 0,
   gridOffsetY: 0,
+  buttonOffsetY: 0,
 })
+
+// Édition inline
+import { useInlineEdit } from '~/composables/useInlineEdit'
+const { isEditMode, emitPropUpdate, startEditing, stopEditing, activeEditField } = useInlineEdit()
+
+const isFieldActive = (field: string) => activeEditField.value === field
+
+const editableClasses = (field: string) => {
+  if (!isEditMode.value) return ''
+  return [
+    'outline-none', 'cursor-text', 'transition-all', 'duration-150', 'min-w-[20px]',
+    isFieldActive(field) 
+      ? 'ring-2 ring-emerald-400 ring-offset-2 rounded-sm' 
+      : 'hover:ring-1 hover:ring-emerald-300 hover:ring-offset-1 rounded-sm'
+  ].join(' ')
+}
+
+const onFocus = (field: string) => {
+  if (props.blockId) startEditing(props.blockId, field)
+}
+
+const onBlur = (e: FocusEvent, field: string) => {
+  const newValue = (e.target as HTMLElement).innerText || ''
+  if (props.blockId) {
+    emitPropUpdate(props.blockId, field, newValue)
+    stopEditing()
+  }
+}
+
+const onKeydown = (e: KeyboardEvent, singleLine: boolean) => {
+  if (singleLine && e.key === 'Enter') {
+    e.preventDefault()
+    ;(e.target as HTMLElement).blur()
+  }
+  if (e.key === 'Escape') {
+    ;(e.target as HTMLElement).blur()
+  }
+}
+
+const onPaste = (e: ClipboardEvent) => {
+  e.preventDefault()
+  const text = e.clipboardData?.getData('text/plain') || ''
+  document.execCommand('insertText', false, text)
+}
 
 // Liste des items avec fallback
 const itemsList = computed(() => {
@@ -189,6 +308,7 @@ const sectionStyles = computed(() => ({
 // Get item class with col-span
 const getItemClass = (index: number) => {
   const item = itemsList.value[index]
+  if (!item) return ''
   const templateStyles = template.value.styles as any
   
   // Si le template a des colSpans définis
@@ -229,12 +349,33 @@ const getVimeoEmbedUrl = (url: string): string => {
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============
 
 const getElementOrder = (element: string): number => {
-  return (props.elementsOrder || ['grid']).indexOf(element)
+  const defaultOrder = ['title', 'subtitle', 'grid', 'button']
+  const order = props.elementsOrder || defaultOrder
+  const idx = order.indexOf(element)
+  return idx === -1 ? defaultOrder.indexOf(element) : idx
 }
+
+const titlePositionStyles = computed(() => ({
+  order: getElementOrder('title'),
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+}))
+
+const subtitlePositionStyles = computed(() => ({
+  order: getElementOrder('subtitle'),
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0'
+}))
 
 const gridPositionStyles = computed(() => ({
   order: getElementOrder('grid'),
-  transform: props.gridOffsetY ? `translateY(${props.gridOffsetY}px)` : undefined
+  transform: props.gridOffsetY ? `translateY(${props.gridOffsetY}px)` : undefined,
+  width: '100%'
+}))
+
+const buttonPositionStyles = computed(() => ({
+  order: getElementOrder('button'),
+  transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined,
+  marginTop: '1.5rem'
 }))
 </script>
 

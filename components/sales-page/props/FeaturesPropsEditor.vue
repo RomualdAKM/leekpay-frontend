@@ -448,17 +448,42 @@
       </div>
     </div>
     
+    <!-- ===== BOUTON CTA ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.cta = !sections.cta" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Bouton CTA</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.cta ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.cta" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2">
+          <input v-model="localProps.showButton" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+          <span class="text-xs text-gray-600">Afficher le bouton</span>
+        </label>
+        <div v-if="localProps.showButton">
+          <div class="mb-2">
+            <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
+            <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
+            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===== POSITIONNEMENT ===== -->
     <PositioningSection
-      :elements="['badge', 'title', 'subtitle', 'grid']"
+      :elements="['badge', 'title', 'subtitle', 'features', 'button']"
       :elements-order="localProps.elementsOrder"
       :offsets="{ 
         badgeOffsetY: localProps.badgeOffsetY, 
         titleOffsetY: localProps.titleOffsetY, 
         subtitleOffsetY: localProps.subtitleOffsetY, 
-        gridOffsetY: localProps.gridOffsetY 
+        featuresOffsetY: localProps.featuresOffsetY,
+        buttonOffsetY: localProps.buttonOffsetY
       }"
-      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', grid: 'Grille/Liste' }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', features: 'Grille/Liste', button: 'Bouton CTA' }"
       @update:elements-order="updateProp('elementsOrder', $event)"
       @update:offsets="updateOffsets"
     />
@@ -503,6 +528,7 @@ const sections = reactive({
   animation: false,
   badge: true,
   tabs: true,
+  cta: false,
   positioning: false,
   advanced: false,
 })
@@ -556,14 +582,26 @@ const localProps = reactive({
     { label: 'Performance', title: 'Vitesse incomparable', description: 'Notre infrastructure est optimisée.', features: ['CDN global', 'Cache intelligent'], image: '' },
     { label: 'Sécurité', title: 'Protection maximale', description: 'Vos données sont protégées.', features: ['SSL', 'Sauvegarde'], image: '' },
   ],
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || 'Démarrer maintenant',
+  buttonUrl: props.props.buttonUrl || '',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'grid'],
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'features', 'button'],
   badgeOffsetY: props.props.badgeOffsetY || 0,
   titleOffsetY: props.props.titleOffsetY || 0,
   subtitleOffsetY: props.props.subtitleOffsetY || 0,
-  gridOffsetY: props.props.gridOffsetY || 0,
+  featuresOffsetY: props.props.featuresOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
+})
+
+// S'assurer que les éléments requis sont présents dans elementsOrder
+const requiredElements = ['badge', 'title', 'subtitle', 'features', 'button']
+requiredElements.forEach(el => {
+  if (localProps.elementsOrder && !localProps.elementsOrder.includes(el)) {
+    localProps.elementsOrder.push(el)
+  }
 })
 
 // Texte des features par onglet (pour édition ligne par ligne)

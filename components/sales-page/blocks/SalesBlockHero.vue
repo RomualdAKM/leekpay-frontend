@@ -170,7 +170,6 @@
       <div 
         v-if="props.mediaUrl"
         :class="template.styles.imageWrapper"
-        :style="imagePositionStyles"
       >
         <img 
           :src="props.mediaUrl"

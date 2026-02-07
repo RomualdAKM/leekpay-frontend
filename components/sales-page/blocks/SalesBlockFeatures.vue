@@ -17,7 +17,7 @@
           <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
         </div>
         <!-- Grille/Liste -->
-        <div :style="gridPositionStyles" class="mt-8 w-full">
+        <div :style="featuresPositionStyles" class="mt-8 w-full">
           <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col">
             <div v-for="(item, index) in props.items" :key="index" class="flex items-start gap-6">
               <div 
@@ -55,7 +55,7 @@
           <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
         </div>
         <!-- Grille/Liste -->
-        <div :style="gridPositionStyles" class="mt-8 w-full">
+        <div :style="featuresPositionStyles" class="mt-8 w-full">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
             <div 
               v-for="(item, index) in props.items" 
@@ -99,7 +99,7 @@
           <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
         </div>
         <!-- Grille/Liste -->
-        <div :style="gridPositionStyles" class="mt-8 w-full">
+        <div :style="featuresPositionStyles" class="mt-8 w-full">
           <div :style="{ gap: itemGapMap[props.itemGap || 'xlarge'] || '3rem' }" class="flex flex-col">
             <div 
               v-for="(item, index) in displayShowcaseItems" 
@@ -158,7 +158,7 @@
           <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
         </div>
         <!-- Grille/Liste -->
-        <div :style="gridPositionStyles" class="mt-8 w-full">
+        <div :style="featuresPositionStyles" class="mt-8 w-full">
           <div class="grid grid-cols-1 md:grid-cols-2" :style="{ gap: itemGapMap[props.itemGap || 'medium'] }">
             <div 
               v-for="(item, index) in props.items" 
@@ -204,7 +204,7 @@
           <p v-if="props.subtitle" :style="{ color: textColor }" class="text-base mt-4 opacity-70">{{ props.subtitle }}</p>
         </div>
         <!-- Grille/Liste -->
-        <div :style="gridPositionStyles" class="mt-4 w-full">
+        <div :style="featuresPositionStyles" class="mt-4 w-full">
           <!-- Onglets -->
           <div class="flex flex-wrap justify-center gap-2 mb-10">
             <button 
@@ -297,9 +297,31 @@
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
         >{{ props.subtitle }}</p>
+
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="{ 
+              backgroundColor: props.accentColor || '#10B981', 
+              color: '#ffffff',
+              opacity: props.showButton ? 1 : 0.5 
+            }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
+        </div>
       
         <!-- Grille de features -->
-        <div :class="gridClasses" :style="gridPositionStyles" class="w-full">
+        <div :class="gridClasses" :style="featuresPositionStyles" class="w-full">
           <div 
             v-for="(item, index) in props.items"
             :key="index"
@@ -482,12 +504,17 @@ interface Props {
   showBadge?: boolean
   badge?: string
   tabs?: TabItem[]
+  // Bouton CTA
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
   // Positionnement
   elementsOrder?: string[]
   badgeOffsetY?: number
   titleOffsetY?: number
   subtitleOffsetY?: number
-  gridOffsetY?: number
+  featuresOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -534,15 +561,19 @@ const props = withDefaults(defineProps<Props>(), {
   animationDelay: 0,
   cssId: '',
   customClasses: '',
-  showBadge: false,
   badge: 'Caractéristiques',
   tabs: () => DEFAULT_TABS,
+  // Bouton CTA
+  showButton: false,
+  buttonText: 'Démarrer maintenant',
+  buttonUrl: '',
   // Positionnement
-  elementsOrder: () => ['badge', 'title', 'subtitle', 'grid'],
+  elementsOrder: () => ['badge', 'title', 'subtitle', 'features', 'button'],
   badgeOffsetY: 0,
   titleOffsetY: 0,
   subtitleOffsetY: 0,
-  gridOffsetY: 0,
+  featuresOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Onglet actif pour le layout tabs
@@ -908,7 +939,7 @@ const cardTitleStyles = computed(() => ({
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============
 
 const getElementOrder = (element: string): number => {
-  const defaultOrder = ['badge', 'title', 'subtitle', 'grid']
+  const defaultOrder = ['badge', 'title', 'subtitle', 'features']
   const order = props.elementsOrder || defaultOrder
   const idx = order.indexOf(element)
   return idx === -1 ? defaultOrder.indexOf(element) : idx
@@ -931,11 +962,17 @@ const subtitlePositionStyles = computed(() => ({
   marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0'
 }))
 
-const gridPositionStyles = computed(() => ({
+const featuresPositionStyles = computed(() => ({
   ...gridStyles.value,
-  order: getElementOrder('grid'),
-  transform: props.gridOffsetY ? `translateY(${props.gridOffsetY}px)` : undefined,
-  marginTop: getElementOrder('grid') > 0 ? '2rem' : '0'
+  order: getElementOrder('features'),
+  transform: props.featuresOffsetY ? `translateY(${props.featuresOffsetY}px)` : undefined,
+  marginTop: getElementOrder('features') > 0 ? '2rem' : '0'
+}))
+
+const buttonPositionStyles = computed(() => ({
+  order: getElementOrder('button'),
+  transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined,
+  marginTop: '1rem'
 }))
 
 // Icônes SVG paths

@@ -62,21 +62,38 @@
       </div>
     </div>
     
-    <!-- ===== COMPORTEMENT ===== -->
+    <!-- COMPORTEMENT -->
     <div class="border-b border-gray-200 pb-4">
-      <button @click="sections.behavior = !sections.behavior" class="flex items-center justify-between w-full text-left">
-        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Comportement</h4>
-        <ChevronDown :class="['w-4 h-4 transition-transform', sections.behavior ? 'rotate-180' : '']"/>
+      <button @click="sections.cta = !sections.cta" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Comportement & CTA</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.cta ? 'rotate-180' : '']"/>
       </button>
-      <div v-show="sections.behavior" class="mt-3 space-y-3">
+      <div v-show="sections.cta" class="mt-3 space-y-3">
         <label class="flex items-center gap-2">
           <input v-model="localProps.allowMultiple" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
-          <span class="text-xs text-gray-600">Permettre plusieurs questions ouvertes</span>
+          <span class="text-xs text-gray-600">Autoriser plusieurs questions ouvertes</span>
         </label>
         <label class="flex items-center gap-2">
           <input v-model="localProps.expandFirstByDefault" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
-          <span class="text-xs text-gray-600">Ouvrir la première question par défaut</span>
+          <span class="text-xs text-gray-600">Ouvrir la première par défaut</span>
         </label>
+        
+        <div class="pt-2 border-t border-gray-100 mt-2 space-y-3">
+          <label class="flex items-center gap-2">
+            <input v-model="localProps.showButton" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+            <span class="text-xs text-gray-600 font-semibold">Afficher un bouton CTA</span>
+          </label>
+          <div v-if="localProps.showButton" class="space-y-2 pl-6">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
+              <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
+              <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -133,11 +150,16 @@
     
     <!-- ===== POSITIONNEMENT ===== -->
     <PositioningSection
-      v-show="sections.positioning"
-      :elements="['title', 'subtitle', 'items']"
+      :elements="['badge', 'title', 'subtitle', 'items', 'button']"
       :elements-order="localProps.elementsOrder"
-      :offsets="localProps"
-      :labels="{ title: 'Titre', subtitle: 'Sous-titre', items: 'Questions' }"
+      :offsets="{ 
+        badgeOffsetY: localProps.badgeOffsetY,
+        titleOffsetY: localProps.titleOffsetY, 
+        subtitleOffsetY: localProps.subtitleOffsetY, 
+        itemsOffsetY: localProps.itemsOffsetY,
+        buttonOffsetY: localProps.buttonOffsetY
+      }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', items: 'Questions', button: 'Bouton CTA' }"
       @update:elements-order="updateProp('elementsOrder', $event)"
       @update:offsets="updateOffsets"
     />
@@ -174,8 +196,8 @@ const emit = defineEmits(['update'])
 const sections = reactive({
   content: true,
   items: false,
-  behavior: false,
   appearance: false,
+  cta: false,
   positioning: false,
   advanced: false,
 })
@@ -203,11 +225,26 @@ const localProps = reactive({
   paddingY: props.props.paddingY || 'large',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  showBadge: props.props.showBadge || false,
+  badge: props.props.badge || 'FAQ',
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || 'Démarrer maintenant',
+  buttonUrl: props.props.buttonUrl || '',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'items'],
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'items', 'button'],
+  badgeOffsetY: props.props.badgeOffsetY || 0,
   titleOffsetY: props.props.titleOffsetY || 0,
   subtitleOffsetY: props.props.subtitleOffsetY || 0,
   itemsOffsetY: props.props.itemsOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
+})
+
+// S'assurer que les éléments requis sont présents dans elementsOrder
+const requiredElements = ['badge', 'title', 'subtitle', 'items', 'button']
+requiredElements.forEach(el => {
+  if (localProps.elementsOrder && !localProps.elementsOrder.includes(el)) {
+    localProps.elementsOrder.push(el)
+  }
 })
 
 watch(() => props.props, (newVal) => {

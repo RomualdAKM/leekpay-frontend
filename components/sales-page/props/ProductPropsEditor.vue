@@ -2,6 +2,31 @@
   <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <TemplatePicker block-type="product" :model-value="localProps.templateId" @select="updateProp('templateId', $event)"/>
     
+    <!-- CONTENU -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.content = !sections.content" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Contenu</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.content ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.content" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Titre de section</label>
+          <input v-model="localProps.title" @input="emitUpdate" type="text" placeholder="Nos produits phares" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Sous-titre de section</label>
+          <input v-model="localProps.subtitle" @input="emitUpdate" type="text" placeholder="Découvrez notre sélection..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Alignement en-tête</label>
+          <div class="grid grid-cols-3 gap-1">
+            <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('headerAlignment', a)" :class="['px-3 py-1.5 text-xs rounded border', localProps.headerAlignment === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+              {{ a === 'left' ? 'Gauche' : a === 'center' ? 'Centre' : 'Droite' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- PRODUITS -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.products = !sections.products" class="flex items-center justify-between w-full text-left">
@@ -149,16 +174,52 @@
       </div>
     </div>
     
+    <!-- ===== BOUTON CTA ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.cta = !sections.cta" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Bouton CTA</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.cta ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.cta" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2">
+          <input v-model="localProps.showButton" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+          <span class="text-xs text-gray-600">Afficher le bouton global</span>
+        </label>
+        <div v-if="localProps.showButton" class="space-y-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
+            <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
+            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- POSITIONNEMENT -->
-    <PositioningSection
-      v-show="sections.positioning"
-      :elements="['products']"
-      :elements-order="localProps.elementsOrder"
-      :offsets="localProps"
-      :labels="{ products: 'Grille de produits' }"
-      @update:elements-order="updateProp('elementsOrder', $event)"
-      @update:offsets="updateOffsets"
-    />
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.positioning = !sections.positioning" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Positionnement</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.positioning ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.positioning" class="mt-3">
+        <PositioningSection
+          :elements="['title', 'subtitle', 'products', 'button']"
+          :elements-order="localProps.elementsOrder"
+          :offsets="{
+            titleOffsetY: localProps.titleOffsetY,
+            subtitleOffsetY: localProps.subtitleOffsetY,
+            productsOffsetY: localProps.productsOffsetY,
+            buttonOffsetY: localProps.buttonOffsetY
+          }"
+          :labels="{ title: 'Titre', subtitle: 'Sous-titre', products: 'Grille de produits', button: 'Bouton CTA' }"
+          @update:elements-order="updateProp('elementsOrder', $event)"
+          @update:offsets="updateOffsets"
+        />
+      </div>
+    </div>
 
     <!-- AVANCÉ -->
     <div class="border-b border-gray-200 pb-4">
@@ -192,7 +253,7 @@ const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
 const uploadImage = inject<(file: File) => Promise<string | null>>('uploadImage')
 
-const sections = reactive({ products: true, options: false, appearance: false, positioning: false, advanced: false })
+const sections = reactive({ content: false, products: true, options: false, appearance: false, cta: false, positioning: false, advanced: false })
 const expandedProduct = ref<string | null>(null)
 
 const localProps = reactive({
@@ -209,9 +270,26 @@ const localProps = reactive({
   paddingY: props.props.paddingY || 'large',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  title: props.props.title || '',
+  subtitle: props.props.subtitle || '',
+  headerAlignment: props.props.headerAlignment || 'center',
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || 'Découvrir tous les produits',
+  buttonUrl: props.props.buttonUrl || '',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['products'],
+  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'products', 'button'],
+  titleOffsetY: props.props.titleOffsetY || 0,
+  subtitleOffsetY: props.props.subtitleOffsetY || 0,
   productsOffsetY: props.props.productsOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
+})
+
+// S'assurer que les éléments requis sont présents dans elementsOrder
+const requiredElements = ['title', 'subtitle', 'products', 'button']
+requiredElements.forEach(el => {
+  if (localProps.elementsOrder && !localProps.elementsOrder.includes(el)) {
+    localProps.elementsOrder.push(el)
+  }
 })
 
 watch(() => props.props, (newVal) => {

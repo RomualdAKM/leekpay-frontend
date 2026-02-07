@@ -329,14 +329,15 @@
     
     <!-- ===== POSITIONNEMENT ===== -->
     <PositioningSection
-      :elements="['title', 'subtitle', 'plans']"
+      :elements="['badge', 'title', 'subtitle', 'plans']"
       :elements-order="localProps.elementsOrder"
       :offsets="{ 
+        badgeOffsetY: localProps.badgeOffsetY,
         titleOffsetY: localProps.titleOffsetY, 
         subtitleOffsetY: localProps.subtitleOffsetY, 
         plansOffsetY: localProps.plansOffsetY 
       }"
-      :labels="{ title: 'Titre', subtitle: 'Sous-titre', plans: 'Grille des plans' }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', plans: 'Grille des prix' }"
       @update:elements-order="updateProp('elementsOrder', $event)"
       @update:offsets="updateOffsets"
     />
@@ -429,12 +430,20 @@ const localProps = reactive({
   discountBadge: props.props.discountBadge || '-70%',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  showBadge: props.props.showBadge || false,
+  badge: props.props.badge || 'Tarifs',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'plans'],
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'plans'],
+  badgeOffsetY: props.props.badgeOffsetY || 0,
   titleOffsetY: props.props.titleOffsetY || 0,
   subtitleOffsetY: props.props.subtitleOffsetY || 0,
   plansOffsetY: props.props.plansOffsetY || 0,
 })
+
+// S'assurer que 'badge' est présent dans elementsOrder
+if (localProps.elementsOrder && !localProps.elementsOrder.includes('badge')) {
+  localProps.elementsOrder.unshift('badge')
+}
 
 watch(() => props.props, (newVal) => {
   Object.keys(newVal).forEach(key => {

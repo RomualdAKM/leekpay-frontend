@@ -135,6 +135,28 @@
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
         >{{ props.expiredMessage || 'Cette offre a expiré' }}</p>
+
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-4">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
+            :class="[editableClasses('buttonText')]"
+            :style="{ 
+              backgroundColor: props.accentColor || '#92400e', 
+              color: '#ffffff',
+              opacity: props.showButton ? 1 : 0.5 
+            }"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'En profiter maintenant' }}
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -166,12 +188,17 @@ interface Props {
   backgroundColor?: string
   textColor?: string
   accentColor?: string
+  // Bouton CTA
+  showButton?: boolean
+  buttonText?: string
+  buttonUrl?: string
   // Positionnement
   elementsOrder?: string[]
   titleOffsetY?: number
   subtitleOffsetY?: number
   timerOffsetY?: number
   messageOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -195,12 +222,17 @@ const props = withDefaults(defineProps<Props>(), {
   backgroundColor: '#fef3c7',
   textColor: '#92400e',
   accentColor: '',
+  // Bouton CTA
+  showButton: false,
+  buttonText: 'En profiter maintenant',
+  buttonUrl: '',
   // Positionnement
-  elementsOrder: () => ['title', 'subtitle', 'timer', 'message'],
+  elementsOrder: () => ['title', 'subtitle', 'timer', 'message', 'button'],
   titleOffsetY: 0,
   subtitleOffsetY: 0,
   timerOffsetY: 0,
   messageOffsetY: 0,
+  buttonOffsetY: 0,
 })
 
 // Contexte d'édition inline
@@ -394,5 +426,11 @@ const timerPositionStyles = computed(() => ({
 const messagePositionStyles = computed(() => ({
   order: getElementOrder('message'),
   transform: props.messageOffsetY ? `translateY(${props.messageOffsetY}px)` : undefined
+}))
+
+const buttonPositionStyles = computed(() => ({
+  order: getElementOrder('button'),
+  transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined,
+  marginTop: '1rem'
 }))
 </script>

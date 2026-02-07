@@ -326,6 +326,24 @@
         </div>
       </div>
     </div>
+
+    <!-- ===== BADGE ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.badge = !sections.badge" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Badge</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.badge ? 'rotate-180' : '']"/>
+      </button>
+      <div v-show="sections.badge" class="mt-3 space-y-3">
+        <label class="flex items-center gap-2">
+          <input v-model="localProps.showBadge" @change="emitUpdate" type="checkbox" class="rounded text-emerald-500"/>
+          <span class="text-xs text-gray-600">Afficher le badge</span>
+        </label>
+        <div v-if="localProps.showBadge">
+          <label class="block text-xs text-gray-500 mb-1">Texte du badge</label>
+          <input v-model="localProps.badge" @input="emitUpdate" type="text" placeholder="TÉMOIGNAGES" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+      </div>
+    </div>
     
     <!-- ===== STATISTIQUES (Split Image uniquement) ===== -->
     <div v-if="localProps.templateId?.includes('split-image')" class="border-b border-gray-200 pb-4">
@@ -379,14 +397,16 @@
     
     <!-- ===== POSITIONNEMENT ===== -->
     <PositioningSection
-      :elements="['title', 'subtitle', 'items']"
+      :elements="['badge', 'title', 'subtitle', 'items', 'button']"
       :elements-order="localProps.elementsOrder"
       :offsets="{ 
+        badgeOffsetY: localProps.badgeOffsetY,
         titleOffsetY: localProps.titleOffsetY, 
         subtitleOffsetY: localProps.subtitleOffsetY, 
-        itemsOffsetY: localProps.itemsOffsetY 
+        itemsOffsetY: localProps.itemsOffsetY,
+        buttonOffsetY: localProps.buttonOffsetY
       }"
-      :labels="{ title: 'Titre', subtitle: 'Sous-titre', items: 'Grille des témoignages' }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', items: 'Témoignages', button: 'Bouton CTA' }"
       @update:elements-order="updateProp('elementsOrder', $event)"
       @update:offsets="updateOffsets"
     />
@@ -431,6 +451,8 @@ const sections = reactive({
   animation: false,
   stats: true,
   reviewStats: true,
+  badge: true,
+  cta: false,
   positioning: false,
   advanced: false,
 })
@@ -478,12 +500,36 @@ const localProps = reactive({
   totalReviews: props.props.totalReviews || '1894',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  showBadge: props.props.showBadge || false,
+  badge: props.props.badge || 'Témoignages',
+  showButton: props.props.showButton || false,
+  buttonText: props.props.buttonText || 'Démarrer maintenant',
+  buttonUrl: props.props.buttonUrl || '',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['title', 'subtitle', 'items'],
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'items', 'button'],
+  badgeOffsetY: props.props.badgeOffsetY || 0,
   titleOffsetY: props.props.titleOffsetY || 0,
   subtitleOffsetY: props.props.subtitleOffsetY || 0,
   itemsOffsetY: props.props.itemsOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
 })
+
+// S'assurer que les éléments requis sont présents dans elementsOrder
+const requiredElements = ['badge', 'title', 'subtitle', 'items', 'button']
+requiredElements.forEach(el => {
+  if (localProps.elementsOrder && !localProps.elementsOrder.includes(el)) {
+    localProps.elementsOrder.push(el)
+  }
+})
+
+// Migration des noms d'éléments (ex: testimonials -> items)
+if (localProps.elementsOrder) {
+  localProps.elementsOrder = localProps.elementsOrder.map(el => el === 'testimonials' ? 'items' : el)
+  // S'assurer que 'badge' est présent
+  if (!localProps.elementsOrder.includes('badge')) {
+    localProps.elementsOrder.unshift('badge')
+  }
+}
 
 watch(() => props.props, (newVal) => {
   Object.keys(newVal).forEach(key => {
@@ -500,6 +546,11 @@ const updateProp = (key: string, value: any) => {
 
 const updateOffsets = (offsets: Record<string, number>) => {
   Object.assign(localProps, offsets)
+  // Migration des clés d'offset (ex: testimonialsOffsetY -> itemsOffsetY)
+  if ('testimonialsOffsetY' in offsets) {
+    localProps.itemsOffsetY = offsets.testimonialsOffsetY as number
+    delete (localProps as any).testimonialsOffsetY
+  }
   emitUpdate()
 }
 
