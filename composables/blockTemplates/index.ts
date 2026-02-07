@@ -14,6 +14,7 @@ export { textTemplates, imageTemplates, videoTemplates } from './content'
 export { headerTemplates, footerTemplates, countdownTemplates } from './layout'
 export { productTemplates } from './product'
 export { gridTemplates } from './grid'
+export { boxesTemplates } from './boxes'
 
 // Import pour le mapping
 import { heroTemplates } from './hero'
@@ -26,6 +27,7 @@ import { textTemplates, imageTemplates, videoTemplates } from './content'
 import { headerTemplates, footerTemplates, countdownTemplates } from './layout'
 import { productTemplates } from './product'
 import { gridTemplates } from './grid'
+import { boxesTemplates } from './boxes'
 import type { BlockTemplateGroup, BlockTemplate } from './types'
 import { getDefaultTemplate } from './types'
 
@@ -45,6 +47,7 @@ export const blockTemplatesMap: Record<string, BlockTemplateGroup> = {
   countdown: countdownTemplates,
   product: productTemplates,
   grid: gridTemplates,
+  boxes: boxesTemplates,
 }
 
 // Fonction pour obtenir les templates d'un type de bloc
@@ -71,5 +74,5 @@ export function getDefaultTemplateId(blockType: string): string | null {
   const templates = blockTemplatesMap[blockType]
   if (!templates) return null
   const keys = Object.keys(templates)
-  return keys.length > 0 ? keys[0] : null
+  return keys[0] || null
 }

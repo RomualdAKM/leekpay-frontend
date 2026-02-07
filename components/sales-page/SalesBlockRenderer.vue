@@ -26,6 +26,7 @@ import SalesBlockCta from './blocks/SalesBlockCta.vue'
 import SalesBlockCountdown from './blocks/SalesBlockCountdown.vue'
 import SalesBlockProduct from './blocks/SalesBlockProduct.vue'
 import SalesBlockGrid from './blocks/SalesBlockGrid.vue'
+import SalesBlockBoxes from './blocks/SalesBlockBoxes.vue'
 import SalesBlockFooter from './blocks/SalesBlockFooter.vue'
 
 interface Props {
@@ -51,6 +52,7 @@ const blockComponents: Record<string, any> = {
   countdown: SalesBlockCountdown,
   product: SalesBlockProduct,
   grid: SalesBlockGrid,
+  boxes: SalesBlockBoxes,
   footer: SalesBlockFooter,
 }
 

@@ -45,6 +45,7 @@ const blockLabels: Record<string, string> = {
   countdown: 'Compte à rebours',
   product: 'Produit',
   grid: 'Grille',
+  boxes: 'Cadres (Boxes)',
   footer: 'Pied de page',
 }
 
@@ -68,6 +69,7 @@ const propsEditors: Record<string, any> = {
   footer: defineAsyncComponent(() => import('./props/FooterPropsEditor.vue')),
   product: defineAsyncComponent(() => import('./props/ProductPropsEditor.vue')),
   grid: defineAsyncComponent(() => import('./props/GridPropsEditor.vue')),
+  boxes: defineAsyncComponent(() => import('./props/BoxesPropsEditor.vue')),
 }
 
 const propsComponent = computed(() => {
