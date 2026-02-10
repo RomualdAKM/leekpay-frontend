@@ -9,6 +9,15 @@
     <div class="max-w-6xl mx-auto px-6">
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Badge -->
+        <div v-if="props.showBadge && props.badge" :style="badgePositionStyles" class="flex justify-center">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge }}
+          </span>
+        </div>
         <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
           <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
         </div>
@@ -65,6 +74,15 @@
     <div class="max-w-4xl mx-auto px-6">
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Badge -->
+        <div v-if="props.showBadge && props.badge" :style="badgePositionStyles" class="flex justify-center">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge }}
+          </span>
+        </div>
         <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
           <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
         </div>
@@ -123,6 +141,16 @@
           <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-4">{{ props.subtitle }}</p>
         </div>
         
+        <!-- Badge -->
+        <div v-if="props.showBadge && props.badge" :style="badgePositionStyles" class="flex justify-center mb-4">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge }}
+          </span>
+        </div>
+
         <div :style="plansPositionStyles" class="mt-4">
           <!-- Toggle Mensuel/Annuel -->
           <div class="flex justify-center mb-10">
@@ -259,7 +287,7 @@
           <!-- Badge unique pour ce layout -->
           <span 
             v-if="firstPlan.showBadge && firstPlan.badgeText"
-            :style="getBadgeStyles(firstPlan)"
+            :style="{ ...getBadgeStyles(firstPlan), ...badgePositionStyles }"
             class="inline-block px-5 py-2 text-sm font-bold uppercase tracking-wide rounded-full mb-6"
           >{{ firstPlan.badgeText }}</span>
           <!-- Prix -->
@@ -299,6 +327,15 @@
     <div class="max-w-7xl mx-auto text-center px-6">
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
+        <!-- Badge -->
+        <div v-if="props.showBadge && props.badge" :style="badgePositionStyles" class="flex justify-center mb-4">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge }}
+          </span>
+        </div>
         <div v-if="props.title || isEditMode" :style="titlePositionStyles">
           <h2 v-if="props.title" :class="template.styles.title" :style="titleStyles">{{ props.title }}</h2>
         </div>
@@ -459,9 +496,12 @@ interface Props {
   customClasses?: string
   // Positionnement
   elementsOrder?: string[]
+  badge?: string // Added to match other blocks, though badgeText is main prop
+  badgeOffsetY?: number
   titleOffsetY?: number
   subtitleOffsetY?: number
   plansOffsetY?: number
+  buttonOffsetY?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -938,11 +978,17 @@ function formatPrice(price: string | number | null | undefined): string {
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============
 
 const getElementOrder = (element: string): number => {
-  const defaultOrder = ['title', 'subtitle', 'plans']
+  const defaultOrder = ['badge', 'title', 'subtitle', 'plans', 'cta']
   const order = props.elementsOrder || defaultOrder
   const idx = order.indexOf(element)
   return idx === -1 ? defaultOrder.indexOf(element) : idx
 }
+
+const badgePositionStyles = computed(() => ({
+  order: getElementOrder('badge'),
+  marginTop: props.badgeOffsetY ? `${props.badgeOffsetY}px` : undefined,
+  marginBottom: '1rem' // Default spacing
+}))
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
@@ -957,5 +1003,10 @@ const subtitlePositionStyles = computed(() => ({
 const plansPositionStyles = computed(() => ({
   order: getElementOrder('plans'),
   transform: props.plansOffsetY ? `translateY(${props.plansOffsetY}px)` : undefined
+}))
+
+const buttonPositionStyles = computed(() => ({
+  order: getElementOrder('cta'),
+  transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined
 }))
 </script>

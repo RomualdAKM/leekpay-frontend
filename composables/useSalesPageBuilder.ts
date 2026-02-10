@@ -133,7 +133,7 @@ export const COLUMN_LAYOUTS = {
 export const useSalesPageBuilder = () => {
   const config = useRuntimeConfig()
   const { token } = useAuth()
-  
+
   // State
   const page = ref<SalesPage>({
     title: '',
@@ -160,7 +160,7 @@ export const useSalesPageBuilder = () => {
     is_published: false,
     payment_link_id: null,
   })
-  
+
   const blockTypes = ref<BlockType[]>([])
   const selectedBlockId = ref<string | null>(null)
   const isDirty = ref(false)
@@ -168,15 +168,15 @@ export const useSalesPageBuilder = () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const previewMode = ref(false)
-  
+
   // Computed
   const selectedBlock = computed(() => {
     if (!selectedBlockId.value) return null
-    
+
     // Chercher d'abord dans les blocs legacy
     const legacyBlock = page.value.blocks.find(b => b.id === selectedBlockId.value)
     if (legacyBlock) return legacyBlock
-    
+
     // Chercher dans les sections (mode sections)
     if (page.value.sections && page.value.sections.length > 0) {
       for (const section of page.value.sections) {
@@ -186,36 +186,36 @@ export const useSalesPageBuilder = () => {
         }
       }
     }
-    
+
     return null
   })
-  
+
   const hasBlocks = computed(() => page.value.blocks.length > 0)
-  
+
   const sortedBlocks = computed(() => {
     return [...page.value.blocks].sort((a, b) => a.order - b.order)
   })
-  
+
   // Watchers
   watch(() => page.value, () => {
     isDirty.value = true
   }, { deep: true })
-  
+
   // Actions - API
   const getAuthHeaders = () => {
     return {
       Authorization: token.value ? `Bearer ${token.value}` : '',
     }
   }
-  
+
   const fetchBlockTypes = async () => {
     if (!token.value) return
     try {
       const response = await $fetch<{ success: boolean; data: BlockType[] }>(
         '/sales-pages/block-types',
-        { 
+        {
           baseURL: config.public.apiBaseURL,
-          headers: getAuthHeaders() 
+          headers: getAuthHeaders()
         }
       )
       if (response.success) {
@@ -225,16 +225,16 @@ export const useSalesPageBuilder = () => {
       console.error('Erreur chargement block types:', err)
     }
   }
-  
+
   const fetchPage = async (id: number | string) => {
     isLoading.value = true
     error.value = null
     try {
       const response = await $fetch<{ success: boolean; data: SalesPage }>(
         `/sales-pages/${id}`,
-        { 
+        {
           baseURL: config.public.apiBaseURL,
-          headers: getAuthHeaders() 
+          headers: getAuthHeaders()
         }
       )
       if (response.success) {
@@ -272,16 +272,16 @@ export const useSalesPageBuilder = () => {
       isLoading.value = false
     }
   }
-  
+
   const savePage = async () => {
     isSaving.value = true
     error.value = null
     try {
       const isNew = !page.value.id
-      const url = isNew 
-        ? '/sales-pages' 
+      const url = isNew
+        ? '/sales-pages'
         : `/sales-pages/${page.value.id}`
-      
+
       const response = await $fetch<{ success: boolean; data: SalesPage; message: string }>(
         url,
         {
@@ -302,7 +302,7 @@ export const useSalesPageBuilder = () => {
           },
         }
       )
-      
+
       if (response.success) {
         page.value = response.data
         isDirty.value = false
@@ -315,10 +315,10 @@ export const useSalesPageBuilder = () => {
       isSaving.value = false
     }
   }
-  
+
   const deletePage = async () => {
     if (!page.value.id) return
-    
+
     try {
       await $fetch(`/sales-pages/${page.value.id}`, {
         method: 'DELETE',
@@ -330,10 +330,10 @@ export const useSalesPageBuilder = () => {
       throw err
     }
   }
-  
+
   const publishPage = async () => {
     if (!page.value.id) return
-    
+
     try {
       const response = await $fetch<{ success: boolean; data: SalesPage }>(
         `/sales-pages/${page.value.id}/publish`,
@@ -351,10 +351,10 @@ export const useSalesPageBuilder = () => {
       throw err
     }
   }
-  
+
   const unpublishPage = async () => {
     if (!page.value.id) return
-    
+
     try {
       const response = await $fetch<{ success: boolean; data: SalesPage }>(
         `/sales-pages/${page.value.id}/unpublish`,
@@ -372,7 +372,7 @@ export const useSalesPageBuilder = () => {
       throw err
     }
   }
-  
+
   const checkSlugAvailability = async (slug: string): Promise<boolean> => {
     try {
       const response = await $fetch<{ available: boolean }>(
@@ -388,12 +388,12 @@ export const useSalesPageBuilder = () => {
       return false
     }
   }
-  
+
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const formData = new FormData()
       formData.append('image', file)
-      
+
       const response = await $fetch<{ success: boolean; data: { url: string } }>(
         '/sales-pages/upload-image',
         {
@@ -403,7 +403,7 @@ export const useSalesPageBuilder = () => {
           body: formData,
         }
       )
-      
+
       if (response.success) {
         return response.data.url
       }
@@ -413,19 +413,19 @@ export const useSalesPageBuilder = () => {
       return null
     }
   }
-  
+
   // Actions - Blocs
   const addBlock = (type: string, position?: number) => {
     const blockType = blockTypes.value.find(bt => bt.value === type)
     if (!blockType) return
-    
+
     const newBlock: Block = {
       id: generateBlockId(),
       type: type,
       order: position !== undefined ? position : page.value.blocks.length,
-      props: { ...blockType.defaultProps },
+      props: JSON.parse(JSON.stringify(blockType.defaultProps)),
     }
-    
+
     if (position !== undefined && position < page.value.blocks.length) {
       // Insérer à la position et réindexer
       page.value.blocks.splice(position, 0, newBlock)
@@ -433,63 +433,63 @@ export const useSalesPageBuilder = () => {
     } else {
       page.value.blocks.push(newBlock)
     }
-    
+
     selectedBlockId.value = newBlock.id
   }
-  
+
   const removeBlock = (blockId: string) => {
     const index = page.value.blocks.findIndex(b => b.id === blockId)
     if (index !== -1) {
       page.value.blocks.splice(index, 1)
       reindexBlocks()
-      
+
       if (selectedBlockId.value === blockId) {
         selectedBlockId.value = null
       }
     }
   }
-  
+
   const duplicateBlock = (blockId: string) => {
     const block = page.value.blocks.find(b => b.id === blockId)
     if (!block) return
-    
+
     const newBlock: Block = {
       id: generateBlockId(),
       type: block.type,
       order: block.order + 1,
       props: JSON.parse(JSON.stringify(block.props)),
     }
-    
+
     const index = page.value.blocks.findIndex(b => b.id === blockId)
     page.value.blocks.splice(index + 1, 0, newBlock)
     reindexBlocks()
-    
+
     selectedBlockId.value = newBlock.id
   }
-  
+
   const moveBlock = (blockId: string, direction: 'up' | 'down') => {
     const index = page.value.blocks.findIndex(b => b.id === blockId)
     if (index === -1) return
-    
+
     const newIndex = direction === 'up' ? index - 1 : index + 1
     if (newIndex < 0 || newIndex >= page.value.blocks.length) return
-    
+
     // Swap avec copie du tableau pour éviter les problèmes de réactivité
     const blocks = [...page.value.blocks]
     const temp = blocks[index]!
     blocks[index] = blocks[newIndex]!
     blocks[newIndex] = temp
     page.value.blocks = blocks
-    
+
     reindexBlocks()
   }
-  
+
   const reindexBlocks = () => {
     page.value.blocks.forEach((block, index) => {
       block.order = index
     })
   }
-  
+
   const updateBlockProps = (blockId: string, props: Partial<BlockProps>) => {
     // Fonction helper pour appliquer la mise à jour
     const applyUpdate = (block: Block) => {
@@ -511,14 +511,14 @@ export const useSalesPageBuilder = () => {
         block.props = { ...block.props, ...props }
       }
     }
-    
+
     // Chercher d'abord dans les blocs legacy
     const legacyBlock = page.value.blocks.find(b => b.id === blockId)
     if (legacyBlock) {
       applyUpdate(legacyBlock)
       return
     }
-    
+
     // Chercher dans les sections (mode sections)
     if (page.value.sections && page.value.sections.length > 0) {
       for (const section of page.value.sections) {
@@ -532,10 +532,10 @@ export const useSalesPageBuilder = () => {
       }
     }
   }
-  
+
   const selectBlock = (blockId: string | null) => {
     selectedBlockId.value = blockId
-    
+
     // Si un bloc est sélectionné, trouver et sélectionner sa section/colonne parent
     if (blockId && page.value.sections) {
       for (const section of page.value.sections) {
@@ -550,24 +550,24 @@ export const useSalesPageBuilder = () => {
       }
     }
   }
-  
+
   const reorderBlocks = (newOrder: Block[]) => {
     page.value.blocks = newOrder.map((block, index) => ({
       ...block,
       order: index,
     }))
   }
-  
+
   // Actions - Theme
   const updateTheme = (updates: Partial<Theme>) => {
     page.value.theme = { ...page.value.theme, ...updates }
   }
-  
+
   // Actions - Settings
   const updateSettings = (updates: Partial<Settings>) => {
     page.value.settings = { ...page.value.settings, ...updates }
   }
-  
+
   // Actions - Page
   const resetPage = () => {
     page.value = {
@@ -598,7 +598,7 @@ export const useSalesPageBuilder = () => {
     selectedBlockId.value = null
     isDirty.value = false
   }
-  
+
   const togglePreview = () => {
     previewMode.value = !previewMode.value
     if (previewMode.value) {
@@ -607,16 +607,16 @@ export const useSalesPageBuilder = () => {
   }
 
   // ============ GESTION DES SECTIONS (Phase 3) ============
-  
+
   const selectedSectionId = ref<string | null>(null)
   const selectedColumnId = ref<string | null>(null)
-  
+
   // Computed pour vérifier si on utilise le nouveau mode sections
   // IMPORTANT: Une fois qu'on a des sections, on reste en mode sections
   const useSectionsMode = computed(() => {
     return page.value.sections && page.value.sections.length > 0
   })
-  
+
   // ============ ADD BLOCK SMART - Création intelligente de blocs ============
   // Cette fonction crée automatiquement une section si nécessaire
   // C'est la méthode principale pour ajouter des blocs (utilisée par la sidebar)
@@ -624,14 +624,14 @@ export const useSalesPageBuilder = () => {
     // Trouver les props par défaut du type de bloc
     const typeInfo = blockTypes.value.find(bt => bt.value === blockType)
     const defaultProps = typeInfo?.defaultProps || {}
-    
+
     const newBlock: Block = {
       id: generateBlockId(),
       type: blockType,
       order: 0,
-      props: { ...defaultProps },
+      props: JSON.parse(JSON.stringify(defaultProps)),
     }
-    
+
     // Si on utilise déjà le mode sections OU si on n'a pas de blocs legacy
     // → Ajouter dans une section
     if (useSectionsMode.value || page.value.blocks.length === 0) {
@@ -639,7 +639,7 @@ export const useSalesPageBuilder = () => {
       if (!page.value.sections) {
         page.value.sections = []
       }
-      
+
       // Si une colonne est sélectionnée, ajouter le bloc dedans
       if (selectedColumnId.value && selectedSection.value) {
         const column = selectedSection.value.columns.find(c => c.id === selectedColumnId.value)
@@ -650,7 +650,7 @@ export const useSalesPageBuilder = () => {
           return
         }
       }
-      
+
       // Sinon, créer une nouvelle section avec le bloc
       const newSection: Section = {
         id: generateSectionId(),
@@ -670,7 +670,7 @@ export const useSalesPageBuilder = () => {
           blocks: [newBlock],
         }],
       }
-      
+
       page.value.sections.push(newSection)
       selectedSectionId.value = newSection.id
       selectedBlockId.value = newBlock.id
@@ -681,25 +681,25 @@ export const useSalesPageBuilder = () => {
       selectedBlockId.value = newBlock.id
     }
   }
-  
+
   // Sélection d'une section
   const selectedSection = computed(() => {
     if (!selectedSectionId.value || !page.value.sections) return null
     return page.value.sections.find(s => s.id === selectedSectionId.value) || null
   })
-  
+
   // Sélection d'une colonne
   const selectedColumn = computed(() => {
     if (!selectedColumnId.value || !selectedSection.value) return null
     return selectedSection.value.columns.find(c => c.id === selectedColumnId.value) || null
   })
-  
+
   // Ajouter une nouvelle section
   const addSection = (layout: keyof typeof COLUMN_LAYOUTS = '1') => {
     if (!page.value.sections) {
       page.value.sections = []
     }
-    
+
     const widths = COLUMN_LAYOUTS[layout]
     const columns: Column[] = widths.map((width) => ({
       id: generateColumnId(),
@@ -710,7 +710,7 @@ export const useSalesPageBuilder = () => {
       },
       blocks: [],
     }))
-    
+
     const newSection: Section = {
       id: generateSectionId(),
       order: page.value.sections.length,
@@ -721,7 +721,7 @@ export const useSalesPageBuilder = () => {
       },
       columns,
     }
-    
+
     page.value.sections.push(newSection)
     selectedSectionId.value = newSection.id
     // Sélectionner automatiquement la première colonne
@@ -729,27 +729,27 @@ export const useSalesPageBuilder = () => {
       selectedColumnId.value = columns[0].id
     }
   }
-  
+
   // Supprimer une section
   const removeSection = (sectionId: string) => {
     if (!page.value.sections) return
-    
+
     page.value.sections = page.value.sections.filter(s => s.id !== sectionId)
     reindexSections()
-    
+
     if (selectedSectionId.value === sectionId) {
       selectedSectionId.value = null
       selectedColumnId.value = null
     }
   }
-  
+
   // Dupliquer une section
   const duplicateSection = (sectionId: string) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (!section) return
-    
+
     const newSection: Section = {
       id: generateSectionId(),
       order: section.order + 1,
@@ -766,34 +766,34 @@ export const useSalesPageBuilder = () => {
         })),
       })),
     }
-    
+
     const index = page.value.sections.findIndex(s => s.id === sectionId)
     page.value.sections.splice(index + 1, 0, newSection)
     reindexSections()
-    
+
     selectedSectionId.value = newSection.id
   }
-  
+
   // Mettre à jour les settings d'une section
   const updateSectionSettings = (sectionId: string, settings: Partial<SectionSettings>) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (section) {
       section.settings = { ...section.settings, ...settings }
     }
   }
-  
+
   // Changer le layout des colonnes d'une section
   const changeSectionLayout = (sectionId: string, layout: keyof typeof COLUMN_LAYOUTS) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (!section) return
-    
+
     const widths = COLUMN_LAYOUTS[layout]
     const existingBlocks = section.columns.flatMap(col => col.blocks)
-    
+
     // Créer les nouvelles colonnes avec les largeurs
     section.columns = widths.map((width, i) => ({
       id: generateColumnId(),
@@ -805,7 +805,7 @@ export const useSalesPageBuilder = () => {
       blocks: i === 0 ? existingBlocks : [], // Mettre tous les blocs dans la première colonne
     }))
   }
-  
+
   // Réindexer les sections
   const reindexSections = () => {
     if (!page.value.sections) return
@@ -813,54 +813,54 @@ export const useSalesPageBuilder = () => {
       section.order = index
     })
   }
-  
+
   // Ajouter un bloc dans une colonne
   const addBlockToColumn = (sectionId: string, columnId: string, blockType: string) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (!section) return
-    
+
     const column = section.columns.find(c => c.id === columnId)
     if (!column) return
-    
+
     // Trouver les props par défaut du type de bloc
     const typeInfo = blockTypes.value.find(bt => bt.value === blockType)
     const defaultProps = typeInfo?.defaultProps || {}
-    
+
     const newBlock: Block = {
       id: generateBlockId(),
       type: blockType,
       order: column.blocks.length,
       props: { ...defaultProps },
     }
-    
+
     column.blocks.push(newBlock)
     selectedBlockId.value = newBlock.id
   }
-  
+
   // Supprimer un bloc d'une colonne
   const removeBlockFromColumn = (sectionId: string, columnId: string, blockId: string) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (!section) return
-    
+
     const column = section.columns.find(c => c.id === columnId)
     if (!column) return
-    
+
     column.blocks = column.blocks.filter(b => b.id !== blockId)
-    
+
     // Réindexer les blocs dans la colonne
     column.blocks.forEach((block, index) => {
       block.order = index
     })
-    
+
     if (selectedBlockId.value === blockId) {
       selectedBlockId.value = null
     }
   }
-  
+
   // Déplacer un bloc dans une colonne (ou entre colonnes)
   const moveBlockInColumn = (
     fromSectionId: string,
@@ -871,28 +871,28 @@ export const useSalesPageBuilder = () => {
     newIndex: number
   ) => {
     if (!page.value.sections) return
-    
+
     const fromSection = page.value.sections.find(s => s.id === fromSectionId)
     const toSection = page.value.sections.find(s => s.id === toSectionId)
     if (!fromSection || !toSection) return
-    
+
     const fromColumn = fromSection.columns.find(c => c.id === fromColumnId)
     const toColumn = toSection.columns.find(c => c.id === toColumnId)
     if (!fromColumn || !toColumn) return
-    
+
     const blockIndex = fromColumn.blocks.findIndex(b => b.id === blockId)
     if (blockIndex === -1) return
-    
+
     const [block] = fromColumn.blocks.splice(blockIndex, 1)
     if (!block) return
     block.order = newIndex
     toColumn.blocks.splice(newIndex, 0, block)
-    
+
     // Réindexer les blocs dans les deux colonnes
     fromColumn.blocks.forEach((b, i) => { b.order = i })
     toColumn.blocks.forEach((b, i) => { b.order = i })
   }
-  
+
   // Mettre à jour les props d'un bloc dans une section
   const updateBlockPropsInSection = (
     sectionId: string,
@@ -901,16 +901,16 @@ export const useSalesPageBuilder = () => {
     props: Partial<BlockProps>
   ) => {
     if (!page.value.sections) return
-    
+
     const section = page.value.sections.find(s => s.id === sectionId)
     if (!section) return
-    
+
     const column = section.columns.find(c => c.id === columnId)
     if (!column) return
-    
+
     const block = column.blocks.find(b => b.id === blockId)
     if (!block) return
-    
+
     // Gérer la mise à jour d'array (édition inline)
     if (props.__arrayUpdate) {
       const { arrayKey, index, propKey, value } = props.__arrayUpdate as {
@@ -928,7 +928,7 @@ export const useSalesPageBuilder = () => {
       block.props = { ...block.props, ...props }
     }
   }
-  
+
   // Sélection
   const selectSection = (sectionId: string | null) => {
     selectedSectionId.value = sectionId
@@ -937,15 +937,15 @@ export const useSalesPageBuilder = () => {
       selectedBlockId.value = null
     }
   }
-  
+
   const selectColumn = (columnId: string | null) => {
     selectedColumnId.value = columnId
     // Désélectionner le bloc pour afficher les paramètres de la section
     selectedBlockId.value = null
-    
+
     // Trouver et sélectionner la section parent de cette colonne
     if (columnId && page.value.sections) {
-      const parentSection = page.value.sections.find(section => 
+      const parentSection = page.value.sections.find(section =>
         section.columns.some(col => col.id === columnId)
       )
       if (parentSection) {
@@ -953,14 +953,14 @@ export const useSalesPageBuilder = () => {
       }
     }
   }
-  
+
   // Convertir l'ancienne structure (blocks[]) vers la nouvelle (sections[])
   const migrateToSectionsMode = () => {
     if (page.value.blocks.length === 0) {
       page.value.sections = []
       return
     }
-    
+
     // Créer une section avec une colonne pour chaque bloc existant
     page.value.sections = page.value.blocks.map((block, index) => ({
       id: generateSectionId(),
@@ -980,11 +980,11 @@ export const useSalesPageBuilder = () => {
         blocks: [block],
       }],
     }))
-    
+
     // Vider l'ancien tableau de blocs
     page.value.blocks = []
   }
-  
+
   // ============ FIN GESTION DES SECTIONS ============
 
   // Appliquer un template
@@ -994,9 +994,9 @@ export const useSalesPageBuilder = () => {
     try {
       const response = await $fetch<{ success: boolean; data: { blocks: Block[]; sections: Section[]; theme: Theme; settings: Settings } }>(
         `/sales-page-templates/${templateId}/data`,
-        { 
+        {
           baseURL: config.public.apiBaseURL,
-          headers: getAuthHeaders() 
+          headers: getAuthHeaders()
         }
       )
       if (response.success && response.data) {
@@ -1017,7 +1017,7 @@ export const useSalesPageBuilder = () => {
               }))
             }))
           }))
-          
+
           page.value.sections = newSections
           page.value.blocks = [] // Vider les blocs legacy
         } else {
@@ -1027,15 +1027,15 @@ export const useSalesPageBuilder = () => {
             id: generateBlockId(),
             order: index
           }))
-          
+
           page.value.blocks = newBlocks
           page.value.sections = [] // Vider les sections
         }
-        
+
         if (response.data.theme) {
           page.value.theme = { ...page.value.theme, ...response.data.theme }
         }
-        
+
         if (response.data.settings) {
           page.value.settings = {
             ...page.value.settings,
@@ -1044,7 +1044,7 @@ export const useSalesPageBuilder = () => {
             // Ne pas copier les tracking IDs du template
           }
         }
-        
+
         isDirty.value = true
         return true
       }
@@ -1057,7 +1057,7 @@ export const useSalesPageBuilder = () => {
       isLoading.value = false
     }
   }
-  
+
   return {
     // State
     page,
@@ -1069,18 +1069,18 @@ export const useSalesPageBuilder = () => {
     isLoading,
     error,
     previewMode,
-    
+
     // State - Sections (Phase 3)
     selectedSectionId,
     selectedColumnId,
     selectedSection,
     selectedColumn,
     useSectionsMode,
-    
+
     // Computed
     hasBlocks,
     sortedBlocks,
-    
+
     // API Actions
     fetchBlockTypes,
     fetchPage,
@@ -1090,7 +1090,7 @@ export const useSalesPageBuilder = () => {
     unpublishPage,
     checkSlugAvailability,
     uploadImage,
-    
+
     // Block Actions (legacy)
     addBlock,
     addBlockSmart, // Méthode intelligente pour ajouter des blocs (crée section automatiquement)
@@ -1100,7 +1100,7 @@ export const useSalesPageBuilder = () => {
     updateBlockProps,
     selectBlock,
     reorderBlocks,
-    
+
     // Section Actions (Phase 3)
     addSection,
     removeSection,
@@ -1114,11 +1114,11 @@ export const useSalesPageBuilder = () => {
     moveBlockInColumn,
     updateBlockPropsInSection,
     migrateToSectionsMode,
-    
+
     // Theme & Settings
     updateTheme,
     updateSettings,
-    
+
     // Page Actions
     resetPage,
     togglePreview,

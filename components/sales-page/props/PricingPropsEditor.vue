@@ -329,15 +329,16 @@
     
     <!-- ===== POSITIONNEMENT ===== -->
     <PositioningSection
-      :elements="['badge', 'title', 'subtitle', 'plans']"
+      :elements="['badge', 'title', 'subtitle', 'plans', 'cta']"
       :elements-order="localProps.elementsOrder"
       :offsets="{ 
         badgeOffsetY: localProps.badgeOffsetY,
         titleOffsetY: localProps.titleOffsetY, 
         subtitleOffsetY: localProps.subtitleOffsetY, 
-        plansOffsetY: localProps.plansOffsetY 
+        plansOffsetY: localProps.plansOffsetY,
+        ctaOffsetY: localProps.buttonOffsetY
       }"
-      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', plans: 'Grille des prix' }"
+      :labels="{ badge: 'Badge', title: 'Titre', subtitle: 'Sous-titre', plans: 'Grille des prix', cta: 'Bouton d\'action' }"
       @update:elements-order="updateProp('elementsOrder', $event)"
       @update:offsets="updateOffsets"
     />
@@ -433,16 +434,18 @@ const localProps = reactive({
   showBadge: props.props.showBadge || false,
   badge: props.props.badge || 'Tarifs',
   // Positionnement
-  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'plans'],
+  elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'plans', 'cta'],
   badgeOffsetY: props.props.badgeOffsetY || 0,
   titleOffsetY: props.props.titleOffsetY || 0,
   subtitleOffsetY: props.props.subtitleOffsetY || 0,
   plansOffsetY: props.props.plansOffsetY || 0,
+  buttonOffsetY: props.props.buttonOffsetY || 0,
 })
 
-// S'assurer que 'badge' est présent dans elementsOrder
-if (localProps.elementsOrder && !localProps.elementsOrder.includes('badge')) {
-  localProps.elementsOrder.unshift('badge')
+// S'assurer que 'badge' et 'cta' sont présents dans elementsOrder
+if (localProps.elementsOrder) {
+  if (!localProps.elementsOrder.includes('badge')) localProps.elementsOrder.unshift('badge')
+  if (!localProps.elementsOrder.includes('cta')) localProps.elementsOrder.push('cta')
 }
 
 watch(() => props.props, (newVal) => {
@@ -456,6 +459,11 @@ const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => { (localProps as any)[key] = value; emitUpdate() }
 
 const updateOffsets = (offsets: Record<string, number>) => {
+  // Mapper ctaOffsetY vers buttonOffsetY si présent
+  if ('ctaOffsetY' in offsets) {
+    (localProps as any).buttonOffsetY = offsets.ctaOffsetY
+    delete offsets.ctaOffsetY
+  }
   Object.assign(localProps, offsets)
   emitUpdate()
 }
