@@ -1,44 +1,51 @@
 <template>
   <div class="font-sans bg-white">
     <!-- HERO -->
-    <section class="bg-[#2ECC71] text-white py-12 md:py-20 px-6 md:px-12 overflow-hidden">
-      <div class="container mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <section class="bg-[#2ECC71] text-white pt-10 pb-4 md:pt-14 md:pb-6 px-6 md:px-12 overflow-hidden">
+      <div class="container mx-auto max-w-[1100px] grid md:grid-cols-[1fr_0.95fr] gap-6 lg:gap-7 items-start">
         <div
-          class="max-w-xl"
+          class="flex flex-col"
           v-motion="{
             initial: { opacity: 0, x: -60 },
             visible: { opacity: 1, x: 0, transition: { duration: 700, easing: 'easeOut' } }
           }"
           v-motion-visibility="{ once: true, threshold: 0.25 }"
         >
-          <span class="inline-flex items-center gap-2 border border-white/50 bg-white/10 text-white text-sm font-semibold px-3 py-1.5 rounded-full mb-6">
-            <span class="w-4 h-4 bg-white rounded-full"></span>
-            Intégrez les paiements par API simplement
-          </span>
+          <div class="space-y-4">
+            <span class="inline-flex w-max items-center gap-2 border border-white/70 bg-white/10 text-white text-[15px] md:text-[16px] font-semibold px-3 md:px-3.5 py-1.5 rounded-full leading-none">
+              <span class="w-4 h-4 bg-white rounded-full"></span>
+              Intégrez les paiements par API simplement
+            </span>
 
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight mb-4">
-            Intégrez les paiements à<br />
-            vos solutions grâce à
-            une <span class="italic">API</span> simple et sécurisée
-          </h1>
+            <h1 class="max-w-[620px] text-[34px] sm:text-[36px] md:text-[40px] lg:text-[46px] font-normal leading-[1.12]">
+              Intégrez les paiements à
+              <br class="hidden md:block" />
+              vos solutions grâce à
+              <br class="hidden md:block" />
+              <span class="md:whitespace-nowrap">une <span class="italic font-bold">API</span> simple et sécurisée</span>
+            </h1>
 
-          <p class="text-white/95 text-base md:text-lg leading-relaxed mb-8">
-            Connectez votre site web, votre application mobile
-            ou votre logiciel à notre infrastructure de paiement.
-            Automatisez les encaissements, les notifications
-            et le suivi des transactions.
-          </p>
+            <p class="text-white/95 text-[18px] md:text-[21px] leading-[1.24]">
+              Connectez votre site web, votre application mobile
+              <br class="hidden md:block" />
+              ou votre logiciel à notre infrastructure de paiement.
+              <br class="hidden md:block" />
+              Automatisez les encaissements, les notifications
+              <br class="hidden md:block" />
+              et le suivi des transactions.
+            </p>
+          </div>
 
-          <div class="flex flex-wrap gap-3">
+          <div class="flex flex-wrap gap-3 mt-7">
             <NuxtLink
               to="/docs"
-              class="bg-white text-[#2ECC71] px-6 py-3 rounded-full font-semibold shadow-sm hover:bg-gray-100 transition"
+              class="bg-white text-[#2ECC71] px-7 py-3 rounded-[22px] text-[18px] md:text-[19px] font-semibold shadow-sm hover:bg-gray-100 transition"
             >
               Voir la documentation
             </NuxtLink>
             <NuxtLink
               to="/register"
-              class="border border-white text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition"
+              class="border-2 border-white text-white px-7 py-3 rounded-[22px] text-[18px] md:text-[19px] font-semibold hover:bg-white/10 transition"
             >
               Commencer l'intégration
             </NuxtLink>
@@ -46,7 +53,7 @@
         </div>
 
         <div
-          class="w-full flex justify-center md:justify-end"
+          class="hero-visual-wrap w-full flex justify-center md:justify-end md:items-start"
           v-motion="{
             initial: { opacity: 0, x: 60, scale: 0.98 },
             visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 800, easing: 'easeOut' } }
@@ -56,15 +63,15 @@
           <img
             src="~/assets/img/api/img_principal_api.png"
             alt="API LeekPay"
-            class="w-full max-w-md md:max-w-lg rounded-xl shadow-lg"
+            class="w-full max-w-[440px] md:max-w-[560px] lg:max-w-[620px] h-auto rounded-lg shadow-lg"
           />
         </div>
       </div>
     </section>
 
     <!-- BENEFITS -->
-    <section class="py-10 md:py-12 px-6 md:px-12 bg-white">
-      <div class="container mx-auto grid md:grid-cols-3 gap-8">
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1000px] grid md:grid-cols-3 gap-6">
         <div
           class="flex items-start gap-3"
           v-motion="{
@@ -73,14 +80,14 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Rapide</h3>
-            <p class="text-gray-600 text-sm">Intégration en quelques lignes de code.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Rapide</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Intégration en quelques lignes de code.</p>
           </div>
         </div>
 
@@ -92,14 +99,14 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Sécurisée</h3>
-            <p class="text-gray-600 text-sm">Chiffrement SSL et conformité aux standards.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Sécurisée</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Chiffrement SSL et conformité aux standards.</p>
           </div>
         </div>
 
@@ -111,61 +118,64 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Scalable</h3>
-            <p class="text-gray-600 text-sm">Adaptée aux startups comme aux grandes plateformes.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Scalable</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Adaptée aux startups comme aux grandes plateformes.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- INTEGRATION SECTION -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-[#E9F8EF]">
-      <div class="container mx-auto grid md:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
-        <div
-          v-motion="{
-            initial: { opacity: 0, x: -50 },
-            visible: { opacity: 1, x: 0, transition: { duration: 700 } }
-          }"
-          v-motion-visibility="{ once: true, threshold: 0.2 }"
-        >
-          <h2 class="text-[#2ECC71] text-xl md:text-2xl font-bold italic mb-4">Intégrez votre solution de paiement</h2>
-          <p class="text-gray-700 text-base md:text-lg leading-relaxed">
-            Notre API vous permet de gérer les paiements directement depuis vos applications, sites web ou logiciels.
-            Vous pouvez créer des paiements et des liens dynamiques, automatiser les confirmations grâce aux webhooks
-            et suivre toutes les transactions en temps réel. Elle intègre un environnement de test (sandbox),
-            une gestion sécurisée des clés d’accès et des permissions avancées pour garantir des intégrations fiables
-            et sécurisées. L’API s’adapte aussi bien aux projets simples qu’aux plateformes à fort volume.
-          </p>
-        </div>
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px]">
+        <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-8 grid md:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
+          <div
+            v-motion="{
+              initial: { opacity: 0, x: -50 },
+              visible: { opacity: 1, x: 0, transition: { duration: 700 } }
+            }"
+            v-motion-visibility="{ once: true, threshold: 0.2 }"
+          >
+            <h2 class="text-[#2ECC71] text-2xl md:text-[36px] font-bold italic mb-3">Intégrez votre solution de paiement</h2>
+            <p class="text-gray-700 text-lg md:text-[19px] leading-[1.28]">
+              Notre API vous permet de gérer les paiements directement depuis vos applications, sites web ou
+              logiciels. Vous pouvez créer des paiements et des liens dynamiques, automatiser les confirmations
+              grâce aux webhooks et suivre toutes les transactions en temps réel. Elle intègre un environnement
+              de test (sandbox), une gestion sécurisée des clés d'accès et des permissions avancées pour garantir
+              des intégrations fiables et sécurisées. L'API s'adapte aussi bien aux projets simples qu'aux
+              plateformes à fort volume.
+            </p>
+          </div>
 
-        <div
-          class="w-full flex justify-center"
-          v-motion="{
-            initial: { opacity: 0, x: 50 },
-            visible: { opacity: 1, x: 0, transition: { duration: 700 } }
-          }"
-          v-motion-visibility="{ once: true, threshold: 0.2 }"
-        >
-          <img
-            src="~/assets/img/api/img_integrer_api.png"
-            alt="Intégrer l'API LeekPay"
-            class="w-full max-w-md rounded-2xl shadow-md"
-          />
+          <div
+            class="w-full flex justify-center"
+            v-motion="{
+              initial: { opacity: 0, x: 50 },
+              visible: { opacity: 1, x: 0, transition: { duration: 700 } }
+            }"
+            v-motion-visibility="{ once: true, threshold: 0.2 }"
+          >
+            <img
+              src="~/assets/img/api/img_integrer_api.png"
+              alt="Intégrer l'API LeekPay"
+              class="w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] rounded-[22px] border border-[#2ECC71]"
+            />
+          </div>
         </div>
       </div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
-      <div class="container mx-auto text-center">
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px] text-center">
         <h2
-          class="text-2xl md:text-3xl font-bold text-gray-900 mb-3"
+          class="text-4xl md:text-5xl font-bold text-gray-900 mb-3"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
@@ -175,7 +185,7 @@
           Comment ça marche ?
         </h2>
         <p
-          class="text-gray-600 max-w-2xl mx-auto"
+          class="text-gray-600 text-xl md:text-[22px] max-w-2xl mx-auto leading-[1.25]"
           v-motion="{
             initial: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 100 } }
@@ -187,32 +197,34 @@
         </p>
 
         <div
-          class="mt-10"
+          class="mt-10 md:mt-12 relative max-w-[980px] mx-auto"
           v-motion="{
             initial: { opacity: 0, y: 30 },
             visible: { opacity: 1, y: 0, transition: { duration: 700 } }
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <div class="flex items-center justify-center flex-wrap md:flex-nowrap gap-4 md:gap-6">
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full bg-[#2ECC71] text-white font-bold flex items-center justify-center">1</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Découvrez<br />la documentation</p>
+          <div class="hidden md:block absolute left-[12.5%] right-[12.5%] top-7 h-[2px] bg-[#2ECC71]"></div>
+
+          <div class="relative grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-x-4">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">1</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Découvrez<br />la documentation</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full border-2 border-[#2ECC71] text-[#2ECC71] font-bold flex items-center justify-center">2</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Intégrez<br />l’API</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">2</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Intégrez<br />l'API</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full bg-[#2ECC71] text-white font-bold flex items-center justify-center">3</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Configurez<br />&amp; Partagez</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">3</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Configurez<br />&amp; Partagez</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full border-2 border-[#2ECC71] text-[#2ECC71] font-bold flex items-center justify-center">4</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Le client<br />paye</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">4</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Le client<br />paie</p>
             </div>
           </div>
         </div>
@@ -220,10 +232,11 @@
     </section>
 
     <!-- USE CASES -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
-      <div class="container mx-auto">
-        <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-10 grid md:grid-cols-[0.9fr_1.1fr] gap-8 items-center">
+    <section class="py-10 md:py-12 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px]">
+        <div class="bg-[#D9EDE2] rounded-2xl p-6 md:p-8 grid md:grid-cols-[0.9fr_1.1fr] gap-8 md:gap-10 items-center">
           <div
+            class="w-full flex justify-center md:justify-start"
             v-motion="{
               initial: { opacity: 0, x: -50 },
               visible: { opacity: 1, x: 0, transition: { duration: 700 } }
@@ -233,7 +246,7 @@
             <img
               src="~/assets/img/api/img_cas_usage.png"
               alt="Cas d'usage API"
-              class="w-full h-auto rounded-xl"
+              class="w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] h-auto rounded-[22px] border border-[#2ECC71]"
             />
           </div>
           <div
@@ -243,23 +256,36 @@
             }"
             v-motion-visibility="{ once: true, threshold: 0.2 }"
           >
-            <h3 class="text-[#2ECC71] text-xl md:text-2xl font-bold mb-3">Cas d'usage</h3>
-            <p class="text-gray-700 leading-relaxed text-base md:text-lg">
+            <h3 class="text-[#2ECC71] text-3xl md:text-[44px] font-bold italic leading-[1.08] mb-4">Cas d'usage</h3>
+            <p class="text-[#111827] leading-[1.24] text-lg md:text-[19px]">
               Que vous développiez une application mobile, un SaaS ou une plateforme e-commerce,
-              notre API vous permet d’intégrer facilement les paiements et d’automatiser
+              notre API vous permet d'intégrer facilement les paiements et d'automatiser
               vos flux financiers.
             </p>
-            <div class="h-0.5 w-44 bg-[#2ECC71] mt-6"></div>
+            <svg
+              class="mt-6 w-full max-w-[420px]"
+              viewBox="0 0 520 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M12 28C86 18 170 18 258 18C314 18 360 18 418 18C374 24 326 30 274 35C252 37 236 39 224 42C240 44 262 43 304 39"
+                stroke="#2ECC71"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+            </svg>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA -->
-    <section class="py-10 md:py-12 px-6 md:px-12">
-      <div class="container mx-auto">
+    <section class="py-8 md:py-10 px-6 md:px-12">
+      <div class="container mx-auto max-w-[1100px]">
         <div
-          class="bg-[#2ECC71] rounded-2xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          class="bg-[#2ECC71] rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6"
           v-motion="{
             initial: { opacity: 0, y: 40 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
@@ -267,8 +293,8 @@
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
           <div class="text-white">
-            <h3 class="text-lg md:text-xl font-bold italic mb-1">Démarrez votre intégration dès maintenant</h3>
-            <p class="text-white/90 text-sm md:text-base">
+            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Démarrez votre intégration dès maintenant</h3>
+            <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Accédez à notre documentation API et commencez
               <br class="hidden md:block" />
               à intégrer les paiements en toute simplicité.
@@ -276,7 +302,7 @@
           </div>
           <NuxtLink
             to="/docs"
-            class="bg-white text-[#2ECC71] px-6 py-3 rounded-full font-semibold shadow-sm hover:bg-gray-100 transition"
+            class="bg-white text-[#2ECC71] px-6 py-3 rounded-full text-lg font-semibold shadow-sm hover:bg-gray-100 transition"
           >
             Voir la documentation
           </NuxtLink>
@@ -286,7 +312,7 @@
 
     <!-- FOOTER -->
     <footer class="py-8 px-6 md:px-12 bg-[#0A1F44]">
-      <div class="container mx-auto">
+      <div class="container mx-auto max-w-[1000px]">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-3">
             <img
@@ -362,3 +388,18 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
 })
 </script>
+
+<style scoped>
+@media (min-width: 768px) {
+  .hero-visual-wrap {
+    position: relative;
+    right: -4rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero-visual-wrap {
+    right: calc((100vw - 1100px) / -2 - 1.25rem);
+  }
+}
+</style>

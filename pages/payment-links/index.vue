@@ -1,67 +1,70 @@
 <template>
   <div class="font-sans bg-white">
     <!-- HERO -->
-    <section class="bg-[#2ECC71] text-white py-12 md:py-20 px-6 md:px-12 overflow-hidden">
-      <div class="container mx-auto grid md:grid-cols-2 gap-12 items-center">
-        <div
-          class="max-w-xl"
-          v-motion="{
-            initial: { opacity: 0, x: -60 },
-            visible: { opacity: 1, x: 0, transition: { duration: 700, easing: 'easeOut' } }
-          }"
-          v-motion-visibility="{ once: true, threshold: 0.25 }"
-        >
-          <span class="inline-flex items-center gap-2 border border-white/50 bg-white/10 text-white text-sm font-semibold px-3 py-1.5 rounded-full mb-6">
-            <span class="w-4 h-4 bg-white rounded-full"></span>
-            Encaissez en ligne, simplement
-          </span>
+<section class="bg-[#2ECC71] text-white pt-10 pb-4 md:pt-14 md:pb-6 px-6 md:px-12 overflow-hidden">
+  <div class="container mx-auto max-w-[1100px] grid md:grid-cols-[1fr_0.8fr] gap-6 lg:gap-7 items-start">
+    <div
+      class="flex flex-col"
+      v-motion="{
+        initial: { opacity: 0, x: -60 },
+        visible: { opacity: 1, x: 0, transition: { duration: 700, easing: 'easeOut' } }
+      }"
+      v-motion-visibility="{ once: true, threshold: 0.25 }"
+    >
+      <div class="space-y-4">
+        <span class="inline-flex w-max items-center gap-3 border-2 border-white/70 bg-white/10 text-white text-[20px] md:text-[22px] font-semibold px-4 md:px-5 py-2 rounded-full leading-none">
+          <span class="w-6 h-6 bg-white rounded-full"></span>
+          Encaissez en ligne, simplement
+        </span>
 
-          <h1 class="text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight mb-4">
-            Créez des <span class="italic font-semibold">liens de paiement</span>
-            et encaissez instantanément
-          </h1>
+        <h1 class="text-[34px] sm:text-[38px] md:text-[44px] lg:text-[50px] font-normal leading-[1.12]">
+          <span class="md:whitespace-nowrap">Créez des <span class="italic font-bold">liens de paiement</span></span>
+          <br class="hidden md:block" />
+          et encaissez instantanément
+        </h1>
 
-          <p class="text-white/95 text-base md:text-lg leading-relaxed mb-8">
-            Recevez vos paiements via mobile money,
-            carte bancaire et wallet en un simple clic.
-          </p>
-
-          <div class="flex flex-wrap gap-3">
-            <NuxtLink
-              to="/dashboard/create-link"
-              class="bg-white text-[#2ECC71] px-6 py-3 rounded-full font-semibold shadow-sm hover:bg-gray-100 transition"
-            >
-              Créer un lien
-            </NuxtLink>
-            <button
-              type="button"
-              class="border border-white text-white px-6 py-3 rounded-full font-semibold hover:bg-white/10 transition"
-            >
-              vidéo de démo
-            </button>
-          </div>
-        </div>
-
-        <div
-          class="w-full flex justify-center md:justify-end"
-          v-motion="{
-            initial: { opacity: 0, x: 60, scale: 0.98 },
-            visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 800, easing: 'easeOut' } }
-          }"
-          v-motion-visibility="{ once: true, threshold: 0.25 }"
-        >
-          <img
-            src="~/assets/img/leekpay_link/img_principal_link.png"
-            alt="Liens de paiement LeekPay"
-            class="w-full max-w-md md:max-w-lg rounded-xl shadow-lg"
-          />
-        </div>
+        <p class="text-white/95 text-[21px] md:text-[24px] leading-[1.24]">
+          Recevez vos paiements via mobile money,<br class="hidden md:block" />
+          carte bancaire et wallet en un simple clic.
+        </p>
       </div>
-    </section>
+
+      <div class="flex flex-wrap gap-3 mt-7">
+        <NuxtLink
+          to="/dashboard/create-link"
+          class="bg-white text-[#2ECC71] px-8 py-3.5 rounded-[24px] text-[19px] md:text-[20px] font-semibold shadow-sm hover:bg-gray-100 transition"
+        >
+          Créer un lien
+        </NuxtLink>
+        <button
+          type="button"
+          class="border-2 border-white text-white px-8 py-3.5 rounded-[24px] text-[19px] md:text-[20px] font-semibold hover:bg-white/10 transition"
+        >
+          vidéo de démo
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="w-full flex justify-center md:justify-end"
+      v-motion="{
+        initial: { opacity: 0, x: 60, scale: 0.98 },
+        visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 800, easing: 'easeOut' } }
+      }"
+      v-motion-visibility="{ once: true, threshold: 0.25 }"
+    >
+      <img
+        src="~/assets/img/leekpay_link/img_principal_link.png"
+        alt="Liens de paiement LeekPay"
+        class="h-auto max-h-[400px] max-w-[320px] md:max-w-[360px] rounded-xl shadow-lg"
+      />
+    </div>
+  </div>
+</section>
 
     <!-- BENEFITS -->
-    <section class="py-10 md:py-12 px-6 md:px-12 bg-white">
-      <div class="container mx-auto grid md:grid-cols-3 gap-8">
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1000px] grid md:grid-cols-3 gap-6">
         <div
           class="flex items-start gap-3"
           v-motion="{
@@ -70,14 +73,14 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Rapide</h3>
-            <p class="text-gray-600 text-sm">Créez un lien de paiement et encaissez en quelques minutes.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Rapide</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Créez un lien de paiement et encaissez en quelques minutes, sans étapes inutiles ni complexité.</p>
           </div>
         </div>
 
@@ -89,14 +92,14 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Flexible</h3>
-            <p class="text-gray-600 text-sm">Vos clients paient quand et où ils le souhaitent.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Flexible</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Vos clients paient quand et où ils le souhaitent, sur mobile ou ordinateur, sans contrainte.</p>
           </div>
         </div>
 
@@ -108,23 +111,23 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <span class="mt-1 w-6 h-6 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
-            <svg class="w-3.5 h-3.5 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+            <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
           <div>
-            <h3 class="text-gray-900 font-semibold">Sécurisé</h3>
-            <p class="text-gray-600 text-sm">Transactions protégées par des standards élevés.</p>
+            <h3 class="text-gray-900 text-[22px] md:text-[24px] font-semibold leading-tight">Sécurisé</h3>
+            <p class="text-gray-600 text-[16px] md:text-[18px] leading-[1.28]">Chaque transaction est protégée par des standards de sécurité élevés et fiables.</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CREATE LINK SECTION -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
-      <div class="container mx-auto">
-        <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-10 grid md:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px]">
+        <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-8 grid md:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
           <div
             v-motion="{
               initial: { opacity: 0, x: -50 },
@@ -132,8 +135,8 @@
             }"
             v-motion-visibility="{ once: true, threshold: 0.2 }"
           >
-            <h2 class="text-[#2ECC71] text-xl md:text-2xl font-bold italic mb-4">Créez un lien de paiement</h2>
-            <p class="text-gray-700 text-base md:text-lg leading-relaxed">
+            <h2 class="text-[#2ECC71] text-2xl md:text-[36px] font-bold italic mb-3">Créez un lien de paiement</h2>
+            <p class="text-gray-700 text-lg md:text-[19px] leading-[1.28]">
               en quelques secondes et partagez-le facilement par WhatsApp, SMS ou email.
               Vos clients peuvent payer avec plusieurs moyens de paiement en toute sécurité
               grâce au chiffrement SSL. Vous recevez des notifications instantanées à chaque
@@ -152,7 +155,7 @@
             <img
               src="~/assets/img/leekpay_link/img_create_link.png"
               alt="Créer un lien de paiement"
-              class="w-full max-w-md rounded-2xl shadow-md"
+              class="w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] rounded-2xl shadow-md"
             />
           </div>
         </div>
@@ -160,10 +163,10 @@
     </section>
 
     <!-- HOW IT WORKS -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
-      <div class="container mx-auto text-center">
+    <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px] text-center">
         <h2
-          class="text-2xl md:text-3xl font-bold text-gray-900 mb-3"
+          class="text-4xl md:text-5xl font-bold text-gray-900 mb-3"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
@@ -173,7 +176,7 @@
           Comment ça marche ?
         </h2>
         <p
-          class="text-gray-600 max-w-2xl mx-auto"
+          class="text-gray-600 text-xl md:text-[22px] max-w-2xl mx-auto leading-[1.25]"
           v-motion="{
             initial: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 100 } }
@@ -185,32 +188,34 @@
         </p>
 
         <div
-          class="mt-10"
+          class="mt-10 md:mt-12 relative max-w-[980px] mx-auto"
           v-motion="{
             initial: { opacity: 0, y: 30 },
             visible: { opacity: 1, y: 0, transition: { duration: 700 } }
           }"
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
-          <div class="flex items-center justify-center flex-wrap md:flex-nowrap gap-4 md:gap-6">
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full bg-[#2ECC71] text-white font-bold flex items-center justify-center">1</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Crée<br />ton lien</p>
+          <div class="hidden md:block absolute left-[12.5%] right-[12.5%] top-7 h-[2px] bg-[#2ECC71]"></div>
+
+          <div class="relative grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-x-4">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">1</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Crée<br />ton lien</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full border-2 border-[#2ECC71] text-[#2ECC71] font-bold flex items-center justify-center">2</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Personnalise<br />les paramètres</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">2</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Personnalise<br />les paramètres</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full bg-[#2ECC71] text-white font-bold flex items-center justify-center">3</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Partage<br />le lien</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">3</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Partage<br />le lien</p>
             </div>
-            <div class="hidden md:block flex-1 h-px bg-[#2ECC71] max-w-[110px]"></div>
-            <div class="flex flex-col items-center text-center w-28">
-              <div class="w-10 h-10 rounded-full border-2 border-[#2ECC71] text-[#2ECC71] font-bold flex items-center justify-center">4</div>
-              <p class="text-sm text-[#2ECC71] font-semibold mt-3">Le client<br />paie</p>
+
+            <div class="flex flex-col items-center text-center">
+              <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">4</div>
+              <p class="mt-4 text-[18px] md:text-[18px] text-[#2ECC71] font-semibold leading-[1.1] whitespace-nowrap">Le client<br />paie</p>
             </div>
           </div>
         </div>
@@ -218,10 +223,11 @@
     </section>
 
     <!-- USE CASES -->
-    <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
-      <div class="container mx-auto">
-        <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-10 grid md:grid-cols-[0.9fr_1.1fr] gap-8 items-center">
+    <section class="py-10 md:py-12 px-6 md:px-12 bg-white">
+      <div class="container mx-auto max-w-[1100px]">
+        <div class="bg-[#D9EDE2] rounded-2xl p-6 md:p-8 grid md:grid-cols-[0.9fr_1.1fr] gap-8 md:gap-10 items-center">
           <div
+            class="w-full flex justify-center md:justify-start"
             v-motion="{
               initial: { opacity: 0, x: -50 },
               visible: { opacity: 1, x: 0, transition: { duration: 700 } }
@@ -231,7 +237,7 @@
             <img
               src="~/assets/img/leekpay_link/img_use_case_link.png"
               alt="Cas d'usage liens de paiement"
-              class="w-full h-auto rounded-xl"
+              class="w-full max-w-[260px] sm:max-w-[300px] md:max-w-[360px] h-auto rounded-[22px] border border-[#2ECC71]"
             />
           </div>
           <div
@@ -241,23 +247,36 @@
             }"
             v-motion-visibility="{ once: true, threshold: 0.2 }"
           >
-            <h3 class="text-[#2ECC71] text-xl md:text-2xl font-bold mb-3">Cas d'usage</h3>
-            <p class="text-gray-700 leading-relaxed text-base md:text-lg">
+            <h3 class="text-[#2ECC71] text-3xl md:text-[44px] font-bold italic leading-[1.08] mb-4">Cas d'usage</h3>
+            <p class="text-[#111827] leading-[1.24] text-lg md:text-[19px]">
               Que vous soyez freelance, commerçant, école, ONG ou coach, vous pouvez utiliser
               les liens de paiement pour recevoir des paiements rapidement, même à distance.
               Vos clients paient facilement et vous gagnez du temps dans la gestion des paiements.
             </p>
-            <div class="h-0.5 w-44 bg-[#2ECC71] mt-6"></div>
+            <svg
+              class="mt-6 w-full max-w-[420px]"
+              viewBox="0 0 520 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 34C82 20 136 10 218 12C250 13 272 16 278 23C283 29 270 34 263 39C254 45 285 44 313 40C379 31 442 20 516 14"
+                stroke="#2ECC71"
+                stroke-width="2.5"
+                stroke-linecap="round"
+              />
+            </svg>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA -->
-    <section class="py-10 md:py-12 px-6 md:px-12">
-      <div class="container mx-auto">
+    <section class="py-8 md:py-10 px-6 md:px-12">
+      <div class="container mx-auto max-w-[1100px]">
         <div
-          class="bg-[#2ECC71] rounded-2xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-6"
+          class="bg-[#2ECC71] rounded-2xl p-5 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6"
           v-motion="{
             initial: { opacity: 0, y: 40 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
@@ -265,8 +284,8 @@
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
           <div class="text-white">
-            <h3 class="text-lg md:text-xl font-bold italic mb-1">Tu es prêt à recevoir tes premiers paiements ?</h3>
-            <p class="text-white/90 text-sm md:text-base">
+            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Tu es prêt à recevoir tes premiers paiements ?</h3>
+            <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Commence dès aujourd'hui et encaisse tes paiements
               <br class="hidden md:block" />
               en toute simplicité.
@@ -274,7 +293,7 @@
           </div>
           <NuxtLink
             to="/dashboard/create-link"
-            class="bg-white text-[#2ECC71] px-6 py-3 rounded-full font-semibold shadow-sm hover:bg-gray-100 transition"
+            class="bg-white text-[#2ECC71] px-6 py-3 rounded-full text-lg font-semibold shadow-sm hover:bg-gray-100 transition"
           >
             Créer un lien
           </NuxtLink>
@@ -284,7 +303,7 @@
 
     <!-- FOOTER -->
     <footer class="py-8 px-6 md:px-12 bg-[#0A1F44]">
-      <div class="container mx-auto">
+      <div class="container mx-auto max-w-[1000px]">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
           <div class="flex items-center gap-3">
             <img
