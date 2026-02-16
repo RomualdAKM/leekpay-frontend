@@ -7,7 +7,8 @@
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col" :style="{ gap: '1rem' }">
         <!-- Titre optionnel -->
-        <h2 
+        <component
+          :is="props.titleTag || 'h2'"
           v-if="props.showTitle && (props.title || isEditMode)"
           :class="[template.styles.title, editableClasses('title')]"
           :style="{ ...titleStyles, ...titlePositionStyles }"
@@ -16,7 +17,7 @@
           @focus="onFocus('title')"
           @blur="onBlurText($event, 'title')"
           @keydown="onKeydown"
-        >{{ props.title }}</h2>
+        >{{ props.title }}</component>
         
         <!-- Contenu / Description -->
         <div 
@@ -74,17 +75,33 @@ interface Props {
   // Titre optionnel
   showTitle?: boolean
   title?: string
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
+  titleFontFamily?: string
   titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
-  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
   titleColor?: string
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleAlign?: 'left' | 'center' | 'right' | 'justify'
+  titleOpacity?: number
+  titleMarginBottom?: number
+  // Contenu - styles additionnels
+  contentColor?: string
+  contentAlign?: 'left' | 'center' | 'right' | 'justify'
+  contentOpacity?: number
+  contentMaxWidth?: string
+  contentColumns?: number
   // Bouton optionnel
   showButton?: boolean
   buttonText?: string
   buttonUrl?: string
   buttonTarget?: '_self' | '_blank'
   buttonIcon?: 'none' | 'arrow-right' | 'external'
+  buttonVariant?: 'filled' | 'outlined' | 'ghost'
+  buttonSize?: 'sm' | 'md' | 'lg'
   buttonBgColor?: string
   buttonTextColor?: string
+  buttonBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  buttonShadow?: 'none' | 'sm' | 'md' | 'lg'
   buttonAlign?: 'left' | 'center' | 'right'
   // Couleurs
   backgroundColor?: string
@@ -123,17 +140,33 @@ const props = withDefaults(defineProps<Props>(), {
   // Titre
   showTitle: false,
   title: '',
+  titleTag: 'h2',
+  titleFontFamily: '',
   titleSize: 'large',
   titleWeight: 'bold',
   titleColor: '',
+  titleTransform: 'none',
+  titleAlign: 'left',
+  titleOpacity: 100,
+  titleMarginBottom: 16,
+  // Contenu - styles additionnels
+  contentColor: '',
+  contentAlign: 'left',
+  contentOpacity: 100,
+  contentMaxWidth: '100%',
+  contentColumns: 1,
   // Bouton
   showButton: false,
   buttonText: '',
   buttonUrl: '',
   buttonTarget: '_self',
   buttonIcon: 'none',
+  buttonVariant: 'filled',
+  buttonSize: 'md',
   buttonBgColor: '#10b981',
   buttonTextColor: '#ffffff',
+  buttonBorderRadius: 'md',
+  buttonShadow: 'none',
   buttonAlign: 'left',
   // Couleurs
   backgroundColor: '#ffffff',
@@ -259,7 +292,8 @@ const fontWeightMap: Record<string, string> = {
   'normal': '400',
   'medium': '500',
   'semibold': '600',
-  'bold': '700'
+  'bold': '700',
+  'extrabold': '800'
 }
 
 const lineHeightMap: Record<string, string> = {
@@ -364,7 +398,8 @@ const containerStyles = computed(() => {
 
 const textStyles = computed(() => {
   const styles: Record<string, string> = {
-    color: props.textColor || autoTextColor.value
+    color: props.contentColor || props.textColor || autoTextColor.value,
+    textAlign: props.contentAlign || 'left'
   }
   
   if (props.fontFamily) styles.fontFamily = props.fontFamily
@@ -372,10 +407,27 @@ const textStyles = computed(() => {
   styles.fontWeight = fontWeightMap[props.fontWeight || 'normal'] || '400'
   styles.lineHeight = lineHeightMap[props.lineHeight || 'relaxed'] || '1.75'
   styles.letterSpacing = letterSpacingMap[props.letterSpacing || 'normal'] || '0'
-  styles.textAlign = props.textAlign || 'left'
   
   if (props.textTransform && props.textTransform !== 'none') {
     styles.textTransform = props.textTransform
+  }
+  
+  // Opacité du contenu
+  if (props.contentOpacity !== undefined && props.contentOpacity !== 100) {
+    styles.opacity = (props.contentOpacity / 100).toString()
+  }
+  
+  // Largeur max du contenu
+  if (props.contentMaxWidth && props.contentMaxWidth !== '100%') {
+    styles.maxWidth = props.contentMaxWidth
+    styles.marginLeft = 'auto'
+    styles.marginRight = 'auto'
+  }
+  
+  // Colonnes
+  if (props.contentColumns && props.contentColumns > 1) {
+    styles.columnCount = props.contentColumns.toString()
+    styles.columnGap = '2rem'
   }
   
   return styles
@@ -401,9 +453,25 @@ const titleStyles = computed(() => {
     color: props.titleColor || props.textColor || autoTextColor.value,
     fontSize: titleSizeMap[props.titleSize || 'large'] || '2rem',
     fontWeight: fontWeightMap[props.titleWeight || 'bold'] || '700',
-    marginBottom: '1rem',
-    textAlign: props.textAlign || 'left'
+    marginBottom: `${props.titleMarginBottom ?? 16}px`,
+    textAlign: props.titleAlign || 'left'
   }
+  
+  // Police personnalisée pour le titre
+  if (props.titleFontFamily) {
+    styles.fontFamily = props.titleFontFamily
+  }
+  
+  // Transformation du texte
+  if (props.titleTransform && props.titleTransform !== 'none') {
+    styles.textTransform = props.titleTransform
+  }
+  
+  // Opacité
+  if (props.titleOpacity !== undefined && props.titleOpacity !== 100) {
+    styles.opacity = (props.titleOpacity / 100).toString()
+  }
+  
   return styles
 })
 
@@ -421,18 +489,62 @@ const buttonContainerStyles = computed(() => {
 })
 
 // Styles du bouton
+const buttonSizeMap: Record<string, { padding: string; fontSize: string }> = {
+  'sm': { padding: '0.5rem 1rem', fontSize: '0.875rem' },
+  'md': { padding: '0.75rem 1.5rem', fontSize: '1rem' },
+  'lg': { padding: '1rem 2rem', fontSize: '1.125rem' }
+}
+
+const buttonBorderRadiusMap: Record<string, string> = {
+  'none': '0',
+  'sm': '0.25rem',
+  'md': '0.5rem',
+  'lg': '0.75rem',
+  'full': '9999px'
+}
+
+const buttonShadowMap: Record<string, string> = {
+  'none': 'none',
+  'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+}
+
 const buttonStyles = computed(() => {
-  return {
-    backgroundColor: props.buttonBgColor || '#10b981',
-    color: props.buttonTextColor || '#ffffff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '0.5rem',
+  const variant = props.buttonVariant || 'filled'
+  const size = buttonSizeMap[props.buttonSize || 'md']
+  const bgColor = props.buttonBgColor || '#10b981'
+  const textColor = props.buttonTextColor || '#ffffff'
+  
+  const baseStyles: Record<string, string> = {
+    ...size,
+    borderRadius: buttonBorderRadiusMap[props.buttonBorderRadius || 'md'] || '0.5rem',
+    boxShadow: buttonShadowMap[props.buttonShadow || 'none'] || 'none',
     fontWeight: '600',
     textDecoration: 'none',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    border: 'none'
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.5rem'
   }
+  
+  // Variantes
+  if (variant === 'filled') {
+    baseStyles.backgroundColor = bgColor
+    baseStyles.color = textColor
+    baseStyles.border = 'none'
+  } else if (variant === 'outlined') {
+    baseStyles.backgroundColor = 'transparent'
+    baseStyles.color = bgColor
+    baseStyles.border = `2px solid ${bgColor}`
+  } else if (variant === 'ghost') {
+    baseStyles.backgroundColor = 'transparent'
+    baseStyles.color = bgColor
+    baseStyles.border = 'none'
+  }
+  
+  return baseStyles
 })
 
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============

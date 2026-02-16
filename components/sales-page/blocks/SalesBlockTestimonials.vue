@@ -79,12 +79,12 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-8">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
         
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-2">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p :style="subtitleStyles" class="mt-2">{{ props.subtitle }}</p>
         </div>
         
         <!-- Slider Container -->
@@ -165,11 +165,11 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-2">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p :style="subtitleStyles" class="mt-2">{{ props.subtitle }}</p>
         </div>
         <div :style="itemsPositionStyles" class="w-full">
           <!-- Grande icône quote -->
@@ -216,11 +216,11 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight text-center">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base text-center mt-2">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p :style="subtitleStyles" class="text-center mt-2">{{ props.subtitle }}</p>
         </div>
         <div :class="gridClasses" :style="itemsPositionStyles">
           <div 
@@ -263,8 +263,8 @@
           </span>
         </div>
         <!-- Header avec note moyenne -->
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
-          <h2 :style="titleStyles" class="text-2xl md:text-3xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles" class="text-center">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
           <div class="flex items-center justify-center gap-2 mt-3">
             <div class="flex gap-0.5">
               <svg v-for="star in 5" :key="star" :style="{ color: props.accentColor || '#fbbf24' }" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -276,8 +276,8 @@
           </div>
         </div>
 
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles" class="text-center mb-6">
-          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-2">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles" class="text-center mb-6">
+          <p :style="subtitleStyles" class="mt-2">{{ props.subtitle }}</p>
         </div>
         
         <!-- Liste des avis -->
@@ -323,8 +323,9 @@
           </span>
         </div>
         <!-- Title -->
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component 
+            :is="props.titleTag || 'h2'"
             :class="[template.styles.title, editableClasses('title')]"
             :style="titleStyles"
             :contenteditable="isEditMode"
@@ -333,14 +334,14 @@
             @blur="onBlur($event, 'title')"
             @keydown="onKeydown($event, true)"
             @paste="onPaste"
-          >{{ props.title }}</h2>
+          >{{ props.title }}</component>
         </div>
 
         <!-- Subtitle -->
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
           <p 
             :class="[template.styles.subtitle, editableClasses('subtitle')]"
-            :style="{ color: textColor }"
+            :style="subtitleStyles"
             :contenteditable="isEditMode"
             :data-placeholder="'Sous-titre (optionnel)'"
             @focus="onFocus('subtitle')"
@@ -354,13 +355,10 @@
         <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles">
           <a
             :href="isEditMode ? undefined : props.buttonUrl"
-            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95"
+            :target="props.buttonTarget || '_self'"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
             :class="[editableClasses('buttonText')]"
-            :style="{ 
-              backgroundColor: props.accentColor || '#1f2937', 
-              color: '#ffffff',
-              opacity: props.showButton ? 1 : 0.5 
-            }"
+            :style="ctaButtonStyles"
             :contenteditable="isEditMode"
             :data-placeholder="'Texte du bouton'"
             @focus="onFocus('buttonText')"
@@ -528,6 +526,24 @@ interface Props {
   title?: string
   subtitle?: string
   items?: TestimonialItem[]
+  // Titre optionnel
+  showTitle?: boolean
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
+  titleFontFamily?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
+  titleColor?: string
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleAlign?: 'left' | 'center' | 'right' | 'justify'
+  titleOpacity?: number
+  titleMarginBottom?: number
+  // Sous-titre optionnel
+  showSubtitle?: boolean
+  subtitleSize?: 'small' | 'medium' | 'large'
+  subtitleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  subtitleColor?: string
+  subtitleAlign?: 'left' | 'center' | 'right' | 'justify'
+  subtitleOpacity?: number
   headerAlignment?: 'left' | 'center' | 'right'
   // Layout
   layout?: Layout
@@ -550,7 +566,6 @@ interface Props {
   gradientStart?: string
   gradientEnd?: string
   accentColor?: string
-  titleColor?: string
   paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   // Carte
   cardBgColor?: string
@@ -579,6 +594,12 @@ interface Props {
   showButton?: boolean
   buttonText?: string
   buttonUrl?: string
+  buttonTarget?: '_self' | '_blank'
+  buttonSize?: 'sm' | 'md' | 'lg'
+  buttonBgColor?: string
+  buttonTextColor?: string
+  buttonBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  buttonShadow?: 'none' | 'sm' | 'md' | 'lg'
   // Positionnement
   elementsOrder?: string[]
   badgeOffsetY?: number
@@ -593,7 +614,24 @@ const props = withDefaults(defineProps<Props>(), {
   templateId: 'testimonials-minimal-centered',
   title: "Ce qu'ils en disent",
   subtitle: '',
-  items: () => DEFAULT_TESTIMONIAL_ITEMS,
+  // Titre
+  showTitle: true,
+  titleTag: 'h2',
+  titleFontFamily: '',
+  titleSize: 'large',
+  titleWeight: 'bold',
+  titleColor: '',
+  titleTransform: 'none',
+  titleAlign: 'center',
+  titleOpacity: 100,
+  titleMarginBottom: 16,
+  // Sous-titre
+  showSubtitle: true,
+  subtitleSize: 'medium',
+  subtitleWeight: 'normal',
+  subtitleColor: '',
+  subtitleAlign: 'center',
+  subtitleOpacity: 70,
   headerAlignment: 'center',
   layout: 'grid',
   columns: 3,
@@ -611,7 +649,6 @@ const props = withDefaults(defineProps<Props>(), {
   gradientStart: '#f8fafc',
   gradientEnd: '#ffffff',
   accentColor: '#10B981',
-  titleColor: '',
   paddingY: 'large',
   cardBgColor: '',
   cardBorderColor: '',
@@ -636,6 +673,12 @@ const props = withDefaults(defineProps<Props>(), {
   showButton: false,
   buttonText: 'Démarrer maintenant',
   buttonUrl: '',
+  buttonTarget: '_self',
+  buttonSize: 'md',
+  buttonBgColor: '#10b981',
+  buttonTextColor: '#ffffff',
+  buttonBorderRadius: 'md',
+  buttonShadow: 'none',
   // Positionnement
   elementsOrder: () => ['badge', 'title', 'subtitle', 'items', 'button'],
   badgeOffsetY: 0,
@@ -854,8 +897,81 @@ const animationClass = computed(() => {
 })
 
 // Styles titre
+const fontSizeMap: Record<string, string> = {
+  small: '1.5rem',
+  medium: '2rem',
+  large: '2.5rem',
+  xlarge: '3rem',
+}
+
+const fontWeightMap: Record<string, number> = {
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  extrabold: 800,
+}
+
 const titleStyles = computed(() => ({
   color: props.titleColor || textColor.value,
+  fontFamily: props.titleFontFamily || undefined,
+  fontSize: fontSizeMap[props.titleSize || 'large'],
+  fontWeight: fontWeightMap[props.titleWeight || 'bold'],
+  textTransform: props.titleTransform || 'none',
+  textAlign: props.titleAlign || 'center',
+  opacity: `${props.titleOpacity !== undefined ? props.titleOpacity : 100}%`,
+  marginBottom: `${props.titleMarginBottom || 16}px`,
+  width: '100%',
+}))
+
+// Styles sous-titre
+const subtitleFontSizeMap: Record<string, string> = {
+  small: '0.875rem',
+  medium: '1rem',
+  large: '1.25rem',
+}
+
+const subtitleStyles = computed(() => ({
+  color: props.subtitleColor || textColor.value,
+  fontSize: subtitleFontSizeMap[props.subtitleSize || 'medium'],
+  fontWeight: fontWeightMap[props.subtitleWeight || 'normal'],
+  textAlign: props.subtitleAlign || 'center',
+  opacity: `${props.subtitleOpacity !== undefined ? props.subtitleOpacity : 70}%`,
+  width: '100%',
+}))
+
+// Styles bouton CTA
+const buttonSizeMap: Record<string, string> = {
+  sm: '0.5rem 1rem',
+  md: '0.75rem 1.5rem',
+  lg: '1rem 2rem',
+}
+
+const buttonRadiusMap: Record<string, string> = {
+  none: '0',
+  sm: '0.375rem',
+  md: '0.75rem',
+  lg: '1rem',
+  full: '9999px',
+}
+
+const buttonShadowMap: Record<string, string> = {
+  none: 'none',
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+}
+
+const ctaButtonStyles = computed(() => ({
+  backgroundColor: props.buttonBgColor || props.accentColor || '#10B981',
+  color: props.buttonTextColor || '#ffffff',
+  padding: buttonSizeMap[props.buttonSize || 'md'],
+  borderRadius: buttonRadiusMap[props.buttonBorderRadius || 'md'],
+  boxShadow: buttonShadowMap[props.buttonShadow || 'none'],
+  fontWeight: 600,
+  fontSize: props.buttonSize === 'sm' ? '0.875rem' : props.buttonSize === 'lg' ? '1.125rem' : '1rem',
+  opacity: props.showButton ? 1 : 0.5,
+  transition: 'all 0.2s ease',
 }))
 
 // Styles citation
@@ -997,12 +1113,14 @@ const badgePositionStyles = computed(() => ({
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
-  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined,
+  width: '100%',
 }))
 
 const subtitlePositionStyles = computed(() => ({
   order: getElementOrder('subtitle'),
   transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  width: '100%',
 }))
 
 const itemsPositionStyles = computed(() => ({

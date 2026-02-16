@@ -7,7 +7,8 @@
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col" :style="{ gap: '1.5rem' }">
         <!-- Titre (éditable inline) -->
-        <h3 
+        <component
+          :is="props.titleTag || 'h3'"
           v-if="props.title || isEditMode"
           :class="[template.styles.title, editableClasses('title')]"
           :style="{ ...titleStyles, ...titlePositionStyles }"
@@ -17,7 +18,7 @@
           @blur="onBlur($event, 'title')"
           @keydown="onKeydown($event, true)"
           @paste="onPaste"
-        >{{ props.title }}</h3>
+        >{{ props.title }}</component>
         
         <!-- Player vidéo -->
         <div 
@@ -76,7 +77,7 @@
         </div>
         
         <!-- Description optionnelle -->
-        <p 
+        <div 
           v-if="props.showDescription && (props.description || isEditMode)"
           :class="editableClasses('description')"
           :style="{ ...descriptionStyles, ...descriptionPositionStyles }"
@@ -86,7 +87,7 @@
           @blur="onBlur($event, 'description')"
           @keydown="onKeydown($event, false)"
           @paste="onPaste"
-        >{{ props.description }}</p>
+        >{{ props.description }}</div>
         
         <!-- Bouton optionnel -->
         <div v-if="props.showButton && (props.buttonText || isEditMode)" :style="{ ...buttonContainerStyles, ...buttonPositionStyles }">
@@ -94,7 +95,7 @@
             :is="props.buttonUrl ? 'a' : 'button'"
             :href="props.buttonUrl || undefined"
             :target="props.buttonUrl ? props.buttonTarget : undefined"
-            class="inline-flex items-center gap-2"
+            :class="'inline-flex items-center gap-2'"
             :style="buttonStyles"
           >
             {{ props.buttonText || 'Bouton' }}
@@ -122,18 +123,34 @@ interface Props {
   type?: 'youtube' | 'vimeo' | 'url'
   url?: string
   title?: string
+  // Titre
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
+  titleFontFamily?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
+  titleColor?: string
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleAlign?: 'left' | 'center' | 'right' | 'justify'
+  titleOpacity?: number
+  titleMarginBottom?: number
   // Description optionnelle
   showDescription?: boolean
   description?: string
   descriptionColor?: string
+  descriptionAlign?: 'left' | 'center' | 'right' | 'justify'
+  descriptionOpacity?: number
   // Bouton optionnel
   showButton?: boolean
   buttonText?: string
   buttonUrl?: string
   buttonTarget?: '_self' | '_blank'
   buttonIcon?: 'none' | 'arrow-right' | 'external'
+  buttonVariant?: 'filled' | 'outlined' | 'ghost'
+  buttonSize?: 'sm' | 'md' | 'lg'
   buttonBgColor?: string
   buttonTextColor?: string
+  buttonBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  buttonShadow?: 'none' | 'sm' | 'md' | 'lg'
   buttonAlign?: 'left' | 'center' | 'right'
   // Lecture
   autoplay?: boolean
@@ -151,9 +168,6 @@ interface Props {
   borderColor?: string
   // Titre
   titlePosition?: 'top' | 'bottom'
-  titleAlign?: 'left' | 'center' | 'right'
-  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
-  titleWeight?: 'light' | 'normal' | 'medium' | 'semibold' | 'bold'
   // Espacement
   paddingY?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
   // Animation
@@ -172,18 +186,34 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'youtube',
   url: '',
   title: '',
+  // Titre
+  titleTag: 'h3',
+  titleFontFamily: '',
+  titleSize: 'medium',
+  titleWeight: 'medium',
+  titleColor: '',
+  titleTransform: 'none',
+  titleAlign: 'center',
+  titleOpacity: 100,
+  titleMarginBottom: 16,
   // Description
   showDescription: false,
   description: '',
   descriptionColor: '',
+  descriptionAlign: 'center',
+  descriptionOpacity: 100,
   // Bouton
   showButton: false,
   buttonText: '',
   buttonUrl: '',
   buttonTarget: '_self',
   buttonIcon: 'none',
+  buttonVariant: 'filled',
+  buttonSize: 'md',
   buttonBgColor: '#10b981',
   buttonTextColor: '#ffffff',
+  buttonBorderRadius: 'md',
+  buttonShadow: 'none',
   buttonAlign: 'center',
   // Lecture
   autoplay: false,
@@ -197,9 +227,6 @@ const props = withDefaults(defineProps<Props>(), {
   borderWidth: 'none',
   borderColor: '#e5e7eb',
   titlePosition: 'bottom',
-  titleAlign: 'center',
-  titleSize: 'medium',
-  titleWeight: 'medium',
   paddingY: 'large',
   animation: 'none',
   // Positionnement
@@ -270,6 +297,36 @@ const template = computed(() => {
 })
 
 // Mappings
+const fontSizeMap: Record<string, string> = {
+  'small': '0.875rem',
+  'medium': '1rem',
+  'large': '1.25rem',
+  'xlarge': '1.5rem'
+}
+
+const fontWeightMap: Record<string, string> = {
+  'light': '300',
+  'normal': '400',
+  'medium': '500',
+  'semibold': '600',
+  'bold': '700',
+  'extrabold': '800'
+}
+
+const lineHeightMap: Record<string, string> = {
+  'tight': '1.25',
+  'normal': '1.5',
+  'relaxed': '1.75',
+  'loose': '2'
+}
+
+const letterSpacingMap: Record<string, string> = {
+  'tight': '-0.025em',
+  'normal': '0',
+  'wide': '0.025em',
+  'wider': '0.05em'
+}
+
 const paddingYMap: Record<string, string> = {
   'none': '0',
   'small': '1.5rem',
@@ -313,14 +370,6 @@ const titleSizeMap: Record<string, string> = {
   'xlarge': '2rem'
 }
 
-const titleWeightMap: Record<string, string> = {
-  'light': '300',
-  'normal': '400',
-  'medium': '500',
-  'semibold': '600',
-  'bold': '700'
-}
-
 // Styles
 const sectionStyles = computed(() => {
   const styles: Record<string, string> = {
@@ -358,7 +407,23 @@ const titleStyles = computed(() => {
   const styles: Record<string, string> = {
     textAlign: props.titleAlign || 'center',
     fontSize: titleSizeMap[props.titleSize || 'medium'] || '1.125rem',
-    fontWeight: titleWeightMap[props.titleWeight || 'medium'] || '500'
+    fontWeight: fontWeightMap[props.titleWeight || 'medium'] || '500',
+    marginBottom: `${props.titleMarginBottom ?? 16}px`
+  }
+  
+  // Police personnalisée
+  if (props.titleFontFamily) {
+    styles.fontFamily = props.titleFontFamily
+  }
+  
+  // Transformation du texte
+  if (props.titleTransform && props.titleTransform !== 'none') {
+    styles.textTransform = props.titleTransform
+  }
+  
+  // Opacité
+  if (props.titleOpacity !== undefined && props.titleOpacity !== 100) {
+    styles.opacity = (props.titleOpacity / 100).toString()
   }
   
   if (props.titlePosition === 'top') {
@@ -378,15 +443,22 @@ const animationClass = computed(() => {
 
 // Styles de la description
 const descriptionStyles = computed(() => {
-  return {
+  const styles: Record<string, string> = {
     color: props.descriptionColor || '#6b7280',
     fontSize: '1rem',
-    textAlign: props.titleAlign || 'center',
+    textAlign: props.descriptionAlign || props.titleAlign || 'center',
     marginTop: '1rem',
     maxWidth: maxWidthMap[props.maxWidth || 'large'] || '64rem',
     marginLeft: 'auto',
     marginRight: 'auto'
   }
+  
+  // Opacité
+  if (props.descriptionOpacity !== undefined && props.descriptionOpacity !== 100) {
+    styles.opacity = (props.descriptionOpacity / 100).toString()
+  }
+  
+  return styles
 })
 
 // Styles du conteneur du bouton
@@ -403,18 +475,62 @@ const buttonContainerStyles = computed(() => {
 })
 
 // Styles du bouton
+const buttonSizeMap: Record<string, { padding: string; fontSize: string }> = {
+  'sm': { padding: '0.5rem 1rem', fontSize: '0.875rem' },
+  'md': { padding: '0.75rem 1.5rem', fontSize: '1rem' },
+  'lg': { padding: '1rem 2rem', fontSize: '1.125rem' }
+}
+
+const buttonBorderRadiusMap: Record<string, string> = {
+  'none': '0',
+  'sm': '0.25rem',
+  'md': '0.5rem',
+  'lg': '0.75rem',
+  'full': '9999px'
+}
+
+const buttonShadowMap: Record<string, string> = {
+  'none': 'none',
+  'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+}
+
 const buttonStyles = computed(() => {
-  return {
-    backgroundColor: props.buttonBgColor || '#10b981',
-    color: props.buttonTextColor || '#ffffff',
-    padding: '0.75rem 1.5rem',
-    borderRadius: '0.5rem',
+  const variant = props.buttonVariant || 'filled'
+  const size = buttonSizeMap[props.buttonSize || 'md']
+  const bgColor = props.buttonBgColor || '#10b981'
+  const textColor = props.buttonTextColor || '#ffffff'
+  
+  const baseStyles: Record<string, string> = {
+    ...size,
+    borderRadius: buttonBorderRadiusMap[props.buttonBorderRadius || 'md'] || '0.5rem',
+    boxShadow: buttonShadowMap[props.buttonShadow || 'none'] || 'none',
     fontWeight: '600',
     textDecoration: 'none',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    border: 'none'
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '0.5rem'
   }
+  
+  // Variantes
+  if (variant === 'filled') {
+    baseStyles.backgroundColor = bgColor
+    baseStyles.color = textColor
+    baseStyles.border = 'none'
+  } else if (variant === 'outlined') {
+    baseStyles.backgroundColor = 'transparent'
+    baseStyles.color = bgColor
+    baseStyles.border = `2px solid ${bgColor}`
+  } else if (variant === 'ghost') {
+    baseStyles.backgroundColor = 'transparent'
+    baseStyles.color = bgColor
+    baseStyles.border = 'none'
+  }
+  
+  return baseStyles
 })
 
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============

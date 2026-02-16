@@ -20,6 +20,32 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
+              <label class="block text-xs text-gray-500 mb-1">Balise HTML</label>
+              <select v-model="localProps.titleTag" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="h1">H1</option>
+                <option value="h2">H2</option>
+                <option value="h3">H3</option>
+                <option value="h4">H4</option>
+                <option value="h5">H5</option>
+                <option value="h6">H6</option>
+                <option value="p">Paragraphe</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Police</label>
+              <select v-model="localProps.titleFontFamily" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="">Par défaut</option>
+                <option value="'Inter', sans-serif">Inter</option>
+                <option value="'Playfair Display', serif">Playfair Display</option>
+                <option value="'Montserrat', sans-serif">Montserrat</option>
+                <option value="'Lora', serif">Lora</option>
+                <option value="'Poppins', sans-serif">Poppins</option>
+                <option value="Georgia, serif">Georgia</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
               <label class="block text-xs text-gray-500 mb-1">Taille</label>
               <select v-model="localProps.titleSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                 <option value="small">Petit</option>
@@ -29,13 +55,52 @@
               </select>
             </div>
             <div>
+              <label class="block text-xs text-gray-500 mb-1">Poids</label>
+              <select v-model="localProps.titleWeight" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="normal">Normal</option>
+                <option value="medium">Medium</option>
+                <option value="semibold">Semi-gras</option>
+                <option value="bold">Gras</option>
+                <option value="extrabold">Extra gras</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
               <label class="block text-xs text-gray-500 mb-1">Alignement</label>
               <select v-model="localProps.titleAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                 <option value="left">Gauche</option>
                 <option value="center">Centre</option>
                 <option value="right">Droite</option>
+                <option value="justify">Justifié</option>
               </select>
             </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Transformation</label>
+              <select v-model="localProps.titleTransform" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="uppercase">Majuscules</option>
+                <option value="lowercase">Minuscules</option>
+                <option value="capitalize">Capitalisé</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Couleur du titre</label>
+              <div class="flex items-center gap-2">
+                <input type="color" v-model="localProps.titleColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Opacité: {{ localProps.titleOpacity }}%</label>
+              <input v-model.number="localProps.titleOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Marge basse (px)</label>
+            <input v-model.number="localProps.titleMarginBottom" @input="emitUpdate" type="number" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
         </div>
       </div>
@@ -55,6 +120,28 @@
         <div v-if="localProps.showDescription">
           <label class="block text-xs text-gray-500 mb-1">Description</label>
           <textarea v-model="localProps.description" @input="emitUpdate" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Description de l'image..."/>
+          <div class="mt-3 grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+              <select v-model="localProps.descriptionAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="left">Gauche</option>
+                <option value="center">Centre</option>
+                <option value="right">Droite</option>
+                <option value="justify">Justifié</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+              <div class="flex items-center gap-2">
+                <input type="color" v-model="localProps.descriptionColor" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.descriptionColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="block text-xs text-gray-500 mb-1">Opacité: {{ localProps.descriptionOpacity }}%</label>
+            <input v-model.number="localProps.descriptionOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+          </div>
         </div>
       </div>
     </div>
@@ -123,13 +210,66 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
+              <label class="block text-xs text-gray-500 mb-1">Variante</label>
+              <select v-model="localProps.buttonVariant" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="filled">Rempli</option>
+                <option value="outlined">Contour</option>
+                <option value="ghost">Fantôme</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Taille</label>
+              <select v-model="localProps.buttonSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="sm">Petit</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Grand</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Coins arrondis</label>
+              <select v-model="localProps.buttonBorderRadius" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Carrés</option>
+                <option value="sm">Léger</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Arrondi</option>
+                <option value="full">Plein</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Ombre</label>
+              <select v-model="localProps.buttonShadow" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="sm">Légère</option>
+                <option value="md">Moyenne</option>
+                <option value="lg">Forte</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
               <label class="block text-xs text-gray-500 mb-1">Fond bouton</label>
-              <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+              <div class="flex items-center gap-2">
+                <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.buttonBgColor" @input="emitUpdate" type="text" placeholder="#10b981" class="flex-1 px-2 py-1 border rounded text-xs"/>
+              </div>
             </div>
             <div>
               <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
-              <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+              <div class="flex items-center gap-2">
+                <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.buttonTextColor" @input="emitUpdate" type="text" placeholder="#ffffff" class="flex-1 px-2 py-1 border rounded text-xs"/>
+              </div>
             </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+            <select v-model="localProps.buttonAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="left">Gauche</option>
+              <option value="center">Centre</option>
+              <option value="right">Droite</option>
+            </select>
           </div>
         </div>
       </div>
@@ -392,14 +532,21 @@ const localProps = reactive({
   // Titre
   showTitle: props.props.showTitle || false,
   title: props.props.title || '',
+  titleTag: props.props.titleTag || 'h2',
+  titleFontFamily: props.props.titleFontFamily || '',
   titleSize: props.props.titleSize || 'large',
   titleWeight: props.props.titleWeight || 'bold',
   titleColor: props.props.titleColor || '',
+  titleTransform: props.props.titleTransform || 'none',
   titleAlign: props.props.titleAlign || 'center',
+  titleOpacity: props.props.titleOpacity !== undefined ? props.props.titleOpacity : 100,
+  titleMarginBottom: props.props.titleMarginBottom || 16,
   // Description
   showDescription: props.props.showDescription || false,
   description: props.props.description || '',
   descriptionColor: props.props.descriptionColor || '',
+  descriptionAlign: props.props.descriptionAlign || 'center',
+  descriptionOpacity: props.props.descriptionOpacity !== undefined ? props.props.descriptionOpacity : 100,
   // Image
   src: props.props.src || null,
   alt: props.props.alt || '',
@@ -410,8 +557,12 @@ const localProps = reactive({
   buttonUrl: props.props.buttonUrl || '',
   buttonTarget: props.props.buttonTarget || '_self',
   buttonIcon: props.props.buttonIcon || 'none',
+  buttonVariant: props.props.buttonVariant || 'filled',
+  buttonSize: props.props.buttonSize || 'md',
   buttonBgColor: props.props.buttonBgColor || '#10b981',
   buttonTextColor: props.props.buttonTextColor || '#ffffff',
+  buttonBorderRadius: props.props.buttonBorderRadius || 'md',
+  buttonShadow: props.props.buttonShadow || 'none',
   buttonAlign: props.props.buttonAlign || 'center',
   // Affichage
   aspectRatio: props.props.aspectRatio || 'auto',
@@ -435,6 +586,9 @@ const localProps = reactive({
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
   // Positionnement
+  order: props.props.order !== undefined ? props.props.order : 0,
+  offsetX: props.props.offsetX || 0,
+  offsetY: props.props.offsetY || 0,
   elementsOrder: props.props.elementsOrder || ['title', 'description', 'image', 'button'],
   titleOffsetY: props.props.titleOffsetY || 0,
   descriptionOffsetY: props.props.descriptionOffsetY || 0,

@@ -18,11 +18,11 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles" class="text-center">
-          <p :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-4">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="subtitleStyles">{{ props.subtitle }}</p>
         </div>
         <div :class="gridClasses" :style="plansPositionStyles" class="mt-8">
           <div 
@@ -83,8 +83,8 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
         <div :style="plansPositionStyles" class="mt-8">
           <!-- Ligne 1 : 2 cartes -->
@@ -134,8 +134,8 @@
     <div class="max-w-6xl mx-auto px-6">
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles" class="text-center">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
         <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles" class="text-center">
           <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.6 }" class="text-base mt-4">{{ props.subtitle }}</p>
@@ -224,12 +224,12 @@
             >{{ props.enterpriseBadge }}</span>
           </div>
           <!-- Titre -->
-          <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-            <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-4">{{ props.title }}</h2>
+          <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+            <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
           </div>
           <!-- Sous-titre -->
-          <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-            <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.7 }" class="text-lg mb-8">{{ props.subtitle }}</p>
+          <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+            <p v-if="props.subtitle" :style="subtitleStyles">{{ props.subtitle }}</p>
           </div>
           <!-- Features -->
           <div :style="plansPositionStyles">
@@ -277,11 +277,11 @@
     <div class="max-w-lg mx-auto px-6 text-center">
       <!-- Conteneur flex pour le positionnement -->
       <div class="flex flex-col w-full" :style="{ gap: '1rem' }">
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 :style="titleStyles" class="text-3xl md:text-4xl font-bold tracking-tight mb-4">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component :is="props.titleTag || 'h2'" :style="titleStyles">{{ props.title }}</component>
         </div>
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-          <p v-if="props.subtitle" :style="{ color: textColor, opacity: 0.7 }" class="text-lg mb-8">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :style="subtitleStyles">{{ props.subtitle }}</p>
         </div>
         <div :style="plansPositionStyles" class="mt-4">
           <!-- Badge unique pour ce layout -->
@@ -336,11 +336,11 @@
             {{ props.badge }}
           </span>
         </div>
-        <div v-if="props.title || isEditMode" :style="titlePositionStyles">
-          <h2 v-if="props.title" :class="template.styles.title" :style="titleStyles">{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component v-if="props.title" :is="props.titleTag || 'h2'" :class="template.styles.title" :style="titleStyles">{{ props.title }}</component>
         </div>
-        <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
-          <p v-if="props.subtitle" :class="template.styles.subtitle" :style="{ color: textColor }">{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p v-if="props.subtitle" :class="template.styles.subtitle" :style="subtitleStyles">{{ props.subtitle }}</p>
         </div>
         <div :class="gridClasses" :style="plansPositionStyles" class="mt-8">
           <div 
@@ -427,6 +427,24 @@ interface Props {
   // Contenu
   title?: string
   subtitle?: string
+  // Titre optionnel
+  showTitle?: boolean
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
+  titleFontFamily?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
+  titleColor?: string
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleAlign?: 'left' | 'center' | 'right' | 'justify'
+  titleOpacity?: number
+  titleMarginBottom?: number
+  // Sous-titre optionnel
+  showSubtitle?: boolean
+  subtitleSize?: 'small' | 'medium' | 'large'
+  subtitleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  subtitleColor?: string
+  subtitleAlign?: 'left' | 'center' | 'right' | 'justify'
+  subtitleOpacity?: number
   headerAlignment?: 'left' | 'center' | 'right'
   // Plans multiples
   items?: PricingPlan[]
@@ -458,13 +476,15 @@ interface Props {
   buttonStyle?: ButtonStyle
   buttonColor?: string
   buttonBgColor?: string
+  buttonSize?: 'sm' | 'md' | 'lg'
+  buttonBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  buttonShadow?: 'none' | 'sm' | 'md' | 'lg'
   // Apparence
   backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
   gradientStart?: string
   gradientEnd?: string
   accentColor?: string
-  titleColor?: string
   paddingY?: 'small' | 'medium' | 'large' | 'xlarge'
   // Carte
   cardBgColor?: string
@@ -509,6 +529,24 @@ const props = withDefaults(defineProps<Props>(), {
   templateId: 'pricing-minimal-centered',
   title: '',
   subtitle: '',
+  // Titre
+  showTitle: true,
+  titleTag: 'h2',
+  titleFontFamily: '',
+  titleSize: 'large',
+  titleWeight: 'bold',
+  titleColor: '',
+  titleTransform: 'none',
+  titleAlign: 'center',
+  titleOpacity: 100,
+  titleMarginBottom: 16,
+  // Sous-titre
+  showSubtitle: true,
+  subtitleSize: 'medium',
+  subtitleWeight: 'normal',
+  subtitleColor: '',
+  subtitleAlign: 'center',
+  subtitleOpacity: 70,
   headerAlignment: 'center',
   items: undefined,
   price: '0',
@@ -534,12 +572,14 @@ const props = withDefaults(defineProps<Props>(), {
   buttonStyle: 'filled',
   buttonColor: '#ffffff',
   buttonBgColor: '',
+  buttonSize: 'md',
+  buttonBorderRadius: 'md',
+  buttonShadow: 'none',
   backgroundType: 'solid',
   backgroundColor: '#ffffff',
   gradientStart: '#f8fafc',
   gradientEnd: '#ffffff',
   accentColor: '#10B981',
-  titleColor: '',
   paddingY: 'large',
   cardBgColor: '',
   cardBorderColor: '',
@@ -854,9 +894,70 @@ const headerStyles = computed(() => ({
 }))
 
 // Styles titre
+const fontSizeMap: Record<string, string> = {
+  small: '1.5rem',
+  medium: '2rem',
+  large: '2.5rem',
+  xlarge: '3rem',
+}
+
+const fontWeightMap: Record<string, number> = {
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  extrabold: 800,
+}
+
 const titleStyles = computed(() => ({
   color: props.titleColor || textColor.value,
+  fontFamily: props.titleFontFamily || undefined,
+  fontSize: fontSizeMap[props.titleSize || 'large'],
+  fontWeight: fontWeightMap[props.titleWeight || 'bold'],
+  textTransform: props.titleTransform || 'none',
+  textAlign: props.titleAlign || 'center',
+  opacity: `${props.titleOpacity !== undefined ? props.titleOpacity : 100}%`,
+  marginBottom: `${props.titleMarginBottom || 16}px`,
+  width: '100%',
 }))
+
+// Styles sous-titre
+const subtitleFontSizeMap: Record<string, string> = {
+  small: '0.875rem',
+  medium: '1rem',
+  large: '1.25rem',
+}
+
+const subtitleStyles = computed(() => ({
+  color: props.subtitleColor || textColor.value,
+  fontSize: subtitleFontSizeMap[props.subtitleSize || 'medium'],
+  fontWeight: fontWeightMap[props.subtitleWeight || 'normal'],
+  textAlign: props.subtitleAlign || 'center',
+  opacity: `${props.subtitleOpacity !== undefined ? props.subtitleOpacity : 70}%`,
+  width: '100%',
+}))
+
+// Styles bouton CTA global
+const buttonSizeMap: Record<string, string> = {
+  sm: '0.5rem 1rem',
+  md: '0.75rem 1.5rem',
+  lg: '1rem 2rem',
+}
+
+const buttonRadiusMap: Record<string, string> = {
+  none: '0',
+  sm: '0.375rem',
+  md: '0.75rem',
+  lg: '1rem',
+  full: '9999px',
+}
+
+const buttonShadowMap: Record<string, string> = {
+  none: 'none',
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+}
 
 // Styles badge par plan
 function getBadgeStyles(plan: PricingPlan) {
@@ -992,12 +1093,14 @@ const badgePositionStyles = computed(() => ({
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
-  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined,
+  width: '100%',
 }))
 
 const subtitlePositionStyles = computed(() => ({
   order: getElementOrder('subtitle'),
-  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined
+  transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
+  width: '100%',
 }))
 
 const plansPositionStyles = computed(() => ({

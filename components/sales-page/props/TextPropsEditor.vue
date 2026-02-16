@@ -20,6 +20,20 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
+              <label class="block text-xs text-gray-500 mb-1">Police</label>
+              <select v-model="localProps.titleFontFamily" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="">Par défaut</option>
+                <option value="Inter">Inter</option>
+                <option value="'Playfair Display', serif">Playfair Display</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="'Lora', serif">Lora</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="Roboto">Roboto</option>
+                <option value="'Open Sans'">Open Sans</option>
+              </select>
+            </div>
+            <div>
               <label class="block text-xs text-gray-500 mb-1">Taille</label>
               <select v-model="localProps.titleSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                 <option value="small">Petit</option>
@@ -28,6 +42,8 @@
                 <option value="xlarge">Très grand</option>
               </select>
             </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-gray-500 mb-1">Poids</label>
               <select v-model="localProps.titleWeight" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
@@ -35,6 +51,16 @@
                 <option value="medium">Medium</option>
                 <option value="semibold">Semi-gras</option>
                 <option value="bold">Gras</option>
+                <option value="extrabold">Extra gras</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Transformation</label>
+              <select v-model="localProps.titleTransform" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="uppercase">MAJUSCULES</option>
+                <option value="lowercase">minuscules</option>
+                <option value="capitalize">Première Lettre</option>
               </select>
             </div>
           </div>
@@ -43,6 +69,32 @@
             <div class="flex items-center gap-2">
               <input type="color" v-model="localProps.titleColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
               <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+              <select v-model="localProps.titleAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="left">Gauche</option>
+                <option value="center">Centre</option>
+                <option value="right">Droite</option>
+                <option value="justify">Justifié</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Marge basse (px)</label>
+              <input v-model.number="localProps.titleMarginBottom" @input="emitUpdate" type="number" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Opacité (%)</label>
+              <input v-model.number="localProps.titleOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+              <span class="text-xs text-gray-500">{{ localProps.titleOpacity }}%</span>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Marge basse (px)</label>
+              <input v-model.number="localProps.titleMarginBottom" @input="emitUpdate" type="number" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
             </div>
           </div>
         </div>
@@ -55,8 +107,55 @@
         <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Contenu</h4>
         <ChevronDown :class="['w-4 h-4 transition-transform', sections.content ? 'rotate-180' : '']"/>
       </button>
-      <div v-show="sections.content" class="mt-3">
-        <textarea v-model="localProps.content" @input="emitUpdate" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Écrivez votre texte ici... (HTML supporté)"/>
+      <div v-show="sections.content" class="mt-3 space-y-3">
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Texte</label>
+          <textarea v-model="localProps.content" @input="emitUpdate" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Écrivez votre texte ici... (HTML supporté)"/>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Couleur du contenu</label>
+          <div class="flex items-center gap-2">
+            <input type="color" v-model="localProps.contentColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+            <input v-model="localProps.contentColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Opacité (%)</label>
+            <input v-model.number="localProps.contentOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+            <span class="text-xs text-gray-500">{{ localProps.contentOpacity }}%</span>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Largeur max</label>
+            <select v-model="localProps.contentMaxWidth" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="100%">100%</option>
+              <option value="90%">90%</option>
+              <option value="80%">80%</option>
+              <option value="70%">70%</option>
+              <option value="60%">60%</option>
+              <option value="50%">50%</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+            <select v-model="localProps.contentAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="left">Gauche</option>
+              <option value="center">Centre</option>
+              <option value="right">Droite</option>
+              <option value="justify">Justifié</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Colonnes (pour texte long)</label>
+            <select v-model.number="localProps.contentColumns" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option :value="1">1 colonne</option>
+              <option :value="2">2 colonnes</option>
+              <option :value="3">3 colonnes</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -79,6 +178,24 @@
           <div>
             <label class="block text-xs text-gray-500 mb-1">Lien (URL)</label>
             <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Variante</label>
+              <select v-model="localProps.buttonVariant" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="filled">Rempli</option>
+                <option value="outlined">Contour</option>
+                <option value="ghost">Fantôme</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Taille</label>
+              <select v-model="localProps.buttonSize" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="sm">Petit</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Grand</option>
+              </select>
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -111,6 +228,27 @@
                 <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
                 <input v-model="localProps.buttonTextColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-xs"/>
               </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Arrondi</label>
+              <select v-model="localProps.buttonBorderRadius" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucun</option>
+                <option value="sm">Petit</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Grand</option>
+                <option value="full">Complet</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Ombre</label>
+              <select v-model="localProps.buttonShadow" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="none">Aucune</option>
+                <option value="sm">Petite</option>
+                <option value="md">Moyenne</option>
+                <option value="lg">Grande</option>
+              </select>
             </div>
           </div>
           <div>
@@ -367,19 +505,34 @@ const localProps = reactive({
   // Titre
   showTitle: props.props.showTitle || false,
   title: props.props.title || '',
+  titleTag: props.props.titleTag || 'h2',
+  titleFontFamily: props.props.titleFontFamily || '',
   titleSize: props.props.titleSize || 'large',
   titleWeight: props.props.titleWeight || 'bold',
   titleColor: props.props.titleColor || '',
+  titleTransform: props.props.titleTransform || 'none',
+  titleAlign: props.props.titleAlign || 'left',
+  titleOpacity: props.props.titleOpacity ?? 100,
+  titleMarginBottom: props.props.titleMarginBottom ?? 16,
   // Contenu
   content: props.props.content || '',
+  contentColor: props.props.contentColor || '',
+  contentAlign: props.props.contentAlign || 'left',
+  contentOpacity: props.props.contentOpacity ?? 100,
+  contentMaxWidth: props.props.contentMaxWidth || '100%',
+  contentColumns: props.props.contentColumns ?? 1,
   // Bouton
   showButton: props.props.showButton || false,
   buttonText: props.props.buttonText || '',
   buttonUrl: props.props.buttonUrl || '',
   buttonTarget: props.props.buttonTarget || '_self',
   buttonIcon: props.props.buttonIcon || 'none',
+  buttonVariant: props.props.buttonVariant || 'filled',
+  buttonSize: props.props.buttonSize || 'md',
   buttonBgColor: props.props.buttonBgColor || '#10b981',
   buttonTextColor: props.props.buttonTextColor || '#ffffff',
+  buttonBorderRadius: props.props.buttonBorderRadius || 'md',
+  buttonShadow: props.props.buttonShadow || 'none',
   buttonAlign: props.props.buttonAlign || 'left',
   // Typographie
   fontFamily: props.props.fontFamily || '',
