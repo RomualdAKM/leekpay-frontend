@@ -122,7 +122,6 @@
       </div>
     </section>
 
-    <!-- CREATE SALES PAGES SECTION -->
     <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
       <div class="container mx-auto">
         <div class="bg-[#E9F8EF] rounded-2xl p-6 md:p-10 grid md:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
