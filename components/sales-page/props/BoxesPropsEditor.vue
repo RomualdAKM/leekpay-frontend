@@ -9,20 +9,102 @@
         <ChevronDown :class="['w-4 h-4 transition-transform', sections.content ? 'rotate-180' : '']"/>
       </button>
       <div v-show="sections.content" class="mt-3 space-y-3">
+        <div class="flex items-center gap-2">
+          <input type="checkbox" v-model="localProps.showTitle" @change="updateProp('showTitle', localProps.showTitle)" class="rounded"/>
+          <label class="text-xs text-gray-500">Afficher le titre</label>
+        </div>
         <div>
           <label class="block text-xs text-gray-500 mb-1">Titre</label>
           <input v-model="localProps.title" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Taille</label>
+            <select v-model="localProps.titleSize" @change="updateProp('titleSize', localProps.titleSize)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+              <option value="xlarge">Très grand</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Poids</label>
+            <select v-model="localProps.titleWeight" @change="updateProp('titleWeight', localProps.titleWeight)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+              <option value="normal">Normal</option>
+              <option value="medium">Moyen</option>
+              <option value="semibold">Semi-gras</option>
+              <option value="bold">Gras</option>
+              <option value="extrabold">Extra-gras</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+            <input type="color" v-model="localProps.titleColor" @input="updateProp('titleColor', localProps.titleColor)" class="w-full h-8 rounded border border-gray-300"/>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+            <div class="grid grid-cols-3 gap-1">
+              <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('titleAlign', a)" :class="['px-2 py-1 text-xs rounded border', localProps.titleAlign === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+                {{ a === 'left' ? 'G' : a === 'center' ? 'C' : 'D' }}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Opacité</label>
+            <div class="flex items-center gap-1">
+              <input type="range" min="0" max="100" v-model.number="localProps.titleOpacity" @input="updateProp('titleOpacity', localProps.titleOpacity)" class="flex-1"/>
+              <span class="text-xs text-gray-500 w-7">{{ localProps.titleOpacity }}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" v-model="localProps.showSubtitle" @change="updateProp('showSubtitle', localProps.showSubtitle)" class="rounded"/>
+          <label class="text-xs text-gray-500">Afficher le sous-titre</label>
         </div>
         <div>
           <label class="block text-xs text-gray-500 mb-1">Sous-titre</label>
           <input v-model="localProps.subtitle" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
         </div>
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Alignement en-tête</label>
-          <div class="grid grid-cols-3 gap-1">
-            <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('headerAlignment', a)" :class="['px-3 py-1.5 text-xs rounded border', localProps.headerAlignment === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
-              {{ a === 'left' ? 'Gauche' : a === 'center' ? 'Centre' : 'Droite' }}
-            </button>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Taille</label>
+            <select v-model="localProps.subtitleSize" @change="updateProp('subtitleSize', localProps.subtitleSize)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+              <option value="small">Petit</option>
+              <option value="medium">Moyen</option>
+              <option value="large">Grand</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Poids</label>
+            <select v-model="localProps.subtitleWeight" @change="updateProp('subtitleWeight', localProps.subtitleWeight)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+              <option value="normal">Normal</option>
+              <option value="medium">Moyen</option>
+              <option value="semibold">Semi-gras</option>
+              <option value="bold">Gras</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+            <input type="color" v-model="localProps.subtitleColor" @input="updateProp('subtitleColor', localProps.subtitleColor)" class="w-full h-8 rounded border border-gray-300"/>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+            <div class="grid grid-cols-3 gap-1">
+              <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('subtitleAlign', a)" :class="['px-2 py-1 text-xs rounded border', localProps.subtitleAlign === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+                {{ a === 'left' ? 'G' : a === 'center' ? 'C' : 'D' }}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Opacité</label>
+            <div class="flex items-center gap-2">
+              <input type="range" min="0" max="100" v-model.number="localProps.subtitleOpacity" @input="updateProp('subtitleOpacity', localProps.subtitleOpacity)" class="flex-1"/>
+              <span class="text-xs text-gray-500 w-8">{{ localProps.subtitleOpacity }}%</span>
+            </div>
           </div>
         </div>
       </div>
@@ -341,9 +423,45 @@
             <label class="block text-xs text-gray-500 mb-1">Texte du bouton</label>
             <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
-          <div>
+          <div class="mb-2">
             <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
             <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          <div class="mb-2">
+            <label class="block text-xs text-gray-500 mb-1">Ouvrir dans</label>
+            <select v-model="localProps.buttonTarget" @change="updateProp('buttonTarget', localProps.buttonTarget)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+              <option value="_self">Même onglet</option>
+              <option value="_blank">Nouvel onglet</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Taille</label>
+              <select v-model="localProps.buttonSize" @change="updateProp('buttonSize', localProps.buttonSize)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                <option value="sm">Petit</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Grand</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Rayon</label>
+              <select v-model="localProps.buttonBorderRadius" @change="updateProp('buttonBorderRadius', localProps.buttonBorderRadius)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                <option value="none">Aucun</option>
+                <option value="sm">Petit</option>
+                <option value="md">Moyen</option>
+                <option value="lg">Grand</option>
+                <option value="full">Complet</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Ombre</label>
+              <select v-model="localProps.buttonShadow" @change="updateProp('buttonShadow', localProps.buttonShadow)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                <option value="none">Aucune</option>
+                <option value="sm">Petite</option>
+                <option value="md">Moyenne</option>
+                <option value="lg">Grande</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -437,9 +555,31 @@ const localProps = reactive({
   showDescription: props.props.showDescription !== false,
   showBadge: props.props.showBadge || false,
   badge: props.props.badge || 'Informations',
+  // Titre personnalisé
+  showTitle: props.props.showTitle !== false,
+  titleTag: props.props.titleTag || 'h2',
+  titleFontFamily: props.props.titleFontFamily || '',
+  titleSize: props.props.titleSize || 'large',
+  titleWeight: props.props.titleWeight || 'bold',
+  titleTransform: props.props.titleTransform || 'none',
+  titleAlign: props.props.titleAlign || 'center',
+  titleOpacity: props.props.titleOpacity !== undefined ? props.props.titleOpacity : 100,
+  titleMarginBottom: props.props.titleMarginBottom || 16,
+  // Sous-titre personnalisé
+  showSubtitle: props.props.showSubtitle !== false,
+  subtitleSize: props.props.subtitleSize || 'medium',
+  subtitleWeight: props.props.subtitleWeight || 'normal',
+  subtitleColor: props.props.subtitleColor || '',
+  subtitleAlign: props.props.subtitleAlign || 'center',
+  subtitleOpacity: props.props.subtitleOpacity !== undefined ? props.props.subtitleOpacity : 70,
+  // Bouton CTA
   showButton: props.props.showButton || false,
   buttonText: props.props.buttonText || 'Démarrer maintenant',
   buttonUrl: props.props.buttonUrl || '',
+  buttonTarget: props.props.buttonTarget || '_self',
+  buttonSize: props.props.buttonSize || 'md',
+  buttonBorderRadius: props.props.buttonBorderRadius || 'full',
+  buttonShadow: props.props.buttonShadow || 'lg',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
   // Positionnement

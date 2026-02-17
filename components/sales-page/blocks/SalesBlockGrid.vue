@@ -11,42 +11,42 @@
         textAlign: props.headerAlignment || 'center'
       }">
         <!-- Titre -->
-        <h2 
-          v-if="props.title || isEditMode"
-          :class="['text-3xl md:text-4xl font-bold tracking-tight', editableClasses('title')]"
-          :style="{ color: textColor, ...titlePositionStyles }"
-          :contenteditable="isEditMode"
-          :data-placeholder="'Titre de la section'"
-          @focus="onFocus('title')"
-          @blur="onBlur($event, 'title')"
-          @keydown="onKeydown($event, true)"
-          @paste="onPaste"
-        >{{ props.title }}</h2>
+        <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
+          <component 
+            :is="props.titleTag || 'h2'"
+            :class="['text-3xl md:text-4xl font-bold tracking-tight', editableClasses('title')]"
+            :style="titleStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Titre de la section'"
+            @focus="onFocus('title')"
+            @blur="onBlur($event, 'title')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.title }}</component>
+        </div>
 
         <!-- Sous-titre -->
-        <p 
-          v-if="props.subtitle || isEditMode"
-          :class="['text-lg opacity-70 max-w-2xl', editableClasses('subtitle')]"
-          :style="{ color: textColor, ...subtitlePositionStyles }"
-          :contenteditable="isEditMode"
-          :data-placeholder="'Sous-titre (optionnel)'"
-          @focus="onFocus('subtitle')"
-          @blur="onBlur($event, 'subtitle')"
-          @keydown="onKeydown($event, false)"
-          @paste="onPaste"
-        >{{ props.subtitle }}</p>
+        <div v-if="(props.showSubtitle !== false) && (props.subtitle || isEditMode)" :style="subtitlePositionStyles">
+          <p 
+            :class="['text-lg opacity-70 max-w-2xl', editableClasses('subtitle')]"
+            :style="subtitleStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Sous-titre (optionnel)'"
+            @focus="onFocus('subtitle')"
+            @blur="onBlur($event, 'subtitle')"
+            @keydown="onKeydown($event, false)"
+            @paste="onPaste"
+          >{{ props.subtitle }}</p>
+        </div>
 
         <!-- Bouton CTA global -->
         <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles">
           <a
             :href="isEditMode ? undefined : props.buttonUrl"
-            class="inline-flex items-center justify-center px-8 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-lg"
+            :target="props.buttonTarget || '_self'"
+            class="inline-flex items-center justify-center font-bold transition-all hover:scale-105 active:scale-95"
             :class="[editableClasses('buttonTextGlobal')]"
-            :style="{ 
-              backgroundColor: props.accentColor || '#10B981', 
-              color: '#ffffff',
-              opacity: props.showButton ? 1 : 0.5 
-            }"
+            :style="ctaButtonStyles"
             :contenteditable="isEditMode"
             :data-placeholder="'Texte du bouton'"
             @focus="onFocus('buttonTextGlobal')"
@@ -163,10 +163,32 @@ interface Props {
   // Nouveaux éléments globaux
   title?: string
   subtitle?: string
+  // Titre optionnel
+  showTitle?: boolean
+  titleTag?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
+  titleFontFamily?: string
+  titleSize?: 'small' | 'medium' | 'large' | 'xlarge'
+  titleWeight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
+  titleColor?: string
+  titleTransform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  titleAlign?: 'left' | 'center' | 'right' | 'justify'
+  titleOpacity?: number
+  titleMarginBottom?: number
+  // Sous-titre optionnel
+  showSubtitle?: boolean
+  subtitleSize?: 'small' | 'medium' | 'large'
+  subtitleWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  subtitleColor?: string
+  subtitleAlign?: 'left' | 'center' | 'right' | 'justify'
+  subtitleOpacity?: number
   headerAlignment?: 'left' | 'center' | 'right'
   showButton?: boolean
   buttonText?: string
   buttonUrl?: string
+  buttonTarget?: '_self' | '_blank'
+  buttonSize?: 'sm' | 'md' | 'lg'
+  buttonBorderRadius?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  buttonShadow?: 'none' | 'sm' | 'md' | 'lg'
   // Positionnement
   elementsOrder?: string[]
   titleOffsetY?: number
@@ -186,10 +208,32 @@ const props = withDefaults(defineProps<Props>(), {
   accentColor: '#10b981',
   title: '',
   subtitle: '',
+  // Titre
+  showTitle: true,
+  titleTag: 'h2',
+  titleFontFamily: '',
+  titleSize: 'large',
+  titleWeight: 'bold',
+  titleColor: '',
+  titleTransform: 'none',
+  titleAlign: 'center',
+  titleOpacity: 100,
+  titleMarginBottom: 16,
+  // Sous-titre
+  showSubtitle: true,
+  subtitleSize: 'medium',
+  subtitleWeight: 'normal',
+  subtitleColor: '',
+  subtitleAlign: 'center',
+  subtitleOpacity: 70,
   headerAlignment: 'center',
   showButton: false,
   buttonText: 'En savoir plus',
   buttonUrl: '',
+  buttonTarget: '_self',
+  buttonSize: 'md',
+  buttonBorderRadius: 'full',
+  buttonShadow: 'lg',
   // Positionnement
   elementsOrder: () => ['title', 'subtitle', 'grid', 'button'],
   titleOffsetY: 0,
@@ -305,6 +349,85 @@ const sectionStyles = computed(() => ({
   backgroundColor: props.backgroundColor,
 }))
 
+// ============ STYLES TITRE ET SOUS-TITRE ============
+
+const fontSizeMap: Record<string, string> = {
+  small: '1.5rem',
+  medium: '2rem',
+  large: '2.5rem',
+  xlarge: '3rem',
+}
+
+const fontWeightMap: Record<string, number> = {
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  extrabold: 800,
+}
+
+const titleStyles = computed(() => ({
+  color: props.titleColor || textColor.value,
+  fontFamily: props.titleFontFamily || undefined,
+  fontSize: fontSizeMap[props.titleSize || 'large'],
+  fontWeight: fontWeightMap[props.titleWeight || 'bold'],
+  textTransform: props.titleTransform || 'none',
+  textAlign: props.titleAlign || 'center',
+  opacity: `${props.titleOpacity !== undefined ? props.titleOpacity : 100}%`,
+  marginBottom: `${props.titleMarginBottom || 16}px`,
+  width: '100%',
+}))
+
+// Styles sous-titre
+const subtitleFontSizeMap: Record<string, string> = {
+  small: '0.875rem',
+  medium: '1rem',
+  large: '1.25rem',
+}
+
+const subtitleStyles = computed(() => ({
+  color: props.subtitleColor || textColor.value,
+  fontSize: subtitleFontSizeMap[props.subtitleSize || 'medium'],
+  fontWeight: fontWeightMap[props.subtitleWeight || 'normal'],
+  textAlign: props.subtitleAlign || 'center',
+  opacity: `${props.subtitleOpacity !== undefined ? props.subtitleOpacity : 70}%`,
+  width: '100%',
+}))
+
+// Styles bouton CTA
+const buttonSizeMap: Record<string, string> = {
+  sm: '0.5rem 1rem',
+  md: '0.75rem 1.5rem',
+  lg: '1rem 2rem',
+}
+
+const buttonRadiusMap: Record<string, string> = {
+  none: '0',
+  sm: '0.375rem',
+  md: '0.75rem',
+  lg: '1rem',
+  full: '9999px',
+}
+
+const buttonShadowMap: Record<string, string> = {
+  none: 'none',
+  sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  md: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+  lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+}
+
+const ctaButtonStyles = computed(() => ({
+  backgroundColor: props.accentColor || '#10B981',
+  color: '#ffffff',
+  padding: buttonSizeMap[props.buttonSize || 'md'],
+  borderRadius: buttonRadiusMap[props.buttonBorderRadius || 'full'],
+  boxShadow: buttonShadowMap[props.buttonShadow || 'lg'],
+  fontWeight: 600,
+  fontSize: props.buttonSize === 'sm' ? '0.875rem' : props.buttonSize === 'lg' ? '1.125rem' : '1rem',
+  opacity: props.showButton ? 1 : 0.5,
+  transition: 'all 0.2s ease',
+}))
+
 // Get item class with col-span
 const getItemClass = (index: number) => {
   const item = itemsList.value[index]
@@ -357,13 +480,15 @@ const getElementOrder = (element: string): number => {
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
-  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined,
+  width: '100%',
 }))
 
 const subtitlePositionStyles = computed(() => ({
   order: getElementOrder('subtitle'),
   transform: props.subtitleOffsetY ? `translateY(${props.subtitleOffsetY}px)` : undefined,
-  marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0'
+  marginTop: getElementOrder('subtitle') === getElementOrder('title') + 1 ? '-1rem' : '0',
+  width: '100%',
 }))
 
 const gridPositionStyles = computed(() => ({
