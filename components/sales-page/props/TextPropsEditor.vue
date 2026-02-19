@@ -176,8 +176,15 @@
             <input v-model="localProps.buttonText" @input="emitUpdate" type="text" placeholder="Cliquez ici" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1">Lien (URL)</label>
-            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            <label class="block text-xs text-gray-500 mb-1">Lien du bouton</label>
+            <UiLinkSelector
+              v-model="localProps.buttonUrl"
+              :link-type="localProps.buttonLinkType || 'custom'"
+              :payment-link-id="localProps.buttonPaymentLinkId"
+              @update:link-type="(val) => { localProps.buttonLinkType = val; emitUpdate() }"
+              @update:payment-link-id="(val) => { localProps.buttonPaymentLinkId = val; emitUpdate() }"
+              @change="emitUpdate"
+            />
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -360,11 +367,17 @@
         <div v-if="localProps.backgroundType === 'gradient'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Début</label>
-            <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientStart" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Fin</label>
-            <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientEnd" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -525,6 +538,8 @@ const localProps = reactive({
   showButton: props.props.showButton || false,
   buttonText: props.props.buttonText || '',
   buttonUrl: props.props.buttonUrl || '',
+  buttonLinkType: props.props.buttonLinkType || 'custom',
+  buttonPaymentLinkId: props.props.buttonPaymentLinkId || null,
   buttonTarget: props.props.buttonTarget || '_self',
   buttonIcon: props.props.buttonIcon || 'none',
   buttonVariant: props.props.buttonVariant || 'filled',

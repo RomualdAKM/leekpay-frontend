@@ -614,27 +614,57 @@ useSeoMeta({
 const faqs = ref([
   {
     question: "Qu'est-ce que LeekPay ?",
-    answer: "LeekPay est une plateforme qui vous permet de créer des liens de paiement, des pages de vente et des factures numériques pour encaisser vos clients en ligne, sans site web ni compétence technique.",
+    answer: "LeekPay est une plateforme de paiement en ligne qui vous permet d'encaisser vos clients facilement grâce à des liens de paiement, des pages de vente, des factures numériques et une API de paiement, sans avoir besoin de site web ni de compétences techniques.",
+    isOpen: false
+  },
+  {
+    question: "À qui s'adresse LeekPay ?",
+    answer: "LeekPay est conçu pour les entrepreneurs, freelances, commerçants, PME, formateurs, vendeurs en ligne et startups qui souhaitent recevoir des paiements rapidement et simplement, en ligne ou via mobile.",
     isOpen: false
   },
   {
     question: "Qu'est-ce qu'un lien de paiement LeekPay ?",
-    answer: "C'est un lien unique et sécurisé que vous générez pour recevoir un paiement spécifique. Vous pouvez le partager sur WhatsApp, par email, sur les réseaux sociaux ou par SMS.",
+    answer: "Un lien de paiement est un lien unique et sécurisé que vous générez pour encaisser un montant précis. Il suffit de le partager avec votre client pour qu'il puisse payer en quelques clics.",
     isOpen: false
   },
   {
-    question: "Où puis-je utiliser un lien de paiement LeekPay ?",
-    answer: "Partout ! Sur WhatsApp, par email, sur les réseaux sociaux (Facebook, Instagram), dans vos stories, ou même en SMS. Le lien fonctionne sur tous les appareils.",
+    question: "Où puis-je utiliser un lien de paiement ?",
+    answer: "Vous pouvez utiliser vos liens de paiement partout : WhatsApp, Email, Facebook & Instagram, Stories et publications, SMS. Le lien fonctionne sur tous les appareils (smartphone, tablette, ordinateur).",
     isOpen: false
   },
   {
-    question: "Comment fonctionnent mes pages de vente ?",
-    answer: "Créez une page de vente personnalisée pour présenter vos produits ou services. Vos clients peuvent consulter les détails et payer directement depuis la page, sans avoir besoin d'un site web.",
+    question: "Comment fonctionnent les pages de vente LeekPay ?",
+    answer: "Les pages de vente vous permettent de présenter vos produits ou services (description, prix, images) et d'encaisser vos clients directement depuis la page. Aucun site web n'est nécessaire : LeekPay héberge votre page et gère le paiement. Vous pouvez également connecter votre propre nom de domaine et configurer vos outils de tracking (Facebook Pixel, Google Analytics, etc.).",
+    isOpen: false
+  },
+  {
+    question: "Puis-je créer des factures avec LeekPay ?",
+    answer: "Oui. LeekPay vous permet de générer des factures numériques professionnelles que vous pouvez envoyer à vos clients. Ces factures incluent un bouton de paiement, permettant à vos clients de payer immédiatement.",
+    isOpen: false
+  },
+  {
+    question: "LeekPay propose-t-il une API de paiement ?",
+    answer: "Oui. LeekPay met à disposition une API de paiement pour les développeurs et entreprises souhaitant intégrer les paiements directement dans leur application, site web ou système interne.",
+    isOpen: false
+  },
+  {
+    question: "Quels moyens de paiement sont acceptés ?",
+    answer: "LeekPay prend en charge les moyens de paiement Mobile Money dans plus de 14 pays africains, ainsi que PayPal et les cartes bancaires (Visa, Mastercard) pour les paiements internationaux.",
     isOpen: false
   },
   {
     question: "LeekPay est-il sécurisé ?",
-    answer: "Oui, la sécurité est notre priorité. Toutes les transactions sont cryptées, et nous respectons les normes PCI DSS. Vos fonds sont protégés et vos données confidentielles.",
+    answer: "Oui. La sécurité est une priorité chez LeekPay. Toutes les transactions sont cryptées, conformes aux normes PCI DSS, et vos données ainsi que vos fonds sont strictement protégés.",
+    isOpen: false
+  },
+  {
+    question: "Comment et quand puis-je retirer mes fonds ?",
+    answer: "Les demandes de retrait ne sont pas traitées automatiquement. Une fois votre demande effectuée, elle est traitée sous un délai de 24 à 48 heures ouvrées.",
+    isOpen: false
+  },
+  {
+    question: "Ai-je besoin de compétences techniques pour utiliser LeekPay ?",
+    answer: "Non. LeekPay est conçu pour être simple et intuitif. Vous pouvez créer un lien de paiement, une facture ou une page de vente en quelques minutes, sans aucune compétence technique.",
     isOpen: false
   }
 ])

@@ -1,1 +1,32 @@
 @import "tailwindcss";
+
+/* ========================================
+   Color Input Styling
+   Force les inputs color à être carrés
+   ======================================== */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+}

@@ -14,7 +14,8 @@
               :src="props.logoUrl" 
               :alt="props.logoText || 'Logo'"
               :style="logoStyles"
-              class="object-contain"
+              :class="['md:w-auto md:h-auto', logoClasses]"
+              class="logo-responsive"
               @error="handleImageError"
             />
             <span 
@@ -41,26 +42,59 @@
           :class="[navPositionClasses, { 'order-1': props.layout === 'logo-right' }]"
           :style="navStyles"
         >
-          <a 
-            v-for="(item, index) in props.navItems" 
-            :key="index"
-            :href="isEditMode ? undefined : (item.url || '#')"
-            :class="[linkClasses, editableClasses(`navItems[${index}].text`)]"
-            :style="linkStyles"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Lien'"
-            @focus="onArrayFocus('navItems', index, 'text')"
-            @blur="onArrayBlur($event, 'navItems', index, 'text')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-            @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
-            @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
-          >{{ item.text }}</a>
+          <template v-for="(item, index) in props.navItems" :key="index">
+            <!-- Séparateur avant (sauf premier élément) -->
+            <span 
+              v-if="props.navShowSeparator && index > 0" 
+              class="select-none" 
+              :style="navSeparatorStyle"
+            >{{ navSeparator }}</span>
+            
+            <!-- Lien de navigation -->
+            <a 
+              :href="isEditMode ? undefined : (item.url || '#')"
+              :class="[
+                'nav-link-wrapper',
+                linkClasses, 
+                editableClasses(`navItems[${index}].text`),
+                { 'hover-background': props.navHoverStyle === 'background' }
+              ]"
+              :style="linkStyles"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Lien'"
+              @focus="onArrayFocus('navItems', index, 'text')"
+              @blur="onArrayBlur($event, 'navItems', index, 'text')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+              @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+              @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+            >
+              {{ item.text }}
+              <!-- Soulignement animé -->
+              <span 
+                v-if="props.navHoverStyle === 'underline' || props.navHoverStyle === 'border-bottom'"
+                class="nav-underline absolute left-0 right-0 transition-all duration-300"
+                :class="[
+                  props.navHoverStyle === 'underline' ? 'bottom-0' : '-bottom-1',
+                  props.navHoverAnimation === 'slide' ? 'underline-slide' : '',
+                  props.navHoverAnimation === 'expand' ? 'underline-expand' : '',
+                  props.navHoverAnimation === 'fade' ? 'underline-fade' : '',
+                  props.navHoverAnimation === 'none' ? 'underline-fade' : ''
+                ]"
+                :style="{
+                  backgroundColor: props.navUnderlineColor || '#10b981',
+                  height: `${props.navUnderlineHeight || 2}px`
+                }"
+              ></span>
+            </a>
+          </template>
         </nav>
         
-        <!-- CTA Button (éditable inline) -->
-        <div v-if="props.showCta" :class="{ 'order-3': props.layout === 'logo-right' }" class="hidden md:block ml-6">
+        <!-- CTA Buttons -->
+        <div v-if="props.showCta || props.showSecondCta" :class="{ 'order-3': props.layout === 'logo-right' }" class="hidden md:flex items-center gap-3 ml-6">
+          <!-- Primary CTA -->
           <a 
+            v-if="props.showCta"
             :href="isEditMode ? undefined : (props.ctaUrl || '#')"
             :class="[ctaClasses, editableClasses('ctaText')]"
             :style="ctaStyles"
@@ -70,7 +104,37 @@
             @blur="onBlur($event, 'ctaText')"
             @keydown="onKeydown($event, true)"
             @paste="onPaste"
-          >{{ props.ctaText || 'Acheter' }}</a>
+          >
+            <!-- Icône gauche -->
+            <component 
+              v-if="props.ctaIcon && props.ctaIconPosition === 'left'" 
+              :is="getCtaIcon" 
+              :style="{ width: `${props.ctaIconSize || 16}px`, height: `${props.ctaIconSize || 16}px` }"
+            />
+            <span>{{ props.ctaText || 'Acheter' }}</span>
+            <!-- Icône droite -->
+            <component 
+              v-if="props.ctaIcon && props.ctaIconPosition !== 'left'" 
+              :is="getCtaIcon" 
+              :style="{ width: `${props.ctaIconSize || 16}px`, height: `${props.ctaIconSize || 16}px` }"
+            />
+            <!-- Slide effect overlay -->
+            <span v-if="props.ctaHoverEffect === 'slide'" class="cta-slide-overlay"></span>
+          </a>
+          
+          <!-- Secondary CTA -->
+          <a 
+            v-if="props.showSecondCta"
+            :href="isEditMode ? undefined : (props.secondCtaUrl || '#')"
+            :class="[secondCtaClasses, editableClasses('secondCtaText')]"
+            :style="secondCtaStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Bouton 2'"
+            @focus="onFocus('secondCtaText')"
+            @blur="onBlur($event, 'secondCtaText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >{{ props.secondCtaText || 'En savoir plus' }}</a>
         </div>
         
         <!-- Mobile Menu Toggle -->
@@ -100,21 +164,52 @@
           class="hidden md:flex items-center flex-1"
           :style="navStyles"
         >
-          <a 
-            v-for="(item, index) in leftNavItems" 
-            :key="index"
-            :href="isEditMode ? undefined : (item.url || '#')"
-            :class="[linkClasses, editableClasses(`navItems[${index}].text`)]"
-            :style="linkStyles"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Lien'"
-            @focus="onArrayFocus('navItems', index, 'text')"
-            @blur="onArrayBlur($event, 'navItems', index, 'text')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-            @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
-            @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
-          >{{ item.text }}</a>
+          <template v-for="(item, index) in leftNavItems" :key="index">
+            <!-- Séparateur avant (sauf premier élément) -->
+            <span 
+              v-if="props.navShowSeparator && index > 0" 
+              class="select-none" 
+              :style="navSeparatorStyle"
+            >{{ navSeparator }}</span>
+            
+            <!-- Lien de navigation -->
+            <a 
+              :href="isEditMode ? undefined : (item.url || '#')"
+              :class="[
+                'nav-link-wrapper',
+                linkClasses, 
+                editableClasses(`navItems[${index}].text`),
+                { 'hover-background': props.navHoverStyle === 'background' }
+              ]"
+              :style="linkStyles"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Lien'"
+              @focus="onArrayFocus('navItems', index, 'text')"
+              @blur="onArrayBlur($event, 'navItems', index, 'text')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+              @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+              @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+            >
+              {{ item.text }}
+              <!-- Soulignement animé -->
+              <span 
+                v-if="props.navHoverStyle === 'underline' || props.navHoverStyle === 'border-bottom'"
+                class="nav-underline absolute left-0 right-0 transition-all duration-300"
+                :class="[
+                  props.navHoverStyle === 'underline' ? 'bottom-0' : '-bottom-1',
+                  props.navHoverAnimation === 'slide' ? 'underline-slide' : '',
+                  props.navHoverAnimation === 'expand' ? 'underline-expand' : '',
+                  props.navHoverAnimation === 'fade' ? 'underline-fade' : '',
+                  props.navHoverAnimation === 'none' ? 'underline-fade' : ''
+                ]"
+                :style="{
+                  backgroundColor: props.navUnderlineColor || '#10b981',
+                  height: `${props.navUnderlineHeight || 2}px`
+                }"
+              ></span>
+            </a>
+          </template>
         </nav>
         
         <!-- Logo Center -->
@@ -125,7 +220,8 @@
               :src="props.logoUrl" 
               :alt="props.logoText || 'Logo'"
               :style="logoStyles"
-              class="object-contain"
+              :class="['md:w-auto md:h-auto', logoClasses]"
+              class="logo-responsive"
               @error="handleImageError"
             />
             <span 
@@ -148,34 +244,94 @@
         <!-- Nav Right + CTA -->
         <div class="hidden md:flex items-center flex-1 justify-end" :style="navStyles">
           <nav v-if="props.showNavigation && rightNavItems.length" class="flex items-center">
+            <template v-for="(item, navIdx) in rightNavItems" :key="navIdx">
+              <!-- Séparateur avant (sauf premier élément) -->
+              <span 
+                v-if="props.navShowSeparator && navIdx > 0" 
+                class="select-none" 
+                :style="navSeparatorStyle"
+              >{{ navSeparator }}</span>
+              
+              <!-- Lien de navigation -->
+              <a 
+                :href="isEditMode ? undefined : (item.url || '#')"
+                :class="[
+                  'nav-link-wrapper',
+                  linkClasses, 
+                  editableClasses(`navItems[${leftNavItems.length + navIdx}].text`),
+                  { 'hover-background': props.navHoverStyle === 'background' }
+                ]"
+                :style="linkStyles"
+                :contenteditable="isEditMode"
+                :data-placeholder="'Lien'"
+                @focus="onArrayFocus('navItems', leftNavItems.length + navIdx, 'text')"
+                @blur="onArrayBlur($event, 'navItems', leftNavItems.length + navIdx, 'text')"
+                @keydown="onKeydown($event, true)"
+                @paste="onPaste"
+                @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
+                @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
+              >
+                {{ item.text }}
+                <!-- Soulignement animé -->
+                <span 
+                  v-if="props.navHoverStyle === 'underline' || props.navHoverStyle === 'border-bottom'"
+                  class="nav-underline absolute left-0 right-0 transition-all duration-300"
+                  :class="[
+                    props.navHoverStyle === 'underline' ? 'bottom-0' : '-bottom-1',
+                    props.navHoverAnimation === 'slide' ? 'underline-slide' : '',
+                    props.navHoverAnimation === 'expand' ? 'underline-expand' : '',
+                    props.navHoverAnimation === 'fade' ? 'underline-fade' : '',
+                    props.navHoverAnimation === 'none' ? 'underline-fade' : ''
+                  ]"
+                  :style="{
+                    backgroundColor: props.navUnderlineColor || '#10b981',
+                    height: `${props.navUnderlineHeight || 2}px`
+                  }"
+                ></span>
+              </a>
+            </template>
+          </nav>
+          
+          <!-- CTA Buttons (layout center) -->
+          <div v-if="props.showCta || props.showSecondCta" class="flex items-center gap-3 ml-6">
             <a 
-              v-for="(item, navIdx) in rightNavItems" 
-              :key="navIdx"
-              :href="isEditMode ? undefined : (item.url || '#')"
-              :class="[linkClasses, editableClasses(`navItems[${leftNavItems.length + navIdx}].text`)]"
-              :style="linkStyles"
+              v-if="props.showCta"
+              :href="isEditMode ? undefined : (props.ctaUrl || '#')"
+              :class="[ctaClasses, editableClasses('ctaText')]"
+              :style="ctaStyles"
               :contenteditable="isEditMode"
-              :data-placeholder="'Lien'"
-              @focus="onArrayFocus('navItems', leftNavItems.length + navIdx, 'text')"
-              @blur="onArrayBlur($event, 'navItems', leftNavItems.length + navIdx, 'text')"
+              :data-placeholder="'Bouton'"
+              @focus="onFocus('ctaText')"
+              @blur="onBlur($event, 'ctaText')"
               @keydown="onKeydown($event, true)"
               @paste="onPaste"
-              @mouseenter="(e: MouseEvent) => !isEditMode && onLinkHover(e, true)"
-              @mouseleave="(e: MouseEvent) => !isEditMode && onLinkHover(e, false)"
-            >{{ item.text }}</a>
-          </nav>
-          <a 
-            v-if="props.showCta"
-            :href="isEditMode ? undefined : (props.ctaUrl || '#')"
-            :class="[ctaClasses, 'ml-6', editableClasses('ctaText')]"
-            :style="ctaStyles"
-            :contenteditable="isEditMode"
-            :data-placeholder="'Bouton'"
-            @focus="onFocus('ctaText')"
-            @blur="onBlur($event, 'ctaText')"
-            @keydown="onKeydown($event, true)"
-            @paste="onPaste"
-          >{{ props.ctaText || 'Acheter' }}</a>
+            >
+              <component 
+                v-if="props.ctaIcon && props.ctaIconPosition === 'left'" 
+                :is="getCtaIcon" 
+                :style="{ width: `${props.ctaIconSize || 16}px`, height: `${props.ctaIconSize || 16}px` }"
+              />
+              <span>{{ props.ctaText || 'Acheter' }}</span>
+              <component 
+                v-if="props.ctaIcon && props.ctaIconPosition !== 'left'" 
+                :is="getCtaIcon" 
+                :style="{ width: `${props.ctaIconSize || 16}px`, height: `${props.ctaIconSize || 16}px` }"
+              />
+              <span v-if="props.ctaHoverEffect === 'slide'" class="cta-slide-overlay"></span>
+            </a>
+            <a 
+              v-if="props.showSecondCta"
+              :href="isEditMode ? undefined : (props.secondCtaUrl || '#')"
+              :class="[secondCtaClasses, editableClasses('secondCtaText')]"
+              :style="secondCtaStyles"
+              :contenteditable="isEditMode"
+              :data-placeholder="'Bouton 2'"
+              @focus="onFocus('secondCtaText')"
+              @blur="onBlur($event, 'secondCtaText')"
+              @keydown="onKeydown($event, true)"
+              @paste="onPaste"
+            >{{ props.secondCtaText || 'En savoir plus' }}</a>
+          </div>
         </div>
         
         <!-- Mobile Toggle -->
@@ -193,6 +349,23 @@
       </template>
     </div>
     
+    <!-- Mobile Overlay -->
+    <Transition
+      enter-active-class="transition-opacity duration-300"
+      leave-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div 
+        v-if="mobileMenuOpen && props.mobileShowOverlay && (props.mobileMenuStyle === 'fullscreen' || props.mobileMenuStyle === 'sidebar')"
+        class="fixed inset-0 z-30 md:hidden"
+        :style="mobileOverlayStyles"
+        @click="handleOverlayClick"
+      ></div>
+    </Transition>
+    
     <!-- Mobile Menu -->
     <Transition
       enter-active-class="transition-all duration-300 ease-out"
@@ -207,6 +380,18 @@
         :class="mobileMenuClasses"
         :style="mobileMenuStyles"
       >
+        <!-- Close button for fullscreen/sidebar -->
+        <button 
+          v-if="props.mobileShowCloseButton && (props.mobileMenuStyle === 'fullscreen' || props.mobileMenuStyle === 'sidebar')"
+          @click="mobileMenuOpen = false"
+          class="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition-colors z-50"
+          :style="{ color: props.textColor || '#1f2937' }"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
         <div :class="mobileMenuContainerClasses">
           <!-- Nav Links -->
           <nav v-if="props.showNavigation && props.navItems?.length" class="flex flex-col">
@@ -214,8 +399,8 @@
               v-for="(item, index) in props.navItems" 
               :key="index"
               :href="item.url || '#'"
-              class="py-3 px-4 text-base font-medium transition-colors"
-              :style="{ color: props.textColor || '#1f2937' }"
+              :class="mobileLinkClasses"
+              :style="mobileLinkStyles"
               @click="mobileMenuOpen = false"
             >
               {{ item.text }}
@@ -233,6 +418,18 @@
               {{ props.ctaText || 'Acheter' }}
             </a>
           </div>
+          
+          <!-- Second CTA Mobile -->
+          <div v-if="props.showSecondCta" class="px-4 pt-3">
+            <a 
+              :href="props.secondCtaUrl || '#'"
+              :class="secondCtaClasses"
+              :style="{ ...secondCtaStyles, width: '100%', display: 'block', textAlign: 'center' }"
+              @click="mobileMenuOpen = false"
+            >
+              {{ props.secondCtaText || 'En savoir plus' }}
+            </a>
+          </div>
         </div>
       </div>
     </Transition>
@@ -242,6 +439,26 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useInlineEdit } from '~/composables/useInlineEdit'
+import { 
+  ArrowRight, ArrowLeft, ShoppingCart, Check, ChevronRight, 
+  ExternalLink, Download, Play, Heart, Star, Zap, Send
+} from 'lucide-vue-next'
+
+// Map des icônes disponibles
+const iconMap: Record<string, any> = {
+  'arrow-right': ArrowRight,
+  'arrow-left': ArrowLeft,
+  'cart': ShoppingCart,
+  'check': Check,
+  'chevron-right': ChevronRight,
+  'external-link': ExternalLink,
+  'download': Download,
+  'play': Play,
+  'heart': Heart,
+  'star': Star,
+  'zap': Zap,
+  'send': Send,
+}
 
 interface NavItem {
   text: string
@@ -250,17 +467,56 @@ interface NavItem {
 
 interface Props {
   blockId?: string
-  // Logo
+  // Logo - Base
   logoUrl?: string | null
   logoText?: string
   logoWidth?: number
   logoHeight?: number
   logoLink?: string
+  // Logo - Ajustement
+  logoObjectFit?: 'contain' | 'cover' | 'fill' | 'none'
+  logoObjectPosition?: 'center' | 'top' | 'bottom' | 'left' | 'right'
+  logoOpacity?: number
+  // Logo - Style
+  logoBorderRadius?: 'none' | 'small' | 'medium' | 'large' | 'full'
+  logoShadow?: 'none' | 'small' | 'medium' | 'large'
+  logoShowBorder?: boolean
+  logoBorderColor?: string
+  logoBorderWidth?: number
+  // Logo - Effets au survol
+  logoHoverEffect?: 'none' | 'scale' | 'brightness' | 'opacity' | 'shadow' | 'lift'
+  logoHoverScale?: number
+  // Logo - Filtres
+  logoFilter?: 'none' | 'grayscale' | 'sepia' | 'brightness' | 'contrast'
+  logoFilterIntensity?: number
+  logoFilterHoverReset?: boolean
+  // Logo - Responsive
+  logoMobileWidth?: number
+  logoMobileHeight?: number
+  logoHideOnMobile?: boolean
+  // Logo - Animation
+  logoAnimation?: 'none' | 'fade' | 'slide-up' | 'scale' | 'bounce'
   // Navigation
   showNavigation?: boolean
   navItems?: NavItem[]
   navPosition?: 'left' | 'center' | 'right'
   navGap?: 'small' | 'medium' | 'large' | 'xlarge'
+  // Navigation - Padding des liens
+  navLinkPaddingX?: number
+  navLinkPaddingY?: number
+  // Navigation - Style de survol
+  navHoverStyle?: 'none' | 'underline' | 'background' | 'border-bottom'
+  navHoverAnimation?: 'none' | 'slide' | 'fade' | 'expand'
+  navHoverBgColor?: string
+  navUnderlineHeight?: number
+  navUnderlineColor?: string
+  // Navigation - Séparateurs
+  navShowSeparator?: boolean
+  navSeparatorType?: 'pipe' | 'dot' | 'slash' | 'dash'
+  navSeparatorColor?: string
+  // Navigation - Lien actif
+  navActiveStyle?: 'none' | 'color' | 'underline' | 'background' | 'bold'
+  navActiveColor?: string
   // CTA
   showCta?: boolean
   ctaText?: string
@@ -272,6 +528,29 @@ interface Props {
   ctaPaddingX?: number
   ctaPaddingY?: number
   ctaShadow?: 'none' | 'small' | 'medium' | 'large'
+  // CTA - Icône
+  ctaIcon?: string
+  ctaIconPosition?: 'left' | 'right'
+  ctaIconSize?: number
+  ctaIconGap?: number
+  // CTA - Bordure
+  ctaShowBorder?: boolean
+  ctaBorderStyle?: 'solid' | 'dashed' | 'dotted'
+  ctaBorderColor?: string
+  ctaBorderWidth?: number
+  // CTA - Effets survol
+  ctaHoverEffect?: 'none' | 'scale' | 'glow' | 'lift' | 'slide' | 'inverse'
+  ctaHoverBgColor?: string
+  ctaHoverTextColor?: string
+  ctaHoverScale?: number
+  // CTA - Animation
+  ctaAnimation?: 'none' | 'pulse' | 'bounce' | 'shimmer'
+  // CTA - Second bouton
+  showSecondCta?: boolean
+  secondCtaText?: string
+  secondCtaUrl?: string
+  secondCtaStyle?: 'outline' | 'ghost' | 'link'
+  secondCtaColor?: string
   // Apparence
   backgroundType?: 'solid' | 'gradient' | 'transparent'
   backgroundColor?: string
@@ -301,19 +580,60 @@ interface Props {
   // Layout
   layout?: 'logo-left' | 'logo-center' | 'logo-right'
   alignItems?: 'start' | 'center' | 'end'
-  // Mobile
+  // Mobile - Base
   mobileMenuIcon?: 'bars' | 'dots'
   mobileMenuStyle?: 'dropdown' | 'fullscreen' | 'sidebar'
   mobileMenuBg?: string
+  // Mobile - Overlay
+  mobileShowOverlay?: boolean
+  mobileOverlayColor?: string
+  mobileOverlayOpacity?: number
+  // Mobile - Animation
+  mobileMenuAnimation?: 'none' | 'slide' | 'fade' | 'scale'
+  // Mobile - Style des liens
+  mobileLinkPaddingX?: number
+  mobileLinkPaddingY?: number
+  mobileLinkFontSize?: 'sm' | 'base' | 'lg' | 'xl'
+  mobileLinkFontWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  mobileLinkShowBorder?: boolean
+  mobileLinkBorderColor?: string
+  // Mobile - Comportement
+  mobileShowCloseButton?: boolean
+  mobileCloseOnOverlayClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   blockId: '',
+  // Logo - Base
   logoUrl: null,
   logoText: '',
   logoWidth: 120,
   logoHeight: 40,
   logoLink: '/',
+  // Logo - Ajustement
+  logoObjectFit: 'contain',
+  logoObjectPosition: 'center',
+  logoOpacity: 100,
+  // Logo - Style
+  logoBorderRadius: 'none',
+  logoShadow: 'none',
+  logoShowBorder: false,
+  logoBorderColor: '#e5e7eb',
+  logoBorderWidth: 1,
+  // Logo - Effets au survol
+  logoHoverEffect: 'none',
+  logoHoverScale: 105,
+  // Logo - Filtres
+  logoFilter: 'none',
+  logoFilterIntensity: 100,
+  logoFilterHoverReset: true,
+  // Logo - Responsive
+  logoMobileWidth: 100,
+  logoMobileHeight: 32,
+  logoHideOnMobile: false,
+  // Logo - Animation
+  logoAnimation: 'none',
+  // Navigation
   showNavigation: true,
   navItems: () => [
     { text: 'Accueil', url: '#' },
@@ -321,6 +641,23 @@ const props = withDefaults(defineProps<Props>(), {
   ],
   navPosition: 'right',
   navGap: 'medium',
+  // Navigation - Padding des liens
+  navLinkPaddingX: 0,
+  navLinkPaddingY: 0,
+  // Navigation - Style de survol
+  navHoverStyle: 'none',
+  navHoverAnimation: 'none',
+  navHoverBgColor: '#f3f4f6',
+  navUnderlineHeight: 2,
+  navUnderlineColor: '#10b981',
+  // Navigation - Séparateurs
+  navShowSeparator: false,
+  navSeparatorType: 'pipe',
+  navSeparatorColor: '#d1d5db',
+  // Navigation - Lien actif
+  navActiveStyle: 'none',
+  navActiveColor: '#10b981',
+  // CTA
   showCta: true,
   ctaText: 'Acheter',
   ctaUrl: '#',
@@ -331,6 +668,30 @@ const props = withDefaults(defineProps<Props>(), {
   ctaPaddingX: 24,
   ctaPaddingY: 12,
   ctaShadow: 'none',
+  // CTA - Icône
+  ctaIcon: '',
+  ctaIconPosition: 'right',
+  ctaIconSize: 16,
+  ctaIconGap: 8,
+  // CTA - Bordure
+  ctaShowBorder: false,
+  ctaBorderStyle: 'solid',
+  ctaBorderColor: '#10b981',
+  ctaBorderWidth: 2,
+  // CTA - Effets survol
+  ctaHoverEffect: 'none',
+  ctaHoverBgColor: '#059669',
+  ctaHoverTextColor: '#ffffff',
+  ctaHoverScale: 105,
+  // CTA - Animation
+  ctaAnimation: 'none',
+  // CTA - Second bouton
+  showSecondCta: false,
+  secondCtaText: 'En savoir plus',
+  secondCtaUrl: '#',
+  secondCtaStyle: 'outline',
+  secondCtaColor: '#10b981',
+  // Apparence
   backgroundType: 'solid',
   backgroundColor: '#ffffff',
   gradientStart: '#ffffff',
@@ -356,9 +717,26 @@ const props = withDefaults(defineProps<Props>(), {
   hoverColor: '#10b981',
   layout: 'logo-left',
   alignItems: 'center',
+  // Mobile - Base
   mobileMenuIcon: 'bars',
   mobileMenuStyle: 'dropdown',
   mobileMenuBg: '#ffffff',
+  // Mobile - Overlay
+  mobileShowOverlay: false,
+  mobileOverlayColor: '#000000',
+  mobileOverlayOpacity: 50,
+  // Mobile - Animation
+  mobileMenuAnimation: 'none',
+  // Mobile - Style des liens
+  mobileLinkPaddingX: 16,
+  mobileLinkPaddingY: 12,
+  mobileLinkFontSize: 'base',
+  mobileLinkFontWeight: 'medium',
+  mobileLinkShowBorder: false,
+  mobileLinkBorderColor: '#e5e7eb',
+  // Mobile - Comportement
+  mobileShowCloseButton: true,
+  mobileCloseOnOverlayClick: true,
 })
 
 const mobileMenuOpen = ref(false)
@@ -534,9 +912,113 @@ const containerStyles = computed(() => {
 })
 
 const logoStyles = computed(() => {
-  return {
+  const styles: Record<string, string> = {
     width: `${props.logoWidth}px`,
     height: `${props.logoHeight}px`,
+  }
+  
+  // Object-fit
+  styles.objectFit = props.logoObjectFit || 'contain'
+  
+  // Object-position
+  styles.objectPosition = props.logoObjectPosition || 'center'
+  
+  // Opacité
+  if (props.logoOpacity !== undefined && props.logoOpacity < 100) {
+    styles.opacity = String(props.logoOpacity / 100)
+  }
+  
+  // Border-radius
+  const radiusMap: Record<string, string> = {
+    none: '0',
+    small: '4px',
+    medium: '8px',
+    large: '16px',
+    full: '9999px',
+  }
+  if (props.logoBorderRadius && props.logoBorderRadius !== 'none') {
+    styles.borderRadius = radiusMap[props.logoBorderRadius]
+  }
+  
+  // Ombre
+  const shadowMap: Record<string, string> = {
+    none: 'none',
+    small: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+    medium: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+    large: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+  }
+  if (props.logoShadow && props.logoShadow !== 'none') {
+    styles.boxShadow = shadowMap[props.logoShadow]
+  }
+  
+  // Bordure
+  if (props.logoShowBorder) {
+    styles.border = `${props.logoBorderWidth || 1}px solid ${props.logoBorderColor || '#e5e7eb'}`
+  }
+  
+  // Filtres
+  if (props.logoFilter && props.logoFilter !== 'none') {
+    const intensity = props.logoFilterIntensity || 100
+    const filterMap: Record<string, string> = {
+      grayscale: `grayscale(${intensity}%)`,
+      sepia: `sepia(${intensity}%)`,
+      brightness: `brightness(${intensity}%)`,
+      contrast: `contrast(${intensity}%)`,
+    }
+    styles.filter = filterMap[props.logoFilter]
+  }
+  
+  // Transition pour les effets hover
+  styles.transition = 'all 0.3s ease'
+  
+  return styles
+})
+
+// Classes CSS pour le logo (hover, animation, responsive)
+const logoClasses = computed(() => {
+  const classes: string[] = []
+  
+  // Animation au chargement
+  if (props.logoAnimation && props.logoAnimation !== 'none') {
+    const animationMap: Record<string, string> = {
+      fade: 'animate-fade',
+      'slide-up': 'animate-slide-up',
+      scale: 'animate-scale',
+      bounce: 'animate-bounce',
+    }
+    classes.push(animationMap[props.logoAnimation])
+  }
+  
+  // Masquer sur mobile
+  if (props.logoHideOnMobile) {
+    classes.push('hidden md:block')
+  }
+  
+  // Effet au survol
+  if (props.logoHoverEffect && props.logoHoverEffect !== 'none') {
+    const hoverMap: Record<string, string> = {
+      scale: 'hover:scale-105',
+      brightness: 'hover:brightness-110',
+      opacity: 'hover:opacity-80',
+      shadow: 'hover:shadow-lg',
+      lift: 'hover:-translate-y-1 hover:shadow-lg',
+    }
+    classes.push(hoverMap[props.logoHoverEffect], 'transition-all', 'duration-300')
+  }
+  
+  // Reset filtre au survol
+  if (props.logoFilterHoverReset && props.logoFilter !== 'none') {
+    classes.push('hover:filter-none')
+  }
+  
+  return classes.join(' ')
+})
+
+// Styles responsive pour mobile
+const logoMobileStyles = computed(() => {
+  return {
+    '--logo-mobile-width': `${props.logoMobileWidth || 100}px`,
+    '--logo-mobile-height': `${props.logoMobileHeight || 32}px`,
   }
 })
 
@@ -564,7 +1046,7 @@ const navStyles = computed(() => {
 })
 
 const linkClasses = computed(() => {
-  const classes = ['transition-colors', 'duration-200']
+  const classes = ['transition-all', 'duration-200', 'relative']
   
   // Font size
   const sizeMap: Record<string, string> = {
@@ -598,6 +1080,11 @@ const linkClasses = computed(() => {
   }
   classes.push(spacingMap[props.letterSpacing || 'normal'])
   
+  // Style de survol - classes CSS
+  if (props.navHoverStyle === 'background') {
+    classes.push('hover:rounded')
+  }
+  
   return classes.join(' ')
 })
 
@@ -608,12 +1095,87 @@ const linkStyles = computed(() => {
   if (props.fontFamily) {
     styles.fontFamily = props.fontFamily
   }
+  
+  // Padding des liens
+  if (props.navLinkPaddingX && props.navLinkPaddingX > 0) {
+    styles.paddingLeft = `${props.navLinkPaddingX}px`
+    styles.paddingRight = `${props.navLinkPaddingX}px`
+  }
+  if (props.navLinkPaddingY && props.navLinkPaddingY > 0) {
+    styles.paddingTop = `${props.navLinkPaddingY}px`
+    styles.paddingBottom = `${props.navLinkPaddingY}px`
+  }
+  
+  // Variables CSS pour les effets au survol
+  styles['--hover-color'] = props.hoverColor || '#10b981'
+  styles['--hover-bg'] = props.navHoverBgColor || '#f3f4f6'
+  styles['--underline-color'] = props.navUnderlineColor || '#10b981'
+  styles['--underline-height'] = `${props.navUnderlineHeight || 2}px`
+  
   return styles
+})
+
+// Styles pour l'effet de soulignement animé
+const linkHoverStyles = computed(() => {
+  if (!props.navHoverStyle || props.navHoverStyle === 'none') return {}
+  
+  const styles: Record<string, string> = {}
+  
+  if (props.navHoverStyle === 'underline' || props.navHoverStyle === 'border-bottom') {
+    styles.position = 'relative'
+  }
+  
+  return styles
+})
+
+// Séparateur de navigation
+const navSeparator = computed(() => {
+  if (!props.navShowSeparator) return ''
+  
+  const separatorMap: Record<string, string> = {
+    pipe: '|',
+    dot: '•',
+    slash: '/',
+    dash: '—',
+  }
+  return separatorMap[props.navSeparatorType || 'pipe']
+})
+
+const navSeparatorStyle = computed(() => {
+  return {
+    color: props.navSeparatorColor || '#d1d5db',
+    margin: '0 8px',
+  }
 })
 
 function onLinkHover(e: MouseEvent, isHover: boolean) {
   const target = e.target as HTMLElement
+  const hoverStyle = props.navHoverStyle || 'none'
+  const hoverAnimation = props.navHoverAnimation || 'none'
+  
+  // Couleur de texte
   target.style.color = isHover ? (props.hoverColor || '#10b981') : (props.textColor || '#1f2937')
+  
+  // Fond au survol
+  if (hoverStyle === 'background') {
+    target.style.backgroundColor = isHover ? (props.navHoverBgColor || '#f3f4f6') : 'transparent'
+  }
+  
+  // Soulignement
+  if (hoverStyle === 'underline' || hoverStyle === 'border-bottom') {
+    const underline = target.querySelector('.nav-underline') as HTMLElement
+    if (underline) {
+      if (hoverAnimation === 'slide') {
+        underline.style.transform = isHover ? 'scaleX(1)' : 'scaleX(0)'
+      } else if (hoverAnimation === 'expand') {
+        underline.style.width = isHover ? '100%' : '0'
+      } else if (hoverAnimation === 'fade') {
+        underline.style.opacity = isHover ? '1' : '0'
+      } else {
+        underline.style.opacity = isHover ? '1' : '0'
+      }
+    }
+  }
 }
 
 const ctaClasses = computed(() => {
@@ -628,6 +1190,28 @@ const ctaClasses = computed(() => {
     full: 'rounded-full',
   }
   classes.push(radiusMap[props.ctaRadius || 'medium'])
+  
+  // Animation
+  if (props.ctaAnimation === 'pulse') {
+    classes.push('cta-pulse')
+  } else if (props.ctaAnimation === 'bounce') {
+    classes.push('cta-bounce')
+  } else if (props.ctaAnimation === 'shimmer') {
+    classes.push('cta-shimmer')
+  }
+  
+  // Hover effect classes
+  if (props.ctaHoverEffect === 'scale') {
+    classes.push('cta-hover-scale')
+  } else if (props.ctaHoverEffect === 'glow') {
+    classes.push('cta-hover-glow')
+  } else if (props.ctaHoverEffect === 'lift') {
+    classes.push('cta-hover-lift')
+  } else if (props.ctaHoverEffect === 'slide') {
+    classes.push('cta-hover-slide', 'overflow-hidden', 'relative')
+  } else if (props.ctaHoverEffect === 'inverse') {
+    classes.push('cta-hover-inverse')
+  }
   
   return classes.join(' ')
 })
@@ -662,19 +1246,129 @@ const ctaStyles = computed(() => {
     styles.boxShadow = shadowMap[props.ctaShadow]
   }
   
+  // Bordure
+  if (props.ctaShowBorder) {
+    styles.border = `${props.ctaBorderWidth || 2}px ${props.ctaBorderStyle || 'solid'} ${props.ctaBorderColor || '#10b981'}`
+  }
+  
+  // Gap pour icône
+  if (props.ctaIcon) {
+    styles.gap = `${props.ctaIconGap || 8}px`
+  }
+  
+  // Variables CSS pour hover
+  styles['--cta-hover-bg'] = props.ctaHoverBgColor || '#059669'
+  styles['--cta-hover-text'] = props.ctaHoverTextColor || '#ffffff'
+  styles['--cta-hover-scale'] = `${(props.ctaHoverScale || 105) / 100}`
+  styles['--cta-bg'] = props.ctaBgColor || '#10b981'
+  styles['--cta-text'] = props.ctaTextColor || '#ffffff'
+  
   return styles
+})
+
+// Second CTA styles
+const secondCtaClasses = computed(() => {
+  const classes = ['inline-flex', 'items-center', 'justify-center', 'font-medium', 'transition-all', 'duration-200']
+  
+  // Radius (same as primary)
+  const radiusMap: Record<string, string> = {
+    none: 'rounded-none',
+    small: 'rounded',
+    medium: 'rounded-lg',
+    large: 'rounded-2xl',
+    full: 'rounded-full',
+  }
+  classes.push(radiusMap[props.ctaRadius || 'medium'])
+  
+  return classes.join(' ')
+})
+
+const secondCtaStyles = computed(() => {
+  const color = props.secondCtaColor || '#10b981'
+  const style = props.secondCtaStyle || 'outline'
+  
+  const styles: Record<string, string> = {
+    paddingLeft: `${props.ctaPaddingX || 24}px`,
+    paddingRight: `${props.ctaPaddingX || 24}px`,
+    paddingTop: `${props.ctaPaddingY || 12}px`,
+    paddingBottom: `${props.ctaPaddingY || 12}px`,
+  }
+  
+  // Size
+  const sizeMap: Record<string, { fontSize: string }> = {
+    small: { fontSize: '12px' },
+    medium: { fontSize: '14px' },
+    large: { fontSize: '16px' },
+  }
+  styles.fontSize = sizeMap[props.ctaSize || 'medium'].fontSize
+  
+  if (style === 'outline') {
+    styles.backgroundColor = 'transparent'
+    styles.color = color
+    styles.border = `2px solid ${color}`
+  } else if (style === 'ghost') {
+    styles.backgroundColor = 'transparent'
+    styles.color = color
+    styles.border = 'none'
+  } else if (style === 'link') {
+    styles.backgroundColor = 'transparent'
+    styles.color = color
+    styles.border = 'none'
+    styles.padding = '0'
+    styles.textDecoration = 'underline'
+  }
+  
+  return styles
+})
+
+// Computed pour l'icône CTA
+const getCtaIcon = computed(() => {
+  if (!props.ctaIcon) return null
+  return iconMap[props.ctaIcon] || null
 })
 
 // Mobile menu
 const mobileMenuTransitionFrom = computed(() => {
-  if (props.mobileMenuStyle === 'fullscreen') return 'opacity-0'
-  if (props.mobileMenuStyle === 'sidebar') return 'translate-x-full opacity-0'
+  const animation = props.mobileMenuAnimation || 'none'
+  const style = props.mobileMenuStyle || 'dropdown'
+  
+  // Animation personnalisée
+  if (animation !== 'none') {
+    switch (animation) {
+      case 'slide':
+        return style === 'sidebar' ? 'translate-x-full' : '-translate-y-4 opacity-0'
+      case 'fade':
+        return 'opacity-0'
+      case 'scale':
+        return 'scale-95 opacity-0'
+    }
+  }
+  
+  // Animation par défaut selon le style
+  if (style === 'fullscreen') return 'opacity-0'
+  if (style === 'sidebar') return 'translate-x-full opacity-0'
   return 'opacity-0 -translate-y-2'
 })
 
 const mobileMenuTransitionTo = computed(() => {
-  if (props.mobileMenuStyle === 'fullscreen') return 'opacity-100'
-  if (props.mobileMenuStyle === 'sidebar') return 'translate-x-0 opacity-100'
+  const animation = props.mobileMenuAnimation || 'none'
+  const style = props.mobileMenuStyle || 'dropdown'
+  
+  // Animation personnalisée
+  if (animation !== 'none') {
+    switch (animation) {
+      case 'slide':
+        return style === 'sidebar' ? 'translate-x-0' : 'translate-y-0 opacity-100'
+      case 'fade':
+        return 'opacity-100'
+      case 'scale':
+        return 'scale-100 opacity-100'
+    }
+  }
+  
+  // Animation par défaut selon le style
+  if (style === 'fullscreen') return 'opacity-100'
+  if (style === 'sidebar') return 'translate-x-0 opacity-100'
   return 'opacity-100 translate-y-0'
 })
 
@@ -704,4 +1398,207 @@ const mobileMenuContainerClasses = computed(() => {
   }
   return 'py-4'
 })
+
+// Mobile overlay
+const mobileOverlayStyles = computed(() => {
+  return {
+    backgroundColor: props.mobileOverlayColor || '#000000',
+    opacity: (props.mobileOverlayOpacity || 50) / 100,
+  }
+})
+
+// Mobile link styles
+const mobileLinkClasses = computed(() => {
+  const classes = ['transition-colors', 'block']
+  
+  // Font size
+  const sizeMap: Record<string, string> = {
+    sm: 'text-sm',
+    base: 'text-base',
+    lg: 'text-lg',
+    xl: 'text-xl',
+  }
+  classes.push(sizeMap[props.mobileLinkFontSize || 'base'])
+  
+  // Font weight
+  const weightMap: Record<string, string> = {
+    normal: 'font-normal',
+    medium: 'font-medium',
+    semibold: 'font-semibold',
+    bold: 'font-bold',
+  }
+  classes.push(weightMap[props.mobileLinkFontWeight || 'medium'])
+  
+  return classes.join(' ')
+})
+
+const mobileLinkStyles = computed(() => {
+  const styles: Record<string, string> = {
+    color: props.textColor || '#1f2937',
+    paddingLeft: `${props.mobileLinkPaddingX || 16}px`,
+    paddingRight: `${props.mobileLinkPaddingX || 16}px`,
+    paddingTop: `${props.mobileLinkPaddingY || 12}px`,
+    paddingBottom: `${props.mobileLinkPaddingY || 12}px`,
+  }
+  
+  if (props.mobileLinkShowBorder) {
+    styles.borderBottom = `1px solid ${props.mobileLinkBorderColor || '#e5e7eb'}`
+  }
+  
+  return styles
+})
+
+// Fermer le menu mobile au clic sur l'overlay
+const handleOverlayClick = () => {
+  if (props.mobileCloseOnOverlayClick !== false) {
+    mobileMenuOpen.value = false
+  }
+}
 </script>
+
+<style scoped>
+/* Effet de soulignement au survol */
+.nav-link-wrapper:hover .nav-underline {
+  opacity: 1 !important;
+  transform: scaleX(1) !important;
+  width: 100% !important;
+}
+
+/* Animation slide (de gauche à droite) */
+.nav-underline.underline-slide {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* Animation expand (du centre) */
+.nav-underline.underline-expand {
+  width: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-link-wrapper:hover .nav-underline.underline-expand {
+  width: 100%;
+}
+
+/* Animation fade */
+.nav-underline.underline-fade {
+  opacity: 0;
+}
+
+/* Style fond au survol */
+.nav-link-wrapper.hover-background:hover {
+  background-color: var(--hover-bg, #f3f4f6);
+  border-radius: 4px;
+}
+
+/* Responsive logo */
+.logo-responsive {
+  width: var(--logo-mobile-width, 100px);
+  height: var(--logo-mobile-height, 32px);
+}
+
+@media (min-width: 768px) {
+  .logo-responsive {
+    width: auto;
+    height: auto;
+  }
+}
+
+/* ===== CTA Animations ===== */
+
+/* Pulse animation */
+.cta-pulse {
+  animation: cta-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes cta-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Bounce animation */
+.cta-bounce {
+  animation: cta-bounce 1s infinite;
+}
+
+@keyframes cta-bounce {
+  0%, 100% {
+    transform: translateY(-5%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* Shimmer animation */
+.cta-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: cta-shimmer 2s infinite;
+}
+
+@keyframes cta-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Hover effects */
+.cta-hover-scale:hover {
+  transform: scale(var(--cta-hover-scale, 1.05));
+}
+
+.cta-hover-glow:hover {
+  box-shadow: 0 0 20px var(--cta-bg, #10b981);
+}
+
+.cta-hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.cta-hover-inverse:hover {
+  background-color: var(--cta-hover-bg, #059669) !important;
+  color: var(--cta-hover-text, #ffffff) !important;
+}
+
+/* Slide effect */
+.cta-hover-slide .cta-slide-overlay {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--cta-hover-bg, #059669);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.cta-hover-slide:hover .cta-slide-overlay {
+  left: 0;
+}
+
+.cta-hover-slide:hover {
+  color: var(--cta-hover-text, #ffffff) !important;
+}
+</style>

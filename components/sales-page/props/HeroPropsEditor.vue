@@ -69,8 +69,29 @@
         </div>
         
         <div v-if="currentLayout === 'video'">
-          <label class="block text-xs text-gray-500 mb-1">URL de la vidéo (MP4)</label>
-          <input v-model="localProps.videoUrl" @input="updateProp('videoUrl', localProps.videoUrl)" type="url" placeholder="https://...video.mp4" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          <label class="block text-xs text-gray-500 mb-1">Type de vidéo</label>
+          <select v-model="localProps.videoType" @change="updateProp('videoType', localProps.videoType)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-2">
+            <option value="mp4">Fichier MP4</option>
+            <option value="youtube">YouTube</option>
+            <option value="vimeo">Vimeo</option>
+          </select>
+          
+          <div v-if="localProps.videoType === 'mp4'">
+            <label class="block text-xs text-gray-500 mb-1">URL de la vidéo (MP4)</label>
+            <input v-model="localProps.videoUrl" @input="updateProp('videoUrl', localProps.videoUrl)" type="url" placeholder="https://...video.mp4" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          </div>
+          
+          <div v-else-if="localProps.videoType === 'youtube'">
+            <label class="block text-xs text-gray-500 mb-1">ID YouTube</label>
+            <input v-model="localProps.videoYoutubeId" @input="updateProp('videoYoutubeId', localProps.videoYoutubeId)" type="text" placeholder="ex: dQw4w9WgXcQ" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            <p class="text-xs text-gray-400 mt-1">L'ID se trouve après "v=" dans l'URL YouTube</p>
+          </div>
+          
+          <div v-else-if="localProps.videoType === 'vimeo'">
+            <label class="block text-xs text-gray-500 mb-1">ID Vimeo</label>
+            <input v-model="localProps.videoVimeoId" @input="updateProp('videoVimeoId', localProps.videoVimeoId)" type="text" placeholder="ex: 123456789" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            <p class="text-xs text-gray-400 mt-1">L'ID se trouve à la fin de l'URL Vimeo</p>
+          </div>
         </div>
         
         <div v-if="hasOverlay">
@@ -172,8 +193,15 @@
         </div>
         
         <div>
-          <label class="block text-xs text-gray-500 mb-1">URL</label>
-          <input v-model="localProps.ctaUrl" @input="updateProp('ctaUrl', localProps.ctaUrl)" type="url" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          <label class="block text-xs text-gray-500 mb-1">Lien du bouton</label>
+          <UiLinkSelector
+            v-model="localProps.ctaUrl"
+            :link-type="localProps.ctaLinkType || 'custom'"
+            :payment-link-id="localProps.ctaPaymentLinkId"
+            @update:link-type="(val) => { localProps.ctaLinkType = val; updateProp('ctaLinkType', val) }"
+            @update:payment-link-id="(val) => { localProps.ctaPaymentLinkId = val; updateProp('ctaPaymentLinkId', val) }"
+            @change="updateProp('ctaUrl', localProps.ctaUrl)"
+          />
         </div>
         
         <div class="grid grid-cols-2 gap-3">
@@ -290,8 +318,15 @@
         </div>
         
         <div>
-          <label class="block text-xs text-gray-500 mb-1">URL</label>
-          <input v-model="localProps.secondaryButtonUrl" @input="updateProp('secondaryButtonUrl', localProps.secondaryButtonUrl)" type="url" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+          <label class="block text-xs text-gray-500 mb-1">Lien du bouton</label>
+          <UiLinkSelector
+            v-model="localProps.secondaryButtonUrl"
+            :link-type="localProps.secondaryButtonLinkType || 'custom'"
+            :payment-link-id="localProps.secondaryButtonPaymentLinkId"
+            @update:link-type="(val) => { localProps.secondaryButtonLinkType = val; updateProp('secondaryButtonLinkType', val) }"
+            @update:payment-link-id="(val) => { localProps.secondaryButtonPaymentLinkId = val; updateProp('secondaryButtonPaymentLinkId', val) }"
+            @change="updateProp('secondaryButtonUrl', localProps.secondaryButtonUrl)"
+          />
         </div>
         
         <div class="grid grid-cols-2 gap-3">
@@ -594,6 +629,109 @@
       </div>
     </div>
     
+    <!-- ===== SECTION EFFETS PROFESSIONNELS ===== -->
+    <div class="border-b border-gray-200 pb-4">
+      <button @click="sections.effects = !sections.effects" class="flex items-center justify-between w-full text-left">
+        <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Effets</h4>
+        <ChevronDown :class="['w-4 h-4 transition-transform', sections.effects ? 'rotate-180' : '']"/>
+      </button>
+      
+      <div v-show="sections.effects" class="mt-3 space-y-4">
+        <!-- Indicateur de scroll -->
+        <div class="p-3 bg-gray-50 rounded-lg space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="localProps.showScrollIndicator" @change="updateProp('showScrollIndicator', localProps.showScrollIndicator)" class="rounded text-emerald-500"/>
+            <span class="text-xs font-medium text-gray-700">Indicateur de scroll</span>
+          </label>
+          <div v-if="localProps.showScrollIndicator" class="grid grid-cols-2 gap-2 mt-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Style</label>
+              <select v-model="localProps.scrollIndicatorStyle" @change="updateProp('scrollIndicatorStyle', localProps.scrollIndicatorStyle)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs">
+                <option value="arrow">Flèche ↓</option>
+                <option value="chevron">Chevron ⌄</option>
+                <option value="mouse">Souris 🖱</option>
+                <option value="line">Ligne |</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+              <div class="flex items-center gap-1">
+                <input type="color" v-model="localProps.scrollIndicatorColor" @input="updateProp('scrollIndicatorColor', localProps.scrollIndicatorColor)" class="w-8 h-8 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.scrollIndicatorColor" @input="updateProp('scrollIndicatorColor', localProps.scrollIndicatorColor)" type="text" placeholder="Auto" class="flex-1 px-1 py-1 border border-gray-300 rounded text-xs"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Effet Parallaxe -->
+        <div class="p-3 bg-gray-50 rounded-lg space-y-2" v-if="needsMedia">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="localProps.parallaxEnabled" @change="updateProp('parallaxEnabled', localProps.parallaxEnabled)" class="rounded text-emerald-500"/>
+            <span class="text-xs font-medium text-gray-700">Effet parallaxe sur l'image</span>
+          </label>
+          <div v-if="localProps.parallaxEnabled">
+            <label class="block text-xs text-gray-500 mb-1">Intensité</label>
+            <select v-model="localProps.parallaxIntensity" @change="updateProp('parallaxIntensity', localProps.parallaxIntensity)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs">
+              <option value="light">Légère</option>
+              <option value="medium">Moyenne</option>
+              <option value="strong">Forte</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Ombre sur le titre -->
+        <div class="p-3 bg-gray-50 rounded-lg space-y-2">
+          <label class="block text-xs font-medium text-gray-700 mb-1">Ombre du titre</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Style</label>
+              <select v-model="localProps.titleShadow" @change="updateProp('titleShadow', localProps.titleShadow)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs">
+                <option value="none">Aucune</option>
+                <option value="subtle">Subtile</option>
+                <option value="medium">Moyenne</option>
+                <option value="strong">Forte</option>
+                <option value="glow">Lueur</option>
+              </select>
+            </div>
+            <div v-if="localProps.titleShadow !== 'none'">
+              <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+              <div class="flex items-center gap-1">
+                <input type="color" v-model="localProps.titleShadowColor" @input="updateProp('titleShadowColor', localProps.titleShadowColor)" class="w-8 h-8 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.titleShadowColor" @input="updateProp('titleShadowColor', localProps.titleShadowColor)" type="text" class="flex-1 px-1 py-1 border border-gray-300 rounded text-xs"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bordure/Séparateur bas -->
+        <div class="p-3 bg-gray-50 rounded-lg space-y-2">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" v-model="localProps.showBottomBorder" @change="updateProp('showBottomBorder', localProps.showBottomBorder)" class="rounded text-emerald-500"/>
+            <span class="text-xs font-medium text-gray-700">Séparateur en bas</span>
+          </label>
+          <div v-if="localProps.showBottomBorder" class="grid grid-cols-3 gap-2 mt-2">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Style</label>
+              <select v-model="localProps.bottomBorderStyle" @change="updateProp('bottomBorderStyle', localProps.bottomBorderStyle)" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs">
+                <option value="line">Ligne</option>
+                <option value="gradient">Dégradé</option>
+                <option value="wave">Vague</option>
+                <option value="dots">Pointillés</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+              <input type="color" v-model="localProps.bottomBorderColor" @input="updateProp('bottomBorderColor', localProps.bottomBorderColor)" class="w-full h-8 rounded cursor-pointer border-0"/>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Épaisseur</label>
+              <input type="number" v-model.number="localProps.bottomBorderHeight" @input="updateProp('bottomBorderHeight', localProps.bottomBorderHeight)" min="1" max="20" class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- ===== SECTION ANIMATION ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.animation = !sections.animation" class="flex items-center justify-between w-full text-left">
@@ -719,8 +857,9 @@ const sections = reactive({
   appearance: false,
   typography: false,
   badge: false,
+  effects: false,
   animation: false,
-  positioning: false, // Nouvelle section positionnement
+  positioning: false,
   advanced: false,
 })
 
@@ -748,6 +887,8 @@ const localProps = reactive({
   // Bouton principal
   ctaText: props.props.ctaText || 'Acheter maintenant',
   ctaUrl: props.props.ctaUrl || '',
+  ctaLinkType: props.props.ctaLinkType || 'custom',
+  ctaPaymentLinkId: props.props.ctaPaymentLinkId || null,
   ctaTarget: props.props.ctaTarget || '_self',
   ctaColor: props.props.ctaColor || '#1f2937',
   ctaTextColor: props.props.ctaTextColor || '',
@@ -761,6 +902,8 @@ const localProps = reactive({
   // Bouton secondaire
   secondaryButtonText: props.props.secondaryButtonText || '',
   secondaryButtonUrl: props.props.secondaryButtonUrl || '',
+  secondaryButtonLinkType: props.props.secondaryButtonLinkType || 'custom',
+  secondaryButtonPaymentLinkId: props.props.secondaryButtonPaymentLinkId || null,
   secondaryButtonTarget: props.props.secondaryButtonTarget || '_self',
   secondaryButtonStyle: props.props.secondaryButtonStyle || 'outline',
   secondaryButtonColor: props.props.secondaryButtonColor || '',
@@ -803,6 +946,21 @@ const localProps = reactive({
   verticalAlignment: props.props.verticalAlignment || 'center',
   cssId: props.props.cssId || '',
   customClasses: props.props.customClasses || '',
+  // Effets professionnels
+  showScrollIndicator: props.props.showScrollIndicator || false,
+  scrollIndicatorStyle: props.props.scrollIndicatorStyle || 'arrow',
+  scrollIndicatorColor: props.props.scrollIndicatorColor || '',
+  parallaxEnabled: props.props.parallaxEnabled || false,
+  parallaxIntensity: props.props.parallaxIntensity || 'medium',
+  titleShadow: props.props.titleShadow || 'none',
+  titleShadowColor: props.props.titleShadowColor || '#000000',
+  showBottomBorder: props.props.showBottomBorder || false,
+  bottomBorderStyle: props.props.bottomBorderStyle || 'line',
+  bottomBorderColor: props.props.bottomBorderColor || '#e5e7eb',
+  bottomBorderHeight: props.props.bottomBorderHeight || 1,
+  videoType: props.props.videoType || 'mp4',
+  videoYoutubeId: props.props.videoYoutubeId || '',
+  videoVimeoId: props.props.videoVimeoId || '',
   // Positionnement (Option 1 + 2)
   elementsOrder: props.props.elementsOrder || ['badge', 'title', 'subtitle', 'buttons'] as ('badge' | 'title' | 'subtitle' | 'buttons')[],
   badgeOffsetY: props.props.badgeOffsetY || 0,

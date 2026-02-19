@@ -516,11 +516,17 @@
         <div v-if="localProps.backgroundType === 'gradient'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur début</label>
-            <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientStart" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur fin</label>
-            <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientEnd" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div>
@@ -626,7 +632,7 @@
               <UiImageUploader
                 v-model="tab.image"
                 label="Image"
-                @update:model-value="emitUpdate"
+                @update:model-value="(val) => updateTabImage(Number(index), val)"
               />
             </div>
           </div>
@@ -652,8 +658,15 @@
             <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
           <div>
-            <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
-            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            <label class="block text-xs text-gray-500 mb-1">Lien du bouton</label>
+            <UiLinkSelector
+              v-model="localProps.buttonUrl"
+              :link-type="localProps.buttonLinkType || 'custom'"
+              :payment-link-id="localProps.buttonPaymentLinkId"
+              @update:link-type="(val) => { localProps.buttonLinkType = val; emitUpdate() }"
+              @update:payment-link-id="(val) => { localProps.buttonPaymentLinkId = val; emitUpdate() }"
+              @change="emitUpdate"
+            />
           </div>
           <!-- Taille et Cible -->
           <div class="grid grid-cols-2 gap-2">
@@ -853,6 +866,8 @@ const localProps = reactive({
   showButton: props.props.showButton || false,
   buttonText: props.props.buttonText || 'Démarrer maintenant',
   buttonUrl: props.props.buttonUrl || '',
+  buttonLinkType: props.props.buttonLinkType || 'custom',
+  buttonPaymentLinkId: props.props.buttonPaymentLinkId || null,
   buttonTarget: props.props.buttonTarget || '_self',
   buttonIcon: props.props.buttonIcon || 'none',
   buttonVariant: props.props.buttonVariant || 'filled',
@@ -915,6 +930,14 @@ function removeTab(index: number) {
   localProps.tabs.splice(index, 1)
   tabFeaturesText.splice(index, 1)
   emitUpdate()
+}
+
+// Mise à jour de l'image d'un onglet avec valeur explicite
+function updateTabImage(index: number, value: string) {
+  if (localProps.tabs && localProps.tabs[index]) {
+    localProps.tabs[index].image = value
+    emitUpdate()
+  }
 }
 
 watch(() => props.props, (newVal) => {

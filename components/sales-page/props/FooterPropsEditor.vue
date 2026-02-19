@@ -85,21 +85,33 @@
         <div v-if="localProps.backgroundType === 'solid'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Fond</label>
-            <input type="color" v-model="localProps.backgroundColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.backgroundColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.backgroundColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Texte</label>
-            <input type="color" v-model="localProps.textColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.textColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.textColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div v-if="localProps.backgroundType === 'gradient'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Début</label>
-            <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientStart" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Fin</label>
-            <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientEnd" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div>

@@ -41,7 +41,7 @@
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur</label>
-            <input type="color" v-model="localProps.titleColor" @input="updateProp('titleColor', localProps.titleColor)" class="w-full h-8 rounded border border-gray-300"/>
+            <input type="color" v-model="localProps.titleColor" @input="updateProp('titleColor', localProps.titleColor)" class="w-10 h-10 rounded border border-gray-300 cursor-pointer"/>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Alignement</label>
@@ -87,7 +87,7 @@
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur</label>
-            <input type="color" v-model="localProps.subtitleColor" @input="updateProp('subtitleColor', localProps.subtitleColor)" class="w-full h-8 rounded border border-gray-300"/>
+            <input type="color" v-model="localProps.subtitleColor" @input="updateProp('subtitleColor', localProps.subtitleColor)" class="w-10 h-10 rounded border border-gray-300 cursor-pointer"/>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -141,7 +141,7 @@
               <UiImageUploader
                 v-model="product.image"
                 label="Image"
-                @update:model-value="emitUpdate"
+                @update:model-value="(val) => updateProductImage(Number(idx), val)"
               />
             </div>
             <div>
@@ -226,21 +226,33 @@
         <div v-if="localProps.backgroundType === 'solid'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Fond</label>
-            <input type="color" v-model="localProps.backgroundColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.backgroundColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.backgroundColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Accent</label>
-            <input type="color" v-model="localProps.accentColor" @input="emitUpdate" class="w-full h-10 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.accentColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.accentColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div v-if="localProps.backgroundType === 'gradient'" class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Début</label>
-            <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientStart" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientStart" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Fin</label>
-            <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-full h-8 rounded cursor-pointer border-0"/>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.gradientEnd" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.gradientEnd" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border border-gray-300 rounded text-xs"/>
+            </div>
           </div>
         </div>
         <div>
@@ -447,6 +459,14 @@ function addProduct() {
 }
 
 function removeProduct(idx: number) { localProps.products.splice(idx, 1); emitUpdate() }
+
+// Mise à jour de l'image produit avec valeur explicite
+function updateProductImage(index: number, value: string) {
+  if (localProps.products && localProps.products[index]) {
+    localProps.products[index].image = value
+    emitUpdate()
+  }
+}
 
 const formatPrice = (price: string | number) => {
   const num = typeof price === 'string' ? parseFloat(price) : price

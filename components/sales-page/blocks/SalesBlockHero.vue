@@ -1,5 +1,6 @@
 <template>
-  <!-- LAYOUT: SLIDER -->
+  <div class="hero-wrapper relative">
+    <!-- LAYOUT: SLIDER -->
   <section 
     v-if="layout === 'slider'"
     :id="sectionId"
@@ -482,6 +483,23 @@
       </div>
     </div>
   </section>
+  
+  <!-- Indicateur de scroll -->
+  <div 
+    v-if="props.showScrollIndicator"
+    class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce"
+    :style="scrollIndicatorStyles"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" v-html="scrollIndicatorSvg"></svg>
+  </div>
+  
+  <!-- Bordure/Séparateur bas -->
+  <div 
+    v-if="props.showBottomBorder"
+    class="absolute bottom-0 left-0 right-0 z-20"
+    :style="bottomBorderStyles"
+  ></div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -602,6 +620,21 @@ interface Props {
   // Avancé
   cssId?: string
   customClasses?: string
+  // Effets professionnels
+  showScrollIndicator?: boolean
+  scrollIndicatorStyle?: 'arrow' | 'chevron' | 'mouse' | 'line'
+  scrollIndicatorColor?: string
+  parallaxEnabled?: boolean
+  parallaxIntensity?: 'light' | 'medium' | 'strong'
+  titleShadow?: 'none' | 'subtle' | 'medium' | 'strong' | 'glow'
+  titleShadowColor?: string
+  showBottomBorder?: boolean
+  bottomBorderStyle?: 'line' | 'gradient' | 'wave' | 'dots'
+  bottomBorderColor?: string
+  bottomBorderHeight?: number
+  videoType?: 'mp4' | 'youtube' | 'vimeo'
+  videoYoutubeId?: string
+  videoVimeoId?: string
   // Positionnement des éléments (Option 1 + 2)
   elementsOrder?: ('badge' | 'title' | 'subtitle' | 'buttons')[]
   badgeOffsetY?: number
@@ -678,6 +711,21 @@ const props = withDefaults(defineProps<Props>(), {
   autoplayInterval: 5000,
   cssId: '',
   customClasses: '',
+  // Effets professionnels
+  showScrollIndicator: false,
+  scrollIndicatorStyle: 'arrow',
+  scrollIndicatorColor: '',
+  parallaxEnabled: false,
+  parallaxIntensity: 'medium',
+  titleShadow: 'none',
+  titleShadowColor: '#000000',
+  showBottomBorder: false,
+  bottomBorderStyle: 'line',
+  bottomBorderColor: '#e5e7eb',
+  bottomBorderHeight: 1,
+  videoType: 'mp4',
+  videoYoutubeId: '',
+  videoVimeoId: '',
   // Positionnement des éléments (Option 1 + 2)
   elementsOrder: () => ['badge', 'title', 'subtitle', 'buttons'] as ('badge' | 'title' | 'subtitle' | 'buttons')[],
   badgeOffsetY: 0,
@@ -1015,6 +1063,18 @@ const titleStyles = computed(() => {
     styles.textTransform = props.titleTransform
   }
   
+  // Ombre du titre
+  if (props.titleShadow && props.titleShadow !== 'none') {
+    const shadowColor = props.titleShadowColor || '#000000'
+    const shadowMap: Record<string, string> = {
+      'subtle': `1px 1px 2px ${shadowColor}40`,
+      'medium': `2px 2px 4px ${shadowColor}60`,
+      'strong': `3px 3px 6px ${shadowColor}80`,
+      'glow': `0 0 20px ${shadowColor}60, 0 0 40px ${shadowColor}40`
+    }
+    styles.textShadow = shadowMap[props.titleShadow] || ''
+  }
+  
   return styles
 })
 
@@ -1229,6 +1289,16 @@ const subtitlePositionStyles = computed(() => {
     styles.transform = `translateY(${offset}px)`
   }
   styles.order = String(getElementOrder('subtitle'))
+  
+  // Override mx-auto du template si alignement gauche/droite
+  if (props.contentAlignment === 'left') {
+    styles.marginLeft = '0'
+    styles.marginRight = 'auto'
+  } else if (props.contentAlignment === 'right') {
+    styles.marginLeft = 'auto'
+    styles.marginRight = '0'
+  }
+  
   return styles
 })
 
@@ -1244,6 +1314,77 @@ const buttonsPositionStyles = computed(() => {
 })
 
 // ============ FIN POSITIONNEMENT ============
+
+// ============ EFFETS PROFESSIONNELS ============
+
+// Styles pour l'indicateur de scroll
+const scrollIndicatorStyles = computed(() => {
+  const color = props.scrollIndicatorColor || textColor.value
+  return {
+    color,
+    borderColor: color
+  }
+})
+
+// Composant SVG pour l'indicateur de scroll
+const scrollIndicatorSvg = computed(() => {
+  switch (props.scrollIndicatorStyle) {
+    case 'chevron':
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>`
+    case 'mouse':
+      return `<rect x="7" y="3" width="10" height="18" rx="5" stroke-width="2" fill="none"/><line x1="12" y1="8" x2="12" y2="11" stroke-width="2" stroke-linecap="round"/>`
+    case 'line':
+      return `<line x1="12" y1="3" x2="12" y2="21" stroke-width="2" stroke-linecap="round"/>`
+    default: // arrow
+      return `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>`
+  }
+})
+
+// Style pour effet parallaxe
+const parallaxIntensityValue = computed(() => {
+  const map: Record<string, number> = {
+    'light': 0.1,
+    'medium': 0.2,
+    'strong': 0.3
+  }
+  return map[props.parallaxIntensity || 'medium'] || 0.2
+})
+
+// Styles pour la bordure du bas
+const bottomBorderStyles = computed(() => {
+  if (!props.showBottomBorder) return {}
+  
+  const color = props.bottomBorderColor || '#e5e7eb'
+  const height = props.bottomBorderHeight || 1
+  
+  switch (props.bottomBorderStyle) {
+    case 'gradient':
+      return {
+        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+        height: `${height}px`
+      }
+    case 'wave':
+      return {
+        background: color,
+        height: `${height * 4}px`,
+        maskImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 1200 24\'%3E%3Cpath d=\'M0 12 Q150 0 300 12 T600 12 T900 12 T1200 12 V24 H0 Z\' fill=\'%23000\'/%3E%3C/svg%3E")',
+        maskSize: '1200px 100%',
+        maskRepeat: 'repeat-x'
+      }
+    case 'dots':
+      return {
+        background: `repeating-linear-gradient(90deg, ${color} 0px, ${color} 4px, transparent 4px, transparent 12px)`,
+        height: `${height}px`
+      }
+    default: // line
+      return {
+        background: color,
+        height: `${height}px`
+      }
+  }
+})
+
+// ============ FIN EFFETS PROFESSIONNELS ============
 
 // Mapping des valeurs de border-radius
 const radiusMap: Record<string, string> = {

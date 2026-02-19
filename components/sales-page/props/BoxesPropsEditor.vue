@@ -41,7 +41,7 @@
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur</label>
-            <input type="color" v-model="localProps.titleColor" @input="updateProp('titleColor', localProps.titleColor)" class="w-full h-8 rounded border border-gray-300"/>
+            <input type="color" v-model="localProps.titleColor" @input="updateProp('titleColor', localProps.titleColor)" class="w-10 h-10 rounded border border-gray-300 cursor-pointer"/>
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Alignement</label>
@@ -87,7 +87,7 @@
           </div>
           <div>
             <label class="block text-xs text-gray-500 mb-1">Couleur</label>
-            <input type="color" v-model="localProps.subtitleColor" @input="updateProp('subtitleColor', localProps.subtitleColor)" class="w-full h-8 rounded border border-gray-300"/>
+            <input type="color" v-model="localProps.subtitleColor" @input="updateProp('subtitleColor', localProps.subtitleColor)" class="w-10 h-10 rounded border border-gray-300 cursor-pointer"/>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -158,7 +158,7 @@
               <UiImageUploader
                 v-model="item.image"
                 label="Image (Avatar)"
-                @update:model-value="emitUpdate"
+                @update:model-value="(val) => updateItemImage(Number(index), val)"
               />
             </div>
           </div>
@@ -424,8 +424,15 @@
             <input v-model="localProps.buttonText" @input="emitUpdate" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
           </div>
           <div class="mb-2">
-            <label class="block text-xs text-gray-500 mb-1">URL du bouton</label>
-            <input v-model="localProps.buttonUrl" @input="emitUpdate" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            <label class="block text-xs text-gray-500 mb-1">Lien du bouton</label>
+            <UiLinkSelector
+              v-model="localProps.buttonUrl"
+              :link-type="localProps.buttonLinkType || 'custom'"
+              :payment-link-id="localProps.buttonPaymentLinkId"
+              @update:link-type="(val) => { localProps.buttonLinkType = val; emitUpdate() }"
+              @update:payment-link-id="(val) => { localProps.buttonPaymentLinkId = val; emitUpdate() }"
+              @change="emitUpdate"
+            />
           </div>
           <div class="mb-2">
             <label class="block text-xs text-gray-500 mb-1">Ouvrir dans</label>
@@ -576,6 +583,8 @@ const localProps = reactive({
   showButton: props.props.showButton || false,
   buttonText: props.props.buttonText || 'Démarrer maintenant',
   buttonUrl: props.props.buttonUrl || '',
+  buttonLinkType: props.props.buttonLinkType || 'custom',
+  buttonPaymentLinkId: props.props.buttonPaymentLinkId || null,
   buttonTarget: props.props.buttonTarget || '_self',
   buttonSize: props.props.buttonSize || 'md',
   buttonBorderRadius: props.props.buttonBorderRadius || 'full',
@@ -634,5 +643,13 @@ function addItem() {
 function removeItem(index: number) {
   localProps.items.splice(index, 1)
   emitUpdate()
+}
+
+// Mise à jour de l'image avec valeur explicite pour éviter le problème de timing
+function updateItemImage(index: number, value: string) {
+  if (localProps.items && localProps.items[index]) {
+    localProps.items[index].image = value
+    emitUpdate()
+  }
 }
 </script>
