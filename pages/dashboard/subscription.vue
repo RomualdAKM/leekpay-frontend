@@ -101,7 +101,7 @@
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-800">
         <div>
           <p class="text-3xl font-semibold">
-            9 700 <span class="text-lg font-normal text-gray-400">FCFA/mois</span>
+            4 700 <span class="text-lg font-normal text-gray-400">FCFA/mois</span>
           </p>
         </div>
         
@@ -133,7 +133,7 @@
           
           <!-- Prix avec réduction -->
           <p v-if="promoValid && promoDiscount > 0" class="text-sm text-white mb-3">
-            Prix après réduction : <span class="font-semibold">{{ 9700 - promoDiscount }} FCFA</span>
+            Prix après réduction : <span class="font-semibold">{{ 4700 - promoDiscount }} FCFA</span>
           </p>
           
           <button
@@ -228,7 +228,7 @@ const status = ref({
   is_premium: false,
   days_remaining: 0,
   expires_at: null as string | null,
-  price: 9700,
+  price: 4700,
 })
 
 const history = ref<any[]>([])
