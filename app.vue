@@ -1,4 +1,6 @@
 <script setup>
+import { Analytics } from '@vercel/analytics/nuxt';
+
 useHead({
   titleTemplate: (titleChunk) => {
     return titleChunk ? `${titleChunk} - LeekPay` : 'LeekPay - Liens de paiement simplifiés';
@@ -7,7 +9,10 @@ useHead({
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <Analytics />
+  </div>
 </template>

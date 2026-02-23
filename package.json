@@ -29,6 +29,7 @@
     "@tiptap/extension-underline": "^3.8.0",
     "@tiptap/starter-kit": "^3.8.0",
     "@tiptap/vue-3": "^3.8.0",
+    "@vercel/analytics": "^1.6.1",
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^14.0.0",
     "@vueuse/motion": "^3.0.3",
