@@ -86,7 +86,7 @@
         </div>
 
         <p class="mt-4 text-sm text-gray-500 border-l-2 border-gray-200 pl-3">
-          Vos commissions sont créditées dans votre solde. 
+          Vos commissions sont créditées dans votre solde 
           <NuxtLink to="/dashboard/withdrawals" class="text-gray-900 underline">Retirer</NuxtLink>
         </p>
       </div>
