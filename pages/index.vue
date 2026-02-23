@@ -39,9 +39,9 @@
 
           >
             <img
-              src="~/assets/ressource_new_landing_page/Dessin_Dashboard.png"
+              src="~/assets/ressource_new_landing_page/dashboard.png"
               alt="Dashboard LeekPay"
-              class="w-full min-w-[600px] md:min-w-[800px] h-auto md:h-[550px] border border-gray-500 transform rotate-6"
+              class="w-full min-w-[600px] md:min-w-[700px] h-auto md:h-[500px] border border-gray-400 transform rotate-6"
             />
           </div>
         </div>
