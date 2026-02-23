@@ -18,7 +18,7 @@
             </span>
 
             <h1 class="text-[34px] sm:text-[36px] md:text-[40px] lg:text-[46px] font-normal leading-[1.12]">
-              <span class="md:whitespace-nowrap">Créez des <span class="italic font-bold">pages de vente</span></span>
+              <span class="md:whitespace-nowrap">Créez des <span class="italic font-bold">pages de vente </span></span>
               <br class="hidden md:block" />
               <span class="md:whitespace-nowrap">professionnelles et efficaces.</span>
             </h1>
@@ -29,16 +29,16 @@
             </p>
           </div>
 
-          <div class="flex flex-wrap gap-3 mt-7">
+          <div class="mx-auto mt-7 flex w-full max-w-[360px] flex-col gap-3 sm:mx-0 sm:max-w-none sm:flex-row sm:flex-wrap">
             <NuxtLink
               to="/dashboard/sales-pages/create"
-              class="bg-white text-[#2ECC71] px-7 py-3 rounded-[22px] text-[18px] md:text-[19px] font-semibold shadow-sm hover:bg-gray-100 transition"
+              class="inline-flex w-full items-center justify-center rounded-[22px] bg-white px-7 py-3 text-center text-[18px] font-semibold text-[#2ECC71] shadow-sm transition hover:bg-gray-100 sm:w-auto sm:text-[19px]"
             >
               Créer ma page
             </NuxtLink>
             <NuxtLink
               to="/dashboard/sales-pages/create"
-              class="border-2 border-white text-white px-7 py-3 rounded-[22px] text-[18px] md:text-[19px] font-semibold hover:bg-white/10 transition"
+              class="inline-flex w-full items-center justify-center rounded-[22px] border-2 border-white px-7 py-3 text-center text-[18px] font-semibold text-white transition hover:bg-white/10 sm:w-auto sm:text-[19px]"
             >
               Voir un exemple
             </NuxtLink>
@@ -64,16 +64,16 @@
 
     <!-- BENEFITS -->
     <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
-      <div class="container mx-auto max-w-[1000px] grid md:grid-cols-3 gap-6">
+      <div class="container mx-auto max-w-[1000px] grid gap-8 md:grid-cols-3 md:gap-6">
         <div
-          class="flex items-start gap-3"
+          class="flex flex-col items-center text-center gap-3 md:flex-row md:items-start md:text-left"
           v-motion="{
             initial: { opacity: 0, y: 30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
           }"
 
         >
-          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+          <span class="w-8 h-8 rounded-full border-2 border-[#2ECC71] flex items-center justify-center md:mt-1 md:w-5 md:h-5">
             <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
@@ -85,14 +85,14 @@
         </div>
 
         <div
-          class="flex items-start gap-3"
+          class="flex flex-col items-center text-center gap-3 md:flex-row md:items-start md:text-left"
           v-motion="{
             initial: { opacity: 0, y: 30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 100 } }
           }"
 
         >
-          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+          <span class="w-8 h-8 rounded-full border-2 border-[#2ECC71] flex items-center justify-center md:mt-1 md:w-5 md:h-5">
             <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
@@ -104,14 +104,14 @@
         </div>
 
         <div
-          class="flex items-start gap-3"
+          class="flex flex-col items-center text-center gap-3 md:flex-row md:items-start md:text-left"
           v-motion="{
             initial: { opacity: 0, y: 30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 200 } }
           }"
 
         >
-          <span class="mt-1 w-5 h-5 rounded-full border-2 border-[#2ECC71] flex items-center justify-center">
+          <span class="w-8 h-8 rounded-full border-2 border-[#2ECC71] flex items-center justify-center md:mt-1 md:w-5 md:h-5">
             <svg class="w-3 h-3 text-[#2ECC71]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
             </svg>
@@ -167,7 +167,7 @@
     <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
       <div class="container mx-auto max-w-[1100px] text-center">
         <h2
-          class="text-4xl md:text-5xl font-bold text-gray-900 mb-3"
+          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }
@@ -177,7 +177,7 @@
           Comment ça marche ?
         </h2>
         <p
-          class="text-gray-600 text-xl md:text-[22px] max-w-2xl mx-auto leading-[1.25]"
+          class="text-gray-600 text-[18px] md:text-[22px] max-w-2xl mx-auto leading-[1.3]"
           v-motion="{
             initial: { opacity: 0, y: -20 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, delay: 100 } }
@@ -196,27 +196,27 @@
           }"
 
         >
-          <div class="hidden md:block absolute left-[11%] right-[11%] top-9 h-[2px] bg-[#2ECC71]"></div>
+          <div class="hidden md:block absolute left-[11%] right-[11%] top-7 h-[2px] bg-[#2ECC71]"></div>
 
-          <div class="relative grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-x-4">
-            <div class="flex flex-col items-center text-center">
+          <div class="relative grid grid-cols-1 md:grid-cols-4 justify-items-center gap-y-9 md:gap-y-0 md:gap-x-4">
+            <div class="flex w-full max-w-[320px] flex-col items-center text-center">
               <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">1</div>
-              <p class="mt-4 md:mt-6 text-[#2ECC71] text-[18px] md:text-[22px] font-semibold leading-[1.12] whitespace-nowrap">Construisez votre<br />page avec l’éditeur</p>
+              <p class="mt-3 text-[#2ECC71] text-[17px] md:text-[18px] font-semibold leading-[1.2]">Construisez votre<br class="hidden md:block" /> page avec l'éditeur</p>
             </div>
 
-            <div class="flex flex-col items-center text-center">
+            <div class="flex w-full max-w-[320px] flex-col items-center text-center">
               <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">2</div>
-              <p class="mt-4 md:mt-6 text-[#2ECC71] text-[18px] md:text-[22px] font-semibold leading-[1.12] whitespace-nowrap">Ajoutez<br />votre offre</p>
+              <p class="mt-3 text-[#2ECC71] text-[17px] md:text-[18px] font-semibold leading-[1.2]">Ajoutez<br class="hidden md:block" /> votre offre</p>
             </div>
 
-            <div class="flex flex-col items-center text-center">
+            <div class="flex w-full max-w-[320px] flex-col items-center text-center">
               <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center">3</div>
-              <p class="mt-4 md:mt-6 text-[#2ECC71] text-[18px] md:text-[22px] font-semibold leading-[1.12] whitespace-nowrap">partagez ou<br />diffusez</p>
+              <p class="mt-3 text-[#2ECC71] text-[17px] md:text-[18px] font-semibold leading-[1.2]">Partagez ou<br class="hidden md:block" /> diffusez</p>
             </div>
 
-            <div class="flex flex-col items-center text-center">
+            <div class="flex w-full max-w-[320px] flex-col items-center text-center">
               <div class="w-14 h-14 rounded-full border-[3px] border-[#2ECC71] bg-white text-[#2ECC71] text-[20px] italic font-bold leading-none flex items-center justify-center">4</div>
-              <p class="mt-4 md:mt-6 text-[#2ECC71] text-[18px] md:text-[22px] font-semibold leading-[1.12] whitespace-nowrap">Le client<br />paie</p>
+              <p class="mt-3 text-[#2ECC71] text-[17px] md:text-[18px] font-semibold leading-[1.2]">Le client<br class="hidden md:block" /> paie</p>
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@
           }"
 
         >
-          <div class="text-white">
+          <div class="text-white text-center md:text-left">
             <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Prêt à créer votre page de vente ?</h3>
             <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Créez votre page de vente en quelques minutes
@@ -341,7 +341,7 @@
           </div>
           <NuxtLink
             to="/dashboard/sales-pages/create"
-            class="bg-white text-[#2ECC71] px-6 py-3 rounded-full text-lg font-semibold shadow-sm hover:bg-gray-100 transition"
+            class="inline-flex w-full justify-center rounded-full bg-white px-6 py-3 text-lg font-semibold text-[#2ECC71] shadow-sm transition hover:bg-gray-100 sm:w-auto"
           >
             Créer ma page de vente
           </NuxtLink>

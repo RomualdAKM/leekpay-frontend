@@ -1,43 +1,61 @@
 import { defineNuxtPlugin } from '#app'
-import { MotionDirective } from '@vueuse/motion'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  // Enregistrer la directive v-motion pour le SSR
-  nuxtApp.vueApp.directive('motion', MotionDirective)
-  
-  // Directive v-motion-visibility simplifiée pour SSR
+  // v-motion est deja fourni par @vueuse/motion/nuxt.
+  // Cette directive ajoute uniquement le declenchement "au scroll".
   nuxtApp.vueApp.directive('motion-visibility', {
     getSSRProps() {
-      // Retourner des props vides pour le SSR
       return {}
     },
     mounted(el, binding) {
-      // Côté client, utiliser IntersectionObserver
+      if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+        return
+      }
+
+      const once = binding.value?.once !== false
+      const threshold = binding.value?.threshold ?? 0.1
+
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              el.classList.add('motion-visible')
-              // Déclencher l'animation
-              const motion = el.__motion__
-              if (motion && binding.value) {
-                motion.apply(binding.value)
+              const runVisible = () => {
+                const motion = (el as any).__motion__
+                if (!motion?.apply) {
+                  return false
+                }
+                // v-motion expose l'instance sur __motion__, on lance la variante "visible".
+                motion.apply('visible')
+                return true
               }
+
+              if (runVisible()) {
+                if (once) {
+                  observer.unobserve(el)
+                }
+                return
+              }
+
+              requestAnimationFrame(() => {
+                if (runVisible() && once) {
+                  observer.unobserve(el)
+                }
+              })
             }
           })
         },
         {
-          threshold: binding.value?.threshold || 0.1,
-          once: binding.value?.once !== false,
+          threshold,
         }
       )
-      
+
       observer.observe(el)
-      el.__intersectionObserver__ = observer
+      ;(el as any).__intersectionObserver__ = observer
     },
     unmounted(el) {
-      if (el.__intersectionObserver__) {
-        el.__intersectionObserver__.disconnect()
+      const observer = (el as any).__intersectionObserver__
+      if (observer) {
+        observer.disconnect()
       }
     },
   })
