@@ -46,5 +46,9 @@ export default defineNuxtConfig({
             apiBaseURL: process.env.NUXT_PUBLIC_API_BASE_URL || 'https://leekpay.fr/api'
         }
     },
-    modules: ['@vueuse/motion/nuxt']
+    modules: ['@vueuse/motion/nuxt', '@posthog/nuxt'],
+    posthogConfig: {
+        publicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY || 'phc_PEiTpBpNA9SBYRvuBaVQcRKQZaF710xKwYcRfzoC0Ln',
+        host: 'https://us.i.posthog.com',
+    },
 })

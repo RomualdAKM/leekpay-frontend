@@ -12,6 +12,7 @@
   "dependencies": {
     "@nuxt/ui": "^4.0.1",
     "@paypal/paypal-js": "^8.4.2",
+    "@posthog/nuxt": "^1.4.35",
     "@tailwindcss/vite": "^4.1.12",
     "@tiptap/core": "^3.8.0",
     "@tiptap/extension-blockquote": "^3.8.0",
