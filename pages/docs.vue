@@ -577,7 +577,7 @@ if (hash_equals($expected, $signature)) {
         <!-- Support -->
         <section class="border-t border-gray-200 pt-8">
           <p class="text-sm text-gray-600">
-            Besoin d'aide ? Contactez <a href="mailto:support@leekpay.me" class="text-gray-900 underline">support@leekpay.me</a>
+            Besoin d'aide ? Contactez <a href="mailto:support@leekpay.fr" class="text-gray-900 underline">support@leekpay.fr</a>
           </p>
         </section>
 

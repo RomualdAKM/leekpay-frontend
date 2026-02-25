@@ -52,7 +52,7 @@
           </div>
           <div>
             <p class="font-medium">Frais de retrait réduits</p>
-            <p class="text-sm text-gray-400">Économisez 50% sur chaque retrait : seulement 1.5% au lieu de 3%</p>
+            <p class="text-sm text-gray-400">Économisez 33% sur chaque retrait : seulement 2% au lieu de 3%</p>
           </div>
         </div>
         
@@ -101,7 +101,7 @@
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-800">
         <div>
           <p class="text-3xl font-semibold">
-            4 700 <span class="text-lg font-normal text-gray-400">FCFA/mois</span>
+            9 600 <span class="text-lg font-normal text-gray-400">FCFA/an</span>
           </p>
         </div>
         
@@ -133,7 +133,7 @@
           
           <!-- Prix avec réduction -->
           <p v-if="promoValid && promoDiscount > 0" class="text-sm text-white mb-3">
-            Prix après réduction : <span class="font-semibold">{{ 4700 - promoDiscount }} FCFA</span>
+            Prix après réduction : <span class="font-semibold">{{ 9600 - promoDiscount }} FCFA</span>
           </p>
           
           <button
@@ -228,7 +228,7 @@ const status = ref({
   is_premium: false,
   days_remaining: 0,
   expires_at: null as string | null,
-  price: 4700,
+  price: 9600,
 })
 
 const history = ref<any[]>([])

@@ -180,8 +180,8 @@
 
     <!-- Dashboard Content -->
     <div v-else class="space-y-6">
-      <!-- Métriques globales -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Ligne 1 : Total collecté + Transactions -->
+      <div class="grid grid-cols-2 gap-4">
         <!-- Total collecté -->
         <div class="border border-gray-200 p-4">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Total collecté</p>
@@ -198,12 +198,37 @@
             <span v-if="data.transactions.pending > 0" class="text-gray-400"> · {{ data.transactions.pending }} en attente</span>
           </p>
         </div>
-        
+      </div>
+
+      <!-- Ligne 2 : Liens + Pages de vente + Factures -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <!-- Liens de paiement -->
         <div class="border border-gray-200 p-4">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Liens</p>
           <p class="text-2xl font-semibold text-gray-900 mt-1">{{ data.links.total }}</p>
           <p class="text-xs text-gray-400 mt-1">{{ data.links.active }} actifs · {{ data.links.clicks }} clics</p>
+        </div>
+        
+        <!-- Pages de vente -->
+        <div class="border border-gray-200 p-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs text-gray-500 uppercase tracking-wide">Pages de vente</p>
+            <NuxtLink to="/dashboard/sales-pages" class="text-xs text-green-600 hover:text-green-700">Voir tout</NuxtLink>
+          </div>
+          <div class="flex items-baseline gap-4 mt-2">
+            <div>
+              <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.total }}</p>
+              <p class="text-xs text-gray-400">pages créées</p>
+            </div>
+            <div>
+              <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.published }}</p>
+              <p class="text-xs text-gray-400">publiées</p>
+            </div>
+            <div>
+              <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.views }}</p>
+              <p class="text-xs text-gray-400">vues</p>
+            </div>
+          </div>
         </div>
         
         <!-- Factures -->
@@ -214,30 +239,6 @@
             <span class="text-green-600">{{ data.invoices.paid }} payées</span>
             <span v-if="data.invoices.pending > 0" class="text-gray-400"> · {{ data.invoices.pending }} en attente</span>
           </p>
-        </div>
-      </div>
-
-      <!-- Section Pages de vente -->
-      <div class="border border-gray-200 p-4">
-        <div class="flex items-center justify-between mb-3">
-          <p class="text-xs text-gray-500 uppercase tracking-wide">Pages de vente</p>
-          <NuxtLink to="/dashboard/sales-pages" class="text-xs text-green-600 hover:text-green-700">
-            Voir tout
-          </NuxtLink>
-        </div>
-        <div class="flex items-baseline gap-6">
-          <div>
-            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.total }}</p>
-            <p class="text-xs text-gray-400">pages créées</p>
-          </div>
-          <div>
-            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.published }}</p>
-            <p class="text-xs text-gray-400">publiées</p>
-          </div>
-          <div>
-            <p class="text-2xl font-semibold text-gray-900">{{ data.sales_pages.views }}</p>
-            <p class="text-xs text-gray-400">vues</p>
-          </div>
         </div>
       </div>
 

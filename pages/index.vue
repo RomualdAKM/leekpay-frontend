@@ -162,13 +162,14 @@
           <em class="text-[#27AE60] italic">Encaissements et paiements</em>
         </h2>
         <p class="text-gray-900 text-base md:text-2xl font-bold mb-4">flexibles via plusieurs réseaux</p>
+      </div>
 
-        <div class="overflow-hidden py-2 md:py-6 bg-gray-200">
-          <div class="flex animate-marquee whitespace-nowrap">
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
-            <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1" />
-          </div>
+      <!-- Carrousel pleine largeur -->
+      <div class="w-full overflow-hidden py-2 md:py-6 bg-gray-200">
+        <div class="flex animate-marquee whitespace-nowrap">
+          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-6 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
         </div>
       </div>
     </section>
@@ -477,6 +478,11 @@
             </transition>
             </div>
         </div>
+
+        <!-- Contact link -->
+        <p class="text-center text-gray-600 mt-8">
+          D'autres questions ? <a href="https://wa.me/221787814572?text=Bonjour,%20j'ai%20une%20question%20concernant%20LeekPay" target="_blank" class="text-[#2ECC71] hover:underline">Contactez-nous.</a>
+        </p>
         </div>
     </div>
     </section>
@@ -513,7 +519,7 @@
             en toute simplicité.
           </p>
           <NuxtLink 
-            to="/auth/register"
+            to="/register"
             class="inline-block bg-white text-[#2ECC71] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-all duration-200 shadow-md hover:shadow-xl hover:scale-105"
           >
             Créer mon compte
@@ -649,7 +655,7 @@ const faqs = ref([
   },
   {
     question: "Quels moyens de paiement sont acceptés ?",
-    answer: "LeekPay prend en charge les moyens de paiement Mobile Money dans plus de 14 pays africains, ainsi que PayPal et les cartes bancaires (Visa, Mastercard) pour les paiements internationaux.",
+    answer: "LeekPay prend en charge les moyens de paiement Mobile Money dans 17 pays africains : Sénégal, Côte d'Ivoire, Bénin, Gabon, Togo, Burkina Faso, Mali, Cameroun, Niger, Kenya, Ouganda, Rwanda, Zambie, Guinée, RD Congo, Sierra Leone et Congo. Nous acceptons également PayPal et les cartes bancaires (Visa, Mastercard) pour les paiements internationaux.",
     isOpen: false
   },
   {
