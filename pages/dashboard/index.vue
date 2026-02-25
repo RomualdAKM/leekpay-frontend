@@ -3,16 +3,16 @@
     <!-- Carrousel Bannières -->
     <div v-if="banners.length > 0" class="relative overflow-hidden">
       <div class="relative">
-        <!-- Sur mobile : clic ouvre le popup, sur desktop : lien direct -->
+        <!-- Clic ouvre le popup -->
         <div 
           v-if="banners[currentBannerIndex]"
-          @click="isMobile ? showBannerModal = true : null"
-          class="block cursor-pointer sm:cursor-default"
+          @click="showBannerModal = true"
+          class="block cursor-pointer"
         >
           <img 
             :src="banners[currentBannerIndex].image_url" 
             :alt="banners[currentBannerIndex].title"
-            class="w-full h-36 sm:h-40 md:h-48 object-cover object-center transition-opacity duration-500"
+            class="w-full h-auto sm:h-40 md:h-48 object-contain object-center transition-opacity duration-500"
           />
         </div>
         
@@ -51,16 +51,16 @@
       </div>
     </div>
 
-    <!-- Modal Bannière (Mobile uniquement) -->
+    <!-- Modal Bannière -->
     <Transition name="modal">
       <div 
         v-if="showBannerModal && banners[currentBannerIndex]"
         @click="showBannerModal = false"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:hidden"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
       >
         <div 
           @click.stop
-          class="relative max-w-lg w-full"
+          class="relative max-w-2xl w-full"
         >
           <!-- Boutons d'action (en haut à droite, flottants) -->
           <div class="absolute -top-12 right-0 flex items-center gap-2 z-10">
