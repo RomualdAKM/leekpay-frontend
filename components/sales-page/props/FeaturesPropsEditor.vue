@@ -85,19 +85,23 @@
               </select>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-3 mt-3">
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Couleur du titre</label>
-              <div class="flex items-center gap-2">
-                <input type="color" v-model="localProps.titleColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
-                <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Opacité: {{ localProps.titleOpacity }}%</label>
-              <input v-model.number="localProps.titleOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+          
+          <!-- Couleur du titre -->
+          <div class="mt-3">
+            <label class="block text-xs text-gray-500 mb-1">Couleur du titre</label>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.titleColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.titleColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
             </div>
           </div>
+          
+          <!-- Opacité -->
+          <div class="mt-3">
+            <label class="block text-xs text-gray-500 mb-1">Opacité: {{ localProps.titleOpacity }}%</label>
+            <input v-model.number="localProps.titleOpacity" @input="emitUpdate" type="range" min="0" max="100" class="w-full"/>
+          </div>
+          
+          <!-- Marge basse -->
           <div class="mt-3">
             <label class="block text-xs text-gray-500 mb-1">Marge basse (px)</label>
             <input v-model.number="localProps.titleMarginBottom" @input="emitUpdate" type="number" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>

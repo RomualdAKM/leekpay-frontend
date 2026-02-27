@@ -221,22 +221,25 @@
               </select>
             </div>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Fond bouton</label>
-              <div class="flex items-center gap-2">
-                <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
-                <input v-model="localProps.buttonBgColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-xs"/>
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
-              <div class="flex items-center gap-2">
-                <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
-                <input v-model="localProps.buttonTextColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-xs"/>
-              </div>
+          
+          <!-- Fond bouton -->
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Fond bouton</label>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.buttonBgColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.buttonBgColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-xs"/>
             </div>
           </div>
+          
+          <!-- Texte bouton -->
+          <div>
+            <label class="block text-xs text-gray-500 mb-1">Texte bouton</label>
+            <div class="flex items-center gap-2">
+              <input type="color" v-model="localProps.buttonTextColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+              <input v-model="localProps.buttonTextColor" @input="emitUpdate" type="text" class="flex-1 px-2 py-1 border rounded text-xs"/>
+            </div>
+          </div>
+          
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-gray-500 mb-1">Arrondi</label>

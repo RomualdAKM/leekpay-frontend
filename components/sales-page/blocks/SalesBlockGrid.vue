@@ -71,7 +71,7 @@
             <div 
               v-if="item.type === 'text'" 
               class="prose prose-sm md:prose-base max-w-none"
-              :style="{ color: textColor }"
+              :style="getTextStyles(item)"
               v-html="item.content"
             />
             
@@ -81,7 +81,9 @@
                 v-if="item.content"
                 :src="item.content"
                 :alt="item.alt || ''"
-                class="w-full h-auto object-cover rounded-lg"
+                class="w-full h-auto"
+                :class="getImageClasses(item)"
+                :style="getImageStyles(item)"
               />
               <div 
                 v-else
@@ -95,7 +97,7 @@
             
             <!-- TYPE: VIDEO -->
             <div v-else-if="item.type === 'video'" class="w-full">
-              <div v-if="item.content" class="relative w-full aspect-video rounded-lg overflow-hidden">
+              <div v-if="item.content" class="relative w-full aspect-video overflow-hidden" :class="getVideoClasses(item)">
                 <!-- YouTube -->
                 <iframe
                   v-if="getVideoType(item.content) === 'youtube'"
@@ -149,6 +151,17 @@ interface GridItem {
   content: string | null
   alt?: string
   span?: number
+  // Propriétés Texte
+  textAlign?: 'left' | 'center' | 'right' | 'justify'
+  textSize?: 'small' | 'medium' | 'large'
+  textWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  textColor?: string
+  // Propriétés Image
+  imageRounded?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  imageObjectFit?: 'cover' | 'contain' | 'fill' | 'none'
+  imageShadow?: 'none' | 'sm' | 'md' | 'lg'
+  // Propriétés Vidéo
+  videoRounded?: 'none' | 'sm' | 'md' | 'lg'
 }
 
 interface Props {
@@ -502,6 +515,64 @@ const buttonPositionStyles = computed(() => ({
   transform: props.buttonOffsetY ? `translateY(${props.buttonOffsetY}px)` : undefined,
   marginTop: '1.5rem'
 }))
+
+// ============ STYLES DES ÉLÉMENTS DE GRILLE ============
+
+// Styles pour les éléments Texte
+const textSizeMap: Record<string, string> = {
+  small: '0.875rem',
+  medium: '1rem',
+  large: '1.125rem'
+}
+
+const textWeightMap: Record<string, number> = {
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700
+}
+
+const getTextStyles = (item: GridItem) => ({
+  color: item.textColor || textColor.value,
+  textAlign: item.textAlign || 'left',
+  fontSize: textSizeMap[item.textSize || 'medium'],
+  fontWeight: textWeightMap[item.textWeight || 'normal']
+})
+
+// Classes pour les images
+const imageRoundedMap: Record<string, string> = {
+  none: 'rounded-none',
+  sm: 'rounded',
+  md: 'rounded-lg',
+  lg: 'rounded-xl',
+  full: 'rounded-full'
+}
+
+const imageShadowMap: Record<string, string> = {
+  none: '',
+  sm: 'shadow-sm',
+  md: 'shadow-md',
+  lg: 'shadow-lg'
+}
+
+const getImageClasses = (item: GridItem) => [
+  imageRoundedMap[item.imageRounded || 'md'],
+  imageShadowMap[item.imageShadow || 'none']
+].filter(Boolean).join(' ')
+
+const getImageStyles = (item: GridItem) => ({
+  objectFit: item.imageObjectFit || 'cover'
+})
+
+// Classes pour les vidéos
+const videoRoundedMap: Record<string, string> = {
+  none: 'rounded-none',
+  sm: 'rounded',
+  md: 'rounded-lg',
+  lg: 'rounded-xl'
+}
+
+const getVideoClasses = (item: GridItem) => videoRoundedMap[item.videoRounded || 'md']
 </script>
 
 <style scoped>

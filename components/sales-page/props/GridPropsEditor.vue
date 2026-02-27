@@ -162,20 +162,106 @@
             </div>
           </div>
           <div v-if="expandedItem === item.id" class="p-3 space-y-3">
-            <div v-if="item.type === 'text'">
-              <label class="block text-xs text-gray-500 mb-1">Contenu HTML</label>
-              <textarea v-model="item.content" @input="emitUpdate" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono resize-none" placeholder="<h2>Titre</h2><p>Paragraphe...</p>"></textarea>
+            <!-- TYPE: TEXTE -->
+            <div v-if="item.type === 'text'" class="space-y-3">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Contenu HTML</label>
+                <textarea v-model="item.content" @input="emitUpdate" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono resize-none" placeholder="<h2>Titre</h2><p>Paragraphe...</p>"></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Alignement</label>
+                  <select v-model="item.textAlign" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="left">Gauche</option>
+                    <option value="center">Centre</option>
+                    <option value="right">Droite</option>
+                    <option value="justify">Justifié</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Taille</label>
+                  <select v-model="item.textSize" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="small">Petit</option>
+                    <option value="medium">Moyen</option>
+                    <option value="large">Grand</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Poids</label>
+                  <select v-model="item.textWeight" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="normal">Normal</option>
+                    <option value="medium">Medium</option>
+                    <option value="semibold">Semi-gras</option>
+                    <option value="bold">Gras</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+                  <div class="flex items-center gap-2">
+                    <input type="color" v-model="item.textColor" @input="emitUpdate" class="w-8 h-8 rounded cursor-pointer border-0"/>
+                    <input v-model="item.textColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div v-else-if="item.type === 'image'" class="space-y-2">
+            
+            <!-- TYPE: IMAGE -->
+            <div v-else-if="item.type === 'image'" class="space-y-3">
               <UiImageUploader
                 v-model="item.content"
                 label="Image"
                 @update:model-value="(val) => updateItemContent(Number(idx), val)"
               />
               <input v-model="item.alt" @input="emitUpdate" type="text" placeholder="Texte alternatif" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Arrondi</label>
+                  <select v-model="item.imageRounded" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="none">Aucun</option>
+                    <option value="sm">Petit</option>
+                    <option value="md">Moyen</option>
+                    <option value="lg">Grand</option>
+                    <option value="full">Cercle</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs text-gray-500 mb-1">Ajustement</label>
+                  <select v-model="item.imageObjectFit" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                    <option value="cover">Couvrir</option>
+                    <option value="contain">Contenir</option>
+                    <option value="fill">Remplir</option>
+                    <option value="none">Original</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Ombre</label>
+                <select v-model="item.imageShadow" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                  <option value="none">Aucune</option>
+                  <option value="sm">Légère</option>
+                  <option value="md">Moyenne</option>
+                  <option value="lg">Forte</option>
+                </select>
+              </div>
             </div>
-            <div v-else-if="item.type === 'video'">
-              <input v-model="item.content" @input="emitUpdate" type="url" placeholder="URL vidéo (YouTube, Vimeo...)" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+            
+            <!-- TYPE: VIDEO -->
+            <div v-else-if="item.type === 'video'" class="space-y-3">
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">URL vidéo</label>
+                <input v-model="item.content" @input="emitUpdate" type="url" placeholder="YouTube, Vimeo..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"/>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-500 mb-1">Arrondi</label>
+                <select v-model="item.videoRounded" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                  <option value="none">Aucun</option>
+                  <option value="sm">Petit</option>
+                  <option value="md">Moyen</option>
+                  <option value="lg">Grand</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -350,7 +436,24 @@ import { ChevronDown } from 'lucide-vue-next'
 import TemplatePicker from './TemplatePicker.vue'
 import PositioningSection from './PositioningSection.vue'
 
-interface GridItem { id: string; type: 'text' | 'image' | 'video'; content: string | null; alt?: string; span?: number }
+interface GridItem {
+  id: string
+  type: 'text' | 'image' | 'video'
+  content: string | null
+  alt?: string
+  span?: number
+  // Propriétés Texte
+  textAlign?: 'left' | 'center' | 'right' | 'justify'
+  textSize?: 'small' | 'medium' | 'large'
+  textWeight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  textColor?: string
+  // Propriétés Image
+  imageRounded?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  imageObjectFit?: 'cover' | 'contain' | 'fill' | 'none'
+  imageShadow?: 'none' | 'sm' | 'md' | 'lg'
+  // Propriétés Vidéo
+  videoRounded?: 'none' | 'sm' | 'md' | 'lg'
+}
 
 const props = defineProps<{ props: Record<string, any> }>()
 const emit = defineEmits(['update'])
@@ -439,9 +542,33 @@ function addItem(type: 'text' | 'image' | 'video') {
   const newId = Date.now().toString()
   if (!localProps.items) localProps.items = []
   const defaults: Record<string, GridItem> = {
-    text: { id: newId, type: 'text', content: '<p>Votre texte ici...</p>', span: 1 },
-    image: { id: newId, type: 'image', content: null, alt: '', span: 1 },
-    video: { id: newId, type: 'video', content: '', span: 1 },
+    text: { 
+      id: newId, 
+      type: 'text', 
+      content: '<p>Votre texte ici...</p>', 
+      span: 1,
+      textAlign: 'left',
+      textSize: 'medium',
+      textWeight: 'normal',
+      textColor: ''
+    },
+    image: { 
+      id: newId, 
+      type: 'image', 
+      content: null, 
+      alt: '', 
+      span: 1,
+      imageRounded: 'md',
+      imageObjectFit: 'cover',
+      imageShadow: 'none'
+    },
+    video: { 
+      id: newId, 
+      type: 'video', 
+      content: '', 
+      span: 1,
+      videoRounded: 'md'
+    },
   }
   localProps.items.push(defaults[type])
   expandedItem.value = newId
