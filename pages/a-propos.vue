@@ -231,7 +231,7 @@
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
           <div class="text-white text-center md:text-left">
-            <h3 class="text-[24px] md:text-[32px] font-bold italic mb-2 leading-tight">Une question? Un projet ?</h3>
+            <h3 class="text-[24px] md:text-[32px] font-bold italic mb-2 leading-tight">Une question ? Un projet ?</h3>
             <p class="text-white/95 text-[17px] md:text-[19px] leading-snug">
               Notre équipe est à votre écoute pour vous accompagner
               <br class="hidden md:block" />
