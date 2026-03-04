@@ -69,6 +69,7 @@
             <div>
               <label class="block text-xs text-gray-500 mb-1">Alignement</label>
               <select v-model="localProps.titleAlign" @change="emitUpdate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option value="">Hérité (En-tête)</option>
                 <option value="left">Gauche</option>
                 <option value="center">Centre</option>
                 <option value="right">Droite</option>
@@ -140,6 +141,7 @@
           <div>
             <label class="block text-xs text-gray-500 mb-1">Alignement</label>
             <select v-model="localProps.subtitleAlign" @change="emitUpdate" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+              <option value="">Hérité (En-tête)</option>
               <option value="left">Gauche</option>
               <option value="center">Centre</option>
               <option value="right">Droite</option>
@@ -206,13 +208,24 @@
                 <option value="large">Grand</option>
               </select>
             </div>
-          </div>
-          <div>
-            <label class="block text-xs text-gray-500 mb-1">Couleur</label>
-            <div class="flex gap-1">
-              <input type="color" v-model="localProps.itemDescriptionColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
-              <input v-model="localProps.itemDescriptionColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1">Couleur</label>
+              <div class="flex gap-1">
+                <input type="color" v-model="localProps.itemDescriptionColor" @input="emitUpdate" class="w-10 h-10 rounded cursor-pointer border-0"/>
+                <input v-model="localProps.itemDescriptionColor" @input="emitUpdate" type="text" placeholder="Auto" class="flex-1 px-2 py-1 border rounded text-xs"/>
+              </div>
             </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">Alignement des cartes</label>
+          <div class="grid grid-cols-4 gap-1">
+            <button @click="updateProp('cardTextAlign', '')" :class="['px-2 py-1.5 text-[10px] rounded border', !localProps.cardTextAlign ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+              Auto
+            </button>
+            <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('cardTextAlign', a)" :class="['px-2 py-1.5 text-[10px] rounded border', localProps.cardTextAlign === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
+              {{ a === 'left' ? 'Gauche' : a === 'center' ? 'C' : 'Droit' }}
+            </button>
           </div>
         </div>
       </div>
@@ -431,14 +444,6 @@
             <option value="glow">Lueur</option>
             <option value="border">Bordure accent</option>
           </select>
-        </div>
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">Alignement texte</label>
-          <div class="grid grid-cols-3 gap-1">
-            <button v-for="a in ['left','center','right']" :key="a" @click="updateProp('cardTextAlign', a)" :class="['px-3 py-1.5 text-xs rounded border', localProps.cardTextAlign === a ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-gray-300']">
-              {{ a === 'left' ? 'Gauche' : a === 'center' ? 'Centre' : 'Droite' }}
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -772,6 +777,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
+import { getTemplate } from '~/composables/blockTemplates/index'
 import TemplatePicker from './TemplatePicker.vue'
 import PositioningSection from './PositioningSection.vue'
 
@@ -813,7 +819,7 @@ const localProps = reactive({
   titleWeight: props.props.titleWeight || 'bold',
   titleColor: props.props.titleColor || '',
   titleTransform: props.props.titleTransform || 'none',
-  titleAlign: props.props.titleAlign || 'center',
+  titleAlign: props.props.titleAlign || '',
   titleOpacity: props.props.titleOpacity !== undefined ? props.props.titleOpacity : 100,
   titleMarginBottom: props.props.titleMarginBottom || 16,
   // Sous-titre
@@ -821,7 +827,7 @@ const localProps = reactive({
   subtitleSize: props.props.subtitleSize || 'medium',
   subtitleWeight: props.props.subtitleWeight || 'normal',
   subtitleColor: props.props.subtitleColor || '',
-  subtitleAlign: props.props.subtitleAlign || 'center',
+  subtitleAlign: props.props.subtitleAlign || '',
   subtitleOpacity: props.props.subtitleOpacity !== undefined ? props.props.subtitleOpacity : 70,
   // Styles des items
   itemTitleSize: props.props.itemTitleSize || 'medium',
@@ -851,7 +857,7 @@ const localProps = reactive({
   cardPadding: props.props.cardPadding || 'medium',
   cardShadow: props.props.cardShadow || 'none',
   cardHoverEffect: props.props.cardHoverEffect || 'none',
-  cardTextAlign: props.props.cardTextAlign || 'center',
+  cardTextAlign: props.props.cardTextAlign || '',
   backgroundType: props.props.backgroundType || 'solid',
   backgroundColor: props.props.backgroundColor || '#ffffff',
   gradientStart: props.props.gradientStart || '#f8fafc',
@@ -897,11 +903,20 @@ const localProps = reactive({
 
 // S'assurer que les éléments requis sont présents dans elementsOrder
 const requiredElements = ['badge', 'title', 'subtitle', 'features', 'button']
-requiredElements.forEach(el => {
-  if (localProps.elementsOrder && !localProps.elementsOrder.includes(el)) {
-    localProps.elementsOrder.push(el)
+if (!localProps.elementsOrder) {
+  localProps.elementsOrder = [...requiredElements]
+} else {
+  // On s'assure que le badge est au début s'il manque
+  if (!localProps.elementsOrder.includes('badge')) {
+    localProps.elementsOrder.unshift('badge')
   }
-})
+  // On ajoute les autres manquants à la fin
+  requiredElements.forEach(el => {
+    if (el !== 'badge' && !localProps.elementsOrder.includes(el)) {
+      localProps.elementsOrder.push(el)
+    }
+  })
+}
 
 // Texte des features par onglet (pour édition ligne par ligne)
 const tabFeaturesText = reactive<string[]>([])
@@ -953,7 +968,20 @@ watch(() => props.props, (newVal) => {
 
 const emitUpdate = () => emit('update', { ...localProps })
 const updateProp = (key: string, value: any) => {
-  (localProps as any)[key] = value
+  if (key === 'templateId') {
+    localProps.templateId = value
+    // Sync config from template
+    const template = getTemplate('features', value)
+    if (template && template.config) {
+      Object.keys(template.config).forEach(ckey => {
+        if (ckey in localProps) {
+          (localProps as any)[ckey] = (template.config as any)[ckey]
+        }
+      })
+    }
+  } else {
+    (localProps as any)[key] = value
+  }
   emitUpdate()
 }
 

@@ -18,7 +18,6 @@ export const featuresTemplates: BlockTemplateGroup = {
       header: 'text-center mb-12 md:mb-16',
       title: 'text-2xl md:text-3xl font-light tracking-tight',
       subtitle: 'text-base opacity-60 mt-4 max-w-2xl mx-auto',
-      grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12',
       card: 'text-center',
       iconWrapper: 'w-12 h-12 mx-auto mb-4 flex items-center justify-center',
       icon: 'w-6 h-6 opacity-70',

@@ -12,8 +12,8 @@
 
     >
       <div class="space-y-4">
-        <span class="inline-flex w-max items-center gap-3 border-2 border-white/70 bg-white/10 text-white text-[20px] md:text-[22px] font-semibold px-4 md:px-5 py-2 rounded-full leading-none">
-          <span class="w-6 h-6 bg-white rounded-full"></span>
+        <span class="inline-flex w-max items-center gap-2 border border-white/70 bg-white/10 text-white text-[15px] md:text-[16px] font-semibold px-3 md:px-3.5 py-1.5 rounded-full leading-none">
+          <span class="w-4 h-4 bg-white rounded-full"></span>
           Encaissez en ligne, simplement
         </span>
 
@@ -166,7 +166,7 @@
     <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
       <div class="container mx-auto max-w-[1100px] text-center">
         <h2
-          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3"
+          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3 whitespace-nowrap"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }

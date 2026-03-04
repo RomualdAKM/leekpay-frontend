@@ -326,10 +326,10 @@
     <section class="py-16 px-6 md:px-12 bg-[#2ECC7126]">
       <div class="container mx-auto text-center">
         <h2 
-          class="text-2xl md:text-3xl font-bold text-gray-900 mb-4"
+          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3 whitespace-nowrap"
           v-motion="{
-            initial: { opacity: 0, y: -40 },
-            visible: { opacity: 1, y: 0, transition: { duration: 700 } }
+            initial: { opacity: 0, y: -30 },
+            visible: { opacity: 1, y: 0, transition: { duration: 600 } }
           }"
 
         >

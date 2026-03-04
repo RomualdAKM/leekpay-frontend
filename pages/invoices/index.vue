@@ -170,7 +170,7 @@
     <section class="py-8 md:py-10 px-6 md:px-12 bg-white">
       <div class="container mx-auto max-w-[1100px] text-center">
         <h2
-          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3"
+          class="text-[34px] md:text-5xl font-bold text-gray-900 mb-3 whitespace-nowrap"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600 } }

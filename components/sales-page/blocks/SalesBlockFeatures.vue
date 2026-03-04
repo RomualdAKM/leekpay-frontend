@@ -8,9 +8,17 @@
   >
     <div class="max-w-3xl mx-auto">
       <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
-        <!-- Titre -->
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
+        </div>
         <div 
-          v-if="(props.showTitle !== false && (props.title || isEditMode)) || (props.showTitle === undefined && (props.title || isEditMode))"
+          v-if="(props.showTitle !== false && (props.title || isEditMode))"
           :style="titlePositionStyles"
         >
           <component
@@ -29,22 +37,50 @@
         <div v-if="props.subtitle || isEditMode" :style="subtitlePositionStyles">
           <p v-if="props.subtitle" :style="subtitleStyles" class="mt-4">{{ props.subtitle }}</p>
         </div>
-        <!-- Grille/Liste -->
         <div :style="featuresPositionStyles" class="mt-8 w-full">
-          <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col">
-            <div v-for="(item, index) in props.items" :key="index" class="flex items-start gap-6">
+          <div :style="{ gap: itemGapMap[props.itemGap || 'medium'] }" class="flex flex-col w-full">
+            <div 
+              v-for="(item, index) in props.items" 
+              :key="index" 
+              class="flex w-full"
+              :class="[
+                (props.cardTextAlign === 'right' || (!props.cardTextAlign && props.headerAlignment === 'right')) ? 'flex-row-reverse items-start text-right' : 
+                (props.cardTextAlign === 'center' || (!props.cardTextAlign && props.headerAlignment === 'center')) ? 'flex-col items-center text-center' : 'flex-row items-start text-left',
+                'gap-6'
+              ]"
+            >
               <div 
-                class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold"
-                :style="{ backgroundColor: props.accentColor || '#1f2937', color: props.iconColor || '#ffffff' }"
+                class="rounded-full flex items-center justify-center flex-shrink-0 text-xl font-bold"
+                :class="[
+                  props.iconSize === 'small' ? 'w-10 h-10' : props.iconSize === 'large' ? 'w-18 h-18' : 'w-14 h-14'
+                ]"
+                :style="{ backgroundColor: props.iconBgColor || props.accentColor || '#1f2937', color: props.iconColor || '#ffffff', borderRadius: iconRadiusMap[props.iconRadius || 'full'] }"
               >
                 {{ index + 1 }}
               </div>
-              <div class="pt-2">
+              <div class="flex-1">
                 <h3 :style="itemTitleStyles" class="text-xl font-semibold mb-1">{{ item.title }}</h3>
                 <p v-if="item.description && props.showDescription" :style="itemDescriptionStyles">{{ item.description }}</p>
               </div>
             </div>
           </div>
+        </div>
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-12">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="ctaButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
         </div>
       </div>
     </div>
@@ -59,6 +95,15 @@
   >
     <div class="max-w-6xl mx-auto">
       <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
+        </div>
         <!-- Titre -->
         <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
           <component :is="props.titleTag || 'h2'" :style="sectionTitleStyles">{{ props.title }}</component>
@@ -73,8 +118,8 @@
             <div 
               v-for="(item, index) in props.items" 
               :key="index" 
-              :style="cardStyles"
-              :class="['rounded-xl p-6 text-left', cardHoverClass]"
+              :style="[cardStyles, { textAlign: props.cardTextAlign || props.headerAlignment || 'left' }]"
+              :class="['rounded-xl p-6', cardHoverClass]"
             >
               <div 
                 v-if="props.showIcon"
@@ -90,6 +135,23 @@
             </div>
           </div>
         </div>
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-12">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="ctaButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -103,6 +165,15 @@
   >
     <div class="max-w-6xl mx-auto">
       <div class="flex flex-col w-full" :style="{ gap: '1rem', textAlign: props.headerAlignment || 'center', alignItems: props.headerAlignment === 'center' ? 'center' : (props.headerAlignment === 'right' ? 'flex-end' : 'flex-start') }">
+        <!-- Badge -->
+        <div v-if="props.showBadge" class="flex" :style="badgePositionStyles">
+          <span 
+            class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded"
+            :style="{ backgroundColor: props.accentColor || '#1f2937', color: '#ffffff' }"
+          >
+            {{ props.badge || 'Caractéristiques' }}
+          </span>
+        </div>
         <!-- Titre -->
         <div v-if="(props.showTitle !== false) && (props.title || isEditMode)" :style="titlePositionStyles">
           <component :is="props.titleTag || 'h2'" :style="sectionTitleStyles">{{ props.title }}</component>
@@ -117,7 +188,10 @@
             <div 
               v-for="(item, index) in displayShowcaseItems" 
               :key="index" 
-              :class="['grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center']"
+              :class="[
+                'grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center',
+                (props.headerAlignment === 'right') ? 'md:flex-row-reverse' : ''
+              ]"
             >
               <div :class="index % 2 === 1 ? 'md:order-2' : ''">
                 <h3 :style="itemTitleStyles" class="text-2xl md:text-3xl font-bold mb-4">{{ item.title }}</h3>
@@ -139,6 +213,23 @@
               </div>
             </div>
           </div>
+        </div>
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-16">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="ctaButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
         </div>
       </div>
     </div>
@@ -177,7 +268,12 @@
               v-for="(item, index) in props.items" 
               :key="index" 
               :style="cardStyles"
-              :class="['flex items-center gap-4 p-4 rounded-lg', cardHoverClass]"
+              :class="[
+                'flex gap-4 p-4 rounded-lg', 
+                cardHoverClass,
+                props.cardTextAlign === 'right' ? 'flex-row-reverse text-right' : 
+                props.cardTextAlign === 'center' ? 'flex-col items-center text-center' : 'flex-row items-center text-left'
+              ]"
             >
               <svg :style="{ color: props.accentColor || '#10B981' }" class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -185,6 +281,23 @@
               <span :style="itemTitleStyles" class="text-base font-medium">{{ item.title }}</span>
             </div>
           </div>
+        </div>
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-12">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="ctaButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
         </div>
       </div>
     </div>
@@ -234,12 +347,15 @@
           </div>
           
           <!-- Contenu de l'onglet actif -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div>
+          <div 
+            class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center"
+            :class="[props.headerAlignment === 'right' ? 'md:flex-row-reverse' : '']"
+          >
+            <div :class="[props.headerAlignment === 'right' ? 'text-right' : props.headerAlignment === 'center' ? 'text-center' : 'text-left']">
               <h3 :style="{ color: props.titleColor || textColor }" class="text-2xl font-bold mb-4">{{ displayTabs[activeTab]?.title }}</h3>
               <p :style="{ color: textColor }" class="mb-6 opacity-80">{{ displayTabs[activeTab]?.description }}</p>
-              <ul class="space-y-3">
-                <li v-for="(feature, idx) in displayTabs[activeTab]?.features" :key="idx" class="flex items-center gap-3">
+              <ul class="space-y-3" :class="[props.headerAlignment === 'right' ? 'flex flex-col items-end' : props.headerAlignment === 'center' ? 'flex flex-col items-center' : '']">
+                <li v-for="(feature, idx) in displayTabs[activeTab]?.features" :key="idx" class="flex items-center gap-3" :class="[props.headerAlignment === 'right' ? 'flex-row-reverse' : '']">
                   <svg :style="{ color: props.accentColor || '#10B981' }" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
@@ -256,6 +372,23 @@
               />
             </div>
           </div>
+        </div>
+        <!-- Bouton CTA global -->
+        <div v-if="props.showButton || isEditMode" :style="buttonPositionStyles" class="mt-12">
+          <a
+            :href="isEditMode ? undefined : props.buttonUrl"
+            class="inline-flex items-center justify-center font-semibold transition-all hover:opacity-90 active:scale-95"
+            :class="[editableClasses('buttonText')]"
+            :style="ctaButtonStyles"
+            :contenteditable="isEditMode"
+            :data-placeholder="'Texte du bouton'"
+            @focus="onFocus('buttonText')"
+            @blur="onBlur($event, 'buttonText')"
+            @keydown="onKeydown($event, true)"
+            @paste="onPaste"
+          >
+            {{ props.buttonText || 'Démarrer maintenant' }}
+          </a>
         </div>
       </div>
     </div>
@@ -301,7 +434,7 @@
 
         <!-- Sous-titre -->
         <p 
-          v-if="props.subtitle || isEditMode"
+          v-if="(props.showSubtitle !== false && (props.subtitle || isEditMode))"
           :class="[template.styles.subtitle, editableClasses('subtitle')]"
           :style="{ ...subtitleStyles, ...subtitlePositionStyles }"
           :contenteditable="isEditMode"
@@ -335,7 +468,7 @@
           <div 
             v-for="(item, index) in props.items"
             :key="index"
-            :class="[template.styles.card, cardHoverClass]"
+            :class="[filteredCardClasses, cardHoverClass]"
             :style="cardStyles"
           >
             <!-- Icône -->
@@ -580,7 +713,7 @@ const props = withDefaults(defineProps<Props>(), {
   titleWeight: 'bold',
   titleColor: '',
   titleTransform: 'none',
-  titleAlign: 'center',
+  titleAlign: undefined,
   titleOpacity: 100,
   titleMarginBottom: 16,
   // Sous-titre
@@ -588,7 +721,7 @@ const props = withDefaults(defineProps<Props>(), {
   subtitleSize: 'medium',
   subtitleWeight: 'normal',
   subtitleColor: '',
-  subtitleAlign: 'center',
+  subtitleAlign: undefined,
   subtitleOpacity: 70,
   // Styles des items
   itemTitleSize: 'medium',
@@ -602,7 +735,7 @@ const props = withDefaults(defineProps<Props>(), {
   itemGap: 'medium',
   showIcon: true,
   iconStyle: 'filled',
-  iconColor: '#ffffff',
+  iconColor: '',
   iconBgColor: '',
   iconSize: 'medium',
   iconRadius: 'full',
@@ -623,7 +756,7 @@ const props = withDefaults(defineProps<Props>(), {
   cardPadding: 'medium',
   cardShadow: 'none',
   cardHoverEffect: 'none',
-  cardTextAlign: 'center',
+  cardTextAlign: undefined,
   animation: 'none',
   animationDuration: 500,
   animationDelay: 0,
@@ -802,8 +935,16 @@ const textColor = computed(() => {
 const iconBgColorFinal = computed(() => props.iconBgColor || props.accentColor || '#10B981')
 const iconTextColor = computed(() => {
   if (props.iconColor) return props.iconColor
+  
   if (props.iconStyle === 'outlined') return iconBgColorFinal.value
-  return '#ffffff'
+  
+  // Pour le style 'filled', on choisit blanc ou gris foncé selon le fond de l'icône
+  const bg = iconBgColorFinal.value.replace('#', '')
+  const r = parseInt(bg.substr(0, 2), 16)
+  const g = parseInt(bg.substr(2, 2), 16)
+  const b = parseInt(bg.substr(4, 2), 16)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+  return luminance > 0.5 ? '#1f2937' : '#ffffff'
 })
 
 // Styles section
@@ -851,17 +992,21 @@ const sectionTitleWeightMap: Record<string, number> = {
   bold: 700,
 }
 
-const sectionTitleStyles = computed(() => ({
-  color: props.titleColor || textColor.value,
-  fontFamily: props.titleFontFamily || props.sectionTitleFont || undefined,
-  fontSize: fontSizeMap[props.titleSize || 'large'],
-  fontWeight: fontWeightMap[props.titleWeight || 'bold'],
-  textTransform: props.titleTransform || 'none',
-  textAlign: props.titleAlign || 'center',
-  opacity: `${props.titleOpacity !== undefined ? props.titleOpacity : 100}%`,
-  marginBottom: `${props.titleMarginBottom || 16}px`,
-  width: '100%',
-}))
+const sectionTitleStyles = computed(() => {
+  const align = props.titleAlign || props.headerAlignment || 'center'
+  return {
+    color: props.titleColor || textColor.value,
+    fontFamily: props.titleFontFamily || props.sectionTitleFont || undefined,
+    fontSize: fontSizeMap[props.titleSize || 'large'],
+    fontWeight: fontWeightMap[props.titleWeight || 'bold'],
+    textTransform: props.titleTransform || 'none',
+    opacity: `${props.titleOpacity !== undefined ? props.titleOpacity : 100}%`,
+    marginBottom: `${props.titleMarginBottom || 16}px`,
+    textAlign: align as any,
+    width: '100%',
+    display: 'block'
+  }
+})
 
 // === STYLES DE TITRE HARMONISÉS ===
 const fontSizeMap: Record<string, string> = {
@@ -879,14 +1024,18 @@ const fontWeightMap: Record<string, number> = {
   extrabold: 800,
 }
 
-const subtitleStyles = computed(() => ({
-  color: props.subtitleColor || textColor.value,
-  fontSize: itemSizeMap[props.subtitleSize || 'medium'],
-  fontWeight: fontWeightMap[props.subtitleWeight || 'normal'],
-  textAlign: props.subtitleAlign || 'center',
-  opacity: `${props.subtitleOpacity !== undefined ? props.subtitleOpacity : 70}%`,
-  width: '100%',
-}))
+const subtitleStyles = computed(() => {
+  const align = props.subtitleAlign || props.headerAlignment || 'center'
+  return {
+    color: props.subtitleColor || textColor.value,
+    fontSize: itemSizeMap[props.subtitleSize || 'medium'],
+    fontWeight: fontWeightMap[props.subtitleWeight || 'normal'],
+    opacity: `${props.subtitleOpacity !== undefined ? props.subtitleOpacity : 70}%`,
+    textAlign: align as any,
+    width: '100%',
+    display: 'block'
+  }
+})
 
 // Styles des items (titres et descriptions des cartes)
 const itemSizeMap: Record<string, string> = {
@@ -899,6 +1048,7 @@ const itemTitleStyles = computed(() => ({
   color: props.itemTitleColor || textColor.value,
   fontSize: itemSizeMap[props.itemTitleSize || 'medium'],
   fontWeight: fontWeightMap[props.itemTitleWeight || 'semibold'],
+  textAlign: (props.cardTextAlign || props.headerAlignment || 'left') as any,
 }))
 
 const itemDescriptionStyles = computed(() => ({
@@ -984,6 +1134,10 @@ const iconWrapperStyles = computed(() => {
     styles.border = `2px solid ${iconBgColorFinal.value}`
   }
   
+  if (props.headerAlignment === 'right' && !props.cardTextAlign) {
+    // Dans certains layouts horizontaux, on peut vouloir ajuster la marge si centré
+  }
+  
   return styles
 })
 
@@ -994,6 +1148,35 @@ const cardShadowMap: Record<string, string> = {
   medium: '0 4px 6px rgba(0,0,0,0.1)',
   large: '0 10px 25px rgba(0,0,0,0.15)',
 }
+
+// === FILTRAGE DES CLASSES DE TEMPLATE ===
+const filteredCardClasses = computed(() => {
+  let classes = template.value.styles.card || ''
+  
+  // Si on est en grille, on retire les classes spécifiques aux listes
+  if (props.layout === 'grid' || props.layout === 'masonry') {
+    classes = classes.replace(/flex items-start gap-\d+/, '')
+    classes = classes.replace(/py-\d+/, '')
+    classes = classes.replace(/border-b-?\d? last:border-b-0/, '')
+  }
+  
+  // Si on n'est PAS en alterné, on retire les classes d'alternance
+  if (props.layout !== 'alternating') {
+    classes = classes.replace('even:md:flex-row-reverse', '')
+  }
+
+  // Si on n'est PAS en masonry, on retire les classes masonry spécifiques
+  if (props.layout !== 'masonry') {
+    classes = classes.replace('first:md:col-span-2 first:md:row-span-2 first:p-12', '')
+  }
+
+  // Si on est en liste simple, on s'assure d'avoir flex items-start si c'est pas déjà là
+  if (props.layout === 'list' && !classes.includes('flex')) {
+    classes += ' flex items-start gap-4'
+  }
+  
+  return classes
+})
 
 const cardStyles = computed(() => {
   const styles: Record<string, string> = {
@@ -1065,6 +1248,7 @@ const cardTitleStyles = computed(() => ({
   color: props.itemTitleColor || textColor.value,
   fontSize: itemSizeMap[props.itemTitleSize || 'medium'],
   fontWeight: fontWeightMap[props.itemTitleWeight || 'semibold'],
+  textAlign: (props.cardTextAlign || props.headerAlignment || 'left') as any,
 }))
 
 // ============ STYLES DU BOUTON CTA ============
@@ -1090,25 +1274,50 @@ const buttonShadowMap: Record<string, string> = {
   lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
 }
 
-const ctaButtonStyles = computed(() => ({
-  backgroundColor: props.buttonBgColor || props.accentColor || '#10B981',
-  color: props.buttonTextColor || '#ffffff',
-  padding: buttonSizeMap[props.buttonSize || 'md'],
-  borderRadius: buttonRadiusMap[props.buttonBorderRadius || 'md'],
-  boxShadow: buttonShadowMap[props.buttonShadow || 'none'],
-  fontWeight: 600,
-  fontSize: props.buttonSize === 'sm' ? '0.875rem' : props.buttonSize === 'lg' ? '1.125rem' : '1rem',
-  opacity: props.showButton ? 1 : 0.5,
-  transition: 'all 0.2s ease',
-}))
+const ctaButtonStyles = computed(() => {
+  const variant = props.buttonVariant || 'filled'
+  const accent = props.accentColor || '#10B981'
+  const bg = props.buttonBgColor || accent
+  const text = props.buttonTextColor || '#ffffff'
+  
+  const styles: Record<string, string> = {
+    padding: (buttonSizeMap as any)[props.buttonSize || 'md'] || '0.75rem 1.5rem',
+    borderRadius: (buttonRadiusMap as any)[props.buttonBorderRadius || 'md'] || '0.75rem',
+    boxShadow: (buttonShadowMap as any)[props.buttonShadow || 'none'] || 'none',
+    fontWeight: '600',
+    fontSize: props.buttonSize === 'sm' ? '0.875rem' : props.buttonSize === 'lg' ? '1.125rem' : '1rem',
+    transition: 'all 0.2s ease',
+    opacity: props.showButton ? '1' : '0.5',
+  }
+
+  if (variant === 'filled') {
+    styles.backgroundColor = bg
+    styles.color = text
+  } else if (variant === 'outlined') {
+    styles.backgroundColor = 'transparent'
+    styles.border = `2px solid ${bg}`
+    styles.color = props.buttonBgColor ? bg : accent
+  } else if (variant === 'ghost') {
+    styles.backgroundColor = 'transparent'
+    styles.color = props.buttonBgColor ? bg : accent
+  }
+
+  return styles
+})
 
 // ============ POSITIONNEMENT DES ÉLÉMENTS ============
 
 const getElementOrder = (element: string): number => {
-  const defaultOrder = ['badge', 'title', 'subtitle', 'features']
-  const order = props.elementsOrder || defaultOrder
-  const idx = order.indexOf(element)
-  return idx === -1 ? defaultOrder.indexOf(element) : idx
+  const defaultOrder = ['badge', 'title', 'subtitle', 'features', 'button']
+  let order = props.elementsOrder
+  
+  if (!order || order.length === 0) return defaultOrder.indexOf(element)
+  
+  // Si l'élément n'est pas dans l'ordre spécifié, on utilise l'ordre par défaut
+  let idx = order.indexOf(element)
+  if (idx === -1) idx = defaultOrder.indexOf(element)
+  
+  return idx
 }
 
 const badgePositionStyles = computed(() => ({
@@ -1119,7 +1328,8 @@ const badgePositionStyles = computed(() => ({
 
 const titlePositionStyles = computed(() => ({
   order: getElementOrder('title'),
-  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined
+  transform: props.titleOffsetY ? `translateY(${props.titleOffsetY}px)` : undefined,
+  width: '100%'
 }))
 
 const subtitlePositionStyles = computed(() => ({
