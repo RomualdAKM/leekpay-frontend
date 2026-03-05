@@ -2,7 +2,6 @@
   <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
     <TemplatePicker block-type="pricing" :model-value="localProps.templateId" @select="updateProp('templateId', $event)"/>
     
-    <!-- ===== CONTENU ===== -->
     <div class="border-b border-gray-200 pb-4">
       <button @click="sections.content = !sections.content" class="flex items-center justify-between w-full text-left">
         <h4 class="text-xs font-semibold text-gray-700 uppercase tracking-wider">Contenu</h4>
