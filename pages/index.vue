@@ -175,7 +175,7 @@
     </section>
 
     <!-- FEES BANNER -->
-    <section class="py-12 md:py-20 px-6 md:px-12 bg-gradient-to-r from-[#2ECC71] to-[#27AE60]">
+    <section id="tarifs" class="py-12 md:py-20 px-6 md:px-12 bg-gradient-to-r from-[#2ECC71] to-[#27AE60]">
     <div class="container mx-auto">
         <div 
           class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12"

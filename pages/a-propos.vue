@@ -11,9 +11,9 @@
           }"
           v-motion-visibility="{ once: true, threshold: 0.25 }"
         >
-          <h1 class="text-[34px] sm:text-[40px] md:text-[48px] lg:text-[56px] font-bold text-gray-900 leading-[1.15] mb-6">
+          <h1 class="text-[34px] sm:text-[40px] md:text-[48px] lg:text-[40px] font-bold text-gray-900 leading-[1.45] mb-6">
             <span class="italic text-[#2ECC71]">LeekPay</span>, la solution simple
-            <br class="hidden md:block" />
+            <!-- <br class="hidden md:block" /> -->
             pour encaisser en ligne
           </h1>
           <p class="text-gray-700 text-[18px] md:text-[21px] leading-[1.3] max-w-[540px]">
@@ -37,7 +37,7 @@
           <img
             src="~/assets/img/about/img_principal_about.png"
             alt="Présentation LeekPay"
-            class="w-full h-auto max-h-[440px] max-w-[360px] md:max-w-[420px] rounded-2xl shadow-xl"
+            class="w-full h-auto max-h-[440px] max-w-[360px] md:max-w-[420px] rounded-2xl"
           />
         </div>
       </div>
