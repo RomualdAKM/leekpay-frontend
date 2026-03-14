@@ -408,6 +408,8 @@ X-LeekPay-Signature: 5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a...
     "currency": "XOF",
     "status": "completed",
     "customer_email": "client@example.com",
+    "customer_name": "Jean Dupont",
+    "customer_phone": "+22990123456",
     "description": "Commande #123",
     "created_at": "2024-01-15T10:30:00Z"
   }
@@ -492,6 +494,16 @@ if (hash_equals($expected, $signature)) {
                   <td class="px-4 py-2"><code class="text-xs">transaction.customer_email</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Email du client</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">transaction.customer_name</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Nom complet du client</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">transaction.customer_phone</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Numéro de téléphone du client</td>
                 </tr>
               </tbody>
             </table>

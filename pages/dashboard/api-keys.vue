@@ -118,6 +118,19 @@
             <pre class="text-sm font-mono"><code class="text-gray-300">POST /api/v1/checkout  -H "Authorization: Bearer sk_live_xxx"  -d '{"amount": 5000, "currency": "XOF"}'</code></pre>
           </div>
         </div>
+
+        <div class="p-5">
+          <div class="flex items-baseline justify-between mb-3">
+            <span class="text-sm font-medium text-gray-700">Vérification Webhook</span>
+            <NuxtLink to="/docs#webhooks" class="text-xs text-gray-500 hover:text-gray-700">Documentation</NuxtLink>
+          </div>
+          <p class="text-xs text-gray-500 mb-3">
+            Utilisez votre <strong>clé publique</strong> pour vérifier la signature <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature</code>
+          </p>
+          <div class="bg-gray-900 rounded p-4 overflow-x-auto">
+            <pre class="text-sm font-mono"><code class="text-gray-300">$signature = hash_hmac('sha256', $payload, '{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}');</code></pre>
+          </div>
+        </div>
       </div>
     </div>
 
