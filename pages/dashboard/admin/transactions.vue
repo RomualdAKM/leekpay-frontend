@@ -99,6 +99,9 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
                 </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -146,6 +149,20 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {{ formatDate(transaction.created_at) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <button
+                    v-if="transaction.status === 'paid'"
+                    @click="downloadInvoice(transaction.id)"
+                    :disabled="downloadingIds.includes(transaction.id)"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 rounded hover:bg-blue-100 disabled:opacity-50"
+                    title="Télécharger la facture"
+                  >
+                    <DownloadIcon v-if="!downloadingIds.includes(transaction.id)" class="w-3 h-3" />
+                    <RefreshCwIcon v-else class="w-3 h-3 animate-spin" />
+                    Facture
+                  </button>
+                  <span v-else class="text-xs text-gray-400 italic">Non disponible</span>
                 </td>
               </tr>
             </tbody>
@@ -242,7 +259,8 @@ import {
   RefreshCwIcon, 
   AlertCircleIcon, 
   CreditCardIcon, 
-  UserIcon 
+  UserIcon,
+  DownloadIcon 
 } from 'lucide-vue-next'
 
 // Layout dashboard et middleware admin
@@ -256,6 +274,7 @@ const transactions = ref([])
 const pagination = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const downloadingIds = ref([])
 
 // Filtres
 const filters = ref({
@@ -399,6 +418,42 @@ const debouncedSearch = () => {
 const changePage = (page) => {
   if (page >= 1 && page <= pagination.value.last_page) {
     loadTransactions(page)
+  }
+}
+
+// Télécharger la facture d'une transaction
+const downloadInvoice = async (transactionId) => {
+  try {
+    downloadingIds.value.push(transactionId)
+    
+    const response = await fetch(`${config.public.apiBaseURL}/admin/transactions/${transactionId}/pdf`, {
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/json'
+      }
+    })
+    
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || 'Erreur lors du téléchargement')
+    }
+    
+    // Créer et télécharger le blob PDF
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `facture-${transactionId}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+  } catch (err) {
+    console.error('Erreur téléchargement facture:', err)
+    alert(err.message || 'Erreur lors du téléchargement de la facture')
+  } finally {
+    downloadingIds.value = downloadingIds.value.filter(id => id !== transactionId)
   }
 }
 
