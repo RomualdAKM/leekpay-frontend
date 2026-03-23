@@ -429,7 +429,7 @@ const downloadInvoice = async (transactionId) => {
     const response = await fetch(`${config.public.apiBaseURL}/admin/transactions/${transactionId}/pdf`, {
       headers: {
         'Authorization': `Bearer ${token.value}`,
-        'Accept': 'application/json'
+        'Accept': 'application/pdf'
       }
     })
     
