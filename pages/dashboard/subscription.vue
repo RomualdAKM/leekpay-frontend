@@ -38,6 +38,19 @@
       </div>
     </div>
 
+    <!-- Toast notification -->
+    <Transition name="toast">
+      <div 
+        v-if="toast.show" 
+        class="fixed bottom-6 right-6 px-4 py-3 flex items-center gap-2 shadow-lg z-50"
+        :class="toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'"
+      >
+        <Check v-if="toast.type === 'success'" class="w-5 h-5" />
+        <AlertCircle v-else class="w-5 h-5" />
+        <span>{{ toast.message }}</span>
+      </div>
+    </Transition>
+
     <!-- Avantages Premium -->
     <div class="bg-gray-900 p-6 text-white">
       <div class="flex items-center gap-3 mb-6">
@@ -97,53 +110,130 @@
         </div>
       </div>
 
-      <!-- Prix et action -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-800">
-        <div>
-          <p class="text-3xl font-semibold">
-            9 600 <span class="text-lg font-normal text-gray-400">FCFA/an</span>
-          </p>
-        </div>
+      <!-- Prix de base -->
+      <div class="pt-6 border-t border-gray-800">
+        <p class="text-3xl font-semibold mb-6">
+          9 600 <span class="text-lg font-normal text-gray-400">FCFA/an</span>
+        </p>
         
-        <div v-if="!status.is_premium" class="w-full sm:w-auto">
-          <!-- Code promo -->
-          <div class="flex gap-2 mb-3">
-            <input
-              v-model="promoCode"
-              type="text"
-              placeholder="Code promo (optionnel)"
-              class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-gray-600"
-              :disabled="promoValidating || subscribing"
-              @blur="validatePromo"
-            />
-            <button
-              v-if="promoCode && !promoValid"
-              @click="validatePromo"
-              :disabled="promoValidating"
-              class="px-3 py-2 bg-gray-700 text-white text-sm hover:bg-gray-600 disabled:opacity-50"
-            >
-              {{ promoValidating ? '...' : 'Valider' }}
-            </button>
+        <div v-if="!status.is_premium">
+          <!-- Code promo (en haut) -->
+          <div class="mb-6">
+            <div class="flex gap-2 max-w-md">
+              <input
+                v-model="promoCode"
+                type="text"
+                placeholder="Code promo (optionnel)"
+                class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-gray-600"
+                :disabled="promoValidating || subscribing || walletSubscribing"
+                @blur="validatePromo"
+                @keyup.enter="validatePromo"
+              />
+              <button
+                v-if="promoCode && !promoValid"
+                @click="validatePromo"
+                :disabled="promoValidating"
+                class="px-4 py-2 bg-gray-700 text-white text-sm hover:bg-gray-600 disabled:opacity-50"
+              >
+                {{ promoValidating ? '...' : 'Valider' }}
+              </button>
+            </div>
+            <p v-if="promoMessage" class="text-sm mt-2" :class="promoValid ? 'text-green-400' : 'text-red-400'">
+              {{ promoMessage }}
+            </p>
           </div>
-          
-          <!-- Message promo -->
-          <p v-if="promoMessage" class="text-sm mb-3" :class="promoValid ? 'text-white' : 'text-red-400'">
-            {{ promoMessage }}
-          </p>
-          
-          <!-- Prix avec réduction -->
-          <p v-if="promoValid && promoDiscount > 0" class="text-sm text-white mb-3">
-            Prix après réduction : <span class="font-semibold">{{ 9600 - promoDiscount }} FCFA</span>
-          </p>
-          
-          <button
-            @click="subscribe"
-            :disabled="subscribing"
-            class="w-full sm:w-auto px-6 py-3 bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            <Loader2 v-if="subscribing" class="w-5 h-5 animate-spin" />
-            <span>{{ subscribing ? 'Redirection...' : 'Passer Premium' }}</span>
-          </button>
+
+          <!-- Titre méthodes de paiement -->
+          <h4 class="text-lg font-medium mb-4">Choisissez votre méthode de paiement :</h4>
+
+          <!-- Deux cartes de paiement -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Carte Wallet LeekPay -->
+            <div 
+              class="bg-gray-800 border-2 p-5 transition-all"
+              :class="walletPreview.can_pay ? 'border-green-500' : 'border-gray-700'"
+            >
+              <div class="flex items-center gap-2 mb-4">
+                <Wallet class="w-5 h-5 text-green-500" />
+                <h5 class="font-semibold text-white">Wallet LeekPay</h5>
+                <span class="ml-auto px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-medium">Recommandé</span>
+              </div>
+              
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-400">Votre solde :</span>
+                  <span class="text-white font-medium">{{ formatAmount(walletPreview.current_balance) }} FCFA</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-400">Montant à payer :</span>
+                  <span class="text-white font-medium">{{ formatAmount(walletPreview.final_amount) }} FCFA</span>
+                </div>
+                <div v-if="walletPreview.discount_amount > 0" class="flex justify-between text-sm">
+                  <span class="text-gray-400">Réduction :</span>
+                  <span class="text-green-400 font-medium">-{{ formatAmount(walletPreview.discount_amount) }} FCFA</span>
+                </div>
+              </div>
+              
+              <!-- <p class="text-xs text-green-400 mb-4 flex items-center gap-1">
+                <Check class="w-3 h-3" />
+                Pas de frais supplémentaires
+              </p> -->
+              
+              <button
+                v-if="walletPreview.can_pay"
+                @click="subscribeWithWallet"
+                :disabled="walletSubscribing"
+                class="w-full py-3 bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Loader2 v-if="walletSubscribing" class="w-5 h-5 animate-spin" />
+                <Wallet v-else class="w-5 h-5" />
+                <span>{{ walletSubscribing ? 'Paiement...' : 'Payer avec mon wallet' }}</span>
+              </button>
+              <div v-else class="w-full py-3 bg-gray-700 text-gray-400 text-sm text-center">
+                <p>Solde insuffisant</p>
+                <p class="text-xs mt-1">Il vous manque {{ formatAmount(walletPreview.missing_amount) }} FCFA</p>
+              </div>
+            </div>
+
+            <!-- Carte Mobile Money -->
+            <div class="bg-gray-800 border-2 border-gray-700 p-5">
+              <div class="flex items-center gap-2 mb-4">
+                <Smartphone class="w-5 h-5 text-orange-500" />
+                <h5 class="font-semibold text-white">Mobile Money</h5>
+              </div>
+              
+              <div class="space-y-2 mb-4">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-400">Prix de base :</span>
+                  <span class="text-white font-medium">{{ formatAmount(walletPreview.final_amount) }} FCFA</span>
+                </div>
+                <!-- <div class="flex justify-between text-sm">
+                  <span class="text-gray-400">Frais (4%) :</span>
+                  <span class="text-orange-400 font-medium">+{{ formatAmount(Math.ceil(walletPreview.final_amount * 0.04)) }} FCFA</span>
+                </div> -->
+                <div class="flex justify-between text-sm border-t border-gray-700 pt-2">
+                  <span class="text-gray-400">Total :</span>
+                  <span class="text-white font-semibold">{{ formatAmount(Math.ceil(walletPreview.final_amount * 1.04)) }} FCFA</span>
+                </div>
+              </div>
+              
+              <p class="text-xs text-orange-400 mb-4 flex items-center gap-1">
+                <AlertCircle class="w-3 h-3" />
+                Inclut 4% de frais de traitement
+              </p>
+              
+              <button
+                @click="subscribe"
+                :disabled="subscribing"
+                class="w-full py-3 bg-orange-600 text-white font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <Loader2 v-if="subscribing" class="w-5 h-5 animate-spin" />
+                <Smartphone v-else class="w-5 h-5" />
+                <span>{{ subscribing ? 'Redirection...' : 'Payer par Mobile Money' }}</span>
+              </button>
+            </div>
+          </div>
         </div>
         
         <div v-else>
@@ -194,19 +284,11 @@
       </div>
     </div>
 
-    <!-- Message si success dans URL -->
-    <div 
-      v-if="route.query.status === 'success'"
-      class="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-3 flex items-center gap-2"
-    >
-      <Check class="w-5 h-5" />
-      <span>Paiement en cours...</span>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Crown, Lock, Check, Loader2 } from 'lucide-vue-next'
+import { Crown, Lock, Check, Loader2, Wallet, Smartphone, AlertCircle } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({ layout: 'dashboard' })
@@ -215,15 +297,27 @@ const config = useRuntimeConfig()
 const route = useRoute()
 const { token, user } = useAuth()
 
+// États de base
 const loading = ref(true)
 const subscribing = ref(false)
+const walletSubscribing = ref(false)
 const showHistory = ref(false)
+
+// Code promo
 const promoCode = ref('')
 const promoValidating = ref(false)
 const promoValid = ref(false)
 const promoMessage = ref('')
 const promoDiscount = ref(0)
 
+// Toast notification
+const toast = ref({
+  show: false,
+  message: '',
+  type: 'success' as 'success' | 'error'
+})
+
+// Statut abonnement
 const status = ref({
   is_premium: false,
   days_remaining: 0,
@@ -231,8 +325,34 @@ const status = ref({
   price: 9600,
 })
 
+// Preview wallet
+const walletPreview = ref({
+  original_price: 9600,
+  discount_amount: 0,
+  final_amount: 9600,
+  current_balance: 0,
+  balance_after_payment: 0,
+  can_pay: false,
+  missing_amount: 0,
+  promo_code_info: null as any
+})
+
 const history = ref<any[]>([])
 
+// Afficher un toast
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+  toast.value = { show: true, message, type }
+  setTimeout(() => {
+    toast.value.show = false
+  }, 4000)
+}
+
+// Formater les montants
+const formatAmount = (value: number) => {
+  return Number(value || 0).toLocaleString('fr-FR')
+}
+
+// Récupérer le statut de l'abonnement
 const fetchStatus = async () => {
   try {
     const response = await $fetch<any>('/subscription/status', {
@@ -258,6 +378,7 @@ const fetchStatus = async () => {
   }
 }
 
+// Récupérer l'historique des abonnements
 const fetchHistory = async () => {
   try {
     const response = await $fetch<any>('/subscription/history', {
@@ -272,11 +393,31 @@ const fetchHistory = async () => {
   }
 }
 
+// Récupérer le preview du paiement wallet
+const fetchWalletPreview = async () => {
+  try {
+    const response = await $fetch<any>('/subscription/wallet-preview', {
+      method: 'POST',
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: { promo_code: promoCode.value || null }
+    })
+    if (response.success) {
+      walletPreview.value = response.data
+    }
+  } catch (err) {
+    console.error('Erreur fetch wallet preview:', err)
+  }
+}
+
+// Valider le code promo
 const validatePromo = async () => {
   if (!promoCode.value.trim()) {
     promoValid.value = false
     promoMessage.value = ''
     promoDiscount.value = 0
+    // Réinitialiser le preview wallet
+    await fetchWalletPreview()
     return
   }
 
@@ -293,6 +434,8 @@ const validatePromo = async () => {
       promoValid.value = true
       promoMessage.value = `Code valide ! -${response.data.discount_percent}%`
       promoDiscount.value = response.data.pricing.discount_amount
+      // Mettre à jour le preview wallet avec le code promo
+      await fetchWalletPreview()
     } else {
       promoValid.value = false
       promoMessage.value = response.data.message || 'Code invalide'
@@ -307,6 +450,7 @@ const validatePromo = async () => {
   }
 }
 
+// Souscrire via Mobile Money (Moneroo)
 const subscribe = async () => {
   subscribing.value = true
   try {
@@ -320,15 +464,51 @@ const subscribe = async () => {
     if (response.success && response.data.payment_url) {
       window.location.href = response.data.payment_url
     } else {
-      alert(response.message || 'Erreur lors de la création de l\'abonnement')
+      showToast(response.message || 'Erreur lors de la création de l\'abonnement', 'error')
       subscribing.value = false
     }
   } catch (err: any) {
-    alert(err.data?.message || 'Erreur lors de la création de l\'abonnement')
+    showToast(err.data?.message || 'Erreur lors de la création de l\'abonnement', 'error')
     subscribing.value = false
   }
 }
 
+// Souscrire via Wallet LeekPay
+const subscribeWithWallet = async () => {
+  walletSubscribing.value = true
+  try {
+    const response = await $fetch<any>('/subscription/subscribe-wallet', {
+      method: 'POST',
+      baseURL: config.public.apiBaseURL,
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: { promo_code: promoCode.value || null }
+    })
+    
+    if (response.success) {
+      showToast('Félicitations ! Vous êtes maintenant Premium !', 'success')
+      
+      // Mettre à jour le statut et le user
+      await fetchStatus()
+      await fetchWalletPreview()
+      
+      // Mettre à jour le cookie user
+      if (user.value) {
+        user.value = {
+          ...user.value,
+          is_premium: true
+        }
+      }
+    } else {
+      showToast(response.message || 'Erreur lors du paiement', 'error')
+    }
+  } catch (err: any) {
+    showToast(err.data?.message || 'Erreur lors du paiement', 'error')
+  } finally {
+    walletSubscribing.value = false
+  }
+}
+
+// Formater une date
 const formatDate = (date: string | null) => {
   if (!date) return ''
   return new Date(date).toLocaleDateString('fr-FR', {
@@ -341,12 +521,28 @@ const formatDate = (date: string | null) => {
 onMounted(() => {
   fetchStatus()
   fetchHistory()
+  fetchWalletPreview()
   
   // Si retour de paiement, rafraîchir après quelques secondes
   if (route.query.status === 'success') {
+    showToast('Paiement en cours de vérification...', 'success')
     setTimeout(() => {
       fetchStatus()
     }, 3000)
   }
 })
 </script>
+
+<style scoped>
+/* Animation toast */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+</style>

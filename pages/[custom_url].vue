@@ -51,21 +51,28 @@
             <!-- Affichage du montant avec détail des frais -->
             <div class="mt-4 bg-gray-50 rounded-lg p-2 border border-gray-200">
               <div class="space-y-2 text-sm">
-                <!-- <div class="flex justify-between text-gray-700">
-                  <span>Montant</span>
-                  <span class="font-medium">{{ displayAmount }} {{ currency.symbol }}</span>
-                </div>
-                <div v-if="calculatedFees.total_fees > 0" class="flex justify-between text-gray-600">
-                  <span>Frais de traitement ({{ Math.round((selectedPaymentMethod?.total_fee_rate || 0) * 100) }}%)</span>
-                  <span>{{ calculatedFees.total_fees.toFixed(2) }} {{ currency.symbol }}</span>
-                </div> -->
-                <!-- <div class="border-t border-gray-300 pt-2 flex justify-between"> -->
-                <div class="pt-2 flex justify-between">
-                  <span class="text-xl font-semibold text-gray-900">Montant</span>
-                  <span class="text-xl font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
-                  <!-- <span class="font-semibold text-gray-900">Total à payer</span>
-                  <span class="text-2xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(2) }} {{ currency.symbol }}</span> -->
-                </div>
+                <!-- Si fee_bearer = 'customer' : afficher détail des frais -->
+                <template v-if="feeBearer === 'customer' && selectedPaymentMethod">
+                  <div class="flex justify-between text-gray-700">
+                    <span>Montant</span>
+                    <span class="font-medium">{{ displayAmount }} {{ currency.symbol }}</span>
+                  </div>
+                  <div v-if="calculatedFees.total_fees > 0" class="flex justify-between text-gray-600">
+                    <span>Frais de traitement</span>
+                    <span>{{ calculatedFees.total_fees.toFixed(0) }} {{ currency.symbol }}</span>
+                  </div>
+                  <div class="border-t border-gray-300 pt-2 flex justify-between">
+                    <span class="text-lg font-semibold text-gray-900">Total à payer</span>
+                    <span class="text-xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(0) }} {{ currency.symbol }}</span>
+                  </div>
+                </template>
+                <!-- Si fee_bearer = 'merchant' : afficher uniquement le montant (pas de frais visibles) -->
+                <template v-else>
+                  <div class="pt-2 flex justify-between">
+                    <span class="text-xl font-semibold text-gray-900">Montant</span>
+                    <span class="text-xl font-bold text-green-600">{{ displayAmount }} {{ currency.symbol }}</span>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
@@ -741,6 +748,11 @@ const calculatedFees = computed(() => {
 
 const currency = computed(() => {
   return paymentData.value?.currency || { symbol: 'FCFA', code: 'XOF' }
+})
+
+// Récupérer le fee_bearer depuis les données du lien de paiement
+const feeBearer = computed(() => {
+  return paymentData.value?.fee_bearer || 'customer'
 })
 
 const paymentTitle = computed(() => {
