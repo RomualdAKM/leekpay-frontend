@@ -297,6 +297,60 @@
       </div>
       <p class="text-[10px] text-gray-400 mt-2">Utilisez le bouton de layout sur la section pour modifier les colonnes</p>
     </div>
+
+    <!-- Bouton Appliquer à toutes les sections -->
+    <div v-if="totalSections > 1" class="pt-4 border-t border-gray-200">
+      <!-- Modal de confirmation -->
+      <div v-if="showConfirmModal" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+        <p class="text-sm text-amber-800 mb-3">
+          Voulez-vous appliquer ces paramètres à toutes les {{ totalSections - 1 }} autres sections de la page ?
+        </p>
+        <div class="flex gap-2">
+          <button
+            @click="confirmApplyToAll"
+            class="flex-1 px-3 py-1.5 bg-emerald-600 text-white text-sm font-medium rounded hover:bg-emerald-700 transition-colors"
+          >
+            Oui, appliquer
+          </button>
+          <button
+            @click="showConfirmModal = false"
+            class="flex-1 px-3 py-1.5 bg-gray-200 text-gray-700 text-sm font-medium rounded hover:bg-gray-300 transition-colors"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+
+      <!-- Toast de succès -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0 translate-y-1"
+        enter-to-class="opacity-100 translate-y-0"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 translate-y-1"
+      >
+        <div v-if="showSuccessToast" class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="text-sm text-emerald-700">Paramètres appliqués à toutes les sections</span>
+        </div>
+      </Transition>
+
+      <!-- Bouton principal -->
+      <button
+        v-if="!showConfirmModal"
+        @click="showConfirmModal = true"
+        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        </svg>
+        <span class="text-sm font-medium">Appliquer à toutes les sections</span>
+      </button>
+      <p class="text-[10px] text-gray-400 mt-2 text-center">Copie les paramètres de cette section vers les {{ totalSections - 1 }} autres</p>
+    </div>
   </div>
 </template>
 
@@ -306,11 +360,15 @@ import type { Section, SectionSettings } from '~/composables/useSalesPageBuilder
 
 interface Props {
   section: Section
+  totalSections?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  totalSections: 1
+})
 const emit = defineEmits<{
   (e: 'update', settings: Partial<SectionSettings>): void
+  (e: 'applyToAll'): void
 }>()
 
 // Sections collapsibles
@@ -321,11 +379,26 @@ const sections = ref({
   advanced: false,
 })
 
+// État pour le modal de confirmation et le toast
+const showConfirmModal = ref(false)
+const showSuccessToast = ref(false)
+
 // Local settings pour réactivité
 const localSettings = computed(() => props.section.settings || {})
 
 // Mettre à jour un paramètre
 const updateSetting = (key: keyof SectionSettings, value: any) => {
   emit('update', { [key]: value })
+}
+
+// Confirmer l'application à toutes les sections
+const confirmApplyToAll = () => {
+  showConfirmModal.value = false
+  emit('applyToAll')
+  // Afficher le toast de succès
+  showSuccessToast.value = true
+  setTimeout(() => {
+    showSuccessToast.value = false
+  }, 3000)
 }
 </script>

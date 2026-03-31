@@ -786,7 +786,9 @@
         <div v-else-if="selectedSection" class="flex-1 overflow-y-auto p-4">
           <SectionSettingsEditor
             :section="selectedSection"
+            :total-sections="page.sections?.length || 0"
             @update="updateSectionSettings(selectedSection.id, $event)"
+            @apply-to-all="handleApplySettingsToAll"
           />
         </div>
       </aside>
@@ -861,6 +863,7 @@ const {
   removeSection,
   duplicateSection,
   updateSectionSettings,
+  applySettingsToAllSections,
   changeSectionLayout,
   selectSection,
   selectColumn,
@@ -1052,6 +1055,13 @@ const handleRemoveBlock = (blockId: string) => {
 }
 
 // ============ HANDLERS SECTIONS (Phase 3) ============
+
+// Appliquer les settings d'une section à toutes les autres
+const handleApplySettingsToAll = () => {
+  if (selectedSection.value) {
+    applySettingsToAllSections(selectedSection.value.id)
+  }
+}
 
 // Supprimer une section
 const handleRemoveSection = (sectionId: string) => {

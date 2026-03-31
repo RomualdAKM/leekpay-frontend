@@ -48,81 +48,43 @@
         </div>
 
       <!-- Configuration des frais de paiement -->
-      <Card class="p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-        <div class="flex items-start gap-3 sm:gap-4">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-            <SettingsIcon class="w-5 h-5 text-blue-600" />
-          </div>
-          <div class="flex-1">
-            <h3 class="font-semibold text-base sm:text-lg text-slate-900 mb-1">Configuration des frais de paiement</h3>
-            <p class="text-sm text-gray-600 mb-4">Qui prend en charge les frais de paiement ?</p>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 py-3">
+        <div class="flex items-center gap-3 flex-1">
+          <span class="text-sm text-gray-700">Qui prend en charge les frais ?</span>
+          
+          <!-- Toggle Switch -->
+          <button
+            @click="updateFeeBearer(feeBearer === 'customer' ? 'merchant' : 'customer')"
+            :disabled="feeBearerLoading"
+            class="relative inline-flex h-8 w-48 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+            :class="feeBearer === 'merchant' ? 'bg-green-600' : 'bg-gray-300'"
+          >
+            <span
+              class="absolute left-1 text-xs font-medium transition-opacity"
+              :class="feeBearer === 'customer' ? 'opacity-0' : 'opacity-100 text-white'"
+            >Le client</span>
+            <span
+              class="inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform"
+              :class="feeBearer === 'merchant' ? 'translate-x-[10.5rem]' : 'translate-x-0.5'"
+            ></span>
+            <span
+              class="absolute right-1 text-xs font-medium transition-opacity"
+              :class="feeBearer === 'merchant' ? 'opacity-0' : 'opacity-100 text-gray-600'"
+            >Moi</span>
             
-            <div class="space-y-3">
-              <!-- Option: Client paie les frais -->
-              <label 
-                :class="[
-                  'flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all',
-                  feeBearer === 'customer' 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                ]"
-              >
-                <input 
-                  type="radio" 
-                  name="fee_bearer" 
-                  value="customer"
-                  :checked="feeBearer === 'customer'"
-                  @change="updateFeeBearer('customer')"
-                  :disabled="feeBearerLoading"
-                  class="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
-                />
-                <div class="flex-1">
-                  <span class="font-medium text-slate-900">Le client</span>
-                  <p class="text-xs text-gray-500">Les frais sont ajoutés au montant du paiement</p>
-                </div>
-                <span v-if="feeBearer === 'customer'" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Actif</span>
-              </label>
-              
-              <!-- Option: Marchand paie les frais -->
-              <label 
-                :class="[
-                  'flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all',
-                  feeBearer === 'merchant' 
-                    ? 'border-green-500 bg-green-50' 
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                ]"
-              >
-                <input 
-                  type="radio" 
-                  name="fee_bearer" 
-                  value="merchant"
-                  :checked="feeBearer === 'merchant'"
-                  @change="updateFeeBearer('merchant')"
-                  :disabled="feeBearerLoading"
-                  class="w-4 h-4 text-green-600 focus:ring-green-500 border-gray-300"
-                />
-                <div class="flex-1">
-                  <span class="font-medium text-slate-900">Moi (le marchand)</span>
-                  <p class="text-xs text-gray-500">Les frais sont déduits de mes revenus</p>
-                </div>
-                <span v-if="feeBearer === 'merchant'" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Actif</span>
-              </label>
-            </div>
-            
-            <p class="text-xs text-gray-500 mt-3 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Ce réglage s'applique à tous vos liens de paiement.
-            </p>
-            
-            <!-- Loading overlay -->
-            <div v-if="feeBearerLoading" class="absolute inset-0 bg-white/50 flex items-center justify-center rounded-lg">
-              <div class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-green-500 border-t-transparent"></div>
-            </div>
-          </div>
+            <!-- Loading spinner -->
+            <span v-if="feeBearerLoading" class="absolute inset-0 flex items-center justify-center">
+              <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+            </span>
+          </button>
+          
+          <span class="text-sm text-gray-600">
+            {{ feeBearer === 'customer' ? 'Le client paie les frais' : 'Je paie les frais' }}
+          </span>
         </div>
-      </Card>
+        
+        <p class="text-xs text-gray-400">Ce réglage s'applique à tous vos liens.</p>
+      </div>
 
       <!-- Stats -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -407,7 +369,7 @@
               <div class="flex-1">
                 <h3 class="text-lg font-semibold text-gray-900 mb-2">Supprimer le lien</h3>
                 <p class="text-sm text-gray-600 mb-6">
-                  Voulez-vous vraiment supprimer "{{ linkToDelete?.title }}" ? Cette action est irréversible.
+                  Voulez-vous vraiment supprimer "{{ linkToDelete?.title }}" ? Le lien sera archivé et ne sera plus accessible.
                 </p>
                 <div class="flex gap-3">
                   <button
@@ -446,7 +408,7 @@ import {
   PowerIcon,
   TrashIcon,
   DownloadIcon,
-  SettingsIcon
+
 } from 'lucide-vue-next'
 import Button from "~/components/ui/Button.vue"
 import Card from "~/components/ui/Card.vue"
@@ -829,7 +791,7 @@ const deleteLink = async () => {
 
     links.value = links.value.filter(l => l.id !== linkToDelete.value.id)
     stats.value.total_links = stats.value.total_links - 1
-    showToast('Lien supprimé avec succès')
+    showToast('Lien archivé avec succès')
     showDeleteModal.value = false
     linkToDelete.value = null
     

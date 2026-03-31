@@ -753,11 +753,13 @@ export const useSalesPageBuilder = () => {
     const newSection: Section = {
       id: generateSectionId(),
       order: section.order + 1,
-      settings: { ...section.settings },
+      // IMPORTANT: Deep clone pour éviter les références partagées
+      settings: JSON.parse(JSON.stringify(section.settings)),
       columns: section.columns.map(col => ({
         id: generateColumnId(),
         width: col.width,
-        settings: { ...col.settings },
+        // IMPORTANT: Deep clone pour éviter les références partagées
+        settings: JSON.parse(JSON.stringify(col.settings)),
         blocks: col.blocks.map(block => ({
           id: generateBlockId(),
           type: block.type,
@@ -782,6 +784,27 @@ export const useSalesPageBuilder = () => {
     if (section) {
       section.settings = { ...section.settings, ...settings }
     }
+  }
+
+  // Appliquer les settings d'une section à toutes les autres sections
+  const applySettingsToAllSections = (sectionId: string) => {
+    if (!page.value.sections || page.value.sections.length <= 1) return false
+
+    const sourceSection = page.value.sections.find(s => s.id === sectionId)
+    if (!sourceSection) return false
+
+    // Deep clone des settings de la section source
+    const settingsToCopy = JSON.parse(JSON.stringify(sourceSection.settings))
+
+    // Appliquer à toutes les autres sections
+    page.value.sections.forEach(section => {
+      if (section.id !== sectionId) {
+        section.settings = JSON.parse(JSON.stringify(settingsToCopy))
+      }
+    })
+
+    isDirty.value = true
+    return true
   }
 
   // Changer le layout des colonnes d'une section
@@ -832,7 +855,8 @@ export const useSalesPageBuilder = () => {
       id: generateBlockId(),
       type: blockType,
       order: column.blocks.length,
-      props: { ...defaultProps },
+      // IMPORTANT: Deep clone pour éviter les références partagées
+      props: JSON.parse(JSON.stringify(defaultProps)),
     }
 
     column.blocks.push(newBlock)
@@ -1003,17 +1027,23 @@ export const useSalesPageBuilder = () => {
         // Gérer les sections (nouveau système)
         if (response.data.sections && response.data.sections.length > 0) {
           // Générer de nouveaux IDs pour les sections, colonnes et blocs
+          // IMPORTANT: Deep clone des settings pour éviter les références partagées
           const newSections = response.data.sections.map((section: Section, sectionIndex: number) => ({
-            ...section,
             id: generateSectionId(),
             order: sectionIndex,
+            // Deep clone des settings de section
+            settings: JSON.parse(JSON.stringify(section.settings || {})),
             columns: section.columns.map((column: Column) => ({
-              ...column,
               id: generateColumnId(),
+              width: column.width,
+              // Deep clone des settings de colonne
+              settings: JSON.parse(JSON.stringify(column.settings || {})),
               blocks: column.blocks.map((block: Block, blockIndex: number) => ({
-                ...block,
                 id: generateBlockId(),
-                order: blockIndex
+                type: block.type,
+                order: blockIndex,
+                // Deep clone des props de bloc
+                props: JSON.parse(JSON.stringify(block.props || {}))
               }))
             }))
           }))
@@ -1106,6 +1136,7 @@ export const useSalesPageBuilder = () => {
     removeSection,
     duplicateSection,
     updateSectionSettings,
+    applySettingsToAllSections,
     changeSectionLayout,
     selectSection,
     selectColumn,

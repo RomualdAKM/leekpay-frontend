@@ -110,21 +110,28 @@
         </div>
       </div>
 
-      <!-- Prix de base -->
+      <!-- Prix et paiement -->
       <div class="pt-6 border-t border-gray-800">
-        <p class="text-3xl font-semibold mb-6">
-          9 600 <span class="text-lg font-normal text-gray-400">FCFA/an</span>
-        </p>
+        <!-- Prix -->
+        <div class="mb-6">
+          <p class="text-3xl font-semibold">
+            <span v-if="walletPreview.discount_amount > 0" class="line-through text-gray-500 text-xl mr-2">9 600</span>
+            {{ formatAmount(walletPreview.final_amount) }} <span class="text-lg font-normal text-gray-400">FCFA/an</span>
+          </p>
+          <p v-if="walletPreview.discount_amount > 0" class="text-sm text-green-400 mt-1">
+            -{{ formatAmount(walletPreview.discount_amount) }} FCFA de réduction appliquée
+          </p>
+        </div>
         
         <div v-if="!status.is_premium">
-          <!-- Code promo (en haut) -->
+          <!-- Code promo -->
           <div class="mb-6">
-            <div class="flex gap-2 max-w-md">
+            <div class="flex gap-2 max-w-sm">
               <input
                 v-model="promoCode"
                 type="text"
                 placeholder="Code promo (optionnel)"
-                class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:border-gray-600"
+                class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-gray-600"
                 :disabled="promoValidating || subscribing || walletSubscribing"
                 @blur="validatePromo"
                 @keyup.enter="validatePromo"
@@ -135,7 +142,7 @@
                 :disabled="promoValidating"
                 class="px-4 py-2 bg-gray-700 text-white text-sm hover:bg-gray-600 disabled:opacity-50"
               >
-                {{ promoValidating ? '...' : 'Valider' }}
+                {{ promoValidating ? '...' : 'Appliquer' }}
               </button>
             </div>
             <p v-if="promoMessage" class="text-sm mt-2" :class="promoValid ? 'text-green-400' : 'text-red-400'">
@@ -143,96 +150,33 @@
             </p>
           </div>
 
-          <!-- Titre méthodes de paiement -->
-          <h4 class="text-lg font-medium mb-4">Choisissez votre méthode de paiement :</h4>
-
-          <!-- Deux cartes de paiement -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <!-- Carte Wallet LeekPay -->
-            <div 
-              class="bg-gray-800 border-2 p-5 transition-all"
-              :class="walletPreview.can_pay ? 'border-green-500' : 'border-gray-700'"
+          <!-- Boutons de paiement -->
+          <div class="space-y-3 max-w-sm">
+            <!-- Wallet LeekPay -->
+            <button
+              v-if="walletPreview.can_pay"
+              @click="subscribeWithWallet"
+              :disabled="walletSubscribing"
+              class="w-full py-3 bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <div class="flex items-center gap-2 mb-4">
-                <Wallet class="w-5 h-5 text-green-500" />
-                <h5 class="font-semibold text-white">Wallet LeekPay</h5>
-                <span class="ml-auto px-2 py-0.5 bg-green-500/20 text-green-400 text-xs font-medium">Recommandé</span>
-              </div>
-              
-              <div class="space-y-2 mb-4">
-                <div class="flex justify-between text-sm">
-                  <span class="text-gray-400">Votre solde :</span>
-                  <span class="text-white font-medium">{{ formatAmount(walletPreview.current_balance) }} FCFA</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                  <span class="text-gray-400">Montant à payer :</span>
-                  <span class="text-white font-medium">{{ formatAmount(walletPreview.final_amount) }} FCFA</span>
-                </div>
-                <div v-if="walletPreview.discount_amount > 0" class="flex justify-between text-sm">
-                  <span class="text-gray-400">Réduction :</span>
-                  <span class="text-green-400 font-medium">-{{ formatAmount(walletPreview.discount_amount) }} FCFA</span>
-                </div>
-              </div>
-              
-              <!-- <p class="text-xs text-green-400 mb-4 flex items-center gap-1">
-                <Check class="w-3 h-3" />
-                Pas de frais supplémentaires
-              </p> -->
-              
-              <button
-                v-if="walletPreview.can_pay"
-                @click="subscribeWithWallet"
-                :disabled="walletSubscribing"
-                class="w-full py-3 bg-green-600 text-white font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                <Loader2 v-if="walletSubscribing" class="w-5 h-5 animate-spin" />
-                <Wallet v-else class="w-5 h-5" />
-                <span>{{ walletSubscribing ? 'Paiement...' : 'Payer avec mon wallet' }}</span>
-              </button>
-              <div v-else class="w-full py-3 bg-gray-700 text-gray-400 text-sm text-center">
-                <p>Solde insuffisant</p>
-                <p class="text-xs mt-1">Il vous manque {{ formatAmount(walletPreview.missing_amount) }} FCFA</p>
-              </div>
-            </div>
-
-            <!-- Carte Mobile Money -->
-            <div class="bg-gray-800 border-2 border-gray-700 p-5">
-              <div class="flex items-center gap-2 mb-4">
-                <Smartphone class="w-5 h-5 text-orange-500" />
-                <h5 class="font-semibold text-white">Mobile Money</h5>
-              </div>
-              
-              <div class="space-y-2 mb-4">
-                <div class="flex justify-between text-sm">
-                  <span class="text-gray-400">Prix de base :</span>
-                  <span class="text-white font-medium">{{ formatAmount(walletPreview.final_amount) }} FCFA</span>
-                </div>
-                <!-- <div class="flex justify-between text-sm">
-                  <span class="text-gray-400">Frais (4%) :</span>
-                  <span class="text-orange-400 font-medium">+{{ formatAmount(Math.ceil(walletPreview.final_amount * 0.04)) }} FCFA</span>
-                </div> -->
-                <div class="flex justify-between text-sm border-t border-gray-700 pt-2">
-                  <span class="text-gray-400">Total :</span>
-                  <span class="text-white font-semibold">{{ formatAmount(Math.ceil(walletPreview.final_amount * 1.04)) }} FCFA</span>
-                </div>
-              </div>
-              
-              <p class="text-xs text-orange-400 mb-4 flex items-center gap-1">
-                <AlertCircle class="w-3 h-3" />
-                Inclut 4% de frais de traitement
-              </p>
-              
-              <button
-                @click="subscribe"
-                :disabled="subscribing"
-                class="w-full py-3 bg-orange-600 text-white font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                <Loader2 v-if="subscribing" class="w-5 h-5 animate-spin" />
-                <Smartphone v-else class="w-5 h-5" />
-                <span>{{ subscribing ? 'Redirection...' : 'Payer par Mobile Money' }}</span>
-              </button>
-            </div>
+              <Loader2 v-if="walletSubscribing" class="w-5 h-5 animate-spin" />
+              <Wallet v-else class="w-5 h-5" />
+              <span>{{ walletSubscribing ? 'Paiement...' : 'Payer avec mon wallet' }}</span>
+            </button>
+            <p v-if="walletPreview.can_pay" class="text-xs text-gray-500 text-center -mt-1">
+              Solde actuel : {{ formatAmount(walletPreview.current_balance) }} FCFA
+            </p>
+            
+            <!-- Mobile Money -->
+            <button
+              @click="subscribe"
+              :disabled="subscribing"
+              class="w-full py-3 bg-gray-700 text-white font-medium hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <Loader2 v-if="subscribing" class="w-5 h-5 animate-spin" />
+              <Smartphone v-else class="w-5 h-5" />
+              <span>{{ subscribing ? 'Redirection...' : 'Payer par Mobile Money' }}</span>
+            </button>
           </div>
         </div>
         
