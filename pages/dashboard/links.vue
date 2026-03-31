@@ -48,42 +48,57 @@
         </div>
 
       <!-- Configuration des frais de paiement -->
-      <div class="flex flex-col sm:flex-row sm:items-center gap-3 py-3">
-        <div class="flex items-center gap-3 flex-1">
-          <span class="text-sm text-gray-700">Qui prend en charge les frais ?</span>
+      <div class="bg-white border border-gray-200 rounded-lg p-4 sm:p-5">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <!-- Contenu explicatif -->
+          <div class="flex-1">
+            <h3 class="text-sm font-semibold text-gray-900 mb-1">Frais de transaction</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              <template v-if="feeBearer === 'customer'">
+                Les frais de transaction sont ajoutés au montant que vos clients paient.
+                <span class="text-gray-900 font-medium">Vous recevez le montant exact de vos liens.</span>
+              </template>
+              <template v-else>
+                Les frais de transaction sont déduits de vos revenus.
+                <span class="text-gray-900 font-medium">Vos clients paient uniquement le montant affiché.</span>
+              </template>
+            </p>
+          </div>
           
           <!-- Toggle Switch -->
-          <button
-            @click="updateFeeBearer(feeBearer === 'customer' ? 'merchant' : 'customer')"
-            :disabled="feeBearerLoading"
-            class="relative inline-flex h-8 w-48 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
-            :class="feeBearer === 'merchant' ? 'bg-green-600' : 'bg-gray-300'"
-          >
-            <span
-              class="absolute left-1 text-xs font-medium transition-opacity"
-              :class="feeBearer === 'customer' ? 'opacity-0' : 'opacity-100 text-white'"
-            >Le client</span>
-            <span
-              class="inline-block h-6 w-6 transform rounded-full bg-white shadow-sm transition-transform"
-              :class="feeBearer === 'merchant' ? 'translate-x-[10.5rem]' : 'translate-x-0.5'"
-            ></span>
-            <span
-              class="absolute right-1 text-xs font-medium transition-opacity"
-              :class="feeBearer === 'merchant' ? 'opacity-0' : 'opacity-100 text-gray-600'"
-            >Moi</span>
+          <div class="flex flex-col items-end gap-2">
+            <div class="flex items-center gap-2">
+              <span 
+                class="text-xs font-medium transition-colors"
+                :class="feeBearer === 'customer' ? 'text-gray-900' : 'text-gray-400'"
+              >Client</span>
+              
+              <button
+                @click="updateFeeBearer(feeBearer === 'customer' ? 'merchant' : 'customer')"
+                :disabled="feeBearerLoading"
+                class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
+                :class="feeBearer === 'merchant' ? 'bg-green-500' : 'bg-gray-200'"
+              >
+                <span
+                  class="inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-200"
+                  :class="feeBearer === 'merchant' ? 'translate-x-6' : 'translate-x-1'"
+                ></span>
+                
+                <!-- Loading spinner -->
+                <span v-if="feeBearerLoading" class="absolute inset-0 flex items-center justify-center">
+                  <span class="h-3 w-3 animate-spin rounded-full border-2 border-green-500 border-t-transparent"></span>
+                </span>
+              </button>
+              
+              <span 
+                class="text-xs font-medium transition-colors"
+                :class="feeBearer === 'merchant' ? 'text-gray-900' : 'text-gray-400'"
+              >Moi</span>
+            </div>
             
-            <!-- Loading spinner -->
-            <span v-if="feeBearerLoading" class="absolute inset-0 flex items-center justify-center">
-              <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-            </span>
-          </button>
-          
-          <span class="text-sm text-gray-600">
-            {{ feeBearer === 'customer' ? 'Le client paie les frais' : 'Je paie les frais' }}
-          </span>
+            <p class="text-xs text-gray-400">S'applique à tous vos liens</p>
+          </div>
         </div>
-        
-        <p class="text-xs text-gray-400">Ce réglage s'applique à tous vos liens.</p>
       </div>
 
       <!-- Stats -->
