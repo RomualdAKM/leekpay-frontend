@@ -152,6 +152,18 @@
             <WalletIcon class="w-5 h-5 flex-shrink-0" />
             <span v-if="!collapsed" class="flex-1 text-left">Retraits</span>
           </button>
+          <button
+            @click="onSectionChange('dashboard/refunds')"
+            class="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition"
+            :class="[
+              isActive('dashboard/refunds') ? 'bg-green-50 text-green-700 font-medium' : 'text-gray-600 hover:bg-gray-50',
+              collapsed ? 'justify-center' : ''
+            ]"
+            title="Remboursements"
+          >
+            <RotateCcwIcon class="w-5 h-5 flex-shrink-0" />
+            <span v-if="!collapsed" class="flex-1 text-left">Remboursements</span>
+          </button>
         </div>
       </div>
 
@@ -323,7 +335,8 @@ import {
   MailIcon,
   LayoutTemplateIcon,
   GiftIcon,
-  ImageIcon
+  ImageIcon,
+  RotateCcwIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -366,6 +379,7 @@ const adminItems = computed(() => [
   { id: 'dashboard/admin/sales-pages', label: 'Pages de vente', icon: LayoutIcon },
   { id: 'dashboard/admin/invoices', label: 'Factures', icon: FileTextIcon },
   { id: 'dashboard/admin/withdrawals', label: 'Retraits', icon: BanknoteIcon },
+  { id: 'dashboard/admin/refunds', label: 'Remboursements', icon: RotateCcwIcon },
   { id: 'dashboard/admin/kyc', label: 'KYC', icon: UserCheckIcon },
   { id: 'dashboard/admin/broadcast', label: 'Communication', icon: MailIcon },
   { id: 'dashboard/admin/templates', label: 'Templates', icon: LayoutTemplateIcon },
