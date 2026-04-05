@@ -13,7 +13,8 @@ interface ExpirationStatusResult {
 }
 
 export function usePaymentTimer(expiresAt: Ref<string | null>, isExpiredFromBackend: Ref<boolean>) {
-  const timeLeft = ref(0)
+  const timeLeft = ref(-1)
+  const isTimerInitialized = ref(false)
   let timerInterval: ReturnType<typeof setInterval> | null = null
 
   const startTimer = () => {
@@ -43,18 +44,23 @@ export function usePaymentTimer(expiresAt: Ref<string | null>, isExpiredFromBack
     const now = new Date()
     const diffInSeconds = Math.max(0, Math.floor((expDate.getTime() - now.getTime()) / 1000))
     timeLeft.value = diffInSeconds
+    isTimerInitialized.value = true
     if (diffInSeconds > 0) {
       startTimer()
     }
   }
 
   const formattedTime = computed(() => {
-    const minutes = Math.floor(timeLeft.value / 60)
-    const seconds = timeLeft.value % 60
+    const t = Math.max(0, timeLeft.value)
+    const minutes = Math.floor(t / 60)
+    const seconds = t % 60
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
   })
 
   const isPaymentExpired = computed(() => {
+    if (!isTimerInitialized.value) {
+      return isExpiredFromBackend.value
+    }
     return isExpiredFromBackend.value || timeLeft.value <= 0
   })
 
@@ -81,6 +87,7 @@ export function usePaymentTimer(expiresAt: Ref<string | null>, isExpiredFromBack
   // Pré-calculer le niveau de sévérité (ne change que quand timeLeft franchit un seuil)
   const severityLevel = computed(() => {
     if (isExpiredFromBackend.value) return 'expired'
+    if (!isTimerInitialized.value) return 'neutral'
     if (timeLeft.value <= 0) return 'expired'
     if (timeLeft.value <= 600) return 'urgent'
     if (timeLeft.value <= 3600) return 'warning'
@@ -131,6 +138,10 @@ export function usePaymentTimer(expiresAt: Ref<string | null>, isExpiredFromBack
 
   const expirationStatus = computed((): ExpirationStatusResult => {
     if (!expiresAt.value && !isExpiredFromBackend.value) {
+      return { show: false }
+    }
+
+    if (!isTimerInitialized.value && !isExpiredFromBackend.value) {
       return { show: false }
     }
 
