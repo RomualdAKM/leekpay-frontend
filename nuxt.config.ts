@@ -2,9 +2,24 @@
 import tailwindcss from "@tailwindcss/vite";
 export default defineNuxtConfig({
     compatibilityDate: '2025-07-15',
-    devtools: { enabled: true },
-    css: ['~/assets/css/main.css', 'flag-icons/css/flag-icons.min.css'],
-    vite: { plugins: [tailwindcss(),], },
+    devtools: { enabled: process.env.NODE_ENV !== 'production' },
+    css: ['~/assets/css/main.css'],
+    vite: {
+        plugins: [tailwindcss()],
+        build: {
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            if (id.includes('chart.js') || id.includes('vue-chartjs')) return 'charts'
+                            if (id.includes('tiptap') || id.includes('vue-quill')) return 'editors'
+                            if (id.includes('posthog')) return 'analytics'
+                        }
+                    },
+                },
+            },
+        },
+    },
 
     app: {
         head: {
@@ -30,8 +45,10 @@ export default defineNuxtConfig({
                     crossorigin: '',
                 },
                 {
-                    rel: 'stylesheet',
-                    href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Bowlby+One&display=swap',
+                    rel: 'preload',
+                    href: 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Bowlby+One&display=swap',
+                    as: 'style',
+                    onload: "this.onload=null;this.rel='stylesheet'",
                 },
             ],
             noscript: [
@@ -47,6 +64,13 @@ export default defineNuxtConfig({
         }
     },
     modules: ['@vueuse/motion/nuxt', '@posthog/nuxt'],
+    nitro: {
+        compressPublicAssets: true,
+        routeRules: {
+            '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+            '/assets/**': { headers: { 'cache-control': 'public, max-age=86400' } },
+        },
+    },
     posthogConfig: {
         publicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY || 'phc_PEiTpBpNA9SBYRvuBaVQcRKQZaF710xKwYcRfzoC0Ln',
         host: 'https://us.i.posthog.com',

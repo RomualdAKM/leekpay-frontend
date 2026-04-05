@@ -23,7 +23,7 @@ const closeFeaturesDropdown = () => {
       <div class="container mx-auto flex justify-between items-center ">
         <NuxtLink to="/" class="flex items-center">
           <img
-            src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png"
+            src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.webp"
             alt="LeekPay"
             class="h-24 w-auto"
           />

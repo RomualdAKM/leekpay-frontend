@@ -369,9 +369,10 @@
             tout devient facile.
           </em>
           <img
-              src="~/assets/img/Mascotte_LeekPay.png"
+              src="~/assets/img/Mascotte_LeekPay.webp"
               alt="Mascotte LeekPay"
               class="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-full shadow-md mt-2 md:mt-0"
+              loading="lazy"
               v-motion="{
           initial: { opacity: 0, scale: 0.8 },
           visible: { opacity: 1, scale: 1, transition: { duration: 800, delay: 200 } }
@@ -391,7 +392,7 @@
              }"
             >
               <img
-                  src="~/assets/img/creer_partage_partout.png"
+                  src="~/assets/img/creer_partage_partout.webp"
                   alt="Création de liens"
                   class="w-auto h-auto lg:max-h-[420px] object-contain rounded-xl shadow-md ml-auto border-4 border-green-100 transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2"
               />
@@ -458,7 +459,7 @@
              }"
             >
               <img
-                  src="~/assets/img/suivi_gestion.png"
+                  src="~/assets/img/suivi_gestion.webp"
                   alt="Suivi en temps réel"
                   class="w-auto h-auto lg:max-h-[420px] object-contain rounded-xl shadow-md ml-auto border-4 border-green-100 transition-all duration-300 ease-in-out hover:scale-105 hover:-translate-y-2"
               />
@@ -498,7 +499,7 @@
           >
             <div class="relative hover-lift">
               <div class="bg-white/10 rounded-2xl p-3 shadow-lg shadow-green-900/30">
-                <img src="~/assets/img/Mascotte_LeekPay.png" alt="" class="w-28 h-28 object-contain" />
+                <img src="~/assets/img/Mascotte_LeekPay.webp" alt="" class="w-28 h-28 object-contain" loading="lazy" />
               </div>
               <div class="absolute -right-3 bottom-2 bg-orange-400 rounded-full p-2 shadow-lg shadow-orange-900/30 animate-bounce">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -514,7 +515,7 @@
           >
             <div class="relative hover-lift">
               <div class="bg-white/10 rounded-2xl p-3 shadow-lg shadow-green-900/30">
-                <img src="~/assets/img/Mascotte_LeekPay.png" alt="" class="w-28 h-28 object-contain" />
+                <img src="~/assets/img/Mascotte_LeekPay.webp" alt="" class="w-28 h-28 object-contain" loading="lazy" />
               </div>
               <div class="absolute -left-3 bottom-2 bg-orange-400 rounded-full p-2 shadow-lg shadow-orange-900/30 animate-bounce">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -851,9 +852,10 @@
           <!-- Logo et nom -->
           <div class="flex items-center gap-3">
             <img 
-              src="~/assets/img/Mascotte_LeekPay.png" 
+              src="~/assets/img/Mascotte_LeekPay.webp" 
               alt="Logo LeekPay" 
               class="w-12 h-12 rounded-full"
+              loading="lazy"
             />
             <span class="text-2xl font-bold text-white">LeekPay</span>
           </div>
@@ -1008,7 +1010,7 @@ import orangeLogo from '~/assets/img/orange.png'
 import mtnLogo from '~/assets/img/mtn.png'
 import waveLogo from '~/assets/img/wave_logo.png'
 import moovLogo from '~/assets/img/moov_logo.png'
-import visaLogo from '~/assets/img/visa.png'
+import visaLogo from '~/assets/img/visa.webp'
 import paypalLogo from '~/assets/img/paypal.png'
 import freeMoneyLogo from '~/assets/img/free_money_logo.png'
 import airtelLogo from '~/assets/img/airtel_logo.svg'

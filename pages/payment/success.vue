@@ -187,9 +187,10 @@
             href="https://leekpay.me" 
             target="_blank" class="flex items-center justify-center mb-1">
             <img 
-              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
+              src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.webp" 
               alt="LeekPay Logo" 
               class="h-16 w-auto"
+              loading="lazy"
             >
         </a>
           <p class="text-xs text-gray-500 mb-2">

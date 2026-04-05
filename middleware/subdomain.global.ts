@@ -3,7 +3,31 @@
  * - Sous-domaines: monshop.leekpay.me → /s/monshop
  * - Domaines personnalisés: monsite.com → /s/[slug] (via API)
  */
+
+const DOMAIN_CACHE_TTL = 300000 // 5 minutes
+
+const PUBLIC_ROUTE_PREFIXES = [
+  '/payment/',
+  '/widget-pay',
+  '/s/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/verify-email',
+  '/dashboard',
+  '/api',
+  '/print/',
+  '/invoices/',
+  '/a-propos',
+  '/docs',
+]
+
 export default defineNuxtRouteMiddleware(async (to) => {
+  // Early return pour les routes publiques connues qui n'ont pas besoin de vérification de domaine
+  if (PUBLIC_ROUTE_PREFIXES.some(prefix => to.path.startsWith(prefix))) {
+    return
+  }
+
   // Obtenir le hostname selon l'environnement
   let host: string | undefined
   
@@ -41,11 +65,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
     'staging',
   ]
   
-  // Ne pas rediriger si déjà sur la page de vente publique
-  if (to.path.startsWith('/s/')) {
-    return
-  }
-  
   // Vérifier si c'est un domaine principal
   if (mainDomains.includes(host)) {
     return // Pas de redirection
@@ -75,6 +94,18 @@ export default defineNuxtRouteMiddleware(async (to) => {
   // Exclure les domaines avec trop peu de parties (ex: localhost sans extension)
   if (parts.length < 2) return
   
+  // Cache en mémoire pour éviter de refaire l'appel API pour le même domaine
+  const domainCache = useState<Record<string, { found: boolean; slug?: string; timestamp: number }>>('domain-cache', () => ({}))
+  
+  // Vérifier le cache
+  const cached = domainCache.value[host]
+  if (cached && (Date.now() - cached.timestamp) < DOMAIN_CACHE_TTL) {
+    if (cached.found && cached.slug) {
+      return navigateTo(`/s/${cached.slug}`, { external: false })
+    }
+    return // Domaine non reconnu (résultat en cache)
+  }
+
   // Appeler l'API pour vérifier si ce domaine personnalisé est configuré
   try {
     const config = useRuntimeConfig()
@@ -83,10 +114,17 @@ export default defineNuxtRouteMiddleware(async (to) => {
       `/api/public/domain/${encodeURIComponent(host)}/check`,
       {
         baseURL: apiBase,
-        timeout: 5000,
+        timeout: 2000,
       }
     )
     
+    // Stocker le résultat dans le cache
+    domainCache.value[host] = {
+      found: response.found,
+      slug: response.slug,
+      timestamp: Date.now(),
+    }
+
     if (response.found && response.slug) {
       // Domaine personnalisé trouvé, rediriger vers la page de vente
       return navigateTo(`/s/${response.slug}`, { external: false })

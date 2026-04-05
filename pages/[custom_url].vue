@@ -215,9 +215,9 @@
               <span>Paiement 100% sécurisé</span>
             </div>
             <div class="flex justify-center gap-4">
-              <img src="~/assets/img/mtn.png" alt="MTN" class="h-6 w-auto" />
-              <img src="~/assets/img/orange.png" alt="Orange" class="h-6 w-auto" />
-              <img src="~/assets/img/visa.png" alt="Visa" class="h-6 w-auto" />
+              <img src="~/assets/img/mtn.png" alt="MTN" class="h-6 w-auto" loading="lazy" />
+              <img src="~/assets/img/orange.png" alt="Orange" class="h-6 w-auto" loading="lazy" />
+              <img src="~/assets/img/visa.webp" alt="Visa" class="h-6 w-auto" loading="lazy" />
             </div>
           </div>
         </div>
@@ -260,9 +260,10 @@
          href="https://leekpay.me" 
          target="_blank" class="flex items-center justify-center mb-1">
          <img 
-           src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" 
+           src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.webp" 
            alt="LeekPay Logo" 
            class="h-16 w-auto"
+           loading="lazy"
          >
      </a>
        <p class="text-xs text-gray-500 mb-2">
@@ -286,7 +287,7 @@
 </template>
 
 <script setup>
-
+import { useThrottleFn } from '@vueuse/core'
 
 definePageMeta({
   layout: false
@@ -295,8 +296,6 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 
-
-
 const { searchQuery, filteredCountries, getCountryByDialCode } = useCountries()
 
 const loading = ref(true)
@@ -304,11 +303,23 @@ const isProcessing = ref(false)
 const error = ref('')
 const paymentData = ref(null)
 const selectedPayment = ref('mobile_money')
-const timeLeft = ref(600)
 const imageError = ref(false)
 const showCountryDropdown = ref(false)
 const selectedCountry = ref(null)
 const showStickyButton = ref(true)
+
+// Timer d'expiration via composable
+const expiresAtRef = computed(() => paymentData.value?.expires_at || null)
+const isExpiredFromBackendRef = computed(() => paymentData.value?.is_expired || false)
+const { timeLeft, formattedTime, expirationStatus, isPaymentExpired, initTimer, stopTimer } = usePaymentTimer(expiresAtRef, isExpiredFromBackendRef)
+
+// Charger flag-icons CSS dynamiquement (retiré du CSS global)
+if (import.meta.client) {
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = 'https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css'
+  document.head.appendChild(link)
+}
 
 // Configuration des métadonnées SEO réactives
 const pageTitle = computed(() => 
@@ -382,13 +393,7 @@ const fetchPaymentData = async () => {
       }
       
       if (paymentData.value.expires_at) {
-        const expiresAt = new Date(paymentData.value.expires_at)
-        const now = new Date()
-        const diffInSeconds = Math.max(0, Math.floor((expiresAt - now) / 1000))
-        timeLeft.value = diffInSeconds
-        if (diffInSeconds > 0) {
-          startTimer()
-        }
+        initTimer(paymentData.value.expires_at)
       }
       
       error.value = ''
@@ -488,152 +493,6 @@ const triggerPayment = async () => {
     isProcessing.value = false
   }
 }
-
-let timerInterval = null
-
-const startTimer = () => {
-  // Nettoyer le timer existant s'il y en a un
-  if (timerInterval) {
-    clearInterval(timerInterval)
-  }
-  
-  timerInterval = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value--
-    } else {
-      clearInterval(timerInterval)
-      timerInterval = null
-      // Optionnel: déclencher une action quand le timer expire
-      console.log('Le lien de paiement a expiré')
-    }
-  }, 1000)
-}
-
-const stopTimer = () => {
-  if (timerInterval) {
-    clearInterval(timerInterval)
-    timerInterval = null
-  }
-}
-
-const formattedTime = computed(() => {
-  const minutes = Math.floor(timeLeft.value / 60)
-  const seconds = timeLeft.value % 60
-  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-})
-
-const expirationStatus = computed(() => {
-  // Si pas de données de paiement, ne rien afficher
-  if (!paymentData.value) {
-    return { show: false }
-  }
-
-  // Si le lien est déjà expiré selon le backend
-  if (paymentData.value.is_expired) {
-    return {
-      show: true,
-      containerClass: 'bg-red-50 border border-red-200 rounded-lg p-3 mb-6',
-      textClass: 'text-red-700 font-medium flex items-center text-sm',
-      badgeClass: 'text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full',
-      iconPath: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
-      message: 'Ce lien de paiement a expiré',
-      badge: 'Expiré'
-    }
-  }
-
-  // Si pas de date d'expiration définie
-  if (!paymentData.value.expires_at) {
-    return { show: false }
-  }
-
-  // Si le temps restant est épuisé (calculé côté frontend)
-  if (timeLeft.value <= 0) {
-    return {
-      show: true,
-      containerClass: 'bg-red-50 border border-red-200 rounded-lg p-3 mb-6',
-      textClass: 'text-red-700 font-medium flex items-center text-sm',
-      badgeClass: 'text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full',
-      iconPath: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
-      message: 'Ce lien de paiement a expiré',
-      badge: 'Expiré'
-    }
-  }
-
-  // Si moins de 10 minutes restantes (urgent)
-  if (timeLeft.value <= 600) {
-    return {
-      show: true,
-      containerClass: 'bg-red-50 border border-red-200 rounded-lg p-3 mb-6',
-      textClass: 'text-red-700 font-medium flex items-center text-sm',
-      badgeClass: 'text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full',
-      iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-      message: `Lien expire dans ${formattedTime.value}`,
-      badge: 'Urgent'
-    }
-  }
-
-  // Si moins d'1 heure restante (attention)
-  if (timeLeft.value <= 3600) {
-    return {
-      show: true,
-      containerClass: 'bg-orange-50 border border-orange-200 rounded-lg p-3 mb-6',
-      textClass: 'text-orange-700 font-medium flex items-center text-sm',
-      badgeClass: 'text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full',
-      iconPath: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-      message: `Lien expire dans ${formattedTime.value}`,
-      badge: 'Attention'
-    }
-  }
-
-  // Si moins de 24 heures restantes (info)
-  if (timeLeft.value <= 86400) {
-    const hours = Math.floor(timeLeft.value / 3600)
-    const minutes = Math.floor((timeLeft.value % 3600) / 60)
-    const timeDisplay = hours > 0 ? `${hours}h ${minutes}min` : formattedTime.value
-    
-    return {
-      show: true,
-      containerClass: 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6',
-      textClass: 'text-blue-700 font-medium flex items-center text-sm',
-      badgeClass: 'text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full',
-      iconPath: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      message: `Lien expire dans ${timeDisplay}`,
-      badge: 'Info'
-    }
-  }
-
-  // Plus de 24 heures, afficher avec style neutre
-  const days = Math.floor(timeLeft.value / 86400)
-  const hours = Math.floor((timeLeft.value % 86400) / 3600)
-  const minutes = Math.floor((timeLeft.value % 3600) / 60)
-  
-  let timeDisplay
-  if (days > 0) {
-    timeDisplay = days === 1 ? `${days} jour` : `${days} jours`
-    if (hours > 0) {
-      timeDisplay += ` ${hours}h`
-    }
-  } else if (hours > 0) {
-    timeDisplay = `${hours}h ${minutes}min`
-  } else {
-    timeDisplay = formattedTime.value
-  }
-  
-  return {
-    show: true,
-    containerClass: 'bg-gray-50 border border-gray-200 rounded-lg p-3 mb-6',
-    textClass: 'text-gray-700 font-medium flex items-center text-sm',
-    badgeClass: 'text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full',
-    iconPath: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    message: `Lien expire dans ${timeDisplay}`,
-    badge: 'Valide'
-  }
-})
-
-const isPaymentExpired = computed(() => {
-  if (!paymentData.value) return false
-  return paymentData.value.is_expired || timeLeft.value <= 0
-})
 
 const availablePaymentMethods = computed(() => {
   return paymentData.value?.available_payment_methods || []
@@ -864,6 +723,9 @@ const checkPaymentFormVisibility = () => {
   }
 }
 
+// Version throttled pour le scroll listener (200ms)
+const throttledCheckVisibility = useThrottleFn(checkPaymentFormVisibility, 200)
+
 // Fonction pour faire défiler vers le formulaire de paiement
 const scrollToPaymentForm = () => {
   const paymentFormElement = document.getElementById('payment-form')
@@ -884,7 +746,7 @@ onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   
   // Ajouter le listener de scroll pour détecter la visibilité du formulaire
-  window.addEventListener('scroll', checkPaymentFormVisibility)
+  window.addEventListener('scroll', throttledCheckVisibility)
   
   // Vérifier la visibilité initiale
   nextTick(() => {
@@ -903,7 +765,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
-  window.removeEventListener('scroll', checkPaymentFormVisibility)
+  window.removeEventListener('scroll', throttledCheckVisibility)
   stopTimer() // Nettoyer le timer pour éviter les fuites mémoire
 })
 

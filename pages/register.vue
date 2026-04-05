@@ -185,9 +185,10 @@
           <div class="absolute inset-0 bg-gray-50 rounded-2xl"></div>
           <div class="relative z-10 p-8">
             <img
-                src="~/assets/img/register_img.jpg"
+                src="~/assets/img/register_img.webp"
                 alt="Illustration"
                 class="w-full h-auto rounded-xl shadow-lg"
+                loading="lazy"
             />
             <div class="mt-6 space-y-4">
               <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
@@ -198,7 +199,7 @@
                 </div>
               </div>
               <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-                <img src="~/assets/img/Logo_de_LeekPay_avec_arrière-plan.png" alt="LeekPay" class="h-8 w-auto" />
+                <img src="~/assets/img/Logo_de_LeekPay_avec_arrière-plan.webp" alt="LeekPay" class="h-8 w-auto" />
                 <div>
                   <p class="text-green-500 font-medium">Argent reçu</p>
                   <p class="text-sm text-gray-700">25 000 FCFA</p>

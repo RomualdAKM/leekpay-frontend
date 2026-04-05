@@ -3,7 +3,7 @@
     <div class="w-full max-w-md">
       <!-- Logo -->
       <div class="text-center mb-6">
-        <img src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" alt="LeekPay" class="h-10 mx-auto" />
+        <img src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.webp" alt="LeekPay" class="h-10 mx-auto" />
       </div>
 
       <!-- Card principale -->
