@@ -296,7 +296,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 
-const { searchQuery, filteredCountries, getCountryByDialCode } = useCountries()
+const { searchQuery, filteredCountries, getCountryByDialCode, getCountryByCode } = useCountries()
 
 const loading = ref(true)
 const isProcessing = ref(false)
@@ -306,6 +306,7 @@ const selectedPayment = ref('mobile_money')
 const imageError = ref(false)
 const showCountryDropdown = ref(false)
 const selectedCountry = ref(null)
+const userHasSelectedCountry = ref(false)
 const showStickyButton = ref(true)
 
 // Timer d'expiration via composable
@@ -642,12 +643,41 @@ const handleImageError = () => {
 
 const selectCountry = (country) => {
   selectedCountry.value = country
+  userHasSelectedCountry.value = true
   showCountryDropdown.value = false
   searchQuery.value = ''
 }
 
 const initializeDefaultCountry = () => {
   selectedCountry.value = getCountryByDialCode('+225')
+}
+
+// Détection automatique du pays par géolocalisation IP (non-bloquant)
+const detectUserCountry = async () => {
+  // Ne pas écraser le choix manuel de l'utilisateur
+  if (userHasSelectedCountry.value) return
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000)
+
+    const response = await fetch('https://api.country.is/', {
+      signal: controller.signal
+    })
+    clearTimeout(timeoutId)
+
+    if (!response.ok) return
+
+    const data = await response.json()
+    if (data?.country && !userHasSelectedCountry.value) {
+      const detected = getCountryByCode(data.country)
+      if (detected) {
+        selectedCountry.value = detected
+      }
+    }
+  } catch {
+    // Silencieux : la géolocalisation est un nice-to-have
+  }
 }
 
 // Close dropdown when clicking outside
@@ -756,7 +786,10 @@ onMounted(() => {
   // Attendre la fin du traitement des paramètres de retour avant de charger les données
   handleReturnParameters().then(shouldRedirect => {
     if (!shouldRedirect) {
-      fetchPaymentData()
+      fetchPaymentData().then(() => {
+        // Lancer la détection du pays en arrière-plan (non-bloquant)
+        detectUserCountry()
+      })
     }
   })
 })
