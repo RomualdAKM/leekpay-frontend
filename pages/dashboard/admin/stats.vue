@@ -53,10 +53,11 @@
         </div>
         <div class="border border-gray-200 p-4">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Profit LeekPay</p>
-          <div class="mt-1 space-y-1">
+          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ formatCurrency(stats.total_leekpay_profit_xof || 0) }}</p>
+          <div class="mt-2 space-y-1 border-t border-gray-100 pt-2">
             <div v-for="(profit, currency) in stats.leekpay_profit_by_currency" :key="currency" class="flex justify-between">
               <span class="text-xs text-gray-500">{{ currency }}</span>
-              <span class="text-sm font-semibold text-gray-900">{{ formatCurrencyByCode(profit, currency) }}</span>
+              <span class="text-xs font-medium text-gray-600">{{ formatCurrencyByCode(profit, currency) }}</span>
             </div>
             <p v-if="!stats.leekpay_profit_by_currency || Object.keys(stats.leekpay_profit_by_currency).length === 0" class="text-sm text-gray-400">-</p>
           </div>
