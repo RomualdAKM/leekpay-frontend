@@ -36,28 +36,37 @@
 
     <template v-else-if="stats">
       <!-- KPIs Principaux -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="border border-gray-200 p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Utilisateurs</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.users?.all_time || 0 }}</p>
+          <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.users?.all_time || 0 }}</p>
           <p class="text-xs text-gray-400 mt-1">+{{ stats.users?.this_month || 0 }} ce mois</p>
         </div>
-        <div class="border border-gray-200 p-4">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Transactions</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.transactions?.total || 0 }}</p>
+          <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.transactions?.total || 0 }}</p>
           <p class="text-xs text-gray-400 mt-1">{{ stats.transactions?.conversion_rate || 0 }}% conversion</p>
         </div>
-        <div class="border border-gray-200 p-4">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Volume</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ formatCurrency(stats.transactions?.volume || 0) }}</p>
+          <p class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate" :title="formatCurrency(stats.transactions?.volume || 0)">
+            <span class="hidden sm:inline">{{ formatCurrency(stats.transactions?.volume || 0) }}</span>
+            <span class="sm:hidden">{{ formatCurrencyCompact(stats.transactions?.volume || 0) }}</span>
+          </p>
         </div>
-        <div class="border border-gray-200 p-4">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Profit LeekPay</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ formatCurrency(stats.total_leekpay_profit_xof || 0) }}</p>
+          <p class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate" :title="formatCurrency(stats.total_leekpay_profit_xof || 0)">
+            <span class="hidden sm:inline">{{ formatCurrency(stats.total_leekpay_profit_xof || 0) }}</span>
+            <span class="sm:hidden">{{ formatCurrencyCompact(stats.total_leekpay_profit_xof || 0) }}</span>
+          </p>
           <div class="mt-2 space-y-1 border-t border-gray-100 pt-2">
-            <div v-for="(profit, currency) in stats.leekpay_profit_by_currency" :key="currency" class="flex justify-between">
-              <span class="text-xs text-gray-500">{{ currency }}</span>
-              <span class="text-xs font-medium text-gray-600">{{ formatCurrencyByCode(profit, currency) }}</span>
+            <div v-for="(profit, currency) in stats.leekpay_profit_by_currency" :key="currency" class="flex justify-between min-w-0 gap-2">
+              <span class="text-xs text-gray-500 shrink-0">{{ currency }}</span>
+              <span class="text-xs font-medium text-gray-600 truncate">
+                <span class="hidden sm:inline">{{ formatCurrencyByCode(profit, currency) }}</span>
+                <span class="sm:hidden">{{ formatCompact(profit) }} {{ currency }}</span>
+              </span>
             </div>
             <p v-if="!stats.leekpay_profit_by_currency || Object.keys(stats.leekpay_profit_by_currency).length === 0" class="text-sm text-gray-400">-</p>
           </div>
@@ -65,37 +74,37 @@
       </div>
 
       <!-- Retraits + KYC -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="border border-gray-200 p-4">
-          <div class="flex items-center justify-between">
-            <div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
               <p class="text-xs text-gray-500 uppercase tracking-wide">Retraits en attente</p>
-              <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.withdrawals?.pending || 0 }}</p>
+              <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.withdrawals?.pending || 0 }}</p>
             </div>
-            <NuxtLink to="/dashboard/admin/withdrawals" class="text-xs text-green-600 hover:text-green-700">
+            <NuxtLink to="/dashboard/admin/withdrawals" class="text-xs text-green-600 hover:text-green-700 shrink-0">
               Gérer →
             </NuxtLink>
           </div>
         </div>
-        <div class="border border-gray-200 p-4">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Retraits traités</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.withdrawals?.processed || 0 }}</p>
-          <p class="text-xs text-gray-400 mt-1">{{ formatCurrency(stats.withdrawals?.volume || 0) }}</p>
+          <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.withdrawals?.processed || 0 }}</p>
+          <p class="text-xs text-gray-400 mt-1 truncate">{{ formatCurrency(stats.withdrawals?.volume || 0) }}</p>
         </div>
-        <div class="border border-gray-200 p-4">
-          <div class="flex items-center justify-between">
-            <div>
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0">
               <p class="text-xs text-gray-500 uppercase tracking-wide">KYC en attente</p>
-              <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.kyc?.pending || 0 }}</p>
+              <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.kyc?.pending || 0 }}</p>
             </div>
-            <NuxtLink to="/dashboard/admin/kyc" class="text-xs text-green-600 hover:text-green-700">
+            <NuxtLink to="/dashboard/admin/kyc" class="text-xs text-green-600 hover:text-green-700 shrink-0">
               Gérer →
             </NuxtLink>
           </div>
         </div>
-        <div class="border border-gray-200 p-4">
+        <div class="border border-gray-200 p-4 min-w-0 overflow-hidden">
           <p class="text-xs text-gray-500 uppercase tracking-wide">KYC approuvés</p>
-          <p class="text-2xl font-semibold text-gray-900 mt-1">{{ stats.kyc?.approved || 0 }}</p>
+          <p class="text-xl md:text-2xl font-semibold text-gray-900 mt-1 truncate">{{ stats.kyc?.approved || 0 }}</p>
         </div>
       </div>
 
@@ -168,7 +177,10 @@
             </div>
             <div class="flex justify-between text-sm border-t border-gray-100 pt-2 mt-2">
               <span class="text-gray-500">Montant encaissé</span>
-              <span class="font-medium">{{ formatCurrency(stats.invoices?.total_amount || 0) }}</span>
+              <span class="font-medium truncate">
+                <span class="hidden sm:inline">{{ formatCurrency(stats.invoices?.total_amount || 0) }}</span>
+                <span class="sm:hidden">{{ formatCurrencyCompact(stats.invoices?.total_amount || 0) }}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -338,6 +350,12 @@ const formatCompact = (amount) => {
   if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M'
   if (amount >= 1000) return (amount / 1000).toFixed(0) + 'K'
   return amount?.toString() || '0'
+}
+
+const formatCurrencyCompact = (amount, currency = 'XOF') => {
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M ' + currency
+  if (amount >= 100000) return (amount / 1000).toFixed(0) + 'K ' + currency
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, minimumFractionDigits: 0 }).format(amount || 0)
 }
 
 const formatDateTime = (date) => {
