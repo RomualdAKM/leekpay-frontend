@@ -94,14 +94,16 @@
                 v-model="formData.name"
                 type="text"
                 placeholder="Nom complet"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
+                :readonly="!!paymentData?.customer_name"
+                :class="['w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm', paymentData?.customer_name ? 'bg-gray-100 cursor-not-allowed' : '']"
                 required
             />
             <input
                 v-model="formData.email"
                 type="email"
                 placeholder="Email"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
+                :readonly="!!paymentData?.customer_email"
+                :class="['w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm', paymentData?.customer_email ? 'bg-gray-100 cursor-not-allowed' : '']"
                 required
             />
             <div class="space-y-2">
@@ -141,7 +143,8 @@
                     v-model="formData.phoneNumber"
                     type="tel"
                     placeholder="Numéro (optionnel)"
-                    class="flex-1 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm"
+                    :readonly="!!paymentData?.customer_phone"
+                    :class="['flex-1 px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm', paymentData?.customer_phone ? 'bg-gray-100 cursor-not-allowed' : '']"
                 />
               </div>
             </div>
@@ -391,6 +394,17 @@ const fetchPaymentData = async () => {
       
       if (paymentData.value.amount_type === 'fixed') {
         formData.value.amount = paymentData.value.fixed_amount
+      }
+
+      // Pré-remplir les champs client si fournis via l'API
+      if (paymentData.value.customer_name) {
+        formData.value.name = paymentData.value.customer_name
+      }
+      if (paymentData.value.customer_email) {
+        formData.value.email = paymentData.value.customer_email
+      }
+      if (paymentData.value.customer_phone) {
+        formData.value.phoneNumber = paymentData.value.customer_phone
       }
       
       if (paymentData.value.expires_at) {
