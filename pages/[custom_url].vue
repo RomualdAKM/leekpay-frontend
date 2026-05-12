@@ -59,11 +59,11 @@
                   </div>
                   <div v-if="calculatedFees.total_fees > 0" class="flex justify-between text-gray-600">
                     <span>Frais de traitement</span>
-                    <span>{{ calculatedFees.total_fees.toFixed(0) }} {{ currency.symbol }}</span>
+                    <span>{{ formatAmount(calculatedFees.total_fees) }} {{ currency.symbol }}</span>
                   </div>
                   <div class="border-t border-gray-300 pt-2 flex justify-between">
                     <span class="text-lg font-semibold text-gray-900">Total à payer</span>
-                    <span class="text-xl font-bold text-green-600">{{ calculatedFees.total_amount.toFixed(0) }} {{ currency.symbol }}</span>
+                    <span class="text-xl font-bold text-green-600">{{ formatAmount(calculatedFees.total_amount) }} {{ currency.symbol }}</span>
                   </div>
                 </template>
                 <!-- Si fee_bearer = 'merchant' : afficher uniquement le montant (pas de frais visibles) -->
@@ -623,6 +623,16 @@ const calculatedFees = computed(() => {
 const currency = computed(() => {
   return paymentData.value?.currency || { symbol: 'FCFA', code: 'XOF' }
 })
+
+// Nombre de décimales selon la devise (XOF = 0, EUR/USD = 2)
+const currencyDecimals = computed(() => {
+  const code = currency.value?.code || 'XOF'
+  return code === 'XOF' ? 0 : 2
+})
+
+const formatAmount = (value) => {
+  return Number(value).toFixed(currencyDecimals.value)
+}
 
 // Récupérer le fee_bearer depuis les données du lien de paiement
 const feeBearer = computed(() => {
