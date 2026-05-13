@@ -304,10 +304,12 @@ const { token } = useAuth()
 
 // Fonction pour formater les montants
 const formatCurrency = (amount, currencyCode = 'XOF') => {
+  const code = currencyCode || 'XOF'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: currencyCode,
-    minimumFractionDigits: 0
+    currency: code,
+    minimumFractionDigits: code === 'XOF' ? 0 : 2,
+    maximumFractionDigits: code === 'XOF' ? 0 : 2
   }).format(amount || 0)
 }
 

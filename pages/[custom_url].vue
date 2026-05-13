@@ -332,11 +332,13 @@ const pageTitle = computed(() =>
     : 'Paiement - LeekPay'
 )
 
-const pageDescription = computed(() => 
-  paymentData.value?.description 
-    ? paymentData.value.description.replace(/<[^>]*>/g, '').substring(0, 160) 
+const pageDescription = computed(() => {
+  const cleanDescription = getCleanDescription(paymentData.value?.description)
+  
+  return cleanDescription 
+    ? cleanDescription.replace(/<[^>]*>/g, '').substring(0, 160) 
     : 'Effectuez votre paiement de manière simple et sécurisée avec LeekPay'
-)
+})
 
 const pageImage = computed(() => 
   paymentData.value?.image_url || 'https://leekpay.me/Logo_de_LeekPay_avec_arriere-plan.png'
@@ -644,7 +646,7 @@ const paymentTitle = computed(() => {
 })
 
 const paymentDescription = computed(() => {
-  return paymentData.value?.description || ''
+  return getCleanDescription(paymentData.value?.description)
 })
 
 // Watcher pour réinitialiser la méthode de paiement si elle devient désactivée

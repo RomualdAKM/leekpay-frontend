@@ -221,7 +221,10 @@ function formatAmount(value) {
 onMounted(() => {
   amount.value = parseFloat(route.query.amount) || 0
   currency.value = route.query.currency || 'XOF'
-  description.value = route.query.description || ''
+  
+  // Nettoyer la description (peut être du JSON si vient de l'API)
+  description.value = getCleanDescription(route.query.description)
+  
   apiKey.value = route.query.key || ''
   returnUrl.value = route.query.return_url || ''
   cancelUrl.value = route.query.cancel_url || ''

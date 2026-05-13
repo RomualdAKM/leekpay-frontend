@@ -338,12 +338,24 @@ const countryFlags = {
 const getCountryName = (code) => countryNames[code] || code
 const getCountryFlag = (code) => countryFlags[code] || '🏳️'
 
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }).format(amount || 0)
+const formatCurrency = (amount, currencyCode = 'XOF') => {
+  const code = currencyCode || 'XOF'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: code,
+    minimumFractionDigits: code === 'XOF' ? 0 : 2,
+    maximumFractionDigits: code === 'XOF' ? 0 : 2
+  }).format(amount || 0)
 }
 
 const formatCurrencyByCode = (amount, currency) => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, minimumFractionDigits: 0 }).format(amount || 0)
+  const code = currency || 'XOF'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: code,
+    minimumFractionDigits: code === 'XOF' ? 0 : 2,
+    maximumFractionDigits: code === 'XOF' ? 0 : 2
+  }).format(amount || 0)
 }
 
 const formatCompact = (amount) => {
@@ -352,10 +364,16 @@ const formatCompact = (amount) => {
   return amount?.toString() || '0'
 }
 
-const formatCurrencyCompact = (amount, currency = 'XOF') => {
-  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M ' + currency
-  if (amount >= 100000) return (amount / 1000).toFixed(0) + 'K ' + currency
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, minimumFractionDigits: 0 }).format(amount || 0)
+const formatCurrencyCompact = (amount, currencyCode = 'XOF') => {
+  const code = currencyCode || 'XOF'
+  if (amount >= 1000000) return (amount / 1000000).toFixed(1) + 'M ' + code
+  if (amount >= 100000) return (amount / 1000).toFixed(0) + 'K ' + code
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: code,
+    minimumFractionDigits: code === 'XOF' ? 0 : 2,
+    maximumFractionDigits: code === 'XOF' ? 0 : 2
+  }).format(amount || 0)
 }
 
 const formatDateTime = (date) => {

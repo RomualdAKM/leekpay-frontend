@@ -134,7 +134,13 @@ const filters = ref({ search: '', status: 'all' })
 const formatDate = (date) => new Date(date).toLocaleDateString('fr-FR')
 
 const formatCurrency = (amount, code = 'XOF') => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: code, minimumFractionDigits: 0 }).format(amount || 0)
+  const currencyCode = code || 'XOF'
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: currencyCode === 'XOF' ? 0 : 2,
+    maximumFractionDigits: currencyCode === 'XOF' ? 0 : 2
+  }).format(amount || 0)
 }
 
 const getStatusClass = (status) => {

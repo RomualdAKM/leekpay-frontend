@@ -458,12 +458,13 @@ const { token } = useAuth()
 
 // Fonction pour formater les montants avec la devise appropriée
 const formatCurrency = (amount, currency = null) => {
-  // Utiliser la devise passée en paramètre ou XOF par défaut
-  const currencyCode = currency?.code || 'XOF'
+  // Supporter à la fois un objet {code: 'XOF'} et une string 'XOF'
+  const currencyCode = (typeof currency === 'string' ? currency : currency?.code) || 'XOF'
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: currencyCode,
-    minimumFractionDigits: 0
+    minimumFractionDigits: currencyCode === 'XOF' ? 0 : 2,
+    maximumFractionDigits: currencyCode === 'XOF' ? 0 : 2
   }).format(amount || 0)
 }
 

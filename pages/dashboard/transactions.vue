@@ -50,7 +50,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-600 mb-1">Revenus</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalRevenue) }}</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalRevenue, user.value?.currency?.code) }}</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-600 mb-1">Payées</p>
@@ -475,15 +475,15 @@ const formatAmount = (value) => {
 }
 
 // Nouvelle fonction pour formater les montants avec devise
-const formatCurrency = (amount, currencyCode) => {
+const formatCurrency = (amount, currencyCode = null) => {
   // Utiliser la devise de l'utilisateur connecté si aucune devise n'est fournie
   const code = currencyCode || user.value?.currency?.code || 'XOF'
   
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: code,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    minimumFractionDigits: code === 'XOF' ? 0 : 2,
+    maximumFractionDigits: code === 'XOF' ? 0 : 2
   }).format(amount || 0)
 }
 
