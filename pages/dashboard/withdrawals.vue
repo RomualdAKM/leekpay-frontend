@@ -727,6 +727,18 @@ const historyPagination = ref({
 })
 
 // Configuration des frais (sera récupérée depuis l'API)
+// Le minimum par défaut est adapté selon la devise de l'utilisateur
+const getDefaultMinimumWithdrawal = () => {
+  const currencyCode = user.value?.currency?.code || 'XOF'
+  switch (currencyCode) {
+    case 'EUR': return 2
+    case 'USD': return 5
+    case 'XOF':
+    case 'XAF': return 1000
+    default: return 1000
+  }
+}
+
 const feesConfig = ref({
   total_rate: 0.03,
   total_percentage: 3,
@@ -738,7 +750,7 @@ const feesConfig = ref({
     share: 0.67,
     percentage: 2
   },
-  minimum_withdrawal: 1000
+  minimum_withdrawal: getDefaultMinimumWithdrawal()
 })
 
 const currencySymbol = ref('CFA')
@@ -1020,12 +1032,13 @@ const formatDate = (dateString) => {
 // Format currency
 const formatCurrency = (amount) => {
   const currencyCode = user.value?.currency?.code || 'XOF'
+  const decimals = currencyCode === 'XOF' || currencyCode === 'XAF' ? 0 : 2
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: currencyCode,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(amount)
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(amount || 0)
 }
 
 // Modal methods
