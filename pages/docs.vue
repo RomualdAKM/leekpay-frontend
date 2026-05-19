@@ -273,15 +273,17 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
             </div>
 
             <div class="bg-gray-900 rounded p-4 overflow-x-auto">
-              <pre class="text-sm font-mono"><code class="text-gray-300"># Réponse
+              <pre class="text-sm font-mono"><code class="text-gray-300"># Réponse (HTTP 201)
 {
   "success": true,
   "data": {
-    "payment_url": "https://leekpay.fr/pay/abc123",
-    "payment_id": "abc123",
-    "status": "pending",
+    "id": "checkout_42",
+    "payment_url": "https://leekpay.me/pay_AbCdEf1234567890",
     "amount": 5000,
-    "currency": "XOF"
+    "currency": "XOF",
+    "status": "pending",
+    "expires_at": "2026-05-20T12:00:00+00:00",
+    "return_url": "https://votresite.com/merci"
   }
 }</code></pre>
             </div>
@@ -290,11 +292,11 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
           <div class="mb-8">
             <h3 class="text-sm font-medium text-gray-900 mb-2">Vérifier le statut</h3>
             <p class="text-xs text-gray-500 mb-3">
-              <code class="bg-gray-100 px-1.5 py-0.5 rounded">GET /api/v1/checkout/{payment_id}</code>
+              <code class="bg-gray-100 px-1.5 py-0.5 rounded">GET /api/v1/checkout/{id}</code>
             </p>
-            
+
             <div class="bg-gray-900 rounded p-4 overflow-x-auto">
-              <pre class="text-sm font-mono"><code class="text-gray-300">curl https://leekpay.fr/api/v1/checkout/abc123 \
+              <pre class="text-sm font-mono"><code class="text-gray-300">curl https://leekpay.fr/api/v1/checkout/checkout_42 \
   -H "Authorization: Bearer sk_live_votre_cle_secrete"</code></pre>
             </div>
           </div>
@@ -311,8 +313,8 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
               <tbody class="divide-y divide-gray-200">
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">amount</code></td>
-                  <td class="px-4 py-2 text-gray-500">integer</td>
-                  <td class="px-4 py-2 text-gray-600">Montant en centimes (requis)</td>
+                  <td class="px-4 py-2 text-gray-500">number</td>
+                  <td class="px-4 py-2 text-gray-600">Montant à payer dans l'unité de la devise — ex. 5000 = 5 000 XOF (requis)</td>
                 </tr>
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">currency</code></td>
@@ -322,17 +324,37 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">description</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
-                  <td class="px-4 py-2 text-gray-600">Description de la commande</td>
+                  <td class="px-4 py-2 text-gray-600">Description de la commande (max 500 caractères)</td>
                 </tr>
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">return_url</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
-                  <td class="px-4 py-2 text-gray-600">URL de redirection après paiement</td>
+                  <td class="px-4 py-2 text-gray-600">URL de redirection après paiement réussi</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">cancel_url</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">URL de redirection si le client annule</td>
                 </tr>
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">customer_email</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
-                  <td class="px-4 py-2 text-gray-600">Email du client</td>
+                  <td class="px-4 py-2 text-gray-600">Email du client (pré-rempli sur la page)</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">customer_name</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Nom complet du client</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">customer_phone</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Numéro de téléphone du client</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">metadata</code></td>
+                  <td class="px-4 py-2 text-gray-500">object</td>
+                  <td class="px-4 py-2 text-gray-600">Données libres renvoyées dans le webhook (ex. n° commande)</td>
                 </tr>
               </tbody>
             </table>
@@ -351,14 +373,24 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                   <tr>
-                    <td class="px-4 py-2"><code class="text-xs">payment_url</code></td>
+                    <td class="px-4 py-2"><code class="text-xs">id</code></td>
                     <td class="px-4 py-2 text-gray-500">string</td>
-                    <td class="px-4 py-2 text-gray-600">URL de la page de paiement</td>
+                    <td class="px-4 py-2 text-gray-600">Identifiant unique du checkout (préfixé <code class="text-xs">checkout_</code>)</td>
                   </tr>
                   <tr>
-                    <td class="px-4 py-2"><code class="text-xs">payment_id</code></td>
+                    <td class="px-4 py-2"><code class="text-xs">payment_url</code></td>
                     <td class="px-4 py-2 text-gray-500">string</td>
-                    <td class="px-4 py-2 text-gray-600">Identifiant unique du paiement</td>
+                    <td class="px-4 py-2 text-gray-600">URL de la page de paiement à afficher au client</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2"><code class="text-xs">amount</code></td>
+                    <td class="px-4 py-2 text-gray-500">number</td>
+                    <td class="px-4 py-2 text-gray-600">Montant du paiement</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2"><code class="text-xs">currency</code></td>
+                    <td class="px-4 py-2 text-gray-500">string</td>
+                    <td class="px-4 py-2 text-gray-600">Devise du paiement</td>
                   </tr>
                   <tr>
                     <td class="px-4 py-2"><code class="text-xs">status</code></td>
@@ -366,14 +398,14 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
                     <td class="px-4 py-2 text-gray-600">Statut du paiement (voir <a href="#statuts" class="text-gray-900 underline">Statuts</a>)</td>
                   </tr>
                   <tr>
-                    <td class="px-4 py-2"><code class="text-xs">amount</code></td>
-                    <td class="px-4 py-2 text-gray-500">integer</td>
-                    <td class="px-4 py-2 text-gray-600">Montant du paiement</td>
+                    <td class="px-4 py-2"><code class="text-xs">expires_at</code></td>
+                    <td class="px-4 py-2 text-gray-500">string (ISO 8601)</td>
+                    <td class="px-4 py-2 text-gray-600">Date d'expiration du lien (24h après création)</td>
                   </tr>
                   <tr>
-                    <td class="px-4 py-2"><code class="text-xs">currency</code></td>
+                    <td class="px-4 py-2"><code class="text-xs">return_url</code></td>
                     <td class="px-4 py-2 text-gray-500">string</td>
-                    <td class="px-4 py-2 text-gray-600">Devise du paiement</td>
+                    <td class="px-4 py-2 text-gray-600">URL de redirection fournie à la création (peut être <code class="text-xs">null</code>)</td>
                   </tr>
                 </tbody>
               </table>
@@ -398,20 +430,26 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
 
 POST https://votresite.com/webhook
 Content-Type: application/json
+X-LeekPay-Event: payment.completed
+X-LeekPay-Delivery: 12345
 X-LeekPay-Signature: 5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a...
 
 {
-  "event": "payment.success",
-  "transaction": {
-    "id": 123,
+  "event": "payment.completed",
+  "data": {
+    "transaction_id": "TXN_ABC123XYZ",
+    "checkout_id": "TXN_ABC123XYZ",
     "amount": 5000,
     "currency": "XOF",
-    "status": "completed",
-    "customer_email": "client@example.com",
-    "customer_name": "Jean Dupont",
-    "customer_phone": "+22990123456",
-    "description": "Commande #123",
-    "created_at": "2024-01-15T10:30:00Z"
+    "status": "paid",
+    "payment_method": "mobile_money",
+    "customer": {
+      "email": "client@example.com",
+      "name": "Jean Dupont",
+      "phone": "+22990123456"
+    },
+    "metadata": null,
+    "paid_at": "2026-01-15T10:30:00+00:00"
   }
 }</code></pre>
             </div>
@@ -440,9 +478,10 @@ $expected = hash_hmac('sha256', $payload, 'pk_live_votre_cle_publique');
 if (hash_equals($expected, $signature)) {
     // Signature valide : traiter le paiement
     $data = json_decode($payload, true);
-    $transactionId = $data['transaction']['id'];
-    $amount = $data['transaction']['amount'];
-    
+    $transactionId = $data['data']['transaction_id'];
+    $amount = $data['data']['amount'];
+    $status = $data['data']['status']; // "paid", "failed", ...
+
     // Mettre à jour votre base de données...
     
     http_response_code(200);
@@ -468,42 +507,62 @@ if (hash_equals($expected, $signature)) {
                 <tr>
                   <td class="px-4 py-2"><code class="text-xs">event</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
-                  <td class="px-4 py-2 text-gray-600">Type d'événement ("payment.success")</td>
+                  <td class="px-4 py-2 text-gray-600">Type d'événement (ex. <code class="text-xs">payment.completed</code>)</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.id</code></td>
-                  <td class="px-4 py-2 text-gray-500">integer</td>
-                  <td class="px-4 py-2 text-gray-600">ID unique de la transaction</td>
+                  <td class="px-4 py-2"><code class="text-xs">data.transaction_id</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Référence unique de la transaction</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.amount</code></td>
-                  <td class="px-4 py-2 text-gray-500">integer</td>
+                  <td class="px-4 py-2"><code class="text-xs">data.checkout_id</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Référence du checkout associé</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">data.amount</code></td>
+                  <td class="px-4 py-2 text-gray-500">number</td>
                   <td class="px-4 py-2 text-gray-600">Montant payé</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.currency</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">data.currency</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Devise (XOF, EUR, USD)</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.status</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">data.status</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
-                  <td class="px-4 py-2 text-gray-600">Statut du paiement</td>
+                  <td class="px-4 py-2 text-gray-600">Statut du paiement (voir <a href="#statuts" class="text-gray-900 underline">Statuts</a>)</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.customer_email</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">data.payment_method</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Méthode utilisée (mobile_money, card, ...)</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">data.customer.email</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Email du client</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.customer_name</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">data.customer.name</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Nom complet du client</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">transaction.customer_phone</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">data.customer.phone</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Numéro de téléphone du client</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">data.metadata</code></td>
+                  <td class="px-4 py-2 text-gray-500">object | null</td>
+                  <td class="px-4 py-2 text-gray-600">Métadonnées fournies à la création du checkout</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2"><code class="text-xs">data.paid_at</code></td>
+                  <td class="px-4 py-2 text-gray-500">string (ISO 8601)</td>
+                  <td class="px-4 py-2 text-gray-600">Date du paiement</td>
                 </tr>
               </tbody>
             </table>
@@ -566,7 +625,7 @@ if (hash_equals($expected, $signature)) {
                   <td class="px-4 py-2 text-gray-600">Paiement en cours de traitement par le prestataire</td>
                 </tr>
                 <tr>
-                  <td class="px-4 py-2"><code class="text-xs">completed</code></td>
+                  <td class="px-4 py-2"><code class="text-xs">paid</code></td>
                   <td class="px-4 py-2 text-gray-600">Paiement réussi et validé</td>
                 </tr>
                 <tr>
