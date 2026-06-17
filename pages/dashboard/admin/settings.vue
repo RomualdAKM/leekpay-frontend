@@ -105,20 +105,23 @@ const message = ref(null)
 const groups = [
   { key: 'payments_provider', title: 'Paiements entrants (Mobile Money)', desc: 'Fournisseur utilisé quand un client paie un lien/widget en Mobile Money.' },
   { key: 'payouts_provider', title: 'Retraits / Payouts', desc: 'Fournisseur utilisé pour décaisser les retraits marchands en Mobile Money.' },
+  { key: 'subscriptions_provider', title: 'Abonnements', desc: 'Fournisseur utilisé pour facturer les abonnements premium des marchands.' },
 ]
 
 const data = ref({
   payments_provider: 'moneroo',
   payouts_provider: 'moneroo',
+  subscriptions_provider: 'moneroo',
   available_providers: [],
   zayono: { configured: false, environment: 'unknown', has_api_key: false, has_webhook_secret: false },
 })
 
-const form = reactive({ payments_provider: 'moneroo', payouts_provider: 'moneroo' })
+const form = reactive({ payments_provider: 'moneroo', payouts_provider: 'moneroo', subscriptions_provider: 'moneroo' })
 
 const isDirty = computed(() =>
   form.payments_provider !== data.value.payments_provider ||
-  form.payouts_provider !== data.value.payouts_provider
+  form.payouts_provider !== data.value.payouts_provider ||
+  form.subscriptions_provider !== data.value.subscriptions_provider
 )
 
 const isDisabled = (provider) => provider === 'zayono' && !data.value.zayono?.configured
@@ -126,6 +129,7 @@ const isDisabled = (provider) => provider === 'zayono' && !data.value.zayono?.co
 const reset = () => {
   form.payments_provider = data.value.payments_provider
   form.payouts_provider = data.value.payouts_provider
+  form.subscriptions_provider = data.value.subscriptions_provider
 }
 
 const loadSettings = async () => {
@@ -156,10 +160,12 @@ const save = async () => {
       body: {
         payments_provider: form.payments_provider,
         payouts_provider: form.payouts_provider,
+        subscriptions_provider: form.subscriptions_provider,
       },
     })
     data.value.payments_provider = res.data.payments_provider
     data.value.payouts_provider = res.data.payouts_provider
+    data.value.subscriptions_provider = res.data.subscriptions_provider
     message.value = { type: 'success', text: res.message || 'Réglages mis à jour.' }
   } catch (e) {
     message.value = { type: 'error', text: e?.data?.message || "Échec de la mise à jour." }
