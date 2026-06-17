@@ -128,6 +128,11 @@ const handleSubmit = async () => {
     // Redirection
     await router.push('/dashboard')
   } catch (err) {
+    // Email non vérifié : rediriger vers le flux de vérification (même page que l'inscription).
+    if (err.data?.requires_verification) {
+      await router.push(`/verify-email?email=${encodeURIComponent(err.data.email || email.value)}`)
+      return
+    }
     if (err.data?.errors) {
       apiErrors.value = err.data.errors
     } else {
