@@ -146,7 +146,8 @@ const pageMap = {
   'dashboard/admin/templates': 'Templates',
   'dashboard/admin/banners': 'Bannières',
   'dashboard/admin/settings': 'Providers de paiement',
-  'dashboard/admin/fees': 'Configuration des frais'
+  'dashboard/admin/fees': 'Configuration des frais',
+  'dashboard/admin/accounting': 'Comptabilité'
 }
 
 const pageTitle = computed(() => {
