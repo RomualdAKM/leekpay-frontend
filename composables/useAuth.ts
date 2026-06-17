@@ -1,16 +1,20 @@
 // composables/useAuth.ts
 export const useAuth = () => {
+    // secure: true en production (cookies envoyés uniquement sur HTTPS) ; false en
+    // dev local (HTTP) pour ne pas casser la connexion. httpOnly reste false car le
+    // token est lu en JS pour l'en-tête Authorization (l'AUTORISATION réelle est
+    // côté serveur : le rôle du cookie 'user' n'est JAMAIS une source de confiance).
     const token = useCookie<string | null>('leekpay_token', {
         sameSite: 'strict',
         default: () => null,
         httpOnly: false,
-        secure: false
+        secure: !import.meta.dev
     })
     const user = useCookie<any | null>('leekpay_user', {
         sameSite: 'strict',
         default: () => null,
         httpOnly: false,
-        secure: false
+        secure: !import.meta.dev
     })
 
     const setAuth = (newToken: string, newUser: any) => {
