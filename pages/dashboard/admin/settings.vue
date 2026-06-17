@@ -2,7 +2,7 @@
   <div class="space-y-6 max-w-3xl">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Providers de paiement</h1>
-      <p class="text-gray-600">Choisissez le fournisseur utilisé pour les paiements Mobile Money entrants.</p>
+      <p class="text-gray-600">Choisissez le fournisseur utilisé pour les paiements entrants et les retraits.</p>
     </div>
 
     <div v-if="loading" class="flex items-center justify-center py-16">
@@ -10,7 +10,6 @@
     </div>
 
     <template v-else>
-      <!-- Message -->
       <div
         v-if="message"
         class="px-4 py-3 text-sm border"
@@ -21,64 +20,55 @@
         {{ message.text }}
       </div>
 
-      <!-- Avertissement -->
       <div class="bg-amber-50 border-l-2 border-amber-400 px-4 py-3 text-sm text-amber-800">
-        La bascule s'applique aux <strong>nouvelles</strong> transactions Mobile Money. Les paiements déjà
-        en cours restent traités et réconciliés par leur provider d'origine. Vous pouvez revenir sur
-        Moneroo à tout moment.
+        La bascule s'applique aux <strong>nouvelles</strong> opérations. Les paiements et payouts déjà
+        en cours restent traités par leur provider d'origine. Vous pouvez revenir sur Moneroo à tout moment.
       </div>
 
-      <!-- Choix du provider -->
-      <div class="border border-gray-200 divide-y divide-gray-200">
-        <label
-          v-for="p in data.available_providers"
-          :key="p.value"
-          class="flex items-start gap-4 p-4 cursor-pointer hover:bg-gray-50"
-          :class="{ 'opacity-50 cursor-not-allowed hover:bg-white': isDisabled(p.value) }"
-        >
-          <input
-            type="radio"
-            name="payments_provider"
-            class="mt-1 accent-green-600"
-            :value="p.value"
-            v-model="selected"
-            :disabled="isDisabled(p.value)"
-          />
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-semibold text-gray-900">{{ p.label }}</span>
+      <!-- Un bloc par axe (paiements, payouts) -->
+      <div v-for="group in groups" :key="group.key" class="space-y-2">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900">{{ group.title }}</h2>
+          <p class="text-xs text-gray-500">{{ group.desc }}</p>
+        </div>
 
-              <!-- Badge provider actif -->
-              <span
-                v-if="p.value === data.payments_provider"
-                class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded"
-              >Actif</span>
-
-              <!-- Badge environnement Zayono -->
-              <span
-                v-if="p.value === 'zayono' && data.zayono.configured"
-                class="px-2 py-0.5 text-xs rounded"
-                :class="data.zayono.environment === 'live'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600'"
-              >{{ data.zayono.environment === 'live' ? 'Live' : (data.zayono.environment === 'test' ? 'Test' : 'Inconnu') }}</span>
+        <div class="border border-gray-200 divide-y divide-gray-200">
+          <label
+            v-for="p in data.available_providers"
+            :key="group.key + '-' + p.value"
+            class="flex items-start gap-4 p-4 cursor-pointer hover:bg-gray-50"
+            :class="{ 'opacity-50 cursor-not-allowed hover:bg-white': isDisabled(p.value) }"
+          >
+            <input
+              type="radio"
+              :name="group.key"
+              class="mt-1 accent-green-600"
+              :value="p.value"
+              v-model="form[group.key]"
+              :disabled="isDisabled(p.value)"
+            />
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-gray-900">{{ p.label }}</span>
+                <span
+                  v-if="p.value === data[group.key]"
+                  class="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded"
+                >Actif</span>
+                <span
+                  v-if="p.value === 'zayono' && data.zayono.configured"
+                  class="px-2 py-0.5 text-xs rounded"
+                  :class="data.zayono.environment === 'live' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'"
+                >{{ data.zayono.environment === 'live' ? 'Live' : (data.zayono.environment === 'test' ? 'Test' : 'Inconnu') }}</span>
+              </div>
+              <p v-if="p.value === 'zayono' && !data.zayono.configured" class="text-sm text-red-600 mt-0.5">
+                Non configuré : renseignez <code class="text-xs bg-gray-100 px-1">ZAYONO_API_KEY</code> et
+                <code class="text-xs bg-gray-100 px-1">ZAYONO_WEBHOOK_SECRET</code> côté serveur, puis videz le cache de config.
+              </p>
             </div>
-
-            <p v-if="p.value === 'moneroo'" class="text-sm text-gray-500 mt-0.5">
-              Fournisseur historique (Mobile Money). Toujours disponible.
-            </p>
-            <p v-else-if="p.value === 'zayono' && !data.zayono.configured" class="text-sm text-red-600 mt-0.5">
-              Non configuré : renseignez <code class="text-xs bg-gray-100 px-1">ZAYONO_API_KEY</code> et
-              <code class="text-xs bg-gray-100 px-1">ZAYONO_WEBHOOK_SECRET</code> côté serveur, puis videz le cache de config.
-            </p>
-            <p v-else-if="p.value === 'zayono'" class="text-sm text-gray-500 mt-0.5">
-              Mobile Money via Zayono (page de paiement hébergée).
-            </p>
-          </div>
-        </label>
+          </label>
+        </div>
       </div>
 
-      <!-- Actions -->
       <div class="flex items-center gap-3">
         <button
           @click="save"
@@ -89,7 +79,7 @@
         </button>
         <button
           v-if="isDirty"
-          @click="selected = data.payments_provider"
+          @click="reset"
           :disabled="saving"
           class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900"
         >
@@ -112,16 +102,31 @@ const loading = ref(true)
 const saving = ref(false)
 const message = ref(null)
 
+const groups = [
+  { key: 'payments_provider', title: 'Paiements entrants (Mobile Money)', desc: 'Fournisseur utilisé quand un client paie un lien/widget en Mobile Money.' },
+  { key: 'payouts_provider', title: 'Retraits / Payouts', desc: 'Fournisseur utilisé pour décaisser les retraits marchands en Mobile Money.' },
+]
+
 const data = ref({
   payments_provider: 'moneroo',
+  payouts_provider: 'moneroo',
   available_providers: [],
   zayono: { configured: false, environment: 'unknown', has_api_key: false, has_webhook_secret: false },
 })
-const selected = ref('moneroo')
 
-const isDirty = computed(() => selected.value !== data.value.payments_provider)
+const form = reactive({ payments_provider: 'moneroo', payouts_provider: 'moneroo' })
+
+const isDirty = computed(() =>
+  form.payments_provider !== data.value.payments_provider ||
+  form.payouts_provider !== data.value.payouts_provider
+)
 
 const isDisabled = (provider) => provider === 'zayono' && !data.value.zayono?.configured
+
+const reset = () => {
+  form.payments_provider = data.value.payments_provider
+  form.payouts_provider = data.value.payouts_provider
+}
 
 const loadSettings = async () => {
   loading.value = true
@@ -131,7 +136,7 @@ const loadSettings = async () => {
       headers: { Authorization: `Bearer ${token.value}` },
     })
     data.value = res.data
-    selected.value = res.data.payments_provider
+    reset()
   } catch (e) {
     message.value = { type: 'error', text: "Impossible de charger les réglages." }
   } finally {
@@ -148,13 +153,17 @@ const save = async () => {
       method: 'PUT',
       baseURL: config.public.apiBaseURL,
       headers: { Authorization: `Bearer ${token.value}` },
-      body: { payments_provider: selected.value },
+      body: {
+        payments_provider: form.payments_provider,
+        payouts_provider: form.payouts_provider,
+      },
     })
     data.value.payments_provider = res.data.payments_provider
+    data.value.payouts_provider = res.data.payouts_provider
     message.value = { type: 'success', text: res.message || 'Réglages mis à jour.' }
   } catch (e) {
     message.value = { type: 'error', text: e?.data?.message || "Échec de la mise à jour." }
-    selected.value = data.value.payments_provider
+    reset()
   } finally {
     saving.value = false
   }
