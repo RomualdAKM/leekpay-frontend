@@ -148,7 +148,8 @@ const pageMap = {
   'dashboard/admin/settings': 'Providers de paiement',
   'dashboard/admin/fees': 'Configuration des frais',
   'dashboard/admin/accounting': 'Comptabilité',
-  'dashboard/admin/users': 'Utilisateurs'
+  'dashboard/admin/users': 'Utilisateurs',
+  'dashboard/admin/withdrawal-options': 'Opérateurs de retrait'
 }
 
 const pageTitle = computed(() => {

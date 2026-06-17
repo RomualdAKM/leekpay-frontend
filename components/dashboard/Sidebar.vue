@@ -389,6 +389,7 @@ const adminItems = computed(() => [
   { id: 'dashboard/admin/settings', label: 'Providers', icon: SettingsIcon },
   { id: 'dashboard/admin/fees', label: 'Frais', icon: PercentIcon },
   { id: 'dashboard/admin/accounting', label: 'Comptabilité', icon: CalculatorIcon },
-  { id: 'dashboard/admin/users', label: 'Utilisateurs', icon: UserIcon }
+  { id: 'dashboard/admin/users', label: 'Utilisateurs', icon: UserIcon },
+  { id: 'dashboard/admin/withdrawal-options', label: 'Opérateurs retrait', icon: ArrowLeftRightIcon }
 ])
 </script>
