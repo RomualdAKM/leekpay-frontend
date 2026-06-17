@@ -35,6 +35,7 @@
                 type="number"
                 step="any"
                 min="0"
+                :max="item.kind === 'rate' ? 100 : undefined"
                 v-model.number="form[item.key]"
                 class="w-28 text-right border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-green-500"
               />
@@ -63,7 +64,7 @@
 <script setup>
 import { useAuth } from '~/composables/useAuth'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: 'dashboard', middleware: 'admin' })
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -117,11 +118,37 @@ const save = async () => {
 
   const changed = Object.keys(form).filter(changedKey)
 
-  // Garde : refuser tout champ vide / non numérique avant l'envoi.
-  const invalid = changed.find(k => !Number.isFinite(Number(form[k])))
+  // Garde 1 : refuser tout champ vide / null / non numérique avant l'envoi.
+  // (v-model.number renvoie '' quand l'input est vidé ; Number('') === 0 passerait
+  //  silencieusement isFinite et écraserait un frais à 0 — on le bloque explicitement.)
+  const invalid = changed.find(k => {
+    const v = form[k]
+    return v === '' || v === null || v === undefined || !Number.isFinite(Number(v))
+  })
   if (invalid) {
     message.value = { type: 'error', text: 'Veuillez saisir une valeur numérique valide pour tous les champs modifiés.' }
     return
+  }
+
+  // Garde 2 : un taux (%) doit rester dans [0, 100] (le backend l'exige aussi).
+  const outOfRange = changed.find(k => kinds[k] === 'rate' && (Number(form[k]) < 0 || Number(form[k]) > 100))
+  if (outOfRange) {
+    message.value = { type: 'error', text: 'Les taux doivent être compris entre 0 et 100 %.' }
+    return
+  }
+
+  // Garde 3 : pour chaque barème de retrait, Part LeekPay + Part agrégateur = 100%.
+  // (le backend reste l'autorité ; ceci évite un aller-retour pour une erreur évidente.)
+  const sharePairs = [
+    ['withdrawal.leekpay_share', 'withdrawal.aggregator_share'],
+    ['withdrawal.premium.leekpay_share', 'withdrawal.premium.aggregator_share'],
+  ]
+  for (const [a, b] of sharePairs) {
+    if (!(a in form) || !(b in form)) continue
+    if (Math.abs((Number(form[a]) + Number(form[b])) - 100) > 1e-6) {
+      message.value = { type: 'error', text: 'Pour chaque barème de retrait, Part LeekPay + Part agrégateur doivent faire 100 %.' }
+      return
+    }
   }
 
   saving.value = true

@@ -93,7 +93,7 @@
       <div class="divide-y divide-gray-100 text-sm">
         <div v-for="exp in expenses" :key="exp.id" class="flex items-center justify-between px-4 py-2">
           <div class="flex-1">
-            <span class="font-medium">{{ Number(exp.amount).toLocaleString() }} {{ exp.currency }}</span>
+            <span class="font-medium">{{ Number(exp.amount).toLocaleString('fr-FR') }} {{ exp.currency }}</span>
             <span class="text-gray-500 ml-2 capitalize">{{ exp.category }}</span>
             <span class="text-gray-400 ml-2">{{ exp.expense_date }}</span>
             <span v-if="exp.description" class="text-gray-400 ml-2 italic">— {{ exp.description }}</span>
@@ -103,7 +103,7 @@
             <button @click="removeExpense(exp)" class="text-xs text-red-600 hover:text-red-800">Supprimer</button>
           </div>
         </div>
-        <div v-if="!expenses.length" class="px-4 py-4 text-gray-400">Aucune dépense.</div>
+        <div v-if="!loading && !expenses.length" class="px-4 py-4 text-gray-400">Aucune dépense.</div>
       </div>
     </div>
   </div>
@@ -112,7 +112,7 @@
 <script setup>
 import { useAuth } from '~/composables/useAuth'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: 'dashboard', middleware: 'admin' })
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -129,7 +129,9 @@ const currencies = ['XOF', 'XAF', 'EUR', 'USD', 'GHS']
 
 const today = new Date()
 const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-const iso = (d) => d.toISOString().slice(0, 10)
+// Date locale (Y-m-d) SANS passer par UTC : toISOString() décalerait d'un jour
+// pour les admins à fuseau non-UTC (ex. GMT+1 en début de mois -> mois précédent).
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const period = reactive({ start: iso(firstOfMonth), end: iso(today) })
 
 const form = reactive({ open: false, id: null, amount: null, currency: 'XOF', category: 'other', description: '', expense_date: iso(today) })

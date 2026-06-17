@@ -33,10 +33,10 @@
           <div class="text-xs text-gray-500">{{ o.name }}</div>
         </div>
         <div class="flex gap-3">
-          <button @click="toggle(o)" class="text-xs font-medium" :class="o.is_active ? 'text-gray-600 hover:text-gray-900' : 'text-green-700 hover:text-green-900'">
+          <button @click="toggle(o)" :disabled="o._busy" class="text-xs font-medium disabled:opacity-40 disabled:cursor-not-allowed" :class="o.is_active ? 'text-gray-600 hover:text-gray-900' : 'text-green-700 hover:text-green-900'">
             {{ o.is_active ? 'Désactiver' : 'Activer' }}
           </button>
-          <button @click="remove(o)" class="text-xs text-red-600 hover:text-red-800">Supprimer</button>
+          <button @click="remove(o)" :disabled="o._busy" class="text-xs text-red-600 hover:text-red-800 disabled:opacity-40 disabled:cursor-not-allowed">Supprimer</button>
         </div>
       </div>
       <div v-if="!options.length" class="px-4 py-6 text-gray-400">Aucun opérateur.</div>
@@ -47,7 +47,7 @@
 <script setup>
 import { useAuth } from '~/composables/useAuth'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: 'dashboard', middleware: 'admin' })
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
@@ -62,6 +62,7 @@ const form = reactive({ country: '', label: '', name: '' })
 
 const load = async () => {
   loading.value = true
+  message.value = null
   try {
     const res = await $fetch('/admin/withdrawal-options', { baseURL, headers: headers.value })
     options.value = res.data ?? []
@@ -96,20 +97,29 @@ const add = async () => {
 }
 
 const toggle = async (o) => {
+  if (o._busy) return            // anti-double-clic : un 2e PATCH ré-inverserait l'état
+  o._busy = true
+  message.value = null
   try {
     const res = await $fetch(`/admin/withdrawal-options/${o.id}/toggle`, { method: 'PATCH', baseURL, headers: headers.value })
     o.is_active = res.data.is_active
   } catch (e) {
     message.value = { type: 'error', text: "Échec de l'opération." }
+  } finally {
+    o._busy = false
   }
 }
 
 const remove = async (o) => {
+  if (o._busy) return
   if (!confirm(`Supprimer « ${o.label} » ?`)) return
+  o._busy = true
+  message.value = null
   try {
     await $fetch(`/admin/withdrawal-options/${o.id}`, { method: 'DELETE', baseURL, headers: headers.value })
-    await load()
+    await load()               // remplace la liste : l'élément (et son _busy) disparaît
   } catch (e) {
+    o._busy = false
     message.value = { type: 'error', text: 'Échec de la suppression.' }
   }
 }

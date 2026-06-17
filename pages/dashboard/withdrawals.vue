@@ -515,6 +515,9 @@
                 <option v-for="opt in items" :key="opt.name" :value="opt.name">{{ opt.label }}</option>
               </optgroup>
             </select>
+            <p v-if="!Object.keys(withdrawalOptions).length" class="mt-1 text-xs text-amber-600">
+              Aucun opérateur de retrait disponible actuellement. Contactez le support.
+            </p>
           </div>
           
           <div>
@@ -688,7 +691,8 @@ const fetchWithdrawalOptions = async () => {
     })
     withdrawalOptions.value = res.data || {}
   } catch (e) {
-    // garder vide en cas d'erreur
+    // Non bloquant pour la page, mais on trace l'échec (cohérent avec les autres fetch).
+    console.error('Erreur lors du chargement des opérateurs de retrait:', e)
   }
 }
 
