@@ -236,6 +236,8 @@ const apiBaseUrl = config.public.apiBaseURL || 'https://leekpay.fr/api'
 const transactionId = computed(() => route.query.transaction)
 const paymentId = computed(() => route.query.paymentId)
 const paymentStatus = computed(() => route.query.paymentStatus)
+// Jeton secret de la transaction (anti-IDOR) : transmis par l'URL de retour du provider.
+const refToken = computed(() => route.query.ref)
 
 // Devise par défaut
 const currency = computed(() => {
@@ -313,6 +315,9 @@ const checkStatus = async () => {
     }
     if (paymentStatus.value) {
       params.append('paymentStatus', paymentStatus.value)
+    }
+    if (refToken.value) {
+      params.append('ref', refToken.value)
     }
     
     if (params.toString()) {

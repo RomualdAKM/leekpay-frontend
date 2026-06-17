@@ -488,7 +488,9 @@ const triggerPayment = async () => {
       if (response.data.payment_url) {
         window.location.href = response.data.payment_url
       } else {
-        await router.push(`/payment/success?transaction=${response.data.transaction_id}`)
+        // Propager la ref (jeton secret) pour l'accès au statut (anti-IDOR).
+        const ref = response.data.transaction_reference ? `&ref=${encodeURIComponent(response.data.transaction_reference)}` : ''
+        await router.push(`/payment/success?transaction=${response.data.transaction_id}${ref}`)
       }
     } else {
       error.value = response.message || 'Erreur lors de l\'initialisation du paiement'
@@ -716,14 +718,16 @@ const handleClickOutside = (event) => {
 const handleReturnParameters = async () => {
   const status = route.query.status
   const transactionId = route.query.transaction
-  
+  const ref = route.query.ref // jeton secret (anti-IDOR) transmis par l'URL de retour
+  const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : ''
+
   if (status === 'success' && transactionId) {
     // Si on est dans une iframe (widget), envoyer un message au parent avec les détails
     if (window.parent && window.parent !== window) {
       try {
         // Récupérer les détails de la transaction
         const config = useRuntimeConfig()
-        const response = await $fetch(`${config.public.apiBaseURL}/public/transaction/${transactionId}/status`)
+        const response = await $fetch(`${config.public.apiBaseURL}/public/transaction/${transactionId}/status${refQuery}`)
         
         if (response.success) {
           window.parent.postMessage({
@@ -747,7 +751,7 @@ const handleReturnParameters = async () => {
       }
     }
     
-    router.push(`/payment/success?transaction=${transactionId}`)
+    router.push(`/payment/success?transaction=${transactionId}${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`)
     return true
   }
   
