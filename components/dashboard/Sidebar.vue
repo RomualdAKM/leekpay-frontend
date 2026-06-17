@@ -383,6 +383,7 @@ const adminItems = computed(() => [
   { id: 'dashboard/admin/kyc', label: 'KYC', icon: UserCheckIcon },
   { id: 'dashboard/admin/broadcast', label: 'Communication', icon: MailIcon },
   { id: 'dashboard/admin/templates', label: 'Templates', icon: LayoutTemplateIcon },
-  { id: 'dashboard/admin/banners', label: 'Bannières', icon: ImageIcon }
+  { id: 'dashboard/admin/banners', label: 'Bannières', icon: ImageIcon },
+  { id: 'dashboard/admin/settings', label: 'Providers', icon: SettingsIcon }
 ])
 </script>

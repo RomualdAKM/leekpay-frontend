@@ -144,7 +144,8 @@ const pageMap = {
   'dashboard/admin/kyc': 'KYC',
   'dashboard/admin/broadcast': 'Communication',
   'dashboard/admin/templates': 'Templates',
-  'dashboard/admin/banners': 'Bannières'
+  'dashboard/admin/banners': 'Bannières',
+  'dashboard/admin/settings': 'Providers de paiement'
 }
 
 const pageTitle = computed(() => {

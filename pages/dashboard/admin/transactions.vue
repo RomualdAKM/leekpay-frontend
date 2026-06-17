@@ -333,6 +333,7 @@ const formatProvider = (provider) => {
   if (!provider) return 'N/A'
   const providers = {
     'moneroo': 'Moneroo',
+    'zayono': 'Zayono',
     'paypal': 'PayPal',
     'stripe': 'Stripe',
     'orange_money': 'Orange Money',
