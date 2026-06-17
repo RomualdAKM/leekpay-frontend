@@ -336,7 +336,8 @@ import {
   LayoutTemplateIcon,
   GiftIcon,
   ImageIcon,
-  RotateCcwIcon
+  RotateCcwIcon,
+  PercentIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -384,6 +385,7 @@ const adminItems = computed(() => [
   { id: 'dashboard/admin/broadcast', label: 'Communication', icon: MailIcon },
   { id: 'dashboard/admin/templates', label: 'Templates', icon: LayoutTemplateIcon },
   { id: 'dashboard/admin/banners', label: 'Bannières', icon: ImageIcon },
-  { id: 'dashboard/admin/settings', label: 'Providers', icon: SettingsIcon }
+  { id: 'dashboard/admin/settings', label: 'Providers', icon: SettingsIcon },
+  { id: 'dashboard/admin/fees', label: 'Frais', icon: PercentIcon }
 ])
 </script>
