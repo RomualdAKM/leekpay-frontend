@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'blank' })
+definePageMeta({ layout: 'blank', middleware: 'admin' })
 
 const route = useRoute()
 const templateId = computed(() => Number(route.params.id))

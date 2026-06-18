@@ -236,7 +236,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
-definePageMeta({ layout: 'dashboard' })
+definePageMeta({ layout: 'dashboard', middleware: 'admin' })
 
 const config = useRuntimeConfig()
 const { token } = useAuth()
