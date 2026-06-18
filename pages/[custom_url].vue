@@ -489,8 +489,9 @@ const triggerPayment = async () => {
         window.location.href = response.data.payment_url
       } else {
         // Propager la ref (jeton secret) pour l'accès au statut (anti-IDOR).
-        const ref = response.data.transaction_reference ? `&ref=${encodeURIComponent(response.data.transaction_reference)}` : ''
-        await router.push(`/payment/success?transaction=${response.data.transaction_id}${ref}`)
+        // NB : ne PAS nommer cette variable "ref" -> casserait l'auto-import de Vue ref().
+        const refParam = response.data.transaction_reference ? `&ref=${encodeURIComponent(response.data.transaction_reference)}` : ''
+        await router.push(`/payment/success?transaction=${response.data.transaction_id}${refParam}`)
       }
     } else {
       error.value = response.message || 'Erreur lors de l\'initialisation du paiement'
@@ -718,8 +719,8 @@ const handleClickOutside = (event) => {
 const handleReturnParameters = async () => {
   const status = route.query.status
   const transactionId = route.query.transaction
-  const ref = route.query.ref // jeton secret (anti-IDOR) transmis par l'URL de retour
-  const refQuery = ref ? `?ref=${encodeURIComponent(ref)}` : ''
+  const refToken = route.query.ref // jeton secret (anti-IDOR) transmis par l'URL de retour
+  const refQuery = refToken ? `?ref=${encodeURIComponent(refToken)}` : ''
 
   if (status === 'success' && transactionId) {
     // Si on est dans une iframe (widget), envoyer un message au parent avec les détails
@@ -751,7 +752,7 @@ const handleReturnParameters = async () => {
       }
     }
     
-    router.push(`/payment/success?transaction=${transactionId}${ref ? `&ref=${encodeURIComponent(ref)}` : ''}`)
+    router.push(`/payment/success?transaction=${transactionId}${refToken ? `&ref=${encodeURIComponent(refToken)}` : ''}`)
     return true
   }
   
