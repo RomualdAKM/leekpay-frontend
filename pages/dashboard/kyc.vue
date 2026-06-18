@@ -77,99 +77,42 @@
         <h3 class="font-medium text-gray-900 mb-4">Soumettre vos documents</h3>
         
         <!-- Instructions -->
-        <div class="mb-6 p-4 bg-gray-50 border border-gray-200">
-          <p class="text-sm font-medium text-gray-700 mb-2">Documents requis :</p>
+        <div class="mb-6 p-4 bg-amber-50 border border-amber-200">
+          <p class="text-sm font-medium text-gray-700 mb-2">Photos à prendre EN DIRECT avec votre caméra :</p>
           <ul class="text-sm text-gray-600 space-y-1">
             <li>• Recto de la carte d'identité</li>
             <li>• Verso de la carte d'identité</li>
             <li>• Selfie avec la carte en main</li>
           </ul>
+          <p class="text-xs text-amber-700 mt-2">
+            Pour limiter la fraude, l'import de fichiers n'est pas autorisé : vous devez
+            <strong>capturer les photos en direct</strong> via la caméra (de préférence un téléphone).
+          </p>
         </div>
 
-        <!-- ID Card Front -->
-        <div class="mb-5">
-          <label class="block text-sm text-gray-700 mb-2">Recto de la carte *</label>
-          <div 
-            class="border border-dashed border-gray-300 p-6 text-center cursor-pointer hover:border-gray-400 transition"
-            :class="{ 'border-green-600 bg-green-50': idCardFrontPreview }"
-            @click="$refs.idCardFrontInput.click()"
-            @dragover.prevent
-            @drop.prevent="handleDrop($event, 'id_card_front')"
-          >
-            <input 
-              ref="idCardFrontInput"
-              type="file" 
-              accept="image/jpeg,image/png,image/jpg"
-              class="hidden"
-              @change="handleFileChange($event, 'id_card_front')"
-            />
-            <div v-if="idCardFrontPreview">
-              <img :src="idCardFrontPreview" alt="Recto" class="max-h-32 mx-auto mb-2" />
-              <p class="text-xs text-gray-500">Cliquer pour changer</p>
+        <!-- Capture caméra en direct, étape par étape (1 seule caméra active à la fois) -->
+        <div class="space-y-3 mb-5">
+          <div v-for="(doc, i) in docs" :key="doc.key" class="border border-gray-200 p-3">
+            <!-- Photo déjà prise -->
+            <div v-if="captured[doc.key]" class="flex items-center gap-3">
+              <img :src="previews[doc.key]" :alt="doc.label" class="h-16 w-16 object-cover border border-gray-200" />
+              <div class="flex-1">
+                <p class="text-sm font-medium text-green-700">✓ {{ doc.label }}</p>
+                <button type="button" @click="retake(doc.key)" class="text-xs text-gray-600 underline">Reprendre</button>
+              </div>
             </div>
-            <div v-else>
-              <Upload class="w-6 h-6 mx-auto text-gray-400 mb-2" />
-              <p class="text-sm text-gray-600">Cliquer ou glisser-déposer</p>
-              <p class="text-xs text-gray-400 mt-1">JPG, PNG (max 5 Mo)</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- ID Card Back -->
-        <div class="mb-5">
-          <label class="block text-sm text-gray-700 mb-2">Verso de la carte *</label>
-          <div 
-            class="border border-dashed border-gray-300 p-6 text-center cursor-pointer hover:border-gray-400 transition"
-            :class="{ 'border-green-600 bg-green-50': idCardBackPreview }"
-            @click="$refs.idCardBackInput.click()"
-            @dragover.prevent
-            @drop.prevent="handleDrop($event, 'id_card_back')"
-          >
-            <input 
-              ref="idCardBackInput"
-              type="file" 
-              accept="image/jpeg,image/png,image/jpg"
-              class="hidden"
-              @change="handleFileChange($event, 'id_card_back')"
+            <!-- Étape courante : caméra -->
+            <CameraCapture
+              v-else-if="i === currentStep"
+              :label="doc.label"
+              :facing-mode="doc.facing"
+              :hint="doc.hint"
+              @captured="onCaptured(doc.key, $event)"
             />
-            <div v-if="idCardBackPreview">
-              <img :src="idCardBackPreview" alt="Verso" class="max-h-32 mx-auto mb-2" />
-              <p class="text-xs text-gray-500">Cliquer pour changer</p>
-            </div>
-            <div v-else>
-              <Upload class="w-6 h-6 mx-auto text-gray-400 mb-2" />
-              <p class="text-sm text-gray-600">Cliquer ou glisser-déposer</p>
-              <p class="text-xs text-gray-400 mt-1">JPG, PNG (max 5 Mo)</p>
-            </div>
-          </div>
-        </div>
 
-        <!-- Selfie -->
-        <div class="mb-5">
-          <label class="block text-sm text-gray-700 mb-2">Selfie avec la carte *</label>
-          <div 
-            class="border border-dashed border-gray-300 p-6 text-center cursor-pointer hover:border-gray-400 transition"
-            :class="{ 'border-green-600 bg-green-50': selfiePreview }"
-            @click="$refs.selfieInput.click()"
-            @dragover.prevent
-            @drop.prevent="handleDrop($event, 'selfie_with_card')"
-          >
-            <input 
-              ref="selfieInput"
-              type="file" 
-              accept="image/jpeg,image/png,image/jpg"
-              class="hidden"
-              @change="handleFileChange($event, 'selfie_with_card')"
-            />
-            <div v-if="selfiePreview">
-              <img :src="selfiePreview" alt="Selfie" class="max-h-32 mx-auto mb-2" />
-              <p class="text-xs text-gray-500">Cliquer pour changer</p>
-            </div>
-            <div v-else>
-              <Upload class="w-6 h-6 mx-auto text-gray-400 mb-2" />
-              <p class="text-sm text-gray-600">Cliquer ou glisser-déposer</p>
-              <p class="text-xs text-gray-400 mt-1">JPG, PNG (max 5 Mo)</p>
-            </div>
+            <!-- Étape à venir -->
+            <div v-else class="text-sm text-gray-400 py-1">{{ i + 1 }}. {{ doc.label }} — en attente</div>
           </div>
         </div>
 
@@ -193,8 +136,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { CheckCircle, XCircle, Clock, Upload } from 'lucide-vue-next'
+import { ref, computed, reactive, onMounted, onBeforeUnmount } from 'vue'
+import { CheckCircle, XCircle, Clock } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -211,14 +154,19 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref('success')
 
-const idCardFront = ref(null)
-const idCardBack = ref(null)
-const selfieWithCard = ref(null)
-const idCardFrontPreview = ref(null)
-const idCardBackPreview = ref(null)
-const selfiePreview = ref(null)
+// Les 3 documents à capturer, dans l'ordre (assistant pas-à-pas).
+const docs = [
+  { key: 'id_card_front', label: 'Recto de la carte', facing: 'environment', hint: 'Cadrez le RECTO de votre pièce, bien lisible.' },
+  { key: 'id_card_back', label: 'Verso de la carte', facing: 'environment', hint: 'Cadrez le VERSO de votre pièce, bien lisible.' },
+  { key: 'selfie_with_card', label: 'Selfie avec la carte', facing: 'user', hint: 'Votre visage + la carte d\'identité tenue en main.' },
+]
 
-const canSubmit = computed(() => idCardFront.value && idCardBack.value && selfieWithCard.value)
+const captured = reactive({ id_card_front: null, id_card_back: null, selfie_with_card: null }) // File de chaque doc
+const previews = reactive({ id_card_front: null, id_card_back: null, selfie_with_card: null }) // URL d'aperçu
+
+// Étape courante = 1er document non encore capturé (-1 si tous pris).
+const currentStep = computed(() => docs.findIndex((d) => !captured[d.key]))
+const canSubmit = computed(() => docs.every((d) => captured[d.key]))
 
 const showToastNotification = (message, type = 'success') => {
   toastMessage.value = message
@@ -238,40 +186,22 @@ const formatDate = (dateString) => {
   })
 }
 
-const handleFileChange = (event, type) => {
-  const file = event.target.files[0]
-  if (!file) return
-  
-  if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-    showToastNotification('Format non supporté. JPG ou PNG uniquement.', 'error')
-    return
-  }
-  
-  if (file.size > 5 * 1024 * 1024) {
-    showToastNotification('Fichier trop volumineux (max 5 Mo)', 'error')
-    return
-  }
-  
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    if (type === 'id_card_front') {
-      idCardFront.value = file
-      idCardFrontPreview.value = e.target.result
-    } else if (type === 'id_card_back') {
-      idCardBack.value = file
-      idCardBackPreview.value = e.target.result
-    } else if (type === 'selfie_with_card') {
-      selfieWithCard.value = file
-      selfiePreview.value = e.target.result
-    }
-  }
-  reader.readAsDataURL(file)
+// Photo capturée en direct par le composant CameraCapture (aucun import de fichier).
+const onCaptured = (key, file) => {
+  if (previews[key]) URL.revokeObjectURL(previews[key])
+  captured[key] = file
+  previews[key] = URL.createObjectURL(file)
 }
 
-const handleDrop = (event, type) => {
-  const file = event.dataTransfer.files[0]
-  if (file) handleFileChange({ target: { files: [file] } }, type)
+const retake = (key) => {
+  if (previews[key]) URL.revokeObjectURL(previews[key])
+  captured[key] = null
+  previews[key] = null
 }
+
+onBeforeUnmount(() => {
+  Object.values(previews).forEach((url) => { if (url) URL.revokeObjectURL(url) })
+})
 
 const loadKycStatus = async () => {
   try {
@@ -300,9 +230,9 @@ const submitKyc = async () => {
     errorMessage.value = ''
     
     const formData = new FormData()
-    formData.append('id_card_front', idCardFront.value)
-    formData.append('id_card_back', idCardBack.value)
-    formData.append('selfie_with_card', selfieWithCard.value)
+    formData.append('id_card_front', captured.id_card_front)
+    formData.append('id_card_back', captured.id_card_back)
+    formData.append('selfie_with_card', captured.selfie_with_card)
     
     const response = await $fetch(`${config.public.apiBaseURL}/kyc/submit`, {
       method: 'POST',
@@ -314,6 +244,12 @@ const submitKyc = async () => {
       showToastNotification('Documents soumis', 'success')
       kycStatus.value = 'pending'
       latestVerification.value = response.data
+      // Libérer les ressources tout de suite (le formulaire est désormais masqué).
+      Object.keys(previews).forEach((k) => {
+        if (previews[k]) URL.revokeObjectURL(previews[k])
+        previews[k] = null
+        captured[k] = null
+      })
     }
   } catch (error) {
     errorMessage.value = error.data?.message || 'Erreur lors de la soumission'
