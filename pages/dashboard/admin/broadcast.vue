@@ -293,6 +293,11 @@
                 {{ broadcast.sent_count }}/{{ broadcast.total_recipients }}
                 <span class="text-gray-500 font-normal">envoyé(s)</span>
               </p>
+              <p v-if="broadcast.sent_count + broadcast.failed_count < broadcast.total_recipients"
+                 class="text-xs text-green-600">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse mr-1 align-middle"></span>
+                envoi en cours
+              </p>
               <p v-if="broadcast.failed_count > 0" class="text-xs text-red-500">
                 {{ broadcast.failed_count }} échec(s)
               </p>
@@ -334,8 +339,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Send, X, Users, Mail } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Send, X, Mail } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'dashboard',
@@ -368,6 +373,25 @@ const broadcastsPagination = ref({
 })
 
 let searchTimeout = null
+
+// Rafraîchissement auto de la progression tant qu'un broadcast est en cours d'envoi.
+let pollTimer = null
+const hasInFlight = () => broadcasts.value.some(
+  (b) => (b.sent_count + b.failed_count) < b.total_recipients
+)
+const startPolling = () => {
+  if (pollTimer) return
+  pollTimer = setInterval(async () => {
+    await loadBroadcasts(broadcastsPagination.value.current_page || 1)
+    if (!hasInFlight()) stopPolling()
+  }, 10000)
+}
+const stopPolling = () => {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
 
 // Computed
 const canSend = computed(() => {
@@ -461,8 +485,9 @@ const sendMessage = async () => {
       content.value = ''
       selectedUsers.value = []
       sendToAll.value = true
-      // Recharger l'historique
-      loadBroadcasts()
+      // Recharger l'historique + suivre la progression en direct
+      await loadBroadcasts()
+      startPolling()
     }
   } catch (error) {
     console.error('Erreur envoi:', error)
@@ -507,8 +532,11 @@ const formatDate = (dateString) => {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   loadUsers()
-  loadBroadcasts()
+  await loadBroadcasts()
+  if (hasInFlight()) startPolling()
 })
+
+onUnmounted(() => stopPolling())
 </script>
