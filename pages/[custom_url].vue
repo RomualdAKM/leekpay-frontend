@@ -106,7 +106,9 @@
                 :class="['w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent text-sm', paymentData?.customer_email ? 'bg-gray-100 cursor-not-allowed' : '']"
                 required
             />
-            <div class="space-y-2">
+            <!-- Téléphone affiché UNIQUEMENT si le marchand a activé la collecte
+                 (collect_phone) — ou si un numéro a été pré-rempli sur le lien. -->
+            <div v-if="paymentData?.collect_phone || paymentData?.customer_phone" class="space-y-2">
               <div class="relative">
                 <input
                     v-model="searchQuery"

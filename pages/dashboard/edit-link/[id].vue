@@ -248,7 +248,7 @@
             >
               <span class="text-sm font-medium text-gray-700">Options avancées</span>
               <div class="flex items-center gap-2">
-                <span v-if="formData.expirationDate || formData.redirectUrl" class="text-xs text-green-600">Configuré</span>
+                <span v-if="formData.expirationDate || formData.redirectUrl || formData.collectPhone" class="text-xs text-green-600">Configuré</span>
                 <span v-else class="text-xs text-gray-400">Optionnel</span>
                 <ChevronDown 
                   class="w-4 h-4 text-gray-400 transition-transform" 
@@ -280,6 +280,22 @@
                 <p class="text-xs text-gray-500">
                   Redirection automatique après un paiement réussi
                 </p>
+              </div>
+
+              <div class="space-y-2">
+                <label class="flex items-start gap-2 cursor-pointer">
+                  <input
+                      type="checkbox"
+                      v-model="formData.collectPhone"
+                      class="mt-0.5 accent-green-600 w-4 h-4"
+                  />
+                  <span class="text-sm text-gray-700">
+                    Demander le numéro de téléphone du client
+                    <span class="block text-xs text-gray-500">
+                      Si décoché, le champ téléphone n'est pas affiché au paiement.
+                    </span>
+                  </span>
+                </label>
               </div>
             </div>
           </div>
@@ -371,7 +387,8 @@ const formData = ref({
   amountType: 'fixed',
   fixedAmount: null,
   expirationDate: '',
-  redirectUrl: ''
+  redirectUrl: '',
+  collectPhone: false
 })
 
 const pdfInput = ref(null)
@@ -660,7 +677,8 @@ const loadLink = async () => {
       amountType: link.amount_type,
       fixedAmount: link.fixed_amount,
       expirationDate: link.expires_at ? link.expires_at.substring(0, 10) : '',
-      redirectUrl: link.redirect_url || ''
+      redirectUrl: link.redirect_url || '',
+      collectPhone: link.collect_phone ?? false
     }
 
     if (link.currency?.symbol) {
@@ -743,6 +761,7 @@ const handleSubmit = async () => {
     body.append('custom_url', formData.value.customUrl)
     body.append('amount_type', formData.value.amountType)
     body.append('is_active', '1')
+    body.append('collect_phone', formData.value.collectPhone ? '1' : '0')
     
     if (formData.value.amountType === 'fixed') {
       body.append('fixed_amount', formData.value.fixedAmount)
