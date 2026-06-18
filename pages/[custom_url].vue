@@ -180,7 +180,7 @@
           <!-- Maintenance : notice discrète (pas d'encadré ni d'icône d'alerte) -->
           <div v-if="staticDisabledMethods.length > 0" class="mt-2 flex items-start gap-2 text-xs text-slate-500">
             <span class="mt-[5px] inline-block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300"></span>
-            <span>Carte bancaire et PayPal en maintenance — payez en Mobile Money.</span>
+            <span>Carte bancaire et PayPal en maintenance. Payez en Mobile Money.</span>
           </div>
         </div>
 
