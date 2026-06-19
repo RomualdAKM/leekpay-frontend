@@ -408,21 +408,31 @@ const downloadPdf = async () => {
   }
 }
 
-// Vérification automatique du statut toutes les 5 secondes pour les transactions en attente
+// Vérification automatique du statut pour les transactions en attente.
+// Cadence réactive : 2 s pendant la 1re minute (fenêtre où le webhook Zayono
+// arrive en général), puis 5 s pour ne pas charger inutilement.
 let statusInterval = null
+let pollElapsed = 0
 
 const startStatusPolling = () => {
   if (statusInterval) clearInterval(statusInterval)
-  
-  statusInterval = setInterval(() => {
-    if (transaction.value?.status === 'pending' || 
-        transaction.value?.status === 'processing' || 
-        transaction.value?.status === 'initiated') {
+  pollElapsed = 0
+
+  const tick = () => {
+    const s = transaction.value?.status
+    if (s === 'pending' || s === 'processing' || s === 'initiated') {
       checkStatus()
+      pollElapsed += currentDelay()
+      // Replanifier avec le délai courant (réactif au début, puis plus espacé).
+      clearInterval(statusInterval)
+      statusInterval = setInterval(tick, currentDelay())
     } else {
       clearInterval(statusInterval)
     }
-  }, 5000)
+  }
+  const currentDelay = () => (pollElapsed < 60000 ? 2000 : 5000)
+
+  statusInterval = setInterval(tick, currentDelay())
 }
 
 // Initialisation au montage du composant
