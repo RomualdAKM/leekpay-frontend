@@ -719,46 +719,48 @@ const handleReturnParameters = async () => {
   const refToken = route.query.ref // jeton secret (anti-IDOR) transmis par l'URL de retour
   const refQuery = refToken ? `?ref=${encodeURIComponent(refToken)}` : ''
 
+  // Notifie la fenêtre marchand, qu'on soit en IFRAME (parent) ou en POPUP (opener).
+  const notifyMerchant = (message) => {
+    try {
+      if (window.parent && window.parent !== window) window.parent.postMessage(message, '*')
+      if (window.opener && window.opener !== window) window.opener.postMessage(message, '*')
+    } catch (e) { /* ignore */ }
+  }
+  const embedded = (window.parent && window.parent !== window) || (window.opener && window.opener !== window)
+
   if (status === 'success' && transactionId) {
-    // Si on est dans une iframe (widget), envoyer un message au parent avec les détails
-    if (window.parent && window.parent !== window) {
+    if (embedded) {
       try {
-        // Récupérer les détails de la transaction
+        // Récupérer les détails de la transaction pour les transmettre au marchand
         const config = useRuntimeConfig()
         const response = await $fetch(`${config.public.apiBaseURL}/public/transaction/${transactionId}/status${refQuery}`)
-        
+
         if (response.success) {
-          window.parent.postMessage({
+          notifyMerchant({
             type: 'leekpay_success',
             transaction: {
               id: response.data.id,
               reference: response.data.transaction_reference,
               amount: response.data.amount,
-              currency: response.data.payment_link?.custom_url || '',
+              currency: response.data.currency || '',
               status: response.data.status
             }
-          }, '*')
+          })
+        } else {
+          notifyMerchant({ type: 'leekpay_success', transaction: { id: transactionId } })
         }
       } catch (error) {
         console.error('Erreur récupération transaction:', error)
-        // Envoyer quand même un message basique
-        window.parent.postMessage({
-          type: 'leekpay_success',
-          transaction: { id: transactionId }
-        }, '*')
+        notifyMerchant({ type: 'leekpay_success', transaction: { id: transactionId } })
       }
     }
-    
+
     router.push(`/payment/success?transaction=${transactionId}${refToken ? `&ref=${encodeURIComponent(refToken)}` : ''}`)
     return true
   }
-  
+
   if (status === 'cancelled' && transactionId) {
-    // Si on est dans une iframe (widget), envoyer un message au parent
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ type: 'leekpay_cancel' }, '*')
-    }
-    
+    notifyMerchant({ type: 'leekpay_cancel' })
     error.value = 'Le paiement a été annulé. Vous pouvez réessayer ci-dessous.'
     return false
   }

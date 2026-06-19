@@ -244,27 +244,30 @@ const currency = computed(() => {
   return { symbol: 'FCFA', code: 'XOF' }
 })
 
-// Fonction pour envoyer un message au parent (si dans une iframe)
+// Envoie un message à la fenêtre marchand, qu'on soit intégré en IFRAME
+// (window.parent) ou ouvert en POPUP par le SDK (window.opener).
 const sendMessageToParent = (messageType, data = {}) => {
   try {
-    // Vérifier si on est dans une iframe
-    const isInIframe = window.parent && window.parent !== window;
-    
-    if (isInIframe) {
-      const message = { type: messageType, ...data };
-      console.log('[LeekPay Success] Envoi message au parent:', message);
-      
-      // Envoyer à tous les parents potentiels (pour supporter les iframes imbriquées)
+    const message = { type: messageType, ...data };
+    let sent = false;
+
+    // Cas iframe : poster au parent (et au top si iframes imbriquées).
+    if (window.parent && window.parent !== window) {
       window.parent.postMessage(message, '*');
-      
-      // Aussi envoyer à window.top si différent
       if (window.top && window.top !== window.parent) {
         window.top.postMessage(message, '*');
       }
-      
-      return true;
+      sent = true;
     }
-    return false;
+
+    // Cas popup : poster à la fenêtre ouvrante (SDK en mode popup).
+    if (window.opener && window.opener !== window) {
+      window.opener.postMessage(message, '*');
+      sent = true;
+    }
+
+    if (sent) console.log('[LeekPay Success] Message envoyé au marchand:', message);
+    return sent;
   } catch (e) {
     console.warn('[LeekPay Success] Erreur envoi message:', e);
     return false;

@@ -17,6 +17,8 @@
           <a href="#javascript" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">JavaScript</a>
           <a href="#api" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">API REST</a>
           <a href="#webhooks" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">Webhooks</a>
+          <a href="#confirmation" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">Confirmer un paiement</a>
+          <a href="#integration" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">App mobile &amp; iframe</a>
           <a href="#devises" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">Devises</a>
           <a href="#statuts" class="block py-1.5 text-sm text-gray-600 hover:text-gray-900">Statuts</a>
         </nav>
@@ -337,6 +339,11 @@ curl -X POST https://leekpay.fr/api/v1/checkout \
                   <td class="px-4 py-2 text-gray-600">URL de redirection si le client annule</td>
                 </tr>
                 <tr>
+                  <td class="px-4 py-2"><code class="text-xs">webhook_url</code></td>
+                  <td class="px-4 py-2 text-gray-500">string</td>
+                  <td class="px-4 py-2 text-gray-600">Webhook propre à cette session (prioritaire sur celui de la clé API)</td>
+                </tr>
+                <tr>
                   <td class="px-4 py-2"><code class="text-xs">customer_email</code></td>
                   <td class="px-4 py-2 text-gray-500">string</td>
                   <td class="px-4 py-2 text-gray-600">Email du client (pré-rempli sur la page)</td>
@@ -567,6 +574,52 @@ if (hash_equals($expected, $signature)) {
               </tbody>
             </table>
           </div>
+        </section>
+
+        <!-- Confirmer un paiement -->
+        <section id="confirmation" class="mb-16">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Confirmer un paiement</h2>
+          <p class="text-gray-600 mb-4">Ne créditez jamais une commande sur la seule base du navigateur (le client peut fermer la page). Confirmez côté serveur de l'une de ces deux manières :</p>
+
+          <div class="space-y-4 mb-6">
+            <div class="border border-gray-200 rounded-lg p-4">
+              <p class="font-medium text-gray-900 mb-1">1. Webhook <span class="text-xs text-green-600">(recommandé si configuré)</span></p>
+              <p class="text-sm text-gray-600">LeekPay envoie <code class="bg-gray-100 px-1 rounded">payment.completed</code> (et <code class="bg-gray-100 px-1 rounded">payment.failed</code> / <code class="bg-gray-100 px-1 rounded">payment.cancelled</code>) sur votre <code class="bg-gray-100 px-1 rounded">webhook_url</code>, signé. Voir la section Webhooks. Le <code class="bg-gray-100 px-1 rounded">webhook_url</code> peut être défini par clé API ou <strong>par session</strong> (champ <code class="bg-gray-100 px-1 rounded">webhook_url</code> dans <code class="bg-gray-100 px-1 rounded">POST /v1/checkout</code>).</p>
+            </div>
+            <div class="border border-amber-200 bg-amber-50 rounded-lg p-4">
+              <p class="font-medium text-gray-900 mb-1">2. Polling du statut <span class="text-xs text-amber-700">(obligatoire si vous n'avez PAS de webhook)</span></p>
+              <p class="text-sm text-gray-700 mb-2">Si aucun webhook n'est configuré, interrogez le statut depuis votre serveur jusqu'à <code class="bg-white px-1 rounded">paid</code> :</p>
+              <div class="bg-gray-900 rounded-lg p-3 overflow-x-auto">
+                <pre class="text-sm font-mono"><code class="text-gray-300">GET https://leekpay.fr/api/v1/checkout/checkout_42
+Authorization: Bearer sk_live_votre_cle_secrete
+
+→ { "data": { "status": "paid" | "pending", "paid_at": "..." } }</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-sm text-gray-500">L'événement navigateur (<code class="bg-gray-100 px-1 rounded">onSuccess</code> du widget / <code class="bg-gray-100 px-1 rounded">postMessage leekpay_success</code>) sert uniquement à mettre à jour votre interface : ce n'est jamais la source de vérité.</p>
+        </section>
+
+        <!-- Intégration app mobile & iframe -->
+        <section id="integration" class="mb-16">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">App mobile &amp; iframe</h2>
+
+          <div class="border border-red-200 bg-red-50 rounded-lg p-4 mb-6">
+            <p class="font-medium text-gray-900 mb-1">⚠️ Ne pas intégrer le checkout en <code class="bg-white px-1 rounded">&lt;iframe&gt;</code></p>
+            <p class="text-sm text-gray-700">La page de paiement finale est hébergée par le prestataire (ex. mobile money), qui <strong>interdit l'affichage en iframe</strong> (protection anti-clickjacking). Selon le prestataire actif, une iframe peut donc échouer en cours de paiement. Utilisez un popup ou une redirection.</p>
+          </div>
+
+          <h3 class="font-medium text-gray-900 mb-2">Site web</h3>
+          <p class="text-sm text-gray-600 mb-4">Le widget <code class="bg-gray-100 px-1 rounded">leekpay.js</code> ouvre automatiquement le paiement dans un <strong>popup</strong> et vous renvoie le résultat via <code class="bg-gray-100 px-1 rounded">onSuccess</code>/<code class="bg-gray-100 px-1 rounded">onCancel</code>. Vous pouvez aussi rediriger toute la page vers le <code class="bg-gray-100 px-1 rounded">payment_url</code>.</p>
+
+          <h3 class="font-medium text-gray-900 mb-2">Application mobile (Android / iOS)</h3>
+          <p class="text-sm text-gray-600 mb-2">Ouvrez le <code class="bg-gray-100 px-1 rounded">payment_url</code> (renvoyé par <code class="bg-gray-100 px-1 rounded">POST /v1/checkout</code>) dans une vue navigateur plein écran — pas dans une iframe HTML :</p>
+          <ul class="text-sm text-gray-600 list-disc pl-5 mb-4 space-y-1">
+            <li><strong>Android</strong> : Chrome Custom Tabs (ou une WebView).</li>
+            <li><strong>iOS</strong> : <code class="bg-gray-100 px-1 rounded">SFSafariViewController</code> (ou <code class="bg-gray-100 px-1 rounded">WKWebView</code>).</li>
+          </ul>
+          <p class="text-sm text-gray-600">La page de paiement étant alors en plein écran, elle fonctionne avec tous les prestataires. Interceptez le retour sur votre <code class="bg-gray-100 px-1 rounded">return_url</code> (ou l'URL <code class="bg-gray-100 px-1 rounded">/payment/success</code>) pour fermer la vue, et confirmez le paiement par <strong>webhook ou polling</strong> (voir ci-dessus).</p>
         </section>
 
         <!-- Devises -->

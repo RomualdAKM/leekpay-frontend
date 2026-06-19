@@ -187,7 +187,6 @@ const description = ref('')
 const apiKey = ref('')
 const returnUrl = ref('')
 const cancelUrl = ref('')
-const isCallback = ref(false)
 
 // État du formulaire
 const step = ref(1)
@@ -229,8 +228,7 @@ onMounted(() => {
   apiKey.value = route.query.key || ''
   returnUrl.value = route.query.return_url || ''
   cancelUrl.value = route.query.cancel_url || ''
-  isCallback.value = route.query.callback === 'true'
-  
+
   // Pré-remplir si fourni
   if (route.query.email) payerEmail.value = route.query.email
   if (route.query.name) payerName.value = route.query.name
@@ -290,10 +288,18 @@ async function processPayment() {
 }
 
 function cancel() {
-  if (isCallback.value) {
-    // Envoyer un message à la fenêtre parente
-    window.parent.postMessage({ type: 'leekpay_cancel' }, '*')
-  } else if (cancelUrl.value) {
+  // Si embarqué (iframe parent ou popup opener), notifier le marchand.
+  const inIframe = window.parent && window.parent !== window
+  const inPopup = window.opener && window.opener !== window
+  if (inIframe || inPopup) {
+    try {
+      if (inIframe) window.parent.postMessage({ type: 'leekpay_cancel' }, '*')
+      if (inPopup) window.opener.postMessage({ type: 'leekpay_cancel' }, '*')
+    } catch (e) { /* ignore */ }
+    return
+  }
+  // Sinon : redirection vers cancel_url, ou retour arrière.
+  if (cancelUrl.value) {
     window.location.href = cancelUrl.value
   } else {
     window.history.back()
