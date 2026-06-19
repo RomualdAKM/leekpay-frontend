@@ -234,6 +234,7 @@
 <script setup lang="ts">
 import { Crown, Lock, Check, Loader2, Wallet, Smartphone, AlertCircle } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
+import { redirectToProvider } from '~/utils/checkout'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -406,7 +407,7 @@ const subscribe = async () => {
     })
     
     if (response.success && response.data.payment_url) {
-      window.location.href = response.data.payment_url
+      redirectToProvider(response.data.payment_url)
     } else {
       showToast(response.message || 'Erreur lors de la création de l\'abonnement', 'error')
       subscribing.value = false

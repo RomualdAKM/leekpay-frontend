@@ -286,6 +286,7 @@
 
 <script setup>
 import { useThrottleFn } from '@vueuse/core'
+import { redirectToProvider } from '~/utils/checkout'
 
 definePageMeta({
   layout: false
@@ -481,7 +482,8 @@ const triggerPayment = async () => {
 
     if (response.success) {
       if (response.data.payment_url) {
-        window.location.href = response.data.payment_url
+        // Sortir d'une éventuelle iframe marchand : le provider refuse le framing.
+        redirectToProvider(response.data.payment_url)
       } else {
         // Propager la ref (jeton secret) pour l'accès au statut (anti-IDOR).
         // NB : ne PAS nommer cette variable "ref" -> casserait l'auto-import de Vue ref().

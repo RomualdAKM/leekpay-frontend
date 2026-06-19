@@ -175,6 +175,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { redirectToProvider } from '~/utils/checkout'
 
 const route = useRoute()
 const config = useRuntimeConfig()
@@ -275,8 +276,9 @@ async function processPayment() {
     })
 
     if (response.success && response.data?.payment_url) {
-      // Rediriger vers la page de paiement
-      window.location.href = response.data.payment_url
+      // Rediriger vers la page de paiement du provider en SORTANT de l'iframe
+      // (le widget est souvent intégré en iframe ; le provider bloque le framing).
+      redirectToProvider(response.data.payment_url)
     } else {
       throw new Error(response.message || 'Erreur lors de la création du paiement')
     }
