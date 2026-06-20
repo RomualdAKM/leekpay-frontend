@@ -30,7 +30,6 @@
         </div>
         
         <div v-else-if="paymentData" class="bg-white p-2 md:p-8 rounded-sm shadow-sm border border-gray-100">
-          <!-- Expiration Status -->
           <div v-if="expirationStatus.show" :class="expirationStatus.containerClass">
             <div class="flex items-center justify-between">
               <span :class="expirationStatus.textClass">
