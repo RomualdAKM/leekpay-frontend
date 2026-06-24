@@ -17,16 +17,25 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-4">Paiement réussi !</h2>
         <p class="text-gray-600 mb-6">Votre transaction a été traitée avec succès.</p>
         
-        <!-- Redirection message -->
-        <div v-if="transaction.payment_link?.redirect_url" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div class="flex items-center">
-            <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-            <p class="text-blue-800 text-sm">
-              Vous allez être redirigé automatiquement dans quelques secondes...
-            </p>
+        <!-- Redirection message + bouton de retour (filet de sécurité si l'auto-redirection
+             ne part pas, ex. provider qui n'a pas préservé le ?ref=). -->
+        <div v-if="transaction.payment_link?.redirect_url" class="mb-6">
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+            <div class="flex items-center">
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+              <p class="text-blue-800 text-sm">
+                Vous allez être redirigé automatiquement dans quelques secondes...
+              </p>
+            </div>
           </div>
+          <a
+            :href="transaction.payment_link.redirect_url"
+            class="inline-flex items-center px-6 py-2.5 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition"
+          >
+            Retourner sur le site
+          </a>
         </div>
-        
+
         <!-- Transaction details -->
         <div class="bg-white p-6 rounded-lg  border border-gray-200 text-left mb-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails de la transaction</h3>
