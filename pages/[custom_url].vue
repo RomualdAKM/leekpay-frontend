@@ -12,11 +12,11 @@
             @error="handleImageError"
         />
         <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-3">{{ paymentTitle }}</h2>
-        <p v-html="paymentDescription" class="text-gray-700 leading-relaxed text-sm md:text-base">
+        <p v-html="paymentDescription" class="text-gray-700 leading-relaxed text-sm md:text-base whitespace-pre-line text-left">
         </p>
       </div>
     </div>
-    <div class="w-full md:w-1/2  flex items-center justify-center p-2 md:p-2">
+    <div class="w-full md:w-1/2 flex items-center justify-center p-2 md:p-2 md:sticky md:top-0 md:self-start md:min-h-screen">
       <div class="w-full max-w-md">
         <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <p class="text-red-700 text-sm">{{ error }}</p>

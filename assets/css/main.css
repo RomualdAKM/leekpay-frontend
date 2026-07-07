@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Défilement doux pour les liens d'ancrage (#tarifs, #contact, ...) */
+html {
+  scroll-behavior: smooth;
+}
+
 /* ========================================
    Color Input Styling
    Force les inputs color à être carrés

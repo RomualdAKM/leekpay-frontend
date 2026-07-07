@@ -1,8 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-white px-6 py-8">
-    <div class="w-full max-w-md">
+  <div class="w-full max-w-md">
       <div class="mb-8 text-center">
-        <h1 class="text-2xl font-bold text-slate-900 mb-2">Bienvenue !</h1>
+        <h1 class="text-2xl font-bold text-slate-900 mb-2">Content de vous revoir !</h1>
         <p class="text-gray-600">Connectez-vous pour accéder à votre espace LeekPay.</p>
       </div>
 
@@ -89,7 +88,6 @@
           <NuxtLink to="/register" class="text-green-500 hover:underline font-medium">Créer un compte</NuxtLink>
         </p>
       </form>
-    </div>
   </div>
 </template>
 
