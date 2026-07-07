@@ -136,13 +136,13 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
-                  <!-- Bouton Payer via Moneroo -->
+                  <!-- Bouton Payer via le provider de payout ACTIF (réglage admin) -->
                   <button
                     v-if="canPayAutomatically(withdrawal)"
                     @click="openPayoutModal(withdrawal)"
                     class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs font-medium"
                   >
-                    💸 Payer via Moneroo
+                    💸 Payer via {{ payoutProviderLabel }}
                   </button>
                   <button
                     v-if="withdrawal.status === 'pending'"
@@ -374,10 +374,10 @@
     <div v-if="showPayoutModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          💸 Payer via Moneroo
+          💸 Payer via {{ payoutProviderLabel }}
         </h3>
         <p class="text-gray-600 mb-4">
-          Êtes-vous sûr de vouloir envoyer automatiquement <strong>{{ formatCurrency(selectedWithdrawal?.net_amount, selectedWithdrawal?.currency) }}</strong> via Moneroo ?
+          Êtes-vous sûr de vouloir envoyer automatiquement <strong>{{ formatCurrency(selectedWithdrawal?.net_amount, selectedWithdrawal?.currency) }}</strong> via {{ payoutProviderLabel }} ?
         </p>
         
         <div class="bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
@@ -452,9 +452,31 @@ const modalAction = ref('')
 const adminNotes = ref('')
 const processingPayout = ref(false)
 
+// Provider de payout ACTIF (réglage admin) : le libellé du bouton doit refléter
+// le vrai provider utilisé, pas un nom figé (le backend dispatche déjà selon ce réglage).
+const payoutProvider = ref(null) // null tant qu'inconnu (évite d'afficher un nom faux)
+const payoutProviderLabel = computed(() =>
+  payoutProvider.value === 'zayono' ? 'Zayono'
+    : payoutProvider.value === 'moneroo' ? 'Moneroo'
+    : 'le provider actif'
+)
+
 // Composables
 const config = useRuntimeConfig()
 const { token } = useAuth()
+
+const fetchPayoutProvider = async () => {
+  try {
+    const res = await fetch(`${config.public.apiBaseURL}/admin/settings`, {
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    const json = await res.json()
+    const p = json?.data?.payouts_provider ?? json?.payouts_provider
+    if (p) payoutProvider.value = p
+  } catch (e) {
+    // garde le défaut 'moneroo' en cas d'échec
+  }
+}
 
 // Fonction pour formater les montants avec la devise appropriée
 const formatCurrency = (amount, currency = null) => {
@@ -737,6 +759,7 @@ const processPayoutAutomatically = async () => {
 // Charger les données au montage
 onMounted(() => {
   loadWithdrawals()
+  fetchPayoutProvider()
 })
 
 // Nettoyer le timeout
