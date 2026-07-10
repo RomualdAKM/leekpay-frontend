@@ -91,7 +91,7 @@
     <section class="py-12 md:py-16 px-6 md:px-12 bg-white">
       <div class="container mx-auto max-w-[1100px]">
         <div class="text-center mb-10">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Pourquoi choisir l’<span class="text-[#2ECC71] italic">API LeekPay</span> ?</h2>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Pourquoi choisir<br class="md:hidden"> l’<span class="text-[#2ECC71] italic">API LeekPay</span>&nbsp;?</h2>
           <p class="text-gray-600 text-[17px] md:text-[19px] max-w-2xl mx-auto">Une intégration simple et sécurisée pour automatiser vos paiements à grande échelle.</p>
         </div>
         <div class="grid gap-5 md:grid-cols-3 md:gap-6">

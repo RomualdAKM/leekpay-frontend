@@ -4,13 +4,13 @@
     <section class="py-10 md:py-16 px-6 md:px-12 overflow-hidden">
       <div class="container mx-auto max-w-[1100px] text-center">
         <h1
-          class="text-[34px] sm:text-[40px] md:text-[48px] font-bold text-gray-900 leading-[1.25] mb-5"
+          class="text-[25px] sm:text-[40px] md:text-[48px] font-bold text-gray-900 leading-[1.25] mb-5"
           v-motion="{
             initial: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0, transition: { duration: 600, easing: 'easeOut' } }
           }"
         >
-          Une tarification <span class="italic text-[#2ECC71]">simple et transparente</span>
+          Une tarification<br class="md:hidden"> <span class="italic text-[#2ECC71]">simple et transparente</span>
         </h1>
         <p
           class="text-gray-700 text-[18px] md:text-[21px] leading-[1.35] max-w-2xl mx-auto"
@@ -115,7 +115,16 @@
         </p>
         <div class="mt-4 mx-auto max-w-xl md:max-w-none md:w-fit bg-[#0A1F44] text-white rounded-2xl px-5 md:px-7 py-3.5 text-sm md:text-base font-medium text-center leading-relaxed md:whitespace-nowrap">
           <svg class="w-5 h-5 inline-block align-text-bottom mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" /></svg>
-          Pour tous les autres pays, payez simplement par <strong class="font-bold">PayPal</strong> ou <strong class="font-bold">carte bancaire</strong> (Visa, Mastercard).
+          Pour tous les autres pays, payez par <strong class="font-bold">PayPal</strong>, <strong class="font-bold">carte bancaire</strong> (Visa, Mastercard) ou <strong class="font-bold">crypto-monnaie</strong>.
+        </div>
+        <div id="crypto" class="relative mt-8 mx-auto max-w-xl border-2 border-[#2ECC71] rounded-2xl px-5 md:px-7 pt-6 pb-5 text-center scroll-mt-32">
+          <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FFD700] text-[#0A1F44] text-xs font-bold tracking-wide px-3.5 py-1 rounded-full shadow">NOUVEAU</span>
+          <p class="font-bold text-gray-900 text-lg md:text-xl mb-2">Paiement en <span class="text-[#27AE60] italic">crypto-monnaie</span></p>
+          <p class="text-gray-600 text-sm md:text-base leading-relaxed">
+            Vos clients peuvent désormais régler en crypto-monnaie, où qu'ils soient dans le monde.
+            Frais totaux au paiement : <strong class="text-[#27AE60]">8 %</strong>
+            (5 % + 3 % de frais LeekPay).
+          </p>
         </div>
       </div>
     </section>
@@ -197,11 +206,11 @@
             </li>
             <li class="flex gap-3">
               <span class="text-[#2ECC71] font-bold">+</span>
-              <p><span class="font-semibold text-gray-900">Moyens de paiement acceptés</span> : Mobile Money dans de nombreux pays africains, PayPal et cartes bancaires (Visa, Mastercard).</p>
+              <p><span class="font-semibold text-gray-900">Moyens de paiement acceptés</span> : Mobile Money dans de nombreux pays africains, PayPal, cartes bancaires (Visa, Mastercard) et crypto-monnaies.</p>
             </li>
           </ul>
-          <p class="text-gray-500 text-sm mt-6">
-            Une question sur les tarifs ? <NuxtLink to="/contact" class="text-[#27AE60] font-medium hover:underline">Contactez-nous</NuxtLink> ou consultez la <NuxtLink to="/#support" class="text-[#27AE60] font-medium hover:underline">FAQ</NuxtLink>.
+          <p class="text-gray-500 text-[11px] sm:text-sm mt-6 text-center">
+            Une question sur les tarifs ? <NuxtLink to="/contact" class="text-[#27AE60] font-medium hover:underline">Contactez-nous</NuxtLink>.
           </p>
         </div>
       </div>

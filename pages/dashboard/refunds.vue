@@ -25,7 +25,7 @@
       </div>
 
       <!-- Balance Overview -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="border border-gray-200 p-4">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Solde disponible</p>
           <p class="text-xl font-semibold text-gray-900 mt-1">{{ formatCurrency(userBalance.available_balance) }}</p>

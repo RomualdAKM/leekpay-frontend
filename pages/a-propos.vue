@@ -234,7 +234,7 @@
             }"
             v-motion-visibility="{ once: true, threshold: 0.2 }"
           >
-            <h3 class="text-[#2ECC71] text-2xl md:text-[32px] font-bold italic mb-4 leading-tight">À qui s’adresse LeekPay ?</h3>
+            <h3 class="text-[#2ECC71] text-[21px] md:text-[32px] font-bold italic mb-4 leading-tight">À qui s’adresse LeekPay&nbsp;?</h3>
             <p class="text-gray-700 leading-[1.3] text-[18px] md:text-[20px]">
               <span class="text-[#2ECC71] font-semibold italic">LeekPay</span> s’adresse aux freelances, entrepreneurs, e-commerçants,
               commerçants, prestataires de services, écoles, associations et entreprises souhaitant encaisser
@@ -257,7 +257,7 @@
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
           <div class="text-white text-center md:text-left">
-            <h3 class="text-[24px] md:text-[32px] font-bold italic mb-2 leading-tight">Une question ? Un projet ?</h3>
+            <h3 class="text-[24px] md:text-[32px] font-bold italic mb-2 leading-tight">Une question&nbsp;?<br class="md:hidden"> Un projet&nbsp;?</h3>
             <p class="text-white/95 text-[17px] md:text-[19px] leading-snug">
               Notre équipe est à votre écoute pour vous accompagner
               <br class="hidden md:block" />

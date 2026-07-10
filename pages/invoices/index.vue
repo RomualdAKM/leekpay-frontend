@@ -329,7 +329,7 @@
           v-motion-visibility="{ once: true, threshold: 0.2 }"
         >
           <div class="text-white text-center md:text-left">
-            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Prêt à créer vos factures numériques ?</h3>
+            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Prêt à créer vos factures numériques&nbsp;?</h3>
             <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Générez des factures professionnelles, envoyez-les
               <br class="hidden md:block" />

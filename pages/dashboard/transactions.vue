@@ -48,7 +48,7 @@
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <div class="bg-white rounded-lg border border-gray-200 p-4 col-span-2 sm:col-span-1">
         <p class="text-xs text-gray-600 mb-1">Revenus</p>
         <p class="text-2xl font-semibold text-gray-900">{{ formatCurrency(totalRevenue, user.value?.currency?.code) }}</p>
       </div>

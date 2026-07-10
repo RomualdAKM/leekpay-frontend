@@ -276,7 +276,7 @@
             <h3 class="font-medium text-gray-900">Statistiques</h3>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="p-4 border border-gray-200 text-center">
               <p class="text-2xl font-semibold text-gray-900">{{ affiliation.usage_count }}</p>
               <p class="text-sm text-gray-500">Utilisations</p>

@@ -3,11 +3,16 @@
     <!-- Logo -->
     <div class="px-4 py-5 border-b border-gray-100">
       <div class="flex items-center justify-between">
-        <NuxtLink to="/dashboard" class="flex items-center gap-3">
-          <div class="w-9 h-9 flex items-center justify-center">
+        <NuxtLink to="/dashboard" class="flex items-center">
+          <img
+            v-if="!collapsed"
+            src="~/assets/img/logo-leekpay-trim.png"
+            alt="LeekPay"
+            class="h-5 w-auto object-contain"
+          />
+          <div v-else class="w-9 h-9 flex items-center justify-center">
             <img src="~/assets/img/Logo_de_LeekPay_png_sans_arrière-plan.png" alt="LeekPay" class="w-full h-full object-contain" />
           </div>
-          <span v-if="!collapsed" class="font-semibold text-gray-900">LeekPay</span>
         </NuxtLink>
         <button
           v-if="canCollapse"

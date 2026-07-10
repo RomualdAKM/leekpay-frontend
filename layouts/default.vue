@@ -15,10 +15,32 @@ const toggleFeaturesDropdown = () => {
 const closeFeaturesDropdown = () => {
   featuresDropdownOpen.value = false
 }
+
+// Bandeau d'annonce crypto (refermable, mémorisé)
+const showCryptoBanner = ref(false)
+onMounted(() => {
+  if (!localStorage.getItem('leekpay_crypto_banner_off')) {
+    showCryptoBanner.value = true
+  }
+})
+const dismissCryptoBanner = () => {
+  showCryptoBanner.value = false
+  localStorage.setItem('leekpay_crypto_banner_off', '1')
+}
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col font-sans shadow-md">
+    <!-- Bandeau nouveauté : paiements crypto -->
+    <div v-if="showCryptoBanner" class="relative bg-gradient-to-r from-[#2ECC71] to-[#27AE60] text-white text-center text-sm md:text-[15px] px-10 py-2.5">
+      <NuxtLink to="/tarifs#crypto" class="font-medium hover:opacity-90">
+        <span class="font-bold">Nouveau :</span> grâce à la crypto-monnaie, encaissez désormais partout dans le monde
+        <span class="underline underline-offset-2 font-semibold ml-1 whitespace-nowrap">En savoir plus</span>
+      </NuxtLink>
+      <button @click="dismissCryptoBanner" class="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/20 transition cursor-pointer" aria-label="Fermer l'annonce">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
     <header class="bg-white/95 backdrop-blur py-2 px-6 lg:px-12 border-b border-gray-100 shadow-sm sticky top-0 z-40">
       <div class="mx-auto max-w-7xl flex justify-between items-center">
         <NuxtLink to="/" class="flex items-center">

@@ -248,7 +248,7 @@
           <div class="relative grid grid-cols-1 md:grid-cols-4 justify-items-center gap-y-9 md:gap-y-0 md:gap-x-4">
             <div class="flex w-full max-w-[320px] flex-col items-center text-center">
               <div class="w-14 h-14 rounded-full bg-[#2ECC71] text-white text-[20px] italic font-bold leading-none flex items-center justify-center shadow-lg shadow-[#2ECC71]/30">1</div>
-              <p class="mt-3 text-gray-900 text-[17px] md:text-[18px] font-semibold leading-[1.2]">Construisez votre<br class="hidden md:block" /> page avec l'éditeur</p>
+              <p class="mt-3 text-gray-900 text-[17px] md:text-[18px] font-semibold leading-[1.2]">Construisez votre<br /> page avec l'éditeur</p>
             </div>
 
             <div class="flex w-full max-w-[320px] flex-col items-center text-center">
@@ -379,7 +379,7 @@
 
         >
           <div class="text-white text-center md:text-left">
-            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Prêt à créer votre page de vente ?</h3>
+            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Prêt à créer votre page <br class="md:hidden">de vente&nbsp;?</h3>
             <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Créez votre page de vente en quelques minutes
               <br class="hidden md:block" />

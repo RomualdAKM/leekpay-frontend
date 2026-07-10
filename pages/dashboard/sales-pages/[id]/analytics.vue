@@ -54,7 +54,7 @@
     <!-- Contenu -->
     <div v-else-if="analytics" class="space-y-6">
       <!-- Stats résumées -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white rounded-xl p-5 border border-gray-200">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">

@@ -1,54 +1,60 @@
 <template>
   <div class="p-4 sm:p-6 space-y-6">
     <!-- Carrousel Bannières -->
-    <div v-if="banners.length > 0" class="relative overflow-hidden">
-      <div class="relative">
-        <!-- Clic ouvre le popup -->
-        <div 
+    <div v-if="banners.length > 0" class="flex items-center justify-center gap-2 sm:gap-3">
+      <!-- Flèche précédente (extérieure) -->
+      <button
+        v-if="banners.length > 1"
+        @click="prevBanner"
+        aria-label="Bannière précédente"
+        class="flex-shrink-0 w-9 h-9 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300 hidden sm:flex items-center justify-center transition-colors cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Cadre ajusté à l'image -->
+      <div class="relative min-w-0 rounded-2xl border border-gray-200 overflow-hidden">
+        <div
           v-if="banners[currentBannerIndex]"
           @click="showBannerModal = true"
+          @touchstart.passive="onBannerTouchStart"
+          @touchend.passive="onBannerTouchEnd"
           class="block cursor-pointer"
         >
-          <img 
-            :src="banners[currentBannerIndex].image_url" 
+          <img
+            :src="banners[currentBannerIndex].image_url"
             :alt="banners[currentBannerIndex].title"
-            class="w-full h-auto sm:h-40 md:h-48 object-contain object-center transition-opacity duration-500"
+            class="block max-w-full h-auto sm:h-40 md:h-48 sm:w-auto object-contain transition-opacity duration-500"
           />
         </div>
-        
+
         <!-- Indicateurs -->
-        <div v-if="banners.length > 1" class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2">
+        <div v-if="banners.length > 1" class="absolute bottom-3 left-1/2 -translate-x-1/2 hidden sm:flex items-center gap-1.5">
           <button
             v-for="(_, index) in banners"
             :key="index"
             @click="currentBannerIndex = index"
             :class="[
-              'w-2 h-2 rounded-full transition-colors',
-              index === currentBannerIndex ? 'bg-white' : 'bg-white/50 hover:bg-white/70'
+              'h-2 rounded-full ring-1 ring-black/10 transition-all cursor-pointer',
+              index === currentBannerIndex ? 'w-5 bg-white' : 'w-2 bg-white/60 hover:bg-white/90'
             ]"
           />
         </div>
-        
-        <!-- Flèches navigation -->
-        <template v-if="banners.length > 1">
-          <button 
-            @click="prevBanner"
-            class="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-            </svg>
-          </button>
-          <button 
-            @click="nextBanner"
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </template>
       </div>
+
+      <!-- Flèche suivante (extérieure) -->
+      <button
+        v-if="banners.length > 1"
+        @click="nextBanner"
+        aria-label="Bannière suivante"
+        class="flex-shrink-0 w-9 h-9 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300 hidden sm:flex items-center justify-center transition-colors cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
     </div>
 
     <!-- Modal Bannière -->
@@ -105,9 +111,8 @@
     <!-- Header + Actions rapides -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-xl font-semibold text-gray-900 flex items-center gap-2">
-          <span>👋</span>
-          <span>Salut {{ user?.first_name || user?.name || 'there' }}</span>
+        <h1 class="text-2xl md:text-[28px] font-bold text-gray-900">
+          <span class="text-[#2ECC71]">Salut</span> {{ user?.first_name || user?.name || '' }}
         </h1>
         <p class="text-sm text-gray-500 mt-1">Vue d'ensemble de votre activité</p>
       </div>
@@ -181,7 +186,7 @@
     <!-- Dashboard Content -->
     <div v-else class="space-y-6">
       <!-- Ligne 1 : Total collecté + Transactions -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- Total collecté -->
         <div class="border border-gray-200 p-4">
           <p class="text-xs text-gray-500 uppercase tracking-wide">Total collecté</p>
@@ -366,6 +371,18 @@ const prevBanner = () => {
 
 const nextBanner = () => {
   currentBannerIndex.value = (currentBannerIndex.value + 1) % banners.value.length
+}
+
+// Balayage tactile (mobile) : les flèches et points sont masqués sur petit écran
+let bannerTouchStartX = 0
+const onBannerTouchStart = (e) => {
+  bannerTouchStartX = e.changedTouches[0].clientX
+}
+const onBannerTouchEnd = (e) => {
+  const dx = e.changedTouches[0].clientX - bannerTouchStartX
+  if (banners.value.length > 1 && Math.abs(dx) > 40) {
+    dx > 0 ? prevBanner() : nextBanner()
+  }
 }
 
 const data = ref({

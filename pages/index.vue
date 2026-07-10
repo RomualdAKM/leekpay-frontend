@@ -12,14 +12,14 @@
               visible: { opacity: 1, x: 0, transition: { duration: 700, easing: 'easeOut' } }
             }"
           >
-            <h1 class="text-4xl md:text-5xl lg:text-[58px] font-bold text-gray-900 leading-[1.18] mb-6">
+            <h1 class="text-[26px] sm:text-4xl md:text-5xl lg:text-[58px] font-bold text-gray-900 leading-[1.18] mb-6">
               <span class="text-[#F39C12] italic">Encaissez</span>, <span class="text-[#F39C12] italic">vendez</span><br>
               et <span class="text-[#F39C12] italic">facturez</span> en ligne<br>
               en toute simplicité
             </h1>
             <p class="text-gray-700 text-base md:text-lg mb-8 leading-relaxed">
-              Un seul outil pour créer vos liens de paiement,
-              pages de vente et factures numériques,
+              Un seul outil pour encaisser partout dans le monde :
+              créez vos liens de paiement, pages de vente et factures numériques,
               sans site web ni compétence technique.
             </p>
             <div class="flex flex-wrap items-center gap-4">
@@ -45,7 +45,7 @@
             }"
           >
             <!-- Dashboard codé (réplique fidèle de la maquette) -->
-            <div class="w-full min-w-[600px] md:min-w-[820px] bg-white rounded-xl border border-gray-300 shadow-2xl overflow-hidden transform rotate-6" aria-hidden="true">
+            <div class="w-full min-w-[600px] md:min-w-[820px] bg-white rounded-xl border border-gray-300 overflow-hidden transform rotate-6" aria-hidden="true">
               <div class="flex">
                 <!-- Menu latéral -->
                 <div class="w-[19%] min-w-[118px] border-r border-gray-200">
@@ -304,7 +304,7 @@
     <!-- PAYMENT METHODS SECTION -->
     <section class="pt-14 md:pt-20 bg-white">
       <div class="mx-auto max-w-7xl px-6 lg:px-12 text-center mb-8 md:mb-12">
-        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">
+        <h2 class="text-lg sm:text-2xl md:text-3xl font-bold text-gray-900">
           <em class="text-[#27AE60] italic">Encaissements et paiements</em><br>
           flexibles via plusieurs réseaux
         </h2>
@@ -312,10 +312,11 @@
 
       <!-- Carrousel pleine largeur -->
       <div class="relative w-full overflow-hidden py-4 md:py-6 bg-gray-100">
-        <div class="flex animate-marquee whitespace-nowrap">
-          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
-          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
-          <img src="~/assets/ressource_new_landing_page/Component2.png" alt="Méthodes de paiement" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+        <div class="flex w-max animate-marquee">
+          <img src="~/assets/ressource_new_landing_page/Component2-crypto.png" alt="Moyens de paiement : Mobile Money, Visa, Mastercard, PayPal, crypto-monnaie" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+          <img src="~/assets/ressource_new_landing_page/Component2-crypto.png" alt="" aria-hidden="true" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+          <img src="~/assets/ressource_new_landing_page/Component2-crypto.png" alt="" aria-hidden="true" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
+          <img src="~/assets/ressource_new_landing_page/Component2-crypto.png" alt="" aria-hidden="true" class="h-8 md:h-16 mx-0.5 md:mx-1 flex-shrink-0" />
         </div>
         <div class="pointer-events-none absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-gray-100 to-transparent"></div>
         <div class="pointer-events-none absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-gray-100 to-transparent"></div>
@@ -342,13 +343,13 @@
 
           <!-- Le texte explicatif -->
           <div class="text-white max-w-3xl text-center md:text-left">
-            <p class="text-xl md:text-[26px] lg:text-[40px] font-bold leading-[1.2] mb-1 md:mb-2">
+            <p class="text-base md:text-[26px] lg:text-[40px] font-bold leading-[1.2] mb-1 md:mb-2">
               <span class="italic">DE FRAIS DE RETRAIT SEULEMENT</span>
             </p>
-            <p class="text-xl md:text-[26px] lg:text-[40px] font-bold leading-[1.2] mb-1 md:mb-2">
+            <p class="text-base md:text-[26px] lg:text-[40px] font-bold leading-[1.2] mb-1 md:mb-2">
               VOUS PERMETTANT DE CONSERVER
             </p>
-            <p class="text-xl md:text-[26px] lg:text-[40px] font-bold leading-[1.2]">
+            <p class="text-base md:text-[26px] lg:text-[40px] font-bold leading-[1.2]">
               <span class="text-[#FFD700]">JUSQU'À 97 %</span> DU PAIEMENT REÇU
             </p>
           </div>
@@ -370,8 +371,10 @@
             <span class="w-5 h-5 bg-gray-900 rounded-full"></span>
             Encaissez en ligne, simplement
           </span>
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Créez, gérez et recevez<br>vos paiements en toute simplicité
+          <h2 class="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
+            Créez, gérez et recevez<br>
+            vos paiements<br class="md:hidden">
+            en toute simplicité
           </h2>
           <p class="text-gray-600 max-w-2xl mx-auto">
             <em class="text-[#2ECC71] italic font-bold">LeekPay</em> vous permet d'encaisser en ligne grâce à des liens de paiement, des pages de vente, des factures numériques et une API puissante, le tout sur une seule plateforme.
@@ -878,15 +881,15 @@
 
             <!-- Right: Content - TOUJOURS CENTRÉ -->
             <div class="text-white text-center">
-              <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 italic">
+              <h2 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 italic">
                 Prêt à commencer<br>
-                l'aventure avec LeekPay ?
+                l'aventure avec LeekPay&nbsp;?
               </h2>
               <p class="text-base md:text-lg mb-8 opacity-95 leading-relaxed">
                 Crée des liens de paiement,<br>
                 des pages de vente et<br>
-                des factures numériques<br>
-                en toute simplicité.
+                des factures numériques :<br>
+                encaisse partout dans le monde.
               </p>
               <NuxtLink
                 to="/register"
@@ -916,8 +919,8 @@ definePageMeta({
 useSeoMeta({
   title: 'LeekPay - Encaissez, vendez et facturez en ligne',
   ogTitle: 'LeekPay - Encaissez, vendez et facturez en ligne',
-  description: 'Un seul outil pour créer vos liens de paiement, pages de vente et factures numériques, sans site web ni compétence technique.',
-  ogDescription: 'Un seul outil pour créer vos liens de paiement, pages de vente et factures numériques, sans site web ni compétence technique.',
+  description: 'Un seul outil pour encaisser partout dans le monde : liens de paiement, pages de vente et factures numériques, sans site web ni compétence technique.',
+  ogDescription: 'Un seul outil pour encaisser partout dans le monde : liens de paiement, pages de vente et factures numériques, sans site web ni compétence technique.',
   ogImage: 'https://leekpay.me/Logo_de_LeekPay_avec_arriere-plan.png',
   twitterCard: 'summary_large_image',
 })
@@ -960,7 +963,12 @@ const faqs = ref([
   },
   {
     question: "Quels moyens de paiement sont acceptés ?",
-    answer: "LeekPay prend en charge les moyens de paiement Mobile Money dans 17 pays africains : Sénégal, Côte d'Ivoire, Bénin, Gabon, Togo, Burkina Faso, Mali, Cameroun, Niger, Kenya, Ouganda, Rwanda, Zambie, Guinée, RD Congo, Sierra Leone et Congo. Nous acceptons également PayPal et les cartes bancaires (Visa, Mastercard) pour les paiements internationaux.",
+    answer: "LeekPay prend en charge les moyens de paiement Mobile Money dans 17 pays africains : Sénégal, Côte d'Ivoire, Bénin, Gabon, Togo, Burkina Faso, Mali, Cameroun, Niger, Kenya, Ouganda, Rwanda, Zambie, Guinée, RD Congo, Sierra Leone et Congo. Nous acceptons également PayPal, les cartes bancaires (Visa, Mastercard) pour les paiements internationaux, ainsi que les paiements en crypto-monnaie.",
+    isOpen: false
+  },
+  {
+    question: "Puis-je encaisser des paiements en crypto-monnaie ?",
+    answer: "Oui, c'est une nouveauté LeekPay ! Grâce à la crypto-monnaie, vous pouvez désormais encaisser vos clients partout dans le monde. Les frais appliqués au paiement sont de 8 % au total (5 % + 3 % de frais LeekPay).",
     isOpen: false
   },
   {
@@ -987,7 +995,7 @@ const faqs = ref([
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-33.33%);
+    transform: translateX(-25%);
   }
 }
 

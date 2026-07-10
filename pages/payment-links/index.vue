@@ -24,7 +24,7 @@
 
         <p class="text-white/95 text-[21px] md:text-[24px] leading-[1.24]">
           Recevez vos paiements via mobile money,<br class="hidden md:block" />
-          carte bancaire et wallet en un simple clic.
+          carte bancaire, wallet et crypto-monnaie.
         </p>
       </div>
 
@@ -316,7 +316,7 @@
 
         >
           <div class="text-white text-center md:text-left">
-            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Tu es prêt à recevoir tes premiers paiements ?</h3>
+            <h3 class="text-xl md:text-[30px] font-bold italic mb-1">Tu es prêt à recevoir <br class="md:hidden">tes premiers paiements&nbsp;?</h3>
             <p class="text-white/90 text-lg md:text-[20px] leading-[1.25]">
               Commence dès aujourd'hui et encaisse tes paiements
               <br class="hidden md:block" />
