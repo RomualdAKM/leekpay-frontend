@@ -1,6 +1,6 @@
 <template>
   <div class="font-sans bg-white">
-    <!-- HERO -->
+    
     <section class="bg-[#2ECC71] text-white py-14 md:py-20 px-6 md:px-12 overflow-hidden">
       <div class="container mx-auto max-w-[1100px] grid md:grid-cols-[1fr_0.95fr] gap-6 lg:gap-7 items-start">
         <div
