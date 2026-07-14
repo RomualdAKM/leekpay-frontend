@@ -6,8 +6,8 @@
         <h1 class="text-2xl font-bold text-gray-900">Gestion des Retraits</h1>
         <p class="text-gray-600">Approuver ou rejeter les demandes de retrait</p>
       </div>
-      <button 
-        @click="loadWithdrawals" 
+      <button
+        @click="loadWithdrawals(pagination?.current_page || 1)"
         :disabled="loading"
         class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
       >
@@ -18,8 +18,9 @@
 
     <!-- Filtres -->
     <div class="bg-white">
-      <div class="flex flex-wrap gap-4">
-        <div class="flex-1 min-w-64">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Recherche -->
+        <div class="lg:col-span-3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
           <input
             v-model="filters.search"
@@ -29,11 +30,13 @@
             @input="debouncedSearch"
           />
         </div>
-        <div class="min-w-48">
+
+        <!-- Statut -->
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
           <select
             v-model="filters.status"
-            @change="loadWithdrawals"
+            @change="applyFilters"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">Tous les statuts</option>
@@ -41,6 +44,71 @@
             <option value="processed">Traité</option>
             <option value="rejected">Rejeté</option>
           </select>
+        </div>
+
+        <!-- Réseau / méthode -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Réseau (méthode)</label>
+          <select
+            v-model="filters.network"
+            @change="applyFilters"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Tous les réseaux</option>
+            <option v-for="network in filterOptions.networks" :key="network" :value="network">
+              {{ network }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Pays -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+          <select
+            v-model="filters.country"
+            @change="applyFilters"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">Tous les pays</option>
+            <option v-for="code in filterOptions.countries" :key="code" :value="code">
+              {{ countryLabel(code) }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Date de début -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Du</label>
+          <input
+            v-model="filters.dateFrom"
+            type="date"
+            :max="filters.dateTo || undefined"
+            @change="applyFilters"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Date de fin -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Au</label>
+          <input
+            v-model="filters.dateTo"
+            type="date"
+            :min="filters.dateFrom || undefined"
+            @change="applyFilters"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+
+        <!-- Réinitialiser -->
+        <div class="flex items-end">
+          <button
+            v-if="hasActiveFilters"
+            @click="resetFilters"
+            class="w-full px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+          >
+            Réinitialiser les filtres
+          </button>
         </div>
       </div>
     </div>
@@ -112,8 +180,8 @@
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ withdrawal.withdrawal_method?.name }}</div>
-                <div class="text-sm text-gray-500">{{ withdrawal.withdrawal_method?.type }}</div>
+                <div class="text-sm text-gray-900">{{ withdrawal.withdrawal_method?.provider_name || '—' }}</div>
+                <div class="text-sm text-gray-500">{{ withdrawal.withdrawal_method?.method_type || '' }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ formatDate(withdrawal.created_at) }}
@@ -439,8 +507,32 @@ const updating = ref(false)
 // Filtres
 const filters = ref({
   search: '',
-  status: 'all'
+  status: 'all',
+  network: '',
+  country: '',
+  dateFrom: '',
+  dateTo: ''
 })
+
+// Options de filtres (réseaux + pays réellement présents), peuplées via l'API
+const filterOptions = ref({ networks: [], countries: [] })
+
+// Libellés pays (réutilise la liste centrale des pays)
+const { getCountryByCode } = useCountries()
+const countryLabel = (code) => {
+  const c = getCountryByCode(code)
+  return c ? `${c.flag} ${c.name}` : code
+}
+
+// Un filtre non-par-défaut est actif ?
+const hasActiveFilters = computed(() =>
+  filters.value.status !== 'all' ||
+  !!filters.value.search ||
+  !!filters.value.network ||
+  !!filters.value.country ||
+  !!filters.value.dateFrom ||
+  !!filters.value.dateTo
+)
 
 // Modal
 const showModal = ref(false)
@@ -529,11 +621,27 @@ const loadWithdrawals = async (page = 1) => {
     if (filters.value.status !== 'all') {
       params.append('status', filters.value.status)
     }
-    
+
     if (filters.value.search.trim()) {
       params.append('search', filters.value.search.trim())
     }
-    
+
+    if (filters.value.network) {
+      params.append('network', filters.value.network)
+    }
+
+    if (filters.value.country) {
+      params.append('country', filters.value.country)
+    }
+
+    if (filters.value.dateFrom) {
+      params.append('date_from', filters.value.dateFrom)
+    }
+
+    if (filters.value.dateTo) {
+      params.append('date_to', filters.value.dateTo)
+    }
+
     const response = await fetch(`${config.public.apiBaseURL}/admin/withdrawal-requests?${params}`, {
       headers: {
         'Authorization': `Bearer ${token.value}`,
@@ -573,8 +681,48 @@ let searchTimeout
 const debouncedSearch = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
-    loadWithdrawals()
+    loadWithdrawals(1)
   }, 500)
+}
+
+// Appliquer les filtres : toujours revenir à la page 1
+const applyFilters = () => {
+  loadWithdrawals(1)
+}
+
+// Réinitialiser tous les filtres
+const resetFilters = () => {
+  filters.value = {
+    search: '',
+    status: 'all',
+    network: '',
+    country: '',
+    dateFrom: '',
+    dateTo: ''
+  }
+  loadWithdrawals(1)
+}
+
+// Charger les options de filtres (réseaux + pays présents)
+const fetchFilterOptions = async () => {
+  try {
+    const response = await fetch(`${config.public.apiBaseURL}/admin/withdrawal-requests/filter-options`, {
+      headers: {
+        'Authorization': `Bearer ${token.value}`,
+        'Accept': 'application/json'
+      }
+    })
+    if (!response.ok) return
+    const data = await response.json()
+    if (data.success && data.data) {
+      filterOptions.value = {
+        networks: data.data.networks || [],
+        countries: data.data.countries || []
+      }
+    }
+  } catch (e) {
+    // silencieux : sans options, les filtres réseau/pays restent vides mais la page fonctionne
+  }
 }
 
 // Changer de page
@@ -760,6 +908,7 @@ const processPayoutAutomatically = async () => {
 onMounted(() => {
   loadWithdrawals()
   fetchPayoutProvider()
+  fetchFilterOptions()
 })
 
 // Nettoyer le timeout
