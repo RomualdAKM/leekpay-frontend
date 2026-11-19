@@ -72,7 +72,7 @@
               v-if="item.type === 'text'" 
               class="prose prose-sm md:prose-base max-w-none"
               :style="getTextStyles(item)"
-              v-html="item.content"
+              v-html="safeHtml(item.content)"
             />
             
             <!-- TYPE: IMAGE -->
@@ -209,6 +209,9 @@ interface Props {
   gridOffsetY?: number
   buttonOffsetY?: number
 }
+
+// SÉCURITÉ : contenu texte du marchand assaini avant v-html.
+const safeHtml = useSafeHtmlFn()
 
 const props = withDefaults(defineProps<Props>(), {
   blockId: '',

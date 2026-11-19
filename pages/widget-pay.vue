@@ -238,8 +238,10 @@ onMounted(() => {
   description.value = getCleanDescription(route.query.description)
   
   apiKey.value = route.query.key || ''
-  returnUrl.value = route.query.return_url || ''
-  cancelUrl.value = route.query.cancel_url || ''
+  // SÉCURITÉ : URLs venant de la query string => http(s) uniquement
+  // (cancel_url=javascript:... exécutait du JS sur leekpay.me au clic « Annuler »).
+  returnUrl.value = safeHttpUrl(route.query.return_url)
+  cancelUrl.value = safeHttpUrl(route.query.cancel_url)
 
   // Pré-remplir si fourni
   if (route.query.email) payerEmail.value = route.query.email

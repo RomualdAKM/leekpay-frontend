@@ -648,9 +648,9 @@ const paymentTitle = computed(() => {
   return paymentData.value?.title || ''
 })
 
-const paymentDescription = computed(() => {
-  return getCleanDescription(paymentData.value?.description)
-})
+// SÉCURITÉ : description fournie par le marchand / l'intégrateur => assainie
+// avant v-html (XSS stockée => vol du token de session).
+const paymentDescription = useSafeHtml(() => getCleanDescription(paymentData.value?.description))
 
 // Watcher pour réinitialiser la méthode de paiement si elle devient désactivée
 watch(displayAmount, (newAmount) => {

@@ -412,7 +412,7 @@
               <h4 class="font-semibold text-sm sm:text-base" style="color: #0A1F44">
                 {{ formData.title || 'Titre du produit' }}
               </h4>
-              <p v-html="formData.description" class="text-xs sm:text-sm text-gray-600 mt-1">
+              <p v-html="safeDescriptionPreview" class="text-xs sm:text-sm text-gray-600 mt-1">
               </p>
             </div>
             <div class="pt-3 sm:pt-4 border-t">
@@ -479,6 +479,9 @@ const { token, user } = useAuth()
 const onBack = () => {
   router.push('/dashboard/links')
 }
+
+// SÉCURITÉ : aperçu assaini (même rendu que la page de paiement publique).
+const safeDescriptionPreview = useSafeHtml(() => formData.value.description)
 
 const formData = ref({
   title: '',

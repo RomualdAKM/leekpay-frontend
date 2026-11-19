@@ -95,10 +95,10 @@
     </div>
     
     <!-- Custom CSS -->
-    <component 
-      v-if="pageData?.settings?.customCss" 
-      :is="'style'" 
-      v-html="pageData.settings.customCss" 
+    <component
+      v-if="safeCustomCss"
+      :is="'style'"
+      v-html="safeCustomCss"
     />
   </div>
 </template>
@@ -129,6 +129,40 @@ const sortedBlocks = computed(() => {
 const checkoutUrl = computed(() => {
   return pageData.value?.payment_link?.checkout_url || ''
 })
+
+// SÉCURITÉ : CSS du marchand. Un « < » permettrait de fermer la balise <style>
+// et d'injecter du HTML ; il n'a pas d'usage légitime hors chaînes CSS.
+const safeCustomCss = computed(() => {
+  const css = pageData.value?.settings?.customCss
+  return typeof css === 'string' && css ? css.replace(/</g, '\\3C ') : ''
+})
+
+// SÉCURITÉ : neutralise toute URL dangereuse (javascript:, data:text/html...)
+// dans les données de la page AVANT rendu : href, window.open, iframe src...
+const URL_KEY = /(url|link|href|src)$/i
+const SAFE_DATA_IMAGE = /^data:image\/(png|jpe?g|gif|webp);base64,/i
+const sanitizePageUrls = (value: any, key = ''): any => {
+  if (Array.isArray(value)) return value.map(v => sanitizePageUrls(v, key))
+  if (value && typeof value === 'object') {
+    const out: Record<string, any> = {}
+    for (const [k, v] of Object.entries(value)) out[k] = sanitizePageUrls(v, k)
+    return out
+  }
+  if (typeof value === 'string' && URL_KEY.test(key) && value.trim()) {
+    return SAFE_DATA_IMAGE.test(value.trim()) ? value : (safeLinkUrl(value) ?? '')
+  }
+  return value
+}
+
+// Le code personnalisé du marchand ne s'exécute JAMAIS sur le domaine principal
+// (leekpay.me/s/...) : le token de session y est lisible en JS. Il reste actif
+// sur le sous-domaine du marchand (slug.leekpay.me) ou son domaine perso.
+const isMainLeekpayHost = () => {
+  const host = window.location.hostname.toLowerCase()
+  const label = host.split('.')[0]
+  return ['leekpay.me', 'www.leekpay.me', 'leekpay.fr', 'www.leekpay.fr', 'localhost', '127.0.0.1'].includes(host)
+    || ['www', 'app', 'api', 'admin', 'dashboard'].includes(label)
+}
 
 const pageStyles = computed(() => {
   const theme = pageData.value?.theme || {}
@@ -217,8 +251,8 @@ const injectTrackingScripts = () => {
     }
   }
   
-  // Code personnalisé (avancé)
-  if (tracking.customCode) {
+  // Code personnalisé (avancé) — jamais sur le domaine principal (voir isMainLeekpayHost)
+  if (tracking.customCode && !isMainLeekpayHost()) {
     const customDiv = document.createElement('div')
     customDiv.innerHTML = tracking.customCode
     // Exécuter les scripts dans le code personnalisé
@@ -252,7 +286,7 @@ const fetchPageData = async () => {
     )
     
     if (response.success) {
-      pageData.value = response.data
+      pageData.value = sanitizePageUrls(response.data)
     } else {
       error.value = true
     }

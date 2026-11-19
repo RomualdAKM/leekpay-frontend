@@ -24,7 +24,7 @@
           v-if="!isEditMode"
           :class="template.styles.text"
           :style="{ ...textStyles, ...contentPositionStyles }"
-          v-html="props.content"
+          v-html="safeContent"
         />
         <!-- Mode édition: contenteditable avec HTML -->
         <div 
@@ -37,7 +37,7 @@
           @blur="onBlur($event, 'content')"
           @keydown="onKeydown"
           ref="contentRef"
-          v-html="props.content"
+          v-html="safeContent"
         />
         
         <!-- Bouton optionnel -->
@@ -132,6 +132,9 @@ interface Props {
   contentOffsetY?: number
   buttonOffsetY?: number
 }
+
+// SÉCURITÉ : contenu HTML du marchand assaini avant v-html (affichage ET édition).
+const safeContent = useSafeHtml(() => props.content)
 
 const props = withDefaults(defineProps<Props>(), {
   blockId: '',

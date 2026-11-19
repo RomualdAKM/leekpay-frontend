@@ -338,7 +338,7 @@
           </div>
           <div class="pt-3">
             <h4 class="font-semibold">{{ formData.title || 'Titre' }}</h4>
-            <p v-html="formData.description" class="text-sm text-gray-600">
+            <p v-html="safeDescriptionPreview" class="text-sm text-gray-600">
             </p>
             <p class="text-xs sm:text-sm text-gray-600 mb-1">
               URL:
@@ -376,6 +376,9 @@ const router = useRouter()
 const route = useRoute()
 const config = useRuntimeConfig()
 const { token } = useAuth()
+
+// SÉCURITÉ : aperçu assaini (même rendu que la page de paiement publique).
+const safeDescriptionPreview = useSafeHtml(() => formData.value.description)
 
 const formData = ref({
   title: '',
