@@ -343,7 +343,8 @@ import {
   ImageIcon,
   RotateCcwIcon,
   PercentIcon,
-  CalculatorIcon
+  CalculatorIcon,
+  GlobeIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -382,6 +383,7 @@ const isActive = (section) => {
 const adminItems = computed(() => [
   { id: 'dashboard/admin/stats', label: 'Statistiques', icon: BarChart3Icon },
   { id: 'dashboard/admin/transactions', label: 'Transactions', icon: CreditCardIcon },
+  { id: 'dashboard/admin/integrations', label: 'Intégrations', icon: GlobeIcon },
   { id: 'dashboard/admin/links', label: 'Liens', icon: Link2Icon },
   { id: 'dashboard/admin/sales-pages', label: 'Pages de vente', icon: LayoutIcon },
   { id: 'dashboard/admin/invoices', label: 'Factures', icon: FileTextIcon },

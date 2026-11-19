@@ -217,8 +217,20 @@ function formatAmount(value) {
   return new Intl.NumberFormat('fr-FR').format(value)
 }
 
+// Site qui embarque le widget (iframe : ancestorOrigins ; popup/redirection :
+// referrer). Envoyé au backend pour tracer la source du paiement.
+const sourceReferrer = ref('')
+const detectSourceReferrer = () => {
+  try {
+    const ancestors = window.location.ancestorOrigins
+    if (ancestors && ancestors.length) return ancestors[0]
+  } catch (e) { /* navigateur sans ancestorOrigins */ }
+  return document.referrer || ''
+}
+
 // Initialisation
 onMounted(() => {
+  sourceReferrer.value = detectSourceReferrer()
   amount.value = parseFloat(route.query.amount) || 0
   currency.value = route.query.currency || 'XOF'
   
@@ -270,6 +282,7 @@ async function processPayment() {
         return_url: returnUrl.value,
         customer_email: payerEmail.value,
         customer_name: payerName.value,
+        source_referrer: sourceReferrer.value || undefined,
       },
     })
 

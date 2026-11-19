@@ -42,6 +42,28 @@
             <option value="failed">Échoué</option>
           </select>
         </div>
+        <div class="min-w-48">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Source</label>
+          <select
+            v-model="filters.source_channel"
+            @change="loadTransactions()"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          >
+            <option value="all">Toutes les sources</option>
+            <option value="api">API</option>
+            <option value="widget">Widget</option>
+            <option value="link">Lien de paiement</option>
+            <option value="invoice">Facture</option>
+            <option value="sales_page">Page de vente</option>
+            <option value="unknown">Non renseignée</option>
+          </select>
+        </div>
+      </div>
+      <div v-if="filters.source_domain" class="mt-3">
+        <span class="inline-flex items-center gap-2 px-3 py-1 text-xs font-medium bg-green-50 text-green-700 border border-green-200 rounded-full">
+          Site : {{ filters.source_domain }}
+          <button type="button" class="hover:text-green-900" title="Retirer le filtre" @click="clearDomainFilter">✕</button>
+        </span>
       </div>
     </div>
 
@@ -83,6 +105,9 @@
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Client
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Source
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Fournisseur
@@ -127,6 +152,28 @@
                 <td class="px-6 py-4">
                   <div class="text-sm text-gray-900">{{ transaction.payer_email || 'N/A' }}</div>
                   <div class="text-xs text-gray-500">{{ transaction.payer_phone || 'N/A' }}</div>
+                </td>
+                <td class="px-6 py-4 max-w-56">
+                  <span
+                    class="inline-flex px-2 py-0.5 text-xs font-medium rounded"
+                    :class="getSourceClass(transaction.source_channel)"
+                  >
+                    {{ getSourceLabel(transaction.source_channel) }}
+                  </span>
+                  <div v-if="transaction.source_domain" class="mt-1" :title="sourceTooltip(transaction)">
+                    <a
+                      v-if="safeUrl(transaction.source_url)"
+                      :href="safeUrl(transaction.source_url)"
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      class="text-sm text-green-700 hover:underline break-all"
+                    >{{ transaction.source_domain }}</a>
+                    <span v-else class="text-sm text-gray-900 break-all">{{ transaction.source_domain }}</span>
+                  </div>
+                  <div v-else class="text-xs text-gray-400 mt-1">Accès direct / inconnu</div>
+                  <div v-if="transaction.source_ip" class="text-xs text-gray-400 font-mono" :title="ipLabel(transaction)">
+                    {{ transaction.source_ip }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm font-medium text-gray-900">{{ formatProvider(transaction.payment_provider) }}</div>
@@ -198,6 +245,26 @@
                 <div>
                   <div class="text-xs text-gray-500">Client</div>
                   <div class="text-gray-900">{{ transaction.payer_email || 'N/A' }}</div>
+                </div>
+                <div class="col-span-2">
+                  <div class="text-xs text-gray-500">Source</div>
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span
+                      class="inline-flex px-2 py-0.5 text-xs font-medium rounded"
+                      :class="getSourceClass(transaction.source_channel)"
+                    >
+                      {{ getSourceLabel(transaction.source_channel) }}
+                    </span>
+                    <a
+                      v-if="transaction.source_domain && safeUrl(transaction.source_url)"
+                      :href="safeUrl(transaction.source_url)"
+                      target="_blank"
+                      rel="noopener noreferrer nofollow"
+                      class="text-green-700 hover:underline break-all"
+                    >{{ transaction.source_domain }}</a>
+                    <span v-else-if="transaction.source_domain" class="text-gray-900 break-all">{{ transaction.source_domain }}</span>
+                    <span v-else class="text-xs text-gray-400">Accès direct / inconnu</span>
+                  </div>
                 </div>
                 <div>
                   <div class="text-xs text-gray-500">Fournisseur</div>
@@ -276,15 +343,71 @@ const loading = ref(true)
 const error = ref(null)
 const downloadingIds = ref([])
 
-// Filtres
-const filters = ref({
-  search: '',
-  status: 'all'
-})
-
 // Composables
 const config = useRuntimeConfig()
 const { token } = useAuth()
+const route = useRoute()
+const router = useRouter()
+
+// Filtres (?source_domain=... depuis la page Intégrations)
+const filters = ref({
+  search: '',
+  status: 'all',
+  source_channel: typeof route.query.source_channel === 'string' ? route.query.source_channel : 'all',
+  source_domain: typeof route.query.source_domain === 'string' ? route.query.source_domain : ''
+})
+
+// ---- Source du paiement ----
+const SOURCE_LABELS = {
+  api: 'API',
+  widget: 'Widget',
+  link: 'Lien',
+  invoice: 'Facture',
+  sales_page: 'Page de vente'
+}
+const SOURCE_CLASSES = {
+  api: 'bg-purple-100 text-purple-700',
+  widget: 'bg-blue-100 text-blue-700',
+  link: 'bg-gray-100 text-gray-700',
+  invoice: 'bg-amber-100 text-amber-700',
+  sales_page: 'bg-teal-100 text-teal-700'
+}
+const DETECTED_FROM_LABELS = {
+  client_referrer: 'page du site qui a ouvert le paiement',
+  payer_referrer: 'page d\'où vient le client',
+  origin: 'en-tête Origin',
+  referer: 'en-tête Referer',
+  user_agent_url: 'User-Agent du serveur (ex. WordPress)',
+  return_url: 'return_url de l\'intégration',
+  cancel_url: 'cancel_url de l\'intégration',
+  webhook_url: 'webhook_url de l\'intégration'
+}
+
+const getSourceLabel = (channel) => SOURCE_LABELS[channel] || 'Non renseignée'
+const getSourceClass = (channel) => SOURCE_CLASSES[channel] || 'bg-gray-50 text-gray-500'
+
+// N'autoriser que des liens http(s) (jamais javascript:, data:, ...)
+const safeUrl = (url) => (typeof url === 'string' && /^https?:\/\//i.test(url) ? url : null)
+
+const sourceTooltip = (t) => {
+  const from = t.source_details?.detected_from
+  const parts = []
+  if (t.source_url) parts.push(t.source_url)
+  if (from) parts.push(`Détecté via : ${DETECTED_FROM_LABELS[from] || from}`)
+  return parts.join('\n')
+}
+
+const ipLabel = (t) => (['api', 'widget'].includes(t.source_channel)
+  ? 'IP de l\'intégrateur (serveur ou navigateur ayant créé le paiement)'
+  : 'IP du client')
+
+const clearDomainFilter = () => {
+  filters.value.source_domain = ''
+  const query = { ...route.query }
+  delete query.source_domain
+  router.replace({ query })
+  loadTransactions()
+}
 
 // Fonction pour formater les montants
 const formatCurrency = (amount, currencyCode = 'XOF') => {
@@ -372,6 +495,14 @@ const loadTransactions = async (page = 1) => {
     
     if (filters.value.search.trim()) {
       params.append('search', filters.value.search.trim())
+    }
+
+    if (filters.value.source_channel !== 'all') {
+      params.append('source_channel', filters.value.source_channel)
+    }
+
+    if (filters.value.source_domain) {
+      params.append('source_domain', filters.value.source_domain)
     }
     
     const response = await fetch(`${config.public.apiBaseURL}/admin/transactions?${params}`, {

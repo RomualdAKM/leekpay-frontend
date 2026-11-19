@@ -136,6 +136,7 @@ const pageMap = {
   'dashboard/support': 'Support',
   'dashboard/admin/stats': 'Statistiques',
   'dashboard/admin/transactions': 'Transactions',
+  'dashboard/admin/integrations': 'Intégrations',
   'dashboard/admin/links': 'Liens',
   'dashboard/admin/sales-pages': 'Pages de vente',
   'dashboard/admin/invoices': 'Factures',

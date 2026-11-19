@@ -468,6 +468,10 @@ const triggerPayment = async () => {
       payer_phone: fullPhoneNumber
     }
 
+    if (sourceReferrer.value) {
+      paymentPayload.source_referrer = sourceReferrer.value
+    }
+
     if (paymentData.value.amount_type === 'flexible') {
       paymentPayload.amount = parseFloat(formData.value.amount)
     } else {
@@ -800,10 +804,22 @@ const scrollToPaymentForm = () => {
   }
 }
 
+// Source du paiement (site d'où vient le client) : captée dès l'arrivée sur la
+// page, envoyée à l'initialisation. Rien à faire côté marchand.
+const sourceReferrer = ref('')
+const detectSourceReferrer = () => {
+  try {
+    const ancestors = window.location.ancestorOrigins
+    if (ancestors && ancestors.length) return ancestors[0]
+  } catch (e) { /* navigateur sans ancestorOrigins */ }
+  return document.referrer || ''
+}
+
 onMounted(() => {
+  sourceReferrer.value = detectSourceReferrer()
   initializeDefaultCountry()
   document.addEventListener('click', handleClickOutside)
-  
+
   // Ajouter le listener de scroll pour détecter la visibilité du formulaire
   window.addEventListener('scroll', throttledCheckVisibility)
   
