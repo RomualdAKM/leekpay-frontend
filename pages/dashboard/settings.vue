@@ -100,6 +100,24 @@
               </div>
             </div>
 
+            <!-- Changement d'email : mot de passe actuel exigé (sécurité du compte) -->
+            <div v-if="emailChanged" class="space-y-2">
+              <label for="email_current_password" class="text-sm font-medium text-gray-700">
+                Mot de passe actuel (requis pour changer d'email)
+              </label>
+              <Input
+                id="email_current_password"
+                type="password"
+                autocomplete="current-password"
+                v-model="emailCurrentPassword"
+                class="text-sm"
+                :class="{ 'border-red-500': apiErrors.current_password }"
+              />
+              <div v-if="apiErrors.current_password" class="text-red-500 text-sm">
+                <p v-for="error in apiErrors.current_password" :key="error">{{ error }}</p>
+              </div>
+            </div>
+
             <Button 
               @click="saveProfile" 
               :disabled="profileLoading"
@@ -361,6 +379,12 @@ const profile = ref({
   email: user.value?.email || ''
 })
 
+// Changement d'email => mot de passe actuel exigé par le backend.
+const emailCurrentPassword = ref('')
+const emailChanged = computed(() =>
+  (profile.value.email || '').trim().toLowerCase() !== (user.value?.email || '').trim().toLowerCase()
+)
+
 // Sécurité
 const security = ref({
   currentPassword: "",
@@ -392,10 +416,15 @@ const saveProfile = async () => {
   successMessage.value = ''
 
   try {
-    const response = await updateProfile({
+    const payload = {
       name: profile.value.name,
       email: profile.value.email
-    })
+    }
+    if (emailChanged.value) {
+      payload.current_password = emailCurrentPassword.value
+    }
+    const response = await updateProfile(payload)
+    emailCurrentPassword.value = ''
 
     displayToast(response.message || 'Profil mis à jour avec succès')
   } catch (err) {

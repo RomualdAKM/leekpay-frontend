@@ -59,7 +59,21 @@
             <div v-if="key.webhook_url" class="text-sm text-gray-500">
               Webhook: <span class="font-mono">{{ key.webhook_url }}</span>
             </div>
-            
+
+            <!-- Secret de signature des webhooks (X-LeekPay-Signature-V2) -->
+            <div class="text-sm">
+              <div v-if="webhookSecrets[key.id]" class="flex flex-wrap items-center gap-2">
+                <span class="text-xs text-gray-500">Secret webhook :</span>
+                <code class="text-xs font-mono text-gray-700 bg-gray-50 px-2 py-1 rounded break-all">{{ webhookSecrets[key.id] }}</code>
+                <button @click="copyToClipboard(webhookSecrets[key.id])" class="text-gray-400 hover:text-gray-600 text-xs">Copier</button>
+                <button @click="hideWebhookSecret(key.id)" class="text-gray-400 hover:text-gray-600 text-xs">Masquer</button>
+                <button @click="rotateWebhookSecret(key)" class="text-gray-400 hover:text-red-600 text-xs">Régénérer</button>
+              </div>
+              <button v-else @click="revealWebhookSecret(key.id)" class="text-xs text-gray-500 hover:text-gray-800 underline">
+                Afficher le secret webhook (whsec_…)
+              </button>
+            </div>
+
             <div v-if="key.last_used_at" class="text-xs text-gray-400">
               Utilisée le {{ formatDate(key.last_used_at) }}
             </div>
@@ -125,10 +139,16 @@
             <NuxtLink to="/docs#webhooks" class="text-xs text-gray-500 hover:text-gray-700">Documentation</NuxtLink>
           </div>
           <p class="text-xs text-gray-500 mb-3">
-            Utilisez votre <strong>clé publique</strong> pour vérifier la signature <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature</code>
+            Vérifiez l'en-tête <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature-V2</code> avec votre
+            <strong>secret webhook</strong> (whsec_…, ci-dessus). Ne vous fiez plus à l'ancien en-tête
+            <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature</code> (signé avec la clé publique, falsifiable, bientôt supprimé).
           </p>
           <div class="bg-gray-900 rounded p-4 overflow-x-auto">
-            <pre class="text-sm font-mono"><code class="text-gray-300">$signature = hash_hmac('sha256', $payload, '{{ apiKeys[0]?.public_key || 'pk_live_xxx' }}');</code></pre>
+            <pre class="text-sm font-mono"><code class="text-gray-300">// En-tête : X-LeekPay-Signature-V2: t=1700000000,v1=&lt;hex&gt;
+parse_str(str_replace(',', '&amp;', $_SERVER['HTTP_X_LEEKPAY_SIGNATURE_V2'] ?? ''), $sig);
+$payload  = file_get_contents('php://input');
+$expected = hash_hmac('sha256', ($sig['t'] ?? '') . '.' . $payload, 'whsec_votre_secret');
+$ok = hash_equals($expected, $sig['v1'] ?? '') &amp;&amp; abs(time() - (int) ($sig['t'] ?? 0)) &lt; 300;</code></pre>
           </div>
         </div>
       </div>
@@ -218,6 +238,16 @@
               </button>
             </div>
           </div>
+
+          <div v-if="createdKeys.webhook_secret">
+            <label class="block text-xs text-gray-500 mb-1">Secret webhook (vérification de X-LeekPay-Signature-V2)</label>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-gray-50 px-3 py-2 rounded font-mono text-sm text-gray-700 break-all">{{ createdKeys.webhook_secret }}</code>
+              <button @click="copyToClipboard(createdKeys.webhook_secret)" class="text-xs text-gray-500 hover:text-gray-700 px-2">
+                Copier
+              </button>
+            </div>
+          </div>
         </div>
         
         <div class="mt-6 pt-4 border-t border-gray-100">
@@ -292,7 +322,8 @@ async function createApiKey() {
     if (response.success) {
       createdKeys.value = {
         public_key: response.data.public_key,
-        secret_key: response.data.secret_key
+        secret_key: response.data.secret_key,
+        webhook_secret: response.data.webhook_secret || ''
       }
       showCreateModal.value = false
       showSecretModal.value = true
@@ -311,7 +342,44 @@ async function createApiKey() {
 
 function closeSecretModal() {
   showSecretModal.value = false
-  createdKeys.value = { public_key: '', secret_key: '' }
+  createdKeys.value = { public_key: '', secret_key: '', webhook_secret: '' }
+}
+
+// ---- Secret de signature des webhooks (par clé) ----
+const webhookSecrets = ref({})
+
+async function revealWebhookSecret(id) {
+  try {
+    const response = await $fetch(`${config.public.apiBaseURL}/api-keys/${id}/webhook-secret`, {
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    if (response.success) {
+      webhookSecrets.value = { ...webhookSecrets.value, [id]: response.data.webhook_secret }
+    }
+  } catch (error) {
+    alert(error.data?.message || 'Impossible de récupérer le secret webhook')
+  }
+}
+
+function hideWebhookSecret(id) {
+  const next = { ...webhookSecrets.value }
+  delete next[id]
+  webhookSecrets.value = next
+}
+
+async function rotateWebhookSecret(key) {
+  if (!confirm(`Régénérer le secret webhook de "${key.name}" ? Les webhooks suivants seront signés avec le NOUVEAU secret : mettez votre serveur à jour immédiatement.`)) return
+  try {
+    const response = await $fetch(`${config.public.apiBaseURL}/api-keys/${key.id}/webhook-secret/rotate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token.value}` }
+    })
+    if (response.success) {
+      webhookSecrets.value = { ...webhookSecrets.value, [key.id]: response.data.webhook_secret }
+    }
+  } catch (error) {
+    alert(error.data?.message || 'Erreur lors de la régénération')
+  }
 }
 
 function editKey(key) {

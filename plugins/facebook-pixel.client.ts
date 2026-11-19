@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
   }
 
   // Ne charger que sur les pages connues de l'app (pas les custom_url de paiement)
-  const knownAppPaths = ['/', '/login', '/register', '/forgot-password', '/verify-email', '/dashboard', '/a-propos', '/docs', '/api', '/invoices', '/payment-links', '/sales-pages', '/print'];
+  const knownAppPaths = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/verify-email', '/dashboard', '/a-propos', '/docs', '/api', '/invoices', '/payment-links', '/sales-pages', '/print'];
   const isKnownPath = knownAppPaths.some(p => pathname === p || pathname.startsWith(p + '/'));
   if (!isKnownPath) {
     return; // C'est probablement un custom_url de paiement

@@ -50,7 +50,7 @@ export const useAuth = () => {
     }
 
     // Mise à jour du profil
-    const updateProfile = async (profileData: { name?: string, email?: string }) => {
+    const updateProfile = async (profileData: { name?: string, email?: string, current_password?: string }) => {
         const config = useRuntimeConfig()
         const response = await $fetch<{
             success: boolean

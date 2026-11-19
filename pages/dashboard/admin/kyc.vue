@@ -198,7 +198,7 @@
                       :src="getDocumentUrl(selectedKyc.id_card_front_url)"
                       alt="Recto carte"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.id_card_front_url))"
+                      @click="openImageFullscreen('id_card_front_url')"
                       @error="handleImageError"
                     />
                     <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
@@ -212,7 +212,7 @@
                       :src="getDocumentUrl(selectedKyc.id_card_back_url)"
                       alt="Verso carte"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.id_card_back_url))"
+                      @click="openImageFullscreen('id_card_back_url')"
                       @error="handleImageError"
                     />
                     <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
@@ -226,7 +226,7 @@
                       :src="getDocumentUrl(selectedKyc.selfie_with_card_url)"
                       alt="Selfie"
                       class="w-full h-40 object-cover rounded cursor-pointer hover:opacity-90"
-                      @click="openImageFullscreen(getDocumentUrl(selectedKyc.selfie_with_card_url))"
+                      @click="openImageFullscreen('selfie_with_card_url')"
                       @error="handleImageError"
                     />
                     <div v-else class="w-full h-40 bg-gray-100 rounded flex items-center justify-center text-gray-400">
@@ -325,6 +325,10 @@ const showModal = ref(false)
 const selectedKyc = ref(null)
 const rejectionReason = ref('')
 const fullscreenImage = ref(null)
+
+// Les URLs signées des documents KYC expirent après 10 min (côté API)
+const DOCUMENT_URL_MAX_AGE_MS = 9 * 60 * 1000
+let documentUrlsFetchedAt = 0
 
 const filters = reactive({
   search: '',
@@ -438,6 +442,7 @@ const openKycModal = async (kyc) => {
     
     if (response.success) {
       selectedKyc.value = response.data
+      documentUrlsFetchedAt = Date.now()
       rejectionReason.value = ''
       showModal.value = true
     }
@@ -452,18 +457,37 @@ const closeModal = () => {
   rejectionReason.value = ''
 }
 
-const openImageFullscreen = (url) => {
-  fullscreenImage.value = url
+// Si la modale est restée ouverte au-delà de la validité des URLs signées,
+// on les régénère avant d'afficher le plein écran.
+const openImageFullscreen = async (field) => {
+  if (!selectedKyc.value) return
+
+  if (Date.now() - documentUrlsFetchedAt > DOCUMENT_URL_MAX_AGE_MS) {
+    const kycId = selectedKyc.value.id
+    try {
+      const response = await $fetch(`${config.public.apiBaseURL}/admin/kyc/${kycId}`, {
+        headers: {
+          Authorization: `Bearer ${token.value}`
+        }
+      })
+      if (response.success && selectedKyc.value?.id === kycId) {
+        selectedKyc.value = response.data
+        documentUrlsFetchedAt = Date.now()
+      }
+    } catch (error) {
+      console.error('Erreur rafraîchissement des documents KYC:', error)
+    }
+  }
+
+  fullscreenImage.value = getDocumentUrl(selectedKyc.value?.[field])
 }
 
-// Construire l'URL du document avec le token pour l'authentification
+// L'API fournit des URLs SIGNÉES temporaires (10 min) : on les utilise telles quelles.
+// Ne JAMAIS ajouter le token d'authentification dans l'URL (fuite dans logs/proxys/historique).
 const getDocumentUrl = (url) => {
   if (!url) return null
-  // Si l'URL est relative, ajouter la base URL
-  const fullUrl = url.startsWith('http') ? url : `${config.public.apiBaseURL}${url.replace('/api', '')}`
-  // Ajouter le token pour l'authentification
-  const separator = fullUrl.includes('?') ? '&' : '?'
-  return `${fullUrl}${separator}token=${token.value}`
+  // Si l'URL est relative, ajouter la base URL (la signature porte sur le chemin + query)
+  return url.startsWith('http') ? url : `${config.public.apiBaseURL}${url.replace('/api', '')}`
 }
 
 const handleImageError = (event) => {

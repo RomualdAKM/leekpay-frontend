@@ -8,7 +8,7 @@
           <div class="mb-8">
             <h1 class="text-3xl font-bold text-slate-900 mb-6">Mot de passe oublié ?</h1>
             <p class="text-gray-700 mb-6">
-              Entrez votre adresse e-mail ci-dessous et nous vous enverrons un mot de passe temporaire.
+              Entrez votre adresse e-mail ci-dessous et nous vous enverrons un lien pour choisir un nouveau mot de passe.
             </p>
           </div>
 

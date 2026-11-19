@@ -439,7 +439,8 @@ POST https://votresite.com/webhook
 Content-Type: application/json
 X-LeekPay-Event: payment.completed
 X-LeekPay-Delivery: 12345
-X-LeekPay-Signature: 5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a...
+X-LeekPay-Timestamp: 1768473000
+X-LeekPay-Signature-V2: t=1768473000,v1=5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a...
 
 {
   "event": "payment.completed",
@@ -465,24 +466,33 @@ X-LeekPay-Signature: 5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a...
           <div class="mb-8">
             <h3 class="text-sm font-medium text-gray-900 mb-3">Vérifier la signature (sécurité)</h3>
             <p class="text-xs text-gray-500 mb-3">
-              La signature <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature</code> est envoyée dans les headers HTTP. 
-              Utilisez votre <strong>clé publique</strong> pour la vérifier.
+              Chaque webhook porte l'en-tête <code class="bg-gray-100 px-1 rounded">X-LeekPay-Signature-V2: t=&lt;timestamp&gt;,v1=&lt;signature&gt;</code>.
+              <code class="bg-gray-100 px-1 rounded">v1</code> = HMAC-SHA256 de <code class="bg-gray-100 px-1 rounded">"&lt;timestamp&gt;.&lt;corps brut&gt;"</code>
+              avec votre <strong>secret webhook</strong> (<code class="bg-gray-100 px-1 rounded">whsec_…</code>, visible dans
+              <strong>Dashboard → Clés API</strong>). Refusez aussi les messages trop anciens (plus de 5 minutes) pour bloquer les rejeux.
+            </p>
+            <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2 mb-3">
+              Important : l'ancien en-tête <code>X-LeekPay-Signature</code> était signé avec la clé <strong>publique</strong>,
+              que n'importe qui peut lire. Il est déprécié et va être supprimé : ne l'utilisez plus.
+              En cas de doute, confirmez toujours le paiement via <code>GET /api/v1/checkout/{id}</code>.
             </p>
             <div class="bg-gray-900 rounded p-4 overflow-x-auto">
               <pre class="text-sm font-mono"><code class="text-gray-300">&lt;?php
-// Exemple PHP : vérification de la signature webhook
+// Exemple PHP : vérification de la signature webhook (V2)
 
-// 1. Récupérer la signature envoyée par LeekPay
-$signature = $_SERVER['HTTP_X_LEEKPAY_SIGNATURE'];
+// 1. Lire l'en-tête « t=...,v1=... » envoyé par LeekPay
+parse_str(str_replace(',', '&amp;', $_SERVER['HTTP_X_LEEKPAY_SIGNATURE_V2'] ?? ''), $sig);
+$timestamp = $sig['t'] ?? '';
+$signature = $sig['v1'] ?? '';
 
-// 2. Récupérer le corps de la requête (payload JSON)
+// 2. Récupérer le corps BRUT de la requête (ne pas le ré-encoder)
 $payload = file_get_contents('php://input');
 
-// 3. Calculer la signature attendue avec votre clé publique
-$expected = hash_hmac('sha256', $payload, 'pk_live_votre_cle_publique');
+// 3. Calculer la signature attendue avec votre SECRET WEBHOOK
+$expected = hash_hmac('sha256', $timestamp . '.' . $payload, 'whsec_votre_secret_webhook');
 
-// 4. Comparer les signatures de manière sécurisée
-if (hash_equals($expected, $signature)) {
+// 4. Comparer de manière sécurisée + refuser les rejeux (> 5 min)
+if (hash_equals($expected, $signature) &amp;&amp; abs(time() - (int) $timestamp) &lt; 300) {
     // Signature valide : traiter le paiement
     $data = json_decode($payload, true);
     $transactionId = $data['data']['transaction_id'];
